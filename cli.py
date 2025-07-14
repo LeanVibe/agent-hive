@@ -53,13 +53,8 @@ class LeanVibeCLI:
             self.resource_manager = ResourceManager(self.resource_limits)
             self.scaling_manager = ScalingManager(self.resource_limits)
             print("✅ LeanVibe Agent Hive systems initialized")
-        except ImportError as e:
-            print(f"❌ Import error: {e}")
-            print("💡 Make sure you have installed all dependencies: pip install -r requirements.txt")
-            sys.exit(1)
         except Exception as e:
             print(f"❌ Failed to initialize systems: {e}")
-            print("💡 Check if the advanced_orchestration module is available")
             sys.exit(1)
     
     async def orchestrate(self, workflow: str = "default", validate: bool = False) -> None:
@@ -243,7 +238,7 @@ def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser."""
     parser = argparse.ArgumentParser(
         prog="leanvibe",
-        description="LeanVibe Agent Hive - Multi-Agent Orchestration System v1.0.0",
+        description="LeanVibe Agent Hive - Multi-Agent Orchestration System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -252,15 +247,7 @@ Examples:
   leanvibe monitor --metrics --real-time  
   leanvibe checkpoint --name milestone-1
   leanvibe checkpoint --list
-
-For more information, visit: https://github.com/leanvibe/agent-hive
         """
-    )
-    
-    parser.add_argument(
-        "--version", 
-        action="version", 
-        version="LeanVibe Agent Hive 1.0.0"
     )
     
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -375,22 +362,8 @@ async def main() -> None:
             
     except KeyboardInterrupt:
         print("\n👋 LeanVibe CLI interrupted by user")
-    except ImportError as e:
-        print(f"❌ Import Error: {e}")
-        print("💡 Make sure you have installed all dependencies and the advanced_orchestration module is available")
-        sys.exit(1)
-    except FileNotFoundError as e:
-        print(f"❌ File Not Found: {e}")
-        print("💡 Check if the file path is correct and you have read permissions")
-        sys.exit(1)
-    except PermissionError as e:
-        print(f"❌ Permission Error: {e}")
-        print("💡 Check if you have write permissions for checkpoints directory")
-        sys.exit(1)
     except Exception as e:
-        print(f"❌ Unexpected Error: {e}")
-        print("💡 For support, please report this issue with the full error message")
-        print("   Repository: https://github.com/leanvibe/agent-hive/issues")
+        print(f"❌ Error: {e}")
         sys.exit(1)
 
 
