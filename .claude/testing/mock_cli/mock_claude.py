@@ -9,11 +9,6 @@ import argparse
 from datetime import datetime
 
 
-def simulate_delay():
-    """Simulate realistic CLI response time."""
-    time.sleep(random.uniform(0.5, 2.0))
-
-
 def simulate_success_response(prompt: str) -> dict:
     """Simulate successful Claude response."""
     return {
@@ -53,8 +48,15 @@ def main():
     parser.add_argument("--error-type", help="Simulate specific error type")
     parser.add_argument("--delay", type=float, default=1.0, help="Response delay in seconds")
     parser.add_argument("--fail-rate", type=float, default=0.0, help="Failure rate (0.0-1.0)")
+    parser.add_argument("--format", help="Output format (ignored)")
+    parser.add_argument("--version", action="store_true", help="Show version")
     
     args = parser.parse_args()
+    
+    # Handle version request
+    if args.version:
+        print(json.dumps({"version": "mock-claude-1.0.0"}))
+        sys.exit(0)
     
     # Simulate delay
     time.sleep(args.delay)

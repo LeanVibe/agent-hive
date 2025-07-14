@@ -1,0 +1,376 @@
+2025-07-14 18:56:56 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 18:56:56 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 18:56:56 INFO     leanvibe.orchestrator                                Starting LeanVibe Orchestrator...
+2025-07-14 18:56:56 INFO     leanvibe.orchestrator [corr=052027e0]                Initializing LeanVibe Orchestrator
+2025-07-14 18:56:56 INFO     leanvibe.claude_agent [corr=052027e0]                ClaudeAgent initialized with CLI path: .claude/testing/mock_cli/mock_claude.py
+2025-07-14 18:56:56 INFO     leanvibe.orchestrator [corr=052027e0]                Claude agent initialized
+2025-07-14 18:56:56 INFO     leanvibe.orchestrator [corr=052027e0]                LeanVibe Orchestrator initialized successfully
+2025-07-14 18:56:56 INFO     leanvibe.orchestrator [corr=052027e0]                Orchestrator Status: {'agents': [{'id': 'orchestrator', 'status': 'initializing', 'current_task': 'Phase 0 setup', 'confidence': 0.9}], 'pending_decisions': [], 'performance': {'tasks_completed': 0, 'average_confidence': 0.8, 'success_rate': 1.0}, 'alerts': [], 'health': {'status': 'healthy', 'uptime': 'just started', 'memory_usage': 'low'}}
+2025-07-14 18:57:07 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 18:57:07 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 18:57:07 INFO     leanvibe.orchestrator                                Starting LeanVibe Orchestrator...
+2025-07-14 18:57:07 INFO     leanvibe.orchestrator [corr=de63e105]                Initializing LeanVibe Orchestrator
+2025-07-14 18:57:07 INFO     leanvibe.claude_agent [corr=de63e105]                ClaudeAgent initialized with CLI path: .claude/testing/mock_cli/mock_claude.py
+2025-07-14 18:57:07 INFO     leanvibe.orchestrator [corr=de63e105]                Claude agent initialized
+2025-07-14 18:57:07 INFO     leanvibe.orchestrator [corr=de63e105]                LeanVibe Orchestrator initialized successfully
+2025-07-14 18:57:07 INFO     leanvibe.orchestrator [corr=de63e105]                Orchestrator Status: {'agents': [{'id': 'orchestrator', 'status': 'initializing', 'current_task': 'Phase 0 setup', 'confidence': 0.9}], 'pending_decisions': [], 'performance': {'tasks_completed': 0, 'average_confidence': 0.8, 'success_rate': 1.0}, 'alerts': [], 'health': {'status': 'healthy', 'uptime': 'just started', 'memory_usage': 'low'}}
+2025-07-14 18:57:07 INFO     queue.task_queue     [corr=de63e105]                Task test-001 added to queue with priority 5
+2025-07-14 18:57:07 INFO     leanvibe.orchestrator [corr=de63e105]                Test task added to queue
+2025-07-14 18:57:09 INFO     leanvibe.orchestrator [corr=de63e105]                Queue status: {'pending': 1, 'assigned': 0, 'in_progress': 0, 'completed': 0, 'failed': 0, 'cancelled': 0}
+2025-07-14 18:57:09 INFO     leanvibe.orchestrator [corr=de63e105]                Shutting down orchestrator...
+2025-07-14 18:57:09 INFO     leanvibe.claude_agent [corr=de63e105]                Shutting down ClaudeAgent claude-primary
+2025-07-14 18:57:09 INFO     leanvibe.claude_agent [corr=de63e105]                Agent shutdown complete - Tasks completed: 0, Total execution time: 0.00s
+2025-07-14 18:57:09 INFO     leanvibe.orchestrator [corr=de63e105]                Agent claude-primary shutdown complete
+2025-07-14 18:57:09 INFO     leanvibe.orchestrator [corr=de63e105]                Orchestrator shutdown complete
+2025-07-14 18:57:09 INFO     leanvibe.orchestrator [corr=de63e105]                Phase 1 demonstration complete!
+2025-07-14 18:57:44 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 18:57:44 INFO     leanvibe.claude_agent                                ClaudeAgent initialized with CLI path: .claude/testing/mock_cli/mock_claude.py
+2025-07-14 18:57:44 ERROR    leanvibe.errors                                     Error in CLI command execution: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 103, in execute_command
+    process = await asyncio.create_subprocess_exec(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        stderr=stderr, **kwds)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_events.py", line 1781, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        protocol, popen_args, False, stdin, stdout, stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 213, in _make_subprocess_transport
+    transp = _UnixSubprocessTransport(self, protocol, args, shell,
+                                    stdin, stdout, stderr, bufsize,
+                                    waiter=waiter, extra=extra,
+                                    **kwargs)
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_subprocess.py", line 39, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                stderr=stderr, bufsize=bufsize, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 855, in _start
+    self._proc = subprocess.Popen(
+                 ~~~~~~~~~~~~~~~~^
+        args, shell=shell, stdin=stdin, stdout=stdout, stderr=stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        universal_newlines=False, bufsize=bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1036, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1966, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:44 ERROR    leanvibe.errors                                     Error in Health check failed: Command execution failed: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 103, in execute_command
+    process = await asyncio.create_subprocess_exec(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        stderr=stderr, **kwds)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_events.py", line 1781, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        protocol, popen_args, False, stdin, stdout, stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 213, in _make_subprocess_transport
+    transp = _UnixSubprocessTransport(self, protocol, args, shell,
+                                    stdin, stdout, stderr, bufsize,
+                                    waiter=waiter, extra=extra,
+                                    **kwargs)
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_subprocess.py", line 39, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                stderr=stderr, bufsize=bufsize, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 855, in _start
+    self._proc = subprocess.Popen(
+                 ~~~~~~~~~~~~~~~~^
+        args, shell=shell, stdin=stdin, stdout=stdout, stderr=stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        universal_newlines=False, bufsize=bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1036, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1966, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 452, in health_check
+    result = await self.cli_manager.execute_command(test_args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 157, in execute_command
+    raise CLIError(f"Command execution failed: {e}")
+agents.claude_agent.CLIError: Command execution failed: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:44 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Executing task: test-001 (code_generation)
+2025-07-14 18:57:44 ERROR    leanvibe.errors      [task=test-001, agent=test-agent] Error in CLI command execution: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 103, in execute_command
+    process = await asyncio.create_subprocess_exec(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        stderr=stderr, **kwds)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_events.py", line 1781, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        protocol, popen_args, False, stdin, stdout, stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 213, in _make_subprocess_transport
+    transp = _UnixSubprocessTransport(self, protocol, args, shell,
+                                    stdin, stdout, stderr, bufsize,
+                                    waiter=waiter, extra=extra,
+                                    **kwargs)
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_subprocess.py", line 39, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                stderr=stderr, bufsize=bufsize, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 855, in _start
+    self._proc = subprocess.Popen(
+                 ~~~~~~~~~~~~~~~~^
+        args, shell=shell, stdin=stdin, stdout=stdout, stderr=stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        universal_newlines=False, bufsize=bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1036, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1966, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:44 WARNING  leanvibe.claude_agent [task=test-001, agent=test-agent] Task test-001 failed (attempt 1), retrying in 1s: Command execution failed: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:45 ERROR    leanvibe.errors      [task=test-001, agent=test-agent] Error in CLI command execution: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 103, in execute_command
+    process = await asyncio.create_subprocess_exec(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        stderr=stderr, **kwds)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_events.py", line 1781, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        protocol, popen_args, False, stdin, stdout, stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 213, in _make_subprocess_transport
+    transp = _UnixSubprocessTransport(self, protocol, args, shell,
+                                    stdin, stdout, stderr, bufsize,
+                                    waiter=waiter, extra=extra,
+                                    **kwargs)
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_subprocess.py", line 39, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                stderr=stderr, bufsize=bufsize, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 855, in _start
+    self._proc = subprocess.Popen(
+                 ~~~~~~~~~~~~~~~~^
+        args, shell=shell, stdin=stdin, stdout=stdout, stderr=stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        universal_newlines=False, bufsize=bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1036, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1966, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:45 WARNING  leanvibe.claude_agent [task=test-001, agent=test-agent] Task test-001 failed (attempt 2), retrying in 2s: Command execution failed: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:47 ERROR    leanvibe.errors      [task=test-001, agent=test-agent] Error in CLI command execution: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 103, in execute_command
+    process = await asyncio.create_subprocess_exec(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        stderr=stderr, **kwds)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_events.py", line 1781, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        protocol, popen_args, False, stdin, stdout, stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 213, in _make_subprocess_transport
+    transp = _UnixSubprocessTransport(self, protocol, args, shell,
+                                    stdin, stdout, stderr, bufsize,
+                                    waiter=waiter, extra=extra,
+                                    **kwargs)
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_subprocess.py", line 39, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                stderr=stderr, bufsize=bufsize, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 855, in _start
+    self._proc = subprocess.Popen(
+                 ~~~~~~~~~~~~~~~~^
+        args, shell=shell, stdin=stdin, stdout=stdout, stderr=stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        universal_newlines=False, bufsize=bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1036, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1966, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:47 ERROR    leanvibe.claude_agent [task=test-001, agent=test-agent] Task test-001 failed after 3 attempts: Command execution failed: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:47 ERROR    leanvibe.errors      [task=test-001, agent=test-agent] Error in Task execution failed: test-001: Command execution failed: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 103, in execute_command
+    process = await asyncio.create_subprocess_exec(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        stderr=stderr, **kwds)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_events.py", line 1781, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        protocol, popen_args, False, stdin, stdout, stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 213, in _make_subprocess_transport
+    transp = _UnixSubprocessTransport(self, protocol, args, shell,
+                                    stdin, stdout, stderr, bufsize,
+                                    waiter=waiter, extra=extra,
+                                    **kwargs)
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/base_subprocess.py", line 39, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                stderr=stderr, bufsize=bufsize, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/asyncio/unix_events.py", line 855, in _start
+    self._proc = subprocess.Popen(
+                 ~~~~~~~~~~~~~~~~^
+        args, shell=shell, stdin=stdin, stdout=stdout, stderr=stderr,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        universal_newlines=False, bufsize=bufsize, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1036, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/uv/python/cpython-3.13.0-macos-aarch64-none/lib/python3.13/subprocess.py", line 1966, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 285, in execute_task
+    result = await self._execute_with_retries(task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 336, in _execute_with_retries
+    raise last_error
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 326, in _execute_with_retries
+    return await self._execute_single_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 351, in _execute_single_task
+    cli_result = await self.cli_manager.execute_command(args)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/.claude/agents/claude_agent.py", line 157, in execute_command
+    raise CLIError(f"Command execution failed: {e}")
+agents.claude_agent.CLIError: Command execution failed: [Errno 2] No such file or directory: '.claude/testing/mock_cli/mock_claude.py'
+2025-07-14 18:57:47 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Shutting down ClaudeAgent test-agent
+2025-07-14 18:57:47 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Cancelling current task: test-001
+2025-07-14 18:57:47 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Agent shutdown complete - Tasks completed: 0, Total execution time: 0.00s
+2025-07-14 18:58:24 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 18:58:24 INFO     leanvibe.claude_agent                                ClaudeAgent initialized with CLI path: /Users/bogdan/work/leanvibe-dev/agent-hive/.claude/testing/mock_cli/mock_claude.py
+2025-07-14 18:58:25 INFO     leanvibe.performance                                Performance: cli_command took 0.414s
+2025-07-14 18:58:25 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Executing task: test-001 (code_generation)
+2025-07-14 18:58:25 INFO     leanvibe.performance [task=test-001, agent=test-agent] Performance: cli_command took 0.025s
+2025-07-14 18:58:25 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Task test-001 completed successfully in 0.03s
+2025-07-14 18:58:25 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Shutting down ClaudeAgent test-agent
+2025-07-14 18:58:25 INFO     leanvibe.claude_agent [task=test-001, agent=test-agent] Agent shutdown complete - Tasks completed: 1, Total execution time: 0.03s

@@ -156,9 +156,17 @@ class ConfigLoader:
         agent_config = self.get_agent_config(agent_name)
         
         if self.should_use_mock_cli():
-            return agent_config.get('test_cli_path', agent_config.get('cli_path', ''))
+            path = agent_config.get('test_cli_path', agent_config.get('cli_path', ''))
         else:
-            return agent_config.get('cli_path', '')
+            path = agent_config.get('cli_path', '')
+        
+        # Make relative paths absolute
+        if path and not Path(path).is_absolute():
+            # Resolve relative to project root
+            project_root = Path(__file__).parent.parent.parent
+            path = str(project_root / path)
+        
+        return path
     
     def reload(self):
         """Reload configuration from file."""
