@@ -420,43 +420,60 @@ class PatternOptimizer:
     def train_models(self) -> Dict[str, float]:
         """Train ML models for pattern recognition and optimization."""
         
-        # Get training data
-        training_data = self._prepare_training_data()
-        if len(training_data) < self.config.min_data_points:
-            logger.warning(f"Insufficient training data: {len(training_data)} samples")
-            return {'error': 'insufficient_data'}
-        
-        X = training_data[self.feature_columns].values
-        y = training_data['performance_score'].values
-        
-        # Train clustering model for pattern grouping
-        self.cluster_model = KMeans(n_clusters=min(5, len(training_data) // 10), random_state=42)
-        X_scaled = self.scaler.fit_transform(X)
-        self.cluster_model.fit(X_scaled)
-        
-        # Train performance prediction model
-        self.performance_model = RandomForestRegressor(
-            n_estimators=100,
-            max_depth=10,
-            random_state=42
-        )
-        self.performance_model.fit(X, y)
-        
-        # Calculate model performance
-        y_pred = self.performance_model.predict(X)
-        mse = mean_squared_error(y, y_pred)
-        r2 = r2_score(y, y_pred)
-        
-        metrics = {
-            'model_version': self.model_version,
-            'training_samples': len(training_data),
-            'mse': mse,
-            'r2_score': r2,
-            'clusters': self.cluster_model.n_clusters
-        }
-        
-        logger.info(f"Model training completed: {metrics}")
-        return metrics
+        try:
+            # Get training data
+            training_data = self._prepare_training_data()
+            if len(training_data) < self.config.min_data_points:
+                logger.warning(f"Insufficient training data: {len(training_data)} samples")
+                return {'error': 'insufficient_data'}
+            
+            X = training_data[self.feature_columns].values
+            y = training_data['performance_score'].values
+            
+            # Train clustering model for pattern grouping
+            try:
+                self.cluster_model = KMeans(n_clusters=min(5, len(training_data) // 10), random_state=42)
+                X_scaled = self.scaler.fit_transform(X)
+                self.cluster_model.fit(X_scaled)
+            except (ValueError, MemoryError) as e:
+                logger.error(f"Clustering model training failed: {e}")
+                return {'error': 'clustering_failed', 'details': str(e)}
+            
+            # Train performance prediction model
+            try:
+                self.performance_model = RandomForestRegressor(
+                    n_estimators=100,
+                    max_depth=10,
+                    random_state=42
+                )
+                self.performance_model.fit(X, y)
+            except (ValueError, MemoryError) as e:
+                logger.error(f"Performance model training failed: {e}")
+                return {'error': 'performance_model_failed', 'details': str(e)}
+            
+            # Calculate model performance
+            try:
+                y_pred = self.performance_model.predict(X)
+                mse = mean_squared_error(y, y_pred)
+                r2 = r2_score(y, y_pred)
+            except Exception as e:
+                logger.error(f"Model evaluation failed: {e}")
+                mse, r2 = float('inf'), 0.0
+            
+            metrics = {
+                'model_version': self.model_version,
+                'training_samples': len(training_data),
+                'mse': mse,
+                'r2_score': r2,
+                'clusters': self.cluster_model.n_clusters if self.cluster_model else 0
+            }
+            
+            logger.info(f"Model training completed: {metrics}")
+            return metrics
+            
+        except Exception as e:
+            logger.error(f"Unexpected error during model training: {e}")
+            return {'error': 'training_failed', 'details': str(e)}
     
     def _prepare_training_data(self) -> pd.DataFrame:
         """Prepare training data from workflow executions."""

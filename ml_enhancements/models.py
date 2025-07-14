@@ -33,6 +33,35 @@ class MLConfig:
     min_data_points: int = 10
     confidence_threshold: float = 0.75
     max_model_age_days: int = 30
+    
+    def __post_init__(self):
+        """Validate configuration parameters."""
+        if not 0 < self.learning_rate < 1:
+            raise ValueError(f"Learning rate must be between 0 and 1, got {self.learning_rate}")
+        
+        if not 0 < self.confidence_threshold <= 1:
+            raise ValueError(f"Confidence threshold must be between 0 and 1, got {self.confidence_threshold}")
+        
+        if not 0 < self.accuracy_threshold <= 1:
+            raise ValueError(f"Accuracy threshold must be between 0 and 1, got {self.accuracy_threshold}")
+        
+        if not 0 < self.pattern_optimization_threshold < 1:
+            raise ValueError(f"Pattern optimization threshold must be between 0 and 1, got {self.pattern_optimization_threshold}")
+        
+        if self.pattern_analysis_window <= 0:
+            raise ValueError(f"Pattern analysis window must be positive, got {self.pattern_analysis_window}")
+        
+        if self.forecasting_horizon <= 0:
+            raise ValueError(f"Forecasting horizon must be positive, got {self.forecasting_horizon}")
+        
+        if self.update_frequency <= 0:
+            raise ValueError(f"Update frequency must be positive, got {self.update_frequency}")
+        
+        if self.min_data_points <= 0:
+            raise ValueError(f"Min data points must be positive, got {self.min_data_points}")
+        
+        if self.max_model_age_days <= 0:
+            raise ValueError(f"Max model age days must be positive, got {self.max_model_age_days}")
 
 
 @dataclass
