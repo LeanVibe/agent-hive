@@ -261,11 +261,12 @@
 2. **✅ Critical Fixes** - Gemini Priority 1 recommendations implemented
 3. **✅ Planning Workflow** - Updated docs with Gemini validation and clear priorities
 
-### ⚡ IMMEDIATE PRIORITIES (Gemini Order - Unblocks All Work)
+### ⚡ IMMEDIATE PRIORITIES (Updated Based on Gemini Review)
 1. **✅ Fix Async Configuration** - Resolve TaskQueue pytest-asyncio issues (COMPLETED)
 2. **✅ Centralize Configuration** - Create config.yaml during legacy cleanup (COMPLETED)
-3. **🧹 Legacy Cleanup** - Remove deprecated components (tests provide safety net) (CURRENT)
-4. **💾 State Management** - Hybrid checkpoint/rollback system (5 verifiable steps)
+3. **✅ Legacy Cleanup Phase 1** - Remove task_distributor, spawn components (COMPLETED)
+4. **🔬 Extract ML Features** - Extract ConfidenceTracker, ContextMonitor from hook_system.py (CURRENT)
+5. **💾 State Management** - SQLite-based StateManager with Git milestone integration
 
 ## Week 4 Focus (Next Phase) - Multi-Agent & Production Features
 

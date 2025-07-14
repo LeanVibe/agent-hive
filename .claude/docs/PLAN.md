@@ -264,49 +264,62 @@ Gemini: *"As part of the legacy cleanup, create the config.yaml. This will simpl
 **Result**: Comprehensive centralized configuration system operational. 15/16 ConfigLoader tests passing. Configuration supports development workflow with mock CLIs and production deployment with security settings.
 
 #### ⚡ IMMEDIATE PRIORITY 3: Legacy Code Cleanup (Safety-First Approach)
+**Status: ✅ PHASE 1 COMPLETED, CONTINUING WITH EXTRACTION APPROACH**
 
-- [ ] **Legacy Code Cleanup** (Safety-First Approach)
+**Gemini Review Results**: *"You must prioritize extracting the features from hook_system.py before removing it. This file contains critical, non-trivial logic that underpins your agent's intelligence."*
+
+- [x] **✅ Phase 1: Safe Removals Complete**
   - [x] ✅ Unit tests created (safety net in place)
-  - [ ] Analyze dependencies of task_distributor.py
-  - [ ] Remove/refactor old task_distributor.py 
-  - [ ] Update/remove legacy state_manager.py if superseded
+  - [x] ✅ Remove legacy task_distributor.py (superseded by TaskQueue)
+  - [x] ✅ Remove scripts/spawn.py (superseded by agents system)
+  - [x] ✅ Test validation: 16/16 TaskQueue, 15/16 ConfigLoader passing
+
+- [ ] **Phase 2: Extract ML Features from hook_system.py** (Gemini Priority)
+  - [ ] Extract ConfidenceTracker (ML decision learning system)
+  - [ ] Extract ContextMonitor (context growth prediction)
+  - [ ] Extract SmartQualityGate (quality evaluation system)
+  - [ ] Extract SmartTestEnforcer (automatic test generation)
+  - [ ] Create new module structure for extracted components
+
+- [ ] **Phase 3: Complete Legacy Cleanup**
+  - [ ] Remove/refactor legacy state_manager.py if superseded
   - [ ] Clean up duplicate orchestrator methods (Phase 0 placeholders)
-  - [ ] Reconcile hook_system.py role (dev tool vs runtime)
-  - [ ] Create centralized config.yaml for all configurable parameters
+  - [ ] Remove hook_system.py after feature extraction complete
 
-#### State Management System Implementation
-- [ ] **Step 1: JSON Checkpoint Creation**
-  - [ ] Design checkpoint data structure
-  - [ ] Implement checkpoint serialization
-  - [ ] Add checkpoint file management
-  - [ ] Unit tests for checkpoint creation
+#### PRIORITY 4: State Management System Implementation
+**Status: UPDATED APPROACH BASED ON GEMINI FEEDBACK**
 
-- [ ] **Step 2: JSON Checkpoint Restoration**
-  - [ ] Implement checkpoint deserialization
-  - [ ] Add state restoration logic
-  - [ ] Test checkpoint round-trip integrity
-  - [ ] Error handling for corrupted checkpoints
+**Gemini Recommendations**: *"Stick with SQLite - it's transactional, scalable, and allows for complex queries. Create a dedicated StateManager module for all database interactions."*
 
-- [ ] **Step 3: Git Milestone Creation** (Define: successful complex tasks)
-  - [ ] Define what constitutes a "complex task completion"
-  - [ ] Implement Git tag-based milestone creation
-  - [ ] Add milestone metadata and context
-  - [ ] Integration with orchestrator workflow
+- [ ] **Step 1: Create Centralized StateManager**
+  - [ ] Design StateManager class with SQLite backend
+  - [ ] Implement transactional state operations
+  - [ ] Add schema migration support
+  - [ ] Create database connection management
 
-- [ ] **Step 4: Git Milestone Restoration**
-  - [ ] Implement Git-based state restoration
-  - [ ] Add conflict resolution for Git state
-  - [ ] Test milestone restoration scenarios
-  - [ ] Backup and recovery procedures
+- [ ] **Step 2: Extract and Integrate Existing State Logic**
+  - [ ] Move ConfidenceTracker database logic to StateManager
+  - [ ] Move ContextMonitor database logic to StateManager
+  - [ ] Consolidate confidence.db and context_history.db schemas
+  - [ ] Add comprehensive state validation
 
-- [ ] **Step 5: Automatic Checkpoint Triggers**
-  - [ ] Task completion checkpoint triggers
-  - [ ] Time-based checkpoint intervals
-  - [ ] Resource threshold-based triggers
-  - [ ] Performance optimization
+- [ ] **Step 3: Implement Checkpoint System (SQLite-based)**
+  - [ ] Design checkpoint data structure in SQLite
+  - [ ] Implement checkpoint creation with transactions
+  - [ ] Add checkpoint restoration with rollback support
+  - [ ] Include performance metrics and metadata
 
-- [ ] **State Validation Mechanism**
-  - [ ] Implement checkpoint integrity validation
+- [ ] **Step 4: Git Milestone Integration**
+  - [ ] Define milestone criteria (complex task completion, error recovery)
+  - [ ] Implement Git tag creation linked to state checkpoints
+  - [ ] Add milestone metadata attachment
+  - [ ] Create milestone browsing and restoration
+
+- [ ] **Step 5: Automatic State Management Triggers**
+  - [ ] Integrate with task completion events
+  - [ ] Add time-based checkpoint intervals
+  - [ ] Implement resource threshold monitoring
+  - [ ] Add intelligent trigger spacing to prevent overhead
   - [ ] Add state consistency checks on restore
   - [ ] Create state corruption detection
   - [ ] Automated repair mechanisms
