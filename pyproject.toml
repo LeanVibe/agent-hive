@@ -1,0 +1,30 @@
+[project]
+name = "leanvibe-orchestrator"
+version = "0.1.0"
+description = "AI orchestration system for XP-driven MVP development"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "gitpython>=3.1.32",
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.5.0",
+    "aiofiles>=23.2.1",
+    "asyncio-mqtt>=0.11.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.9.1",
+    "ruff>=0.1.0",
+    "mypy>=1.6.0",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "mypy>=1.16.1",
+    "pytest>=8.4.1",
+    "ruff>=0.12.3",
+]

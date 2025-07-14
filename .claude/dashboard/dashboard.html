@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeanVibe Dashboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #0a0a0a;
+        color: #e0e0e0;
+        overflow-x: hidden;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .status-line {
+        font-size: 1.1rem;
+        padding: 0.5rem 1rem;
+        background: #1a1a1a;
+        border-radius: 20px;
+        border: 1px solid #333;
+      }
+
+      .status-line.healthy {
+        border-color: #22c55e;
+        color: #22c55e;
+      }
+
+      .status-line.warning {
+        border-color: #eab308;
+        color: #eab308;
+      }
+
+      .status-line.critical {
+        border-color: #ef4444;
+        color: #ef4444;
+      }
+
+      /* Main Content */
+      .content {
+        display: grid;
+        grid-template-columns: 300px 1fr 350px;
+        gap: 1rem;
+        padding: 1rem;
+        overflow: hidden;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        overflow-y: auto;
+      }
+
+      .agent-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .agent-card {
+        background: #252525;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #333;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .agent-card:hover {
+        border-color: #667eea;
+        transform: translateX(5px);
+      }
+
+      .agent-card.active {
+        border-color: #667eea;
+        background: #2a2a3a;
+      }
+
+      .agent-name {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .agent-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #22c55e;
+      }
+
+      .agent-status.busy {
+        background: #eab308;
+      }
+
+      .agent-status.error {
+        background: #ef4444;
+      }
+
+      .agent-metrics {
+        font-size: 0.85rem;
+        color: #999;
+      }
+
+      .context-bar {
+        height: 4px;
+        background: #333;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+      }
+
+      .context-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+        background-size: 300% 100%;
+        transition: all 0.3s ease;
+      }
+
+      /* Main Panel */
+      .main-panel {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      /* Metrics Grid */
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .metric-card {
+        background: #252525;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #333;
+        transition: all 0.3s ease;
+      }
+
+      .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+      }
+
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .metric-label {
+        color: #999;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+
+      /* Activity Feed */
+      .activity-feed {
+        background: #252525;
+        border-radius: 8px;
+        padding: 1rem;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .activity-item {
+        padding: 0.75rem;
+        border-left: 3px solid #333;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+      }
+
+      .activity-item:hover {
+        background: #2a2a2a;
+        border-left-color: #667eea;
+      }
+
+      .activity-time {
+        color: #666;
+        font-size: 0.8rem;
+      }
+
+      .activity-item.success {
+        border-left-color: #22c55e;
+      }
+
+      .activity-item.warning {
+        border-left-color: #eab308;
+      }
+
+      .activity-item.error {
+        border-left-color: #ef4444;
+      }
+
+      /* Right Panel */
+      .right-panel {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 1.5rem;
+        overflow-y: auto;
+      }
+
+      .decisions-pending {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .decision-card {
+        background: #252525;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #667eea;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .decision-card:hover {
+        background: #2a2a3a;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .decision-type {
+        font-size: 0.85rem;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+      }
+
+      .decision-title {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .decision-confidence {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: #999;
+      }
+
+      .confidence-bar {
+        flex: 1;
+        height: 4px;
+        background: #333;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .confidence-fill {
+        height: 100%;
+        background: #667eea;
+        transition: width 0.3s ease;
+      }
+
+      /* Charts */
+      .chart-container {
+        background: #252525;
+        padding: 1.5rem;
+        border-radius: 8px;
+        height: 300px;
+        position: relative;
+      }
+
+      /* Animations */
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .slide-in {
+        animation: slideIn 0.3s ease-out;
+      }
+
+      /* Command Input */
+      .command-input {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        background: #1a1a1a;
+        border: 1px solid #667eea;
+        border-radius: 30px;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .command-input.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .command-input input {
+        flex: 1;
+        background: none;
+        border: none;
+        color: #e0e0e0;
+        font-size: 1rem;
+        outline: none;
+      }
+
+      .command-input input::placeholder {
+        color: #666;
+      }
+
+      /* Tooltips */
+      .tooltip {
+        position: relative;
+      }
+
+      .tooltip::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #e0e0e0;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+      }
+
+      .tooltip:hover::after {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard">
+      <!-- Header -->
+      <div class="header">
+        <div class="logo">LeanVibe</div>
+        <div class="status-line healthy" id="statusLine">
+          ✅ All systems operational | 8.2 features/week | 87% autonomous
+        </div>
+        <div class="actions">
+          <button
+            onclick="toggleCommand()"
+            class="tooltip"
+            data-tooltip="Press / to open"
+          >
+            Command (/)
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- Left Sidebar - Agents -->
+        <div class="sidebar">
+          <h3 style="margin-bottom: 1rem">AI Agents</h3>
+          <div class="agent-list" id="agentList">
+            <div class="agent-card active">
+              <div class="agent-name">
+                <span class="agent-status"></span>
+                Orchestrator
+              </div>
+              <div class="agent-metrics">
+                Tasks: Coordinating<br />
+                CPU: 12%
+              </div>
+              <div class="context-bar">
+                <div
+                  class="context-fill"
+                  style="width: 35%; background-position-x: -35%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="agent-card">
+              <div class="agent-name">
+                <span class="agent-status"></span>
+                Backend Agent
+              </div>
+              <div class="agent-metrics">
+                Tasks: 3 active<br />
+                Context: 42%
+              </div>
+              <div class="context-bar">
+                <div
+                  class="context-fill"
+                  style="width: 42%; background-position-x: -42%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="agent-card">
+              <div class="agent-name">
+                <span class="agent-status busy"></span>
+                Frontend Agent
+              </div>
+              <div class="agent-metrics">
+                Tasks: 5 active<br />
+                Context: 68%
+              </div>
+              <div class="context-bar">
+                <div
+                  class="context-fill"
+                  style="width: 68%; background-position-x: -68%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="agent-card">
+              <div class="agent-name">
+                <span class="agent-status"></span>
+                iOS Agent
+              </div>
+              <div class="agent-metrics">
+                Tasks: 2 active<br />
+                Context: 23%
+              </div>
+              <div class="context-bar">
+                <div
+                  class="context-fill"
+                  style="width: 23%; background-position-x: -23%"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="main-panel">
+          <!-- Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-value">87%</div>
+              <div class="metric-label">Autonomous Work</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">8.2</div>
+              <div class="metric-label">Features/Week</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">3.2%</div>
+              <div class="metric-label">Bug Rate</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">94%</div>
+              <div class="metric-label">Test Coverage</div>
+            </div>
+          </div>
+
+          <!-- Velocity Chart -->
+          <div class="chart-container">
+            <h4 style="margin-bottom: 1rem">Development Velocity</h4>
+            <canvas id="velocityChart"></canvas>
+          </div>
+
+          <!-- Activity Feed -->
+          <div>
+            <h4 style="margin-bottom: 1rem">Recent Activity</h4>
+            <div class="activity-feed" id="activityFeed">
+              <div class="activity-item success slide-in">
+                <div class="activity-time">2 minutes ago</div>
+                <strong>Backend Agent:</strong> Completed user authentication
+                API
+              </div>
+              <div class="activity-item success slide-in">
+                <div class="activity-time">5 minutes ago</div>
+                <strong>Orchestrator:</strong> Checkpoint created:
+                "auth-feature-complete"
+              </div>
+              <div class="activity-item warning slide-in">
+                <div class="activity-time">12 minutes ago</div>
+                <strong>Frontend Agent:</strong> Context usage approaching 70%
+              </div>
+              <div class="activity-item success slide-in">
+                <div class="activity-time">15 minutes ago</div>
+                <strong>iOS Agent:</strong> Tests passing for login screen
+              </div>
+              <div class="activity-item slide-in">
+                <div class="activity-time">23 minutes ago</div>
+                <strong>Gemini:</strong> Reviewed 12 files, all approved
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel - Decisions -->
+        <div class="right-panel">
+          <h3 style="margin-bottom: 1rem">Pending Decisions (2)</h3>
+          <div class="decisions-pending">
+            <div class="decision-card">
+              <div class="decision-type">ARCHITECTURE</div>
+              <div class="decision-title">Database Schema Change</div>
+              <div>Add user roles table for permissions</div>
+              <div class="decision-confidence">
+                <span>Confidence: 72%</span>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" style="width: 72%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="decision-card">
+              <div class="decision-type">PERFORMANCE</div>
+              <div class="decision-title">Caching Strategy</div>
+              <div>Implement Redis for session management</div>
+              <div class="decision-confidence">
+                <span>Confidence: 68%</span>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" style="width: 68%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 style="margin: 2rem 0 1rem">Quick Actions</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem">
+            <button onclick="runCommand('health-check-all')">
+              Health Check All
+            </button>
+            <button onclick="runCommand('snapshot')">Create Snapshot</button>
+            <button onclick="runCommand('analyze-velocity')">
+              Analyze Velocity
+            </button>
+            <button onclick="runCommand('redistribute')">
+              Redistribute Tasks
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Command Input -->
+      <div class="command-input" id="commandInput">
+        <span style="color: #667eea">/</span>
+        <input
+          type="text"
+          id="commandField"
+          placeholder="Type a command..."
+          autocomplete="off"
+        />
+        <span style="color: #666; font-size: 0.85rem">ESC to close</span>
+      </div>
+    </div>
+
+    <script>
+      // Command palette
+      function toggleCommand() {
+        const input = document.getElementById("commandInput");
+        const field = document.getElementById("commandField");
+
+        if (input.classList.contains("active")) {
+          input.classList.remove("active");
+          field.value = "";
+        } else {
+          input.classList.add("active");
+          field.focus();
+        }
+      }
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "/") {
+          e.preventDefault();
+          toggleCommand();
+        } else if (e.key === "Escape") {
+          document.getElementById("commandInput").classList.remove("active");
+        }
+      });
+
+      // Command execution
+      document
+        .getElementById("commandField")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            const command = e.target.value;
+            runCommand(command);
+            toggleCommand();
+          }
+        });
+
+      function runCommand(command) {
+        // Simulate command execution
+        console.log("Executing command:", command);
+
+        // Add to activity feed
+        const feed = document.getElementById("activityFeed");
+        const item = document.createElement("div");
+        item.className = "activity-item slide-in";
+        item.innerHTML = `
+                <div class="activity-time">Just now</div>
+                <strong>You:</strong> Executed /${command}
+            `;
+        feed.insertBefore(item, feed.firstChild);
+
+        // Update status based on command
+        if (command === "health-check-all") {
+          updateStatus("⏳ Running health checks...", "warning");
+          setTimeout(() => {
+            updateStatus(
+              "✅ All systems healthy | 8.2 features/week | 87% autonomous",
+              "healthy",
+            );
+          }, 2000);
+        }
+      }
+
+      function updateStatus(text, type) {
+        const statusLine = document.getElementById("statusLine");
+        statusLine.textContent = text;
+        statusLine.className = `status-line ${type}`;
+      }
+
+      // Simulate real-time updates
+      setInterval(() => {
+        // Update random agent context
+        const agents = document.querySelectorAll(".agent-card");
+        const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+        const contextBar = randomAgent.querySelector(".context-fill");
+        const currentWidth = parseInt(contextBar.style.width);
+        const newWidth = Math.min(100, currentWidth + Math.random() * 5);
+        contextBar.style.width = `${newWidth}%`;
+        contextBar.style.backgroundPositionX = `-${newWidth}%`;
+
+        // Update metrics
+        const autonomy = document.querySelector(".metric-value");
+        const currentValue = parseFloat(autonomy.textContent);
+        const change = (Math.random() - 0.5) * 0.5;
+        autonomy.textContent = `${Math.max(80, Math.min(95, currentValue + change)).toFixed(0)}%`;
+      }, 5000);
+
+      // Initialize charts (placeholder)
+      const canvas = document.getElementById("velocityChart");
+      const ctx = canvas.getContext("2d");
+
+      // Simple line chart
+      function drawChart() {
+        const width = (canvas.width = canvas.offsetWidth);
+        const height = (canvas.height = 250);
+
+        ctx.strokeStyle = "#667eea";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        const points = [
+          [0, 150],
+          [50, 120],
+          [100, 130],
+          [150, 100],
+          [200, 90],
+          [250, 95],
+          [300, 80],
+          [350, 85],
+        ];
+
+        points.forEach((point, i) => {
+          if (i === 0) ctx.moveTo(point[0], point[1]);
+          else ctx.lineTo(point[0], point[1]);
+        });
+
+        ctx.stroke();
+      }
+
+      drawChart();
+      window.addEventListener("resize", drawChart);
+    </script>
+  </body>
+</html>
