@@ -501,28 +501,52 @@ git checkout -b tutorial/phase3-development
 
 ### Autonomous Workflow Implementation
 
+#### **🚨 CRITICAL INSTRUCTION FOR ALL SUBAGENTS**
+**MANDATORY COMMIT PROTOCOL**: Every subagent MUST commit on their feature branch immediately after completing each individual task. Never batch multiple completed tasks into a single commit.
+
+**Feature Branch Workflow**:
+1. **Create Feature Branch**: `git checkout -b feature/specific-task-name`
+2. **Complete Individual Task**: Focus on one specific deliverable
+3. **IMMEDIATE COMMIT**: `git add -A && git commit -m "feat: specific task completed"`
+4. **Continue to Next Task**: Repeat cycle for each task
+5. **Final Integration**: Merge feature branch only when all tasks complete
+
+**Commit Message Format**:
+```bash
+git commit -m "feat(scope): specific task completed
+
+✅ Completed: [specific achievement]
+✅ Tests passed: [relevant tests]
+✅ Quality gates: [validation results]
+
+Technical details and implementation notes.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
 #### Documentation Development Sessions
 **Session 1: Core Documentation Updates (4-6 hours)**
-- README.md modernization
-- DEVELOPMENT.md enhancement
-- TODO.md refresh
-- Initial quality validation
+- **Task 1**: README.md modernization → **COMMIT IMMEDIATELY**
+- **Task 2**: DEVELOPMENT.md enhancement → **COMMIT IMMEDIATELY**
+- **Task 3**: TODO.md refresh → **COMMIT IMMEDIATELY**
+- **Task 4**: Initial quality validation → **COMMIT IMMEDIATELY**
 
 **Session 2: Advanced Documentation (4-6 hours)**
-- API reference creation
-- Troubleshooting guide development
-- Deployment documentation
-- Visual diagram creation
+- **Task 1**: API reference creation → **COMMIT IMMEDIATELY**
+- **Task 2**: Troubleshooting guide development → **COMMIT IMMEDIATELY**
+- **Task 3**: Deployment documentation → **COMMIT IMMEDIATELY**
+- **Task 4**: Visual diagram creation → **COMMIT IMMEDIATELY**
 
 **Session 3: Tutorial Development (6-8 hours)**
-- Tutorial structure creation
-- Phase 1-2 development (setup and initialization)
-- Initial testing and validation
+- **Task 1**: Tutorial structure creation → **COMMIT IMMEDIATELY**
+- **Task 2**: Phase 1-2 development (setup and initialization) → **COMMIT IMMEDIATELY**
+- **Task 3**: Initial testing and validation → **COMMIT IMMEDIATELY**
 
 **Session 4: Tutorial Completion (6-8 hours)**
-- Phase 3-5 development (features, testing, deployment)
-- Comprehensive testing and refinement
-- External validation preparation
+- **Task 1**: Phase 3-5 development (features, testing, deployment) → **COMMIT IMMEDIATELY**
+- **Task 2**: Comprehensive testing and refinement → **COMMIT IMMEDIATELY**
+- **Task 3**: External validation preparation → **COMMIT IMMEDIATELY**
 
 ### Quality Gates and Review Process
 
