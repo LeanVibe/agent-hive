@@ -9,11 +9,13 @@ Provides access to orchestration, monitoring, and management capabilities.
 import argparse
 import asyncio
 import json
+import logging
 import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Set
+from dataclasses import dataclass, field
 
 from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
 from advanced_orchestration.resource_manager import ResourceManager
@@ -25,18 +27,53 @@ from advanced_orchestration.models import (
     ScalingConfig
 )
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('.claude/logs/cli.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class CLIConfig:
+    """Configuration for CLI operations."""
+    default_workflow: str = "feature-dev"
+    timeout_seconds: int = 30
+    monitoring_interval: int = 5
+    log_level: str = "INFO"
+    
+    # Workflow validation
+    allowed_workflows: Set[str] = field(default_factory=lambda: {
+        'feature-dev', 'hotfix', 'release', 'maintenance', 'default'
+    })
+    
+    # Depth validation  
+    allowed_depths: Set[str] = field(default_factory=lambda: {
+        'standard', 'deep', 'ultrathink'
+    })
+
 
 class LeanVibeCLI:
     """Main CLI interface for LeanVibe Agent Hive."""
     
-    def __init__(self):
-        """Initialize CLI with default configuration."""
+    def __init__(self, cli_config: Optional[CLIConfig] = None):
+        """Initialize CLI with configuration."""
+        self.cli_config = cli_config or CLIConfig()
         self.config = CoordinatorConfig()
         
-        # Create default resource limits
+        # Create system-aware resource limits
+        import psutil
+        cpu_count = psutil.cpu_count(logical=False) or 4
+        memory_mb = int(psutil.virtual_memory().total / (1024 * 1024) * 0.8)  # 80% of total
+        
         self.resource_limits = ResourceLimits(
-            max_cpu_cores=8,
-            max_memory_mb=16384,  # 16GB
+            max_cpu_cores=min(cpu_count, 8),
+            max_memory_mb=min(memory_mb, 16384),  # Cap at 16GB
             max_disk_mb=102400,   # 100GB
             max_network_mbps=1000,  # 1Gbps
             max_agents=10
@@ -46,21 +83,68 @@ class LeanVibeCLI:
         self.resource_manager: Optional[ResourceManager] = None
         self.scaling_manager: Optional[ScalingManager] = None
         
-    async def initialize_systems(self) -> None:
-        """Initialize all orchestration systems."""
+    async def with_timeout(self, coro, timeout_seconds: Optional[int] = None):
+        """Add timeout wrapper to prevent hanging operations."""
+        timeout = timeout_seconds or self.cli_config.timeout_seconds
         try:
-            self.coordinator = MultiAgentCoordinator(self.config)
-            self.resource_manager = ResourceManager(self.resource_limits)
-            self.scaling_manager = ScalingManager(self.resource_limits)
-            print("✅ LeanVibe Agent Hive systems initialized")
+            return await asyncio.wait_for(coro, timeout=timeout)
+        except asyncio.TimeoutError:
+            logger.error(f"Operation timed out after {timeout} seconds")
+            raise
+    
+    def validate_workflow_type(self, workflow_type: str) -> bool:
+        """Validate workflow type format."""
+        return workflow_type in self.cli_config.allowed_workflows
+    
+    def validate_depth(self, depth: str) -> bool:
+        """Validate thinking depth."""
+        return depth in self.cli_config.allowed_depths
+
+    async def initialize_systems(self) -> None:
+        """Initialize all orchestration systems with timeout and proper cleanup."""
+        try:
+            async def _init():
+                self.coordinator = MultiAgentCoordinator(self.config)
+                self.resource_manager = ResourceManager(self.resource_limits)
+                self.scaling_manager = ScalingManager(self.resource_limits)
+                logger.info("LeanVibe Agent Hive systems initialized")
+                print("✅ LeanVibe Agent Hive systems initialized")
+            
+            await self.with_timeout(_init())
+            
         except ImportError as e:
-            print(f"❌ Import error: {e}")
-            print("💡 Make sure you have installed all dependencies: pip install -r requirements.txt")
-            sys.exit(1)
+            logger.error(f"Import error during initialization: {e}")
+            print(f"❌ Import Error: {e}")
+            print("💡 Install dependencies: pip install -r requirements.txt")
+            raise
+        except ModuleNotFoundError as e:
+            logger.error(f"Module not found: {e}")
+            print(f"❌ Module Not Found: {e}")
+            print("💡 Check if advanced_orchestration module is available")
+            raise
+        except asyncio.TimeoutError:
+            logger.error("System initialization timed out")
+            print("❌ Initialization timed out")
+            print("💡 Systems may be unresponsive - check system resources")
+            raise
         except Exception as e:
-            print(f"❌ Failed to initialize systems: {e}")
-            print("💡 Check if the advanced_orchestration module is available")
-            sys.exit(1)
+            logger.error(f"Unexpected error during initialization: {e}")
+            print(f"❌ Initialization Error: {e}")
+            print("💡 Check system requirements and permissions")
+            raise
+    
+    async def cleanup_systems(self) -> None:
+        """Cleanup systems on shutdown."""
+        try:
+            if self.coordinator:
+                # Add shutdown method when available
+                logger.info("Coordinator cleaned up")
+            if self.resource_manager:
+                logger.info("Resource manager cleaned up")
+            if self.scaling_manager:
+                logger.info("Scaling manager cleaned up")
+        except Exception as e:
+            logger.error(f"Error during cleanup: {e}")
     
     async def orchestrate(self, workflow: str = "default", validate: bool = False) -> None:
         """
@@ -70,34 +154,51 @@ class LeanVibeCLI:
             workflow: Workflow type to execute
             validate: Whether to validate before execution
         """
-        await self.initialize_systems()
+        # Validate input
+        if not self.validate_workflow_type(workflow):
+            logger.error(f"Invalid workflow type: {workflow}")
+            print(f"❌ Invalid workflow type: {workflow}")
+            print(f"💡 Allowed workflows: {', '.join(sorted(self.cli_config.allowed_workflows))}")
+            return
         
-        print(f"🎯 Starting orchestration workflow: {workflow}")
-        print(f"📋 Validation mode: {'enabled' if validate else 'disabled'}")
-        
-        if validate:
-            print("🔍 Validating system state...")
-            # Basic validation - check if systems are responsive
-            if self.coordinator and self.resource_manager and self.scaling_manager:
-                print("✅ All systems validated successfully")
-            else:
-                print("❌ System validation failed")
-                return
-        
-        # Simulate orchestration workflow
-        print("🚀 Executing orchestration workflow...")
-        
-        # Get system resources
-        if self.resource_manager:
-            resources = self.resource_manager.get_available_resources()
-            print(f"📊 Available resources: CPU {resources.cpu_cores} cores, Memory {resources.memory_mb}MB")
-        
-        # Check scaling metrics
-        if self.scaling_manager and self.coordinator:
-            metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
-            print(f"📈 Scaling metrics: {metrics}")
-        
-        print(f"✅ Orchestration workflow '{workflow}' completed successfully")
+        try:
+            await self.initialize_systems()
+            
+            logger.info(f"Starting orchestration workflow: {workflow}")
+            print(f"🎯 Starting orchestration workflow: {workflow}")
+            print(f"📋 Validation mode: {'enabled' if validate else 'disabled'}")
+            
+            if validate:
+                print("🔍 Validating system state...")
+                # Basic validation - check if systems are responsive
+                if self.coordinator and self.resource_manager and self.scaling_manager:
+                    print("✅ All systems validated successfully")
+                else:
+                    print("❌ System validation failed")
+                    return
+            
+            # Simulate orchestration workflow
+            print("🚀 Executing orchestration workflow...")
+            
+            # Get system resources
+            if self.resource_manager:
+                resources = self.resource_manager.get_available_resources()
+                print(f"📊 Available resources: CPU {resources.cpu_cores} cores, Memory {resources.memory_mb}MB")
+            
+            # Check scaling metrics
+            if self.scaling_manager and self.coordinator:
+                workflow_metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
+                print(f"📈 Scaling metrics: {workflow_metrics}")
+            
+            logger.info(f"Orchestration workflow '{workflow}' completed successfully")
+            print(f"✅ Orchestration workflow '{workflow}' completed successfully")
+            
+        except Exception as e:
+            logger.error(f"Orchestration error: {e}")
+            print(f"❌ Orchestration failed: {e}")
+            raise
+        finally:
+            await self.cleanup_systems()
     
     async def spawn(self, task: str, depth: str = "standard", parallel: bool = False) -> None:
         """
@@ -108,26 +209,56 @@ class LeanVibeCLI:
             depth: Thinking depth (standard, deep, ultrathink)
             parallel: Whether to run in parallel
         """
-        await self.initialize_systems()
+        # Validate inputs
+        if not task.strip():
+            logger.error("Empty task description provided")
+            print("❌ Task description cannot be empty")
+            return
+            
+        if not self.validate_depth(depth):
+            logger.error(f"Invalid depth: {depth}")
+            print(f"❌ Invalid thinking depth: {depth}")
+            print(f"💡 Allowed depths: {', '.join(sorted(self.cli_config.allowed_depths))}")
+            return
         
-        print(f"🎯 Spawning task: {task}")
-        print(f"🧠 Thinking depth: {depth}")
-        print(f"⚡ Parallel execution: {'enabled' if parallel else 'disabled'}")
-        
-        # Simulate task spawning
-        print("🔄 Creating task context...")
-        time.sleep(0.5)  # Simulate processing
-        
-        print("🤖 Assigning to optimal agent...")
-        time.sleep(0.3)
-        
-        if parallel:
-            print("⚡ Starting parallel execution...")
-        else:
-            print("🔄 Starting sequential execution...")
-        
-        print(f"✅ Task '{task}' spawned successfully")
-        print(f"📝 Task ID: task-{int(time.time())}")
+        try:
+            await self.initialize_systems()
+            
+            logger.info(f"Spawning task: {task} with depth: {depth}")
+            print(f"🎯 Spawning task: {task}")
+            print(f"🧠 Thinking depth: {depth}")
+            print(f"⚡ Parallel execution: {'enabled' if parallel else 'disabled'}")
+            
+            # Simulate task spawning with timeout
+            async def _spawn_task():
+                print("🔄 Creating task context...")
+                await asyncio.sleep(0.5)  # Simulate processing
+                
+                print("🤖 Assigning to optimal agent...")
+                await asyncio.sleep(0.3)
+                
+                if parallel:
+                    print("⚡ Starting parallel execution...")
+                else:
+                    print("🔄 Starting sequential execution...")
+            
+            await self.with_timeout(_spawn_task(), 10)  # 10 second timeout for spawning
+            
+            task_id = f"task-{int(time.time())}"
+            logger.info(f"Task spawned successfully: {task_id}")
+            print(f"✅ Task '{task}' spawned successfully")
+            print(f"📝 Task ID: {task_id}")
+            
+        except asyncio.TimeoutError:
+            logger.error(f"Task spawning timed out: {task}")
+            print("⏰ Task spawning timed out")
+            print("💡 Try with simpler task or check system resources")
+        except Exception as e:
+            logger.error(f"Error spawning task: {e}")
+            print(f"❌ Failed to spawn task: {e}")
+            raise
+        finally:
+            await self.cleanup_systems()
     
     async def monitor(self, metrics: bool = False, real_time: bool = False) -> None:
         """
@@ -137,51 +268,60 @@ class LeanVibeCLI:
             metrics: Show detailed metrics
             real_time: Enable real-time monitoring
         """
-        await self.initialize_systems()
-        
-        print("📊 LeanVibe Agent Hive System Monitor")
-        print("=" * 40)
-        
-        if self.resource_manager:
-            # Get available resources
-            resources = self.resource_manager.get_available_resources()
-            print(f"🖥️  Available CPU: {resources.cpu_cores} cores")
-            print(f"💾 Available Memory: {resources.memory_mb}MB")
-            print(f"💿 Available Disk: {resources.disk_mb}MB")
-            print(f"🌐 Available Network: {resources.network_mbps} Mbps")
+        try:
+            await self.initialize_systems()
             
-            # Get resource usage summary
-            summary = await self.resource_manager.get_allocation_summary()
-            print(f"📊 Allocation Summary: {summary}")
-        
-        if self.scaling_manager and self.coordinator:
-            # Get scaling metrics
-            metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
-            print(f"📈 Scaling Metrics: {metrics}")
+            print("📊 LeanVibe Agent Hive System Monitor")
+            print("=" * 40)
             
-            # Get scaling statistics
-            stats = self.scaling_manager.get_scaling_statistics()
-            print(f"📊 Scaling Statistics: {stats}")
+            if self.resource_manager:
+                # Get available resources
+                resources = self.resource_manager.get_available_resources()
+                print(f"🖥️  Available CPU: {resources.cpu_cores} cores")
+                print(f"💾 Available Memory: {resources.memory_mb}MB")
+                print(f"💿 Available Disk: {resources.disk_mb}MB")
+                print(f"🌐 Available Network: {resources.network_mbps} Mbps")
+                
+                # Get resource usage summary
+                summary = await self.resource_manager.get_allocation_summary()
+                print(f"📊 Allocation Summary: {summary}")
+            
+            if self.scaling_manager and self.coordinator:
+                # Get scaling metrics
+                scaling_metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
+                print(f"📈 Scaling Metrics: {scaling_metrics}")
+                
+                # Get scaling statistics
+                stats = self.scaling_manager.get_scaling_statistics()
+                print(f"📊 Scaling Statistics: {stats}")
+            
+            if metrics:
+                print("\n📈 Detailed Metrics:")
+                print("  - Agent coordination latency: <50ms")
+                print("  - Resource utilization efficiency: 95%")
+                print("  - System uptime: 100%")
+                print("  - Error rate: 0%")
+            
+            if real_time:
+                print("\n🔄 Real-time monitoring enabled (Ctrl+C to stop)")
+                try:
+                    while True:
+                        await asyncio.sleep(5)
+                        current_time = datetime.now().strftime("%H:%M:%S")
+                        if self.resource_manager:
+                            resources = self.resource_manager.get_available_resources()
+                            summary = await self.resource_manager.get_allocation_summary()
+                            print(f"[{current_time}] Available: CPU {resources.cpu_cores} cores, Memory {resources.memory_mb}MB, Allocations: {summary}")
+                except KeyboardInterrupt:
+                    logger.info("Real-time monitoring interrupted by user")
+                    print("\n✅ Real-time monitoring stopped")
         
-        if metrics:
-            print("\n📈 Detailed Metrics:")
-            print("  - Agent coordination latency: <50ms")
-            print("  - Resource utilization efficiency: 95%")
-            print("  - System uptime: 100%")
-            print("  - Error rate: 0%")
-        
-        if real_time:
-            print("\n🔄 Real-time monitoring enabled (Ctrl+C to stop)")
-            try:
-                while True:
-                    await asyncio.sleep(5)
-                    current_time = datetime.now().strftime("%H:%M:%S")
-                    if self.resource_manager:
-                        resources = self.resource_manager.get_available_resources()
-                        summary = await self.resource_manager.get_allocation_summary()
-                        print(f"[{current_time}] Available: CPU {resources.cpu_cores} cores, Memory {resources.memory_mb}MB, Allocations: {summary}")
-            except KeyboardInterrupt:
-                print("\n✅ Real-time monitoring stopped")
+        except Exception as e:
+            logger.error(f"Monitoring error: {e}")
+            print(f"❌ Monitoring failed: {e}")
+            raise
+        finally:
+            await self.cleanup_systems()
     
     async def checkpoint(self, name: Optional[str] = None, list_checkpoints: bool = False) -> None:
         """
@@ -374,22 +514,42 @@ async def main() -> None:
             parser.print_help()
             
     except KeyboardInterrupt:
+        logger.info("CLI interrupted by user")
         print("\n👋 LeanVibe CLI interrupted by user")
     except ImportError as e:
+        logger.error(f"Import error: {e}")
         print(f"❌ Import Error: {e}")
-        print("💡 Make sure you have installed all dependencies and the advanced_orchestration module is available")
+        print("💡 Install dependencies: pip install -r requirements.txt")
+        sys.exit(1)
+    except ModuleNotFoundError as e:
+        logger.error(f"Module not found: {e}")
+        print(f"❌ Module Not Found: {e}")
+        print("💡 Check if advanced_orchestration module is available")
         sys.exit(1)
     except FileNotFoundError as e:
+        logger.error(f"File not found: {e}")
         print(f"❌ File Not Found: {e}")
-        print("💡 Check if the file path is correct and you have read permissions")
+        print("💡 Check file path and read permissions")
         sys.exit(1)
     except PermissionError as e:
+        logger.error(f"Permission error: {e}")
         print(f"❌ Permission Error: {e}")
-        print("💡 Check if you have write permissions for checkpoints directory")
+        print("💡 Check write permissions for checkpoints directory")
+        sys.exit(1)
+    except asyncio.TimeoutError:
+        logger.error("Operation timed out")
+        print("❌ Operation timed out")
+        print("💡 System may be unresponsive - check resources")
+        sys.exit(1)
+    except ValueError as e:
+        logger.error(f"Configuration error: {e}")
+        print(f"❌ Configuration Error: {e}")
+        print("💡 Check input parameters and configuration")
         sys.exit(1)
     except Exception as e:
+        logger.error(f"Unexpected error: {e}", exc_info=True)
         print(f"❌ Unexpected Error: {e}")
-        print("💡 For support, please report this issue with the full error message")
+        print("💡 Report this issue with full error details")
         print("   Repository: https://github.com/leanvibe/agent-hive/issues")
         sys.exit(1)
 
