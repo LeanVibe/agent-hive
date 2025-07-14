@@ -4135,3 +4135,25 @@
 2025-07-14 19:37:42 INFO     queue.task_queue                                    Task test-task-003 added to queue with priority 4
 2025-07-14 19:37:42 INFO     queue.task_queue                                    Task test-task-004 added to queue with priority 5
 2025-07-14 19:37:42 INFO     queue.task_queue                                    Restored queue state with 5 tasks
+2025-07-14 19:42:10 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpdzcv1ph2/config.yaml
+2025-07-14 19:42:10 ERROR    config.config_loader                                Configuration file not found: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp1nf9ogf0/missing.yaml
+2025-07-14 19:42:10 ERROR    config.config_loader                                Error parsing configuration file: mapping values are not allowed here
+  in "/var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmplytal38p/invalid.yaml", line 1, column 14
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpqismph0u/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpwg1g2v0y/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp7hlpv8sj/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpscltg6s0/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp5oi0p94b/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpkwen4379/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp1e_a82hy/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp1e_a82hy/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpv_7vzr4w/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpv_7vzr4w/config.yaml
+2025-07-14 19:42:10 ERROR    config.config_loader                                Missing required configuration: agents.claude.cli_path
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpucf85f54/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpucf85f54/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpfbno36mr/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpzd34tomj/config.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpy518divu/empty.yaml
+2025-07-14 19:42:10 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpy518divu/none.yaml
