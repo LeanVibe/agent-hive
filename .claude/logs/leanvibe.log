@@ -13077,3 +13077,214 @@ task: <Task pending name='Task-12' coro=<SmartTestEnforcer.generate_missing_test
 2025-07-14 20:42:50 WARNING  asyncio                                             Loop <_UnixSelectorEventLoop running=False closed=True debug=False> that handles pid 95036 is closed
 2025-07-14 20:42:50 ERROR    asyncio                                             Task was destroyed but it is pending!
 task: <Task pending name='Task-16' coro=<BaseSubprocessTransport._connect_pipes() done, defined at /Users/bogdan/.local/share/mise/installs/python/3.12.11/lib/python3.12/asyncio/base_subprocess.py:156> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-14 20:47:04 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpmpiho251.db
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6ffbvs2i.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Agent test-agent registered successfully
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpv68vtqh8.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Agent test-agent registered successfully
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpqyorf71m.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Agent test-agent registered successfully
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpfquo_fi6.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Agent test-agent registered successfully
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmphpgs2pqw.db
+2025-07-14 20:47:04 WARNING  leanvibe.state_manager                                Agent nonexistent not found in cache
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp_pl9ie32.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Agent test-agent registered successfully
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6psravla.db
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpeb4bi9fk.db
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp1zbnhpz_.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task test-task added with priority 3
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpupqudi8k.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task test-task added with priority 2
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp4ngwe45t.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task test-task added with priority 5
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpr9g2xtmn.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task test-task added with priority 5
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpjg1u29jp.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task task-1 added with priority 5
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task task-2 added with priority 2
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task task-3 added with priority 8
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpw24z9zyi.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task task-1 added with priority 5
+2025-07-14 20:47:04 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:04 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:04 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:04 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp4r178ctd.db
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Agent agent-2 registered successfully
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task task-1 added with priority 5
+2025-07-14 20:47:04 INFO     leanvibe.state_manager                                Task task-2 added with priority 5
+2025-07-14 20:47:04 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:47:04 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 20:47:05 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:47:28 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=gate_1752515248.033113, outcome=pending, pattern_success_rate=0.000, total_samples=1
+2025-07-14 20:47:28 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 20:47:28 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:28 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:28 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:28 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:28 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp2rh7crnr.db
+2025-07-14 20:47:28 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:47:28 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:47:28 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 20:47:28 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:47:50 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=gate_1752515270.254584, outcome=pending, pattern_success_rate=0.000, total_samples=2
+2025-07-14 20:47:50 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 20:47:50 INFO     leanvibe.state_manager                                Checkpoint created: checkpoint_1752515248.041719 (type: manual)
+2025-07-14 20:47:50 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:50 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:50 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:50 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:50 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpp3_42z1u.db
+2025-07-14 20:47:50 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:47:50 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:47:50 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:47:50 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:47:50 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:47:50 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp1px8yqbr.db
+2025-07-14 20:47:50 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:47:50 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:47:50 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 20:47:51 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:48:13 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=gate_1752515293.6208, outcome=pending, pattern_success_rate=0.000, total_samples=3
+2025-07-14 20:48:13 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 20:48:13 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:48:13 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:48:13 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:48:13 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:48:13 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpbt0gowiu.db
+2025-07-14 20:48:13 INFO     leanvibe.state_manager                                Task new-task added with priority 5
+2025-07-14 20:48:13 INFO     leanvibe.confidence_tracker                                Cleanup completed: deleted 0 decisions and 0 patterns
+2025-07-14 20:48:13 INFO     leanvibe.context_monitor                                Cleanup completed: deleted 0 history records and 0 accuracy records
+2025-07-14 20:48:13 INFO     leanvibe.state_manager                                Cleanup completed: deleted 1 records
+2025-07-14 20:48:13 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:48:13 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:48:13 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:48:13 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:48:13 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpxf0rsdse.db
+2025-07-14 20:48:13 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:48:13 INFO     leanvibe.state_manager                                Task task-1 added with priority 5
+2025-07-14 20:48:13 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:48:13 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 20:48:14 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:48:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=gate_1752515316.117819, outcome=pending, pattern_success_rate=0.000, total_samples=4
+2025-07-14 20:48:36 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 20:48:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:48:36 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:48:36 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:48:36 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:48:36 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp7xnz5op2.db
+2025-07-14 20:48:36 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:48:36 INFO     leanvibe.state_manager                                Shutting down StateManager...
+2025-07-14 20:48:36 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:48:36 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 20:48:36 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:48:58 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=gate_1752515338.474988, outcome=pending, pattern_success_rate=0.000, total_samples=5
+2025-07-14 20:48:58 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Checkpoint created: checkpoint_1752515316.128515 (type: shutdown)
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                StateManager shutdown complete
+2025-07-14 20:48:58 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:48:58 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:48:58 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:48:58 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp088vkmhd.db
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-0 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-2 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-3 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-4 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-5 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-6 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-7 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-8 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-9 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:48:58 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:48:58 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:48:58 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpelsuaufu.db
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:48:58 ERROR    leanvibe.state_manager                                Failed to update agent agent-1: Database error
+2025-07-14 20:48:58 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:48:58 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:48:58 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:48:58 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpjtemh236.db
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent agent-1 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 20:48:58 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 20:48:58 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:48:58 INFO     leanvibe.smart_test_enforcer                                SmartTestEnforcer initialized with multi-language support
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp3tre54fk.db
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-3 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-1 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-0 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-2 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-4 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-5 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-6 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-8 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-9 registered successfully
+2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-7 registered successfully
