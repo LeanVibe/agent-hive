@@ -22,7 +22,7 @@ sys.path.insert(0, str(project_root / ".claude"))
 
 # Import components for testing
 try:
-    from queue.task_queue import Task, TaskQueue
+    from task_queue_module.task_queue import Task, TaskQueue
     from agents.base_agent import BaseAgent, AgentStatus, AgentInfo  # Fixed: AgentStatus is the enum
     from config.config_loader import ConfigLoader
     from utils.logging_config import get_logger

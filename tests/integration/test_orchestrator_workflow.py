@@ -18,7 +18,7 @@ sys.path.insert(0, str(project_root / ".claude"))
 
 from orchestrator import LeanVibeOrchestrator
 from task_queue_module.task_queue import Task
-from agents.base_agent import AgentStatus, AgentStatusEnum
+from agents.base_agent import AgentStatus
 
 
 class TestOrchestratorWorkflow:

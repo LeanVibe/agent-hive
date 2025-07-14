@@ -16,7 +16,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
 
 from orchestrator import LeanVibeOrchestrator
-from queue.task_queue import Task
+from task_queue_module.task_queue import Task
 from datetime import datetime
 
 
