@@ -1,6 +1,19 @@
 # Development Guide
 
-This guide provides a comprehensive overview of the LeanVibe Agent Hive project architecture, Phase 2 multi-agent coordination capabilities, modern development workflow with UV/Bun, and contribution guidelines for developers working on the AI orchestration system.
+**📋 Implementation Status**: This guide covers both implemented features and planned functionality. See status markers throughout.
+
+**✅ Currently Implemented**:
+- Multi-agent coordination framework (advanced_orchestration module)
+- Resource management and auto-scaling systems
+- Comprehensive testing infrastructure (100+ tests)
+
+**❌ Not Yet Implemented**:
+- CLI interface and orchestrator wrapper
+- Configuration system and agent framework
+- ML components and pattern analytics
+- Monitoring and observability systems
+
+This guide provides an overview of the LeanVibe Agent Hive project architecture, current coordination capabilities, modern development workflow with UV/Bun, and contribution guidelines.
 
 ## Table of Contents
 
@@ -17,9 +30,17 @@ This guide provides a comprehensive overview of the LeanVibe Agent Hive project 
 
 ## Architecture Overview
 
-LeanVibe Agent Hive is a production-ready distributed multi-agent system with advanced orchestration capabilities. The system has evolved through Phase 1 (Quality Foundation) and is currently implementing Phase 2 (Advanced Orchestration) with 20% completion.
+LeanVibe Agent Hive is a multi-agent system with coordination capabilities. The core orchestration components are implemented, while CLI and configuration systems are planned for Phase 0.
 
-### System Architecture (Phase 2)
+**🏗️ Current Architecture Status**:
+- ✅ **Core Orchestration**: MultiAgentCoordinator, ResourceManager, ScalingManager implemented
+- ❌ **CLI Layer**: Orchestrator wrapper and command interface planned
+- ❌ **Configuration**: Centralized config management planned  
+- ❌ **ML Components**: Pattern analytics and adaptive learning planned
+
+### System Architecture (Planned)
+
+**⚠️ Status**: This diagram shows the planned architecture. Currently only the advanced_orchestration components are implemented.
 
 ```mermaid
 graph TB

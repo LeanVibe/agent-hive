@@ -1,6 +1,19 @@
 # Deployment Guide
 
-Comprehensive deployment guide for LeanVibe Agent Hive - covering production deployment strategies, Docker configuration, monitoring and observability, security considerations, and scalability planning.
+**📋 Implementation Status**: This guide covers deployment plans for both current and future functionality.
+
+**✅ Currently Deployable**:
+- Python API with advanced_orchestration module
+- Multi-agent coordination system as a library
+- Test suite and development environment
+
+**❌ Not Yet Deployable**:
+- CLI interface and orchestrator service
+- Configuration management system
+- Monitoring and observability components
+- Production-ready service wrappers
+
+This guide covers deployment strategies for the current Python API and plans for future production deployment when CLI and service layers are implemented.
 
 ## Table of Contents
 
@@ -21,11 +34,17 @@ LeanVibe Agent Hive is designed for production deployment with high availability
 
 ### Production Readiness Checklist
 
-- [x] **Phase 1 Complete**: Quality foundation with 106+ tests
-- [x] **Phase 2.1 Operational**: Multi-agent coordination with 95%+ efficiency
-- [x] **Performance Validated**: <500ms coordination latency, <5 min MTTR
-- [x] **Security Framework**: Configuration management and access controls
-- [ ] **Phase 2.2-2.5**: Advanced ML, API integration, monitoring, HA (in progress)
+**✅ Currently Ready**:
+- [x] **Core Implementation**: MultiAgentCoordinator, ResourceManager, ScalingManager
+- [x] **Testing Foundation**: 100+ tests with comprehensive coverage
+- [x] **Python API**: Stable import paths and data models
+
+**❌ Not Yet Ready for Production**:
+- [ ] **CLI Interface**: Command-line orchestrator and service wrapper
+- [ ] **Configuration Management**: Centralized config and environment handling
+- [ ] **Service Infrastructure**: Process management, logging, monitoring
+- [ ] **Security Framework**: Authentication, authorization, access controls
+- [ ] **Performance Validation**: Latency benchmarks and MTTR measurement
 
 ### Architecture Overview for Deployment
 

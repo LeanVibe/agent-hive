@@ -1,6 +1,18 @@
 # Troubleshooting Guide
 
-Comprehensive troubleshooting guide for LeanVibe Agent Hive - covering installation issues, configuration problems, multi-agent coordination issues, and performance debugging.
+**📋 Implementation Status**: This guide covers troubleshooting for both implemented and planned features.
+
+**✅ Currently Troubleshootable**:
+- Python API imports and advanced_orchestration module
+- Testing infrastructure and test execution
+- UV/Python environment and dependency issues
+
+**❌ Not Yet Available**:
+- CLI commands and orchestrator troubleshooting
+- Configuration system issues
+- Agent framework and ML component problems
+
+Comprehensive troubleshooting guide for LeanVibe Agent Hive - covering installation issues, current API problems, and development environment debugging.
 
 ## Table of Contents
 
@@ -35,13 +47,18 @@ print(f'Python: {sys.version}')
 print(f'Path: {sys.path[:3]}')
 "
 
-# Validate configuration
+# Validate current implementation
 uv run python -c "
-from claude.config.config_loader import ConfigLoader
-config = ConfigLoader()
-print('✅ Configuration loaded successfully')
-print(f'✅ Validation: {config.validate()}')
+from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from advanced_orchestration.models import CoordinatorConfig
+config = CoordinatorConfig()
+coordinator = MultiAgentCoordinator(config)
+print('✅ Python API working successfully')
+print('✅ Core orchestration components available')
 "
+
+# NOTE: Configuration system not yet implemented
+# Future: from claude.config.config_loader import ConfigLoader
 
 # Run health check test
 uv run pytest tests/integration/test_orchestrator_workflow.py::test_health_check -v
