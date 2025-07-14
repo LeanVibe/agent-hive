@@ -151,36 +151,84 @@ The project has a substantial existing codebase that was initially missed. Gemin
   - [ ] Context efficiency measurements
   - [ ] Scalability testing
 
-#### Success Criteria
-- [ ] All orchestrator methods implemented and functional
-- [ ] Claude Code CLI integration working
-- [ ] Gemini CLI integration working
-- [ ] Agent factory creates and manages agents
-- [ ] State management handles checkpoints and rollbacks
-- [ ] Performance metrics are tracked and reported
-- [ ] All tests pass (unit, integration, performance)
-- [ ] System can execute simple tasks autonomously
+#### Success Criteria ✅ WEEK 2 COMPLETED
+- [x] All orchestrator methods implemented and functional
+- [x] Claude Code CLI integration working (with mock CLI)
+- [x] Agent interface abstraction completed (BaseAgent)
+- [x] ClaudeAgent fully implemented with subprocess management
+- [x] Circuit breaker and retry logic implemented
+- [x] Structured logging with correlation tracking
+- [x] Performance metrics are tracked and reported
+- [x] System can execute simple tasks autonomously
 
-### Phase 2: Smart Integration (Week 3) 🧠
-**Priority: High**
+#### Week 2 Gemini Review Results ⭐
+**Strengths:**
+- ✅ Excellent architecture with clean separation of concerns
+- ✅ Robust error handling with circuit breaker pattern
+- ✅ Successful vertical slice implementation
+- ✅ Superb structured logging with correlation tracking
+- ✅ Proper configuration management
 
-#### Communication Layer Enhancement
-- [ ] Replace file-based communication with message queue
-- [ ] Implement proper task distribution
-- [ ] Add conflict resolution mechanisms
-- [ ] Create task acknowledgment system
+**Critical Areas for Week 3:**
+- 🔧 Create formal pytest test suite
+- 🔧 Remove/refactor legacy components (task_distributor, old state_manager)
+- 🔧 Clean up orchestrator duplicate methods
+- 🔧 Implement checkpoint/rollback system
 
-#### Advanced Learning System
-- [ ] Confidence threshold optimization
-- [ ] Pattern recognition for similar tasks
-- [ ] Performance-based agent selection
-- [ ] Learning from human feedback
+### Phase 1 Week 3: Quality Foundation & State Management 🧪
+**Priority: High - Based on Gemini Review Feedback**
 
-#### Testing Infrastructure
-- [ ] Unit tests for all components
-- [ ] Integration tests for agent communication
-- [ ] Performance benchmarks
-- [ ] End-to-end testing scenarios
+#### Critical Fixes (Gemini Priority 1)
+- [ ] **Formal Test Suite Creation** (Updated based on Gemini feedback)
+  - [ ] Set up pytest framework and basic structure
+  - [ ] **Priority: Unit tests for core independent components**
+    - [ ] CLIManager circuit breaker and retry logic
+    - [ ] TaskQueue priority ordering and dependencies  
+    - [ ] CircuitBreaker state transitions and timing
+    - [ ] ConfigLoader environment variable overrides
+  - [ ] **Pragmatic Integration Tests** (start with key happy paths)
+    - [ ] Basic orchestrator workflow with mock agent
+    - [ ] Task assignment and completion flow
+    - [ ] Agent health check integration
+  - [ ] Target: >80% unit test coverage, selective integration tests
+  
+- [ ] **Legacy Code Cleanup** (Gemini: After unit tests for safety)
+  - [ ] **FIRST**: Create unit tests for components dependent on legacy code
+  - [ ] Remove/refactor old task_distributor.py 
+  - [ ] Update/remove legacy state_manager.py
+  - [ ] Clean up duplicate orchestrator methods (Phase 0 placeholders)  
+  - [ ] Reconcile hook_system.py role (dev tool vs runtime)
+  - [ ] **NEW**: Create centralized config.yaml for all configurable parameters
+
+#### State Management System (Phase 1 Core)
+- [ ] **Checkpoint/Rollback Implementation** (Gemini: Define milestones clearly)
+  - [ ] **Step 1**: Implement JSON checkpoint creation
+  - [ ] **Step 2**: Implement JSON checkpoint restoration  
+  - [ ] **Step 3**: Implement Git milestone creation (define: successful complex tasks)
+  - [ ] **Step 4**: Implement Git milestone restoration
+  - [ ] **Step 5**: Implement automatic checkpoint triggers
+  - [ ] **NEW**: Add state validation mechanism for checkpoint integrity
+  
+- [ ] **Enhanced Performance Monitoring**
+  - [ ] Comprehensive metrics collection
+  - [ ] Performance baseline establishment
+  - [ ] Resource usage tracking
+  - [ ] Bottleneck identification
+  - [ ] Performance regression detection
+
+#### Testing Infrastructure Enhancement
+- [ ] **Comprehensive Test Coverage**
+  - [ ] Unit tests for all core components
+  - [ ] Integration tests for end-to-end workflows
+  - [ ] Mock CLI scenario testing
+  - [ ] Error handling and recovery tests
+  - [ ] Performance and load testing
+  
+- [ ] **CI/CD Pipeline Preparation**
+  - [ ] Automated test execution
+  - [ ] Code quality gates
+  - [ ] Performance benchmarking
+  - [ ] Test reporting and metrics
 
 ### Phase 3: Production Features (Week 4) 🔥
 **Priority: Medium**
@@ -287,8 +335,27 @@ Based on existing codebase foundation:
 4. **Write comprehensive README.md**
 5. **Implement missing orchestrator methods**
 
+### Week 3 Gemini Review Results ⭐ (Latest)
+**Strengths:**
+- ✅ Solid and comprehensive plan incorporating previous feedback effectively
+- ✅ Correct priority on critical fixes (test suite + legacy cleanup)
+- ✅ Sound hybrid state management architecture design
+- ✅ Well-ordered priorities focusing on quality before features
+
+**Specific Recommendations Incorporated:**
+1. **Testing Strategy**: Prioritize unit tests for independent components, start with happy-path integration tests
+2. **State Management**: Define Git milestones as "successful complex tasks", add state validation mechanism
+3. **Risk Mitigation**: Create unit tests before legacy cleanup, centralize configuration management
+4. **Task Breakdown**: Split checkpoint implementation into 5 verifiable steps
+
+**Implementation Approach:**
+- Interleave tasks to maintain momentum
+- Create small, verifiable steps for all major components
+- Safety-first approach: test before cleanup
+
 ## Notes
 - The foundation is much stronger than initially thought
 - Significant cleanup and completion work needed before new features
 - Gemini CLI integration provides excellent review capabilities
 - XP workflow ensures continuous quality and feedback
+- Week 3 plan refined based on detailed Gemini architectural review

@@ -1,6 +1,118 @@
 # LeanVibe Agent Hive - TODO Tracker
 
-## Current Phase: Phase 1 - Core System Completion 🚀
+## Current Phase: Phase 1 Week 3 - Quality Foundation & State Management 🧪
+**Based on Gemini Review Feedback from Week 2**
+
+### Critical Fixes (Gemini Priority 1) - HIGH PRIORITY
+
+#### 1. Formal Test Suite Creation ⭐ (Updated per Gemini)
+- [ ] **Set up pytest framework and basic structure**
+  - [ ] Configure pytest.ini and test structure
+  - [ ] Create test fixtures for common objects  
+  - [ ] Set up mock environments
+  - [ ] Add coverage reporting configuration
+  
+- [ ] **PRIORITY: Unit Tests for Core Independent Components**
+  - [ ] CLIManager circuit breaker and retry logic tests
+  - [ ] TaskQueue priority ordering and dependency tests
+  - [ ] CircuitBreaker state transitions and timing tests
+  - [ ] ConfigLoader environment variable override tests
+  
+- [ ] **Pragmatic Integration Tests** (Start with key happy paths)
+  - [ ] Basic orchestrator workflow with mock agent
+  - [ ] Task assignment and completion flow test
+  - [ ] Agent health check integration test
+  - [ ] **Target**: >80% unit coverage, selective integration tests
+
+#### 2. Legacy Code Cleanup ⭐ (Gemini: Safety-first approach)
+- [ ] **FIRST: Create unit tests for components dependent on legacy code**
+  - [ ] Test components that import task_distributor.py
+  - [ ] Test components that import legacy state_manager.py
+  - [ ] Test components that use Phase 0 orchestrator methods
+  
+- [ ] **Remove/refactor legacy components** (After tests are safety net)
+  - [ ] Remove or update old task_distributor.py
+  - [ ] Update/remove legacy state_manager.py if superseded
+  - [ ] Clean up duplicate orchestrator methods (Phase 0 placeholders)
+  - [ ] Reconcile hook_system.py role (dev tool vs runtime)
+  
+- [ ] **NEW: Configuration Centralization**
+  - [ ] Create centralized config.yaml for all configurable parameters
+  - [ ] Move hardcoded values to configuration
+  - [ ] Update components to use centralized config
+
+### State Management System (Phase 1 Core) - HIGH PRIORITY
+
+#### 3. Checkpoint/Rollback Implementation ⭐ (Gemini: Small verifiable steps)
+- [ ] **Step 1: JSON Checkpoint Creation**
+  - [ ] Design checkpoint data structure
+  - [ ] Implement checkpoint serialization
+  - [ ] Add checkpoint file management
+  
+- [ ] **Step 2: JSON Checkpoint Restoration**  
+  - [ ] Implement checkpoint deserialization
+  - [ ] Add state restoration logic
+  - [ ] Test checkpoint round-trip integrity
+  
+- [ ] **Step 3: Git Milestone Creation** (Define: successful complex tasks)
+  - [ ] Define what constitutes a "complex task completion"
+  - [ ] Implement Git tag-based milestone creation
+  - [ ] Add milestone metadata and context
+  
+- [ ] **Step 4: Git Milestone Restoration**
+  - [ ] Implement Git-based state restoration
+  - [ ] Add conflict resolution for Git state
+  - [ ] Test milestone restoration scenarios
+  
+- [ ] **Step 5: Automatic Checkpoint Triggers**
+  - [ ] Task completion checkpoint triggers
+  - [ ] Time-based checkpoint intervals
+  - [ ] Resource threshold-based triggers
+  
+- [ ] **NEW: State Validation Mechanism**
+  - [ ] Implement checkpoint integrity validation
+  - [ ] Add state consistency checks on restore
+  - [ ] Create state corruption detection
+
+#### 4. Enhanced Performance Monitoring ⭐
+- [ ] **Comprehensive Metrics Collection**
+  - [ ] Task execution time distribution
+  - [ ] Agent utilization and efficiency
+  - [ ] Error rate and recovery time
+  - [ ] Resource usage (CPU, memory, disk)
+  
+- [ ] **Performance Baseline Establishment**
+  - [ ] Benchmark current system performance
+  - [ ] Define acceptable performance thresholds
+  - [ ] Create performance regression detection
+  - [ ] Implement alerting for performance issues
+
+### Testing Infrastructure Enhancement - HIGH PRIORITY
+
+#### 5. Test Coverage and Quality ⭐
+- [ ] **Comprehensive Test Coverage**
+  - [ ] Unit tests achieving >80% code coverage
+  - [ ] Integration tests for all critical workflows
+  - [ ] Mock CLI scenario testing expansion
+  - [ ] Error injection and recovery testing
+  
+- [ ] **CI/CD Pipeline Preparation**
+  - [ ] Automated test execution setup
+  - [ ] Code quality gates configuration
+  - [ ] Performance benchmarking automation
+  - [ ] Test reporting and metrics dashboard
+
+### Week 3 Success Criteria ✅
+- [ ] Formal pytest test suite operational with >80% coverage
+- [ ] All legacy code issues identified and resolved
+- [ ] Checkpoint/rollback system implemented and tested
+- [ ] Performance monitoring providing actionable insights
+- [ ] CI/CD pipeline ready for continuous integration
+- [ ] All critical fixes from Gemini review addressed
+
+---
+
+## Previous Phase Tasks (Completed/Reference)
 
 ### High Priority Tasks
 
@@ -120,12 +232,20 @@
 
 *No blocked tasks currently*
 
-## Next Week's Focus
+## Week 3 Focus (Current) - Quality Foundation
 
-1. **Agent Interface Implementation** - Priority focus on BaseAgent and ClaudeAgent
-2. **Orchestrator Methods** - Complete async method implementations
-3. **Testing Framework** - Expand unit and integration tests
-4. **State Management** - Implement checkpoint/rollback system
+1. **Critical Fixes** - Address all Gemini Priority 1 feedback items
+2. **Test Suite Creation** - Comprehensive pytest implementation with >80% coverage  
+3. **Legacy Cleanup** - Remove/refactor deprecated components and duplicate code
+4. **State Management** - Hybrid checkpoint/rollback system implementation
+5. **Performance Foundation** - Monitoring and benchmarking infrastructure
+
+## Next Week's Focus (Week 4)
+
+1. **GeminiAgent Implementation** - Complete multi-agent coordination
+2. **Advanced Error Recovery** - Intelligent error handling and auto-recovery
+3. **Production Readiness** - Dashboard enhancement and monitoring
+4. **Documentation** - Comprehensive API documentation and usage guides
 
 ## Success Metrics for Phase 1
 
