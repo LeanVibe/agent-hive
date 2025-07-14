@@ -10402,3 +10402,188 @@
 2025-07-14 19:58:26 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp40m_naky/config.yaml
 2025-07-14 19:58:26 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6iig4u3y/empty.yaml
 2025-07-14 19:58:26 INFO     config.config_loader                                Configuration loaded from /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6iig4u3y/none.yaml
+2025-07-14 20:07:34 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:07:47 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpc0gaokkl.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpy8dq7it_.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpx77tt8zr.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp58zvey0z.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmprhwzlfak.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=test_decision_123, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpnc2wze8h.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_3, outcome=failure, pattern_success_rate=0.667, total_samples=3
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpguumw0dz.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp42la3p94.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_0, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp7p1qrl2t.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpzhfg7h7_.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpskgp_pj9.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmplq6tphkh.db
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                Cleanup completed: deleted 1 decisions and 0 patterns
+2025-07-14 20:07:47 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpi0dvoemb.db
+2025-07-14 20:08:30 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpc20ljnow.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp8xkolzkl.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpzsrvsi1k.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6x3xaq7y.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpj77jdm0l.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpt2loz2uf.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=test_decision_123, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpz5nin2d7.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_3, outcome=failure, pattern_success_rate=0.667, total_samples=3
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpr3macf39.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpcagif0wy.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_0, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpj3onxt63.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp0vq75tyz.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmppg28cn2w.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpjlc51yn2.db
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                Cleanup completed: deleted 1 decisions and 0 patterns
+2025-07-14 20:08:30 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpa2wqylvp.db
+2025-07-14 20:08:42 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:08:42 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmphe3qd_3w.db
+2025-07-14 20:08:46 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpx7conciv.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmph5g2y5ci.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpal02sgf6.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpl3u12tiw.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpwvos30fn.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp38mveyyt.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=test_decision_123, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp_cro96ut.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_3, outcome=failure, pattern_success_rate=0.667, total_samples=3
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpmq71zitr.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpa34o9qwb.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_0, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp4cvnsnpb.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpq2n4zq9y.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6ydye2v3.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpkkv176nw.db
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                Cleanup completed: deleted 1 decisions and 0 patterns
+2025-07-14 20:08:46 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp7rf1j814.db
+2025-07-14 20:11:12 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:11:22 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                Cleanup completed: deleted 1 history records and 0 accuracy records
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp8lp0is28.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmplngo2083.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpg0zn7i6z.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpoca2e3k3.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpfsjvq9s9.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpp0ep4vz7.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpk2ij_wra.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpur_l_z58.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                Cleanup completed: deleted 0 history records and 0 accuracy records
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpmf6b9tcn.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp89jxbcmk.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpmo9nfnu2.db
+2025-07-14 20:11:23 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpm7ac59kg.db
+2025-07-14 20:11:34 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                Cleanup completed: deleted 1 history records and 0 accuracy records
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpha_o99uc.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpxg1n5r1a.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpam6_is4p.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp1nd3019n.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp2s4xh2af.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpe05n5td0.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp08urgi0z.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpgfa1tx_3.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                Cleanup completed: deleted 0 history records and 0 accuracy records
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp8v39s448.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpxoo1jmf3.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpi3ctqm5d.db
+2025-07-14 20:11:34 INFO     leanvibe.context_monitor                                ContextMonitor initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp5m9sk1xv.db
+2025-07-14 20:14:32 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:14:32 WARNING  leanvibe.smart_quality_gate                                Test command timed out after 300s
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpaj1d_zn5.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpsi2x9h3p.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpgalzm7e4.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=gate_1752513272.342972, outcome=pending, pattern_success_rate=0.000, total_samples=1
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.800, quality_score: 0.500
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpsvn88mh2.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=gate_1752513272.345803, outcome=pending, pattern_success_rate=0.000, total_samples=1
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.900, quality_score: 0.300
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp0f4nyzos.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpjdc_paqe.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpsjrcjcdk.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6v16hixz.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpfsq2k3a3.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpwq3887qi.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp3113njin.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpvz1hqdxo.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpivxkgf1a.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpu1u3tn1u.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpgwiwjbmb.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmppi8isg68.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpehtxbe3u.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                Final outcome recorded: test_decision_123 -> success
+2025-07-14 20:14:32 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp3rld_480.db
+2025-07-14 20:14:32 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:08 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:15:08 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:08 INFO     leanvibe.smart_quality_gate                                Quality gate decision: allow, confidence: 0.825, quality_score: 0.950
+2025-07-14 20:15:14 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 20:15:14 WARNING  leanvibe.smart_quality_gate                                Test command timed out after 300s
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                Quality gate decision: allow, confidence: 0.825, quality_score: 0.950
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.800, quality_score: 0.500
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.800, quality_score: 0.300
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                Quality gate decision: review, confidence: 0.700, quality_score: 0.950
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 ERROR    leanvibe.smart_quality_gate                                Failed to calculate metrics: Calculation failed
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.800, quality_score: 0.000
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 ERROR    leanvibe.smart_quality_gate                                Failed to get quality stats: DB error
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                Final outcome recorded: test_decision_123 -> success
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 20:15:14 INFO     leanvibe.smart_quality_gate                                Quality gate decision: allow, confidence: 0.825, quality_score: 0.950

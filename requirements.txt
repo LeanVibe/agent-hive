@@ -1,0 +1,16 @@
+# LeanVibe Agent Hive Dependencies
+
+# Core dependencies
+pyyaml>=6.0
+pytest>=7.0
+pytest-asyncio>=0.21.0
+
+# ML and Data Analysis
+numpy>=1.24.0
+
+# Development and testing
+black>=23.0
+ruff>=0.0.290
+
+# Configuration and utilities
+python-dotenv>=1.0.0
