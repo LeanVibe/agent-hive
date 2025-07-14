@@ -611,3 +611,5 @@ agents.claude_agent.CLIError: Command execution failed: [Errno 2] No such file o
 2025-07-14 20:59:02 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-14 20:59:13 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-14 20:59:13 INFO     leanvibe.git_milestone_manager                                GitMilestoneManager initialized for repository: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpt7uzef8d
+2025-07-14 21:02:03 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:02:48 INFO     leanvibe.startup                                    Logging initialized with level INFO

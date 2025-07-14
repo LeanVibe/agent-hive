@@ -12,6 +12,8 @@ from typing import Dict, List, Optional
 sys.path.append(str(Path(__file__).parent))
 
 from state.state_manager import StateManager
+from state.trigger_manager import TriggerManager
+from state.git_milestone_manager import GitMilestoneManager
 from context.smart_context_manager import SmartContextManager
 from learning.confidence_optimizer import ConfidenceOptimizer
 from dashboard.unified_views import UnifiedDashboard
@@ -35,6 +37,12 @@ class LeanVibeOrchestrator:
         
         # State management with ML integration
         self.state_manager = StateManager()
+        
+        # Git milestone management
+        self.git_manager = GitMilestoneManager(self.state_manager)
+        
+        # Automatic trigger system
+        self.trigger_manager = TriggerManager(self.state_manager, self.git_manager)
         
         # Legacy components (Phase 0) - TODO: Replace with StateManager equivalents
         self.monitor = SmartContextManager()
@@ -91,6 +99,9 @@ class LeanVibeOrchestrator:
         
         # Start StateManager checkpoint monitoring
         asyncio.create_task(self._monitor_checkpoints())
+        
+        # Start automatic trigger system
+        asyncio.create_task(self.trigger_manager.start())
 
         while self.running:
             try:
@@ -383,6 +394,9 @@ class LeanVibeOrchestrator:
                 logger.info(f"Agent {agent_id} shutdown complete")
             except Exception as e:
                 logger.error(f"Error shutting down agent {agent_id}: {e}")
+        
+        # Shutdown trigger system
+        await self.trigger_manager.stop()
         
         # Shutdown StateManager
         await self.state_manager.shutdown()
