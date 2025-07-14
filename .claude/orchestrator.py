@@ -20,7 +20,7 @@ from dashboard.unified_views import UnifiedDashboard
 from xp.smart_xp import SmartXPEnforcer
 
 # New imports for Phase 1
-from queue.task_queue import TaskQueue, Task
+from task_queue_module.task_queue import TaskQueue, Task
 from agents.base_agent import BaseAgent
 from agents.claude_agent import ClaudeAgent
 from config.config_loader import get_config

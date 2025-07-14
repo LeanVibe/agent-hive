@@ -16,9 +16,9 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
 
-from claude.orchestrator import LeanVibeOrchestrator
-from claude.queue.task_queue import Task
-from claude.agents.base_agent import AgentStatus, AgentStatusEnum
+from orchestrator import LeanVibeOrchestrator
+from task_queue_module.task_queue import Task
+from agents.base_agent import AgentStatus, AgentStatusEnum
 
 
 class TestOrchestratorWorkflow:

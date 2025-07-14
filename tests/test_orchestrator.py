@@ -21,8 +21,11 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from .claude.orchestrator import LeanVibeOrchestrator
-from queue.task_queue import Task
+# Add .claude directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
+
+from orchestrator import LeanVibeOrchestrator
+from task_queue_module.task_queue import Task
 
 
 class TestLeanVibeOrchestrator:
