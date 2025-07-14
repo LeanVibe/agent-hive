@@ -14014,3 +14014,5 @@ task: <Task pending name='Task-53' coro=<MultiAgentCoordinator._load_balancer() 
 2025-07-14 22:00:08 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator stopped
 2025-07-14 22:00:37 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-14 22:00:37 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=10, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-14 22:50:23 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 22:50:29 INFO     leanvibe.startup                                    Logging initialized with level INFO
