@@ -1,7 +1,8 @@
 # LeanVibe Agent Hive - TODO Tracker
 
-## Current Phase: Phase 1 Week 3 Continuation - Complete Quality Foundation 🧪
-**Major Milestone: Test Suite ✅ COMPLETED | Next: Legacy Cleanup & State Management**
+## Current Phase: Phase 1 Week 3 Continuation - Fix Async Tests (Priority 1) ⚡
+**Major Milestone: Test Suite ✅ COMPLETED | IMMEDIATE: Fix Async Configuration**
+**Gemini Assessment: "Excellent Progress" - Following Priority Order to Unblock All Work**
 
 ### ✅ COMPLETED: Critical Fixes (Gemini Priority 1)
 
@@ -23,30 +24,39 @@
   - [x] Agent health check integration test ✅
   - [x] **Target**: >80% unit coverage, selective integration tests ✅
 
-### 🔄 IN PROGRESS: Remaining Week 3 Tasks - HIGH PRIORITY
+### ⚡ IMMEDIATE PRIORITIES (Gemini Priority Order) - HIGH PRIORITY
 
-#### 1. Fix Async Test Configuration ⚠️ (Immediate Priority)
-- [ ] **Resolve TaskQueue async testing issues**
-  - [ ] Fix pytest asyncio configuration for TaskQueue tests
+#### ⚡ PRIORITY 1: Fix Async Test Configuration (UNBLOCKS ALL WORK)
+**Status: IN PROGRESS** | **Gemini**: *"Immediately focus on resolving the pytest-asyncio configuration issues"*
+
+- [ ] **Resolve pytest-asyncio configuration issues**
+  - [ ] Fix asyncio mode configuration in pytest.ini
+  - [ ] Add proper async fixtures for TaskQueue testing
   - [ ] Ensure all 15+ TaskQueue tests pass
-  - [ ] Add async fixtures for queue testing
+  - [ ] Test async task queue operations (add, get, mark status)
   - [ ] Validate test coverage reaches >80% target
 
-#### 2. Legacy Code Cleanup ⭐ (Gemini: Safety-first approach)
+#### ⚡ PRIORITY 2: Centralize Configuration (During Legacy Cleanup)
+**Status: PENDING** | **Gemini**: *"Create the config.yaml. This will simplify upcoming implementations"*
+
+- [ ] **Create centralized config.yaml**
+  - [ ] Move hardcoded values to configuration
+  - [ ] Define agent configurations (claude, gemini) 
+  - [ ] Add system settings (logging, timeouts, limits)
+  - [ ] Update components to use centralized config
+
+#### ⚡ PRIORITY 3: Execute Legacy Cleanup (Safe with Test Protection)
+**Status: PENDING** | **Gemini**: *"With the test suite as a safety net, this is the next logical step"*
+
 - [x] **FIRST: Create unit tests for components dependent on legacy code** ✅
   - [x] ✅ Unit tests created (safety net in place)
   
-- [ ] **Remove/refactor legacy components** (After tests are safety net)
+- [ ] **Remove/refactor legacy components** (Tests provide protection)
   - [ ] Analyze dependencies of task_distributor.py
   - [ ] Remove or update old task_distributor.py
-  - [ ] Update/remove legacy state_manager.py if superseded
+  - [ ] Update/remove legacy state_manager.py if superseded  
   - [ ] Clean up duplicate orchestrator methods (Phase 0 placeholders)
   - [ ] Reconcile hook_system.py role (dev tool vs runtime)
-  
-- [ ] **NEW: Configuration Centralization**
-  - [ ] Create centralized config.yaml for all configurable parameters
-  - [ ] Move hardcoded values to configuration
-  - [ ] Update components to use centralized config
 
 ### State Management System (Phase 1 Core) - HIGH PRIORITY
 
@@ -239,17 +249,18 @@
 
 *No blocked tasks currently*
 
-## Week 3 Continuation Focus (Current) - Complete Quality Foundation
+## Week 3 Continuation Focus (Current) - Following Gemini Priority Order ⚡
 
-### ✅ COMPLETED (Major Milestone)
+### ✅ COMPLETED (Major Milestone) 
 1. **✅ Test Suite Creation** - Comprehensive pytest implementation (CircuitBreaker + ConfigLoader tests passing)
 2. **✅ Critical Fixes** - Gemini Priority 1 recommendations implemented
+3. **✅ Planning Workflow** - Updated docs with Gemini validation and clear priorities
 
-### 🔄 IN PROGRESS (Immediate Next Steps)
-1. **Fix Async Configuration** - Resolve TaskQueue testing issues for >80% coverage
-2. **Legacy Cleanup** - Remove deprecated components (tests provide safety net)
-3. **State Management** - Hybrid checkpoint/rollback system (5 verifiable steps)
-4. **Performance Foundation** - Monitoring and benchmarking infrastructure
+### ⚡ IMMEDIATE PRIORITIES (Gemini Order - Unblocks All Work)
+1. **🔄 Fix Async Configuration** - Resolve TaskQueue pytest-asyncio issues (IN PROGRESS)
+2. **📋 Centralize Configuration** - Create config.yaml during legacy cleanup
+3. **🧹 Legacy Cleanup** - Remove deprecated components (tests provide safety net)
+4. **💾 State Management** - Hybrid checkpoint/rollback system (5 verifiable steps)
 
 ## Week 4 Focus (Next Phase) - Multi-Agent & Production Features
 
@@ -266,11 +277,16 @@
 - [x] **Integration Testing** - Orchestrator workflow with mock agents functional
 - [x] **Quality Foundation** - Safety-first approach with unit tests before cleanup
 
-### 🎯 Week 3 Completion Targets
-- [ ] **All tests pass** - Including TaskQueue async tests (15+ tests)
+### ⚡ IMMEDIATE COMPLETION TARGETS (Gemini Priority Order)
+- [ ] **Async tests fixed** - All TaskQueue async tests passing (15+ tests) 
+- [ ] **Configuration centralized** - config.yaml created with all settings
 - [ ] **Legacy cleanup complete** - task_distributor.py and duplicate methods removed
-- [ ] **Checkpoint system** - JSON + Git milestone implementation (5 steps)
+- [ ] **>80% test coverage** - Comprehensive test suite validation
+
+### 🎯 Week 3 Final Targets (After Immediate Priorities)
+- [ ] **Checkpoint system** - JSON + Git milestone implementation (5 verifiable steps)
 - [ ] **Performance monitoring** - Comprehensive metrics collection baseline
+- [ ] **State validation** - Integrity checks and corruption detection
 
 ### 🚀 Week 4 Targets
 - [ ] **GeminiAgent integration** - Complete multi-agent coordination

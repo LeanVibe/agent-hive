@@ -231,14 +231,32 @@ The project has a substantial existing codebase that was initially missed. Gemin
   - [ ] Test reporting and metrics
 
 ### Phase 1 Week 3 Continuation: Complete Quality Foundation 🧪
-**Priority: High - Immediate Next Steps**
+**Priority: High - Following Gemini Priority Order**
 
-#### Critical Tasks (Immediate - Following Gemini Recommendations)
-- [ ] **Fix Async Test Configuration**
-  - [ ] Resolve TaskQueue async testing issues
+#### ⚡ IMMEDIATE PRIORITY 1: Fix Async Test Configuration (Unblocks All Work)
+**Status: IN PROGRESS**
+
+Based on Gemini's assessment: *"Immediately focus on resolving the pytest-asyncio configuration issues to get the TaskQueue tests passing. This unblocks all other work."*
+
+- [ ] **Resolve pytest-asyncio configuration issues**
+  - [ ] Fix asyncio mode configuration in pytest.ini
+  - [ ] Add proper async fixtures for TaskQueue testing  
   - [ ] Ensure all 15+ TaskQueue tests pass
-  - [ ] Add async fixtures for queue testing
-  - [ ] Validate test coverage reaches >80%
+  - [ ] Validate test coverage reaches >80% target
+  - [ ] Test async task queue operations (add, get, mark status)
+
+#### ⚡ IMMEDIATE PRIORITY 2: Centralize Configuration (During Legacy Cleanup)
+**Status: PENDING** 
+
+Gemini: *"As part of the legacy cleanup, create the config.yaml. This will simplify the upcoming GeminiAgent and state management implementations."*
+
+- [ ] **Create centralized config.yaml** 
+  - [ ] Move hardcoded values to configuration
+  - [ ] Define agent configurations (claude, gemini)
+  - [ ] Add system settings (logging, timeouts, limits)
+  - [ ] Update components to use centralized config
+
+#### ⚡ IMMEDIATE PRIORITY 3: Legacy Code Cleanup (Safety-First Approach)
 
 - [ ] **Legacy Code Cleanup** (Safety-First Approach)
   - [x] ✅ Unit tests created (safety net in place)
