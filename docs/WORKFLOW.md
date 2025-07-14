@@ -43,15 +43,18 @@ This document defines the autonomous working methodology for the LeanVibe Agent 
 ### Phase 3: Implementation
 
 5. **Execute Tasks**
+   - Create feature branch for each task
    - Implement tasks following the refined plan
    - Maintain focus on current TODO items
    - Write comprehensive tests for all components
    - Ensure quality gates are met
 
 6. **Commit & Push**
-   - Commit completed work with detailed messages
+   - Commit each completed task on feature branch
    - Include test results and quality metrics
-   - Push changes to maintain progress visibility
+   - Push feature branch to origin
+   - Merge to main after task completion
+   - Delete feature branch after merge
 
 ### Phase 4: Continuous Review
 
@@ -126,7 +129,8 @@ gemini cli evaluate-approach --context "current context"
 
 ### Git Workflow
 ```bash
-# Standard commit pattern
+# Feature branch workflow
+git checkout -b feature/phase-X-task-description
 git add -A
 git commit -m "Brief description
 
@@ -137,7 +141,28 @@ Technical details and metrics
 
 Co-Authored-By: Claude <noreply@anthropic.com>"
 
+git push origin feature/phase-X-task-description
+
+# After task completion, merge to main
+git checkout main
+git merge feature/phase-X-task-description
 git push origin main
+git branch -d feature/phase-X-task-description
+```
+
+### Worktree Management
+```bash
+# Create worktree for new phase
+git worktree add ../agent-hive-phase2 -b phase2/main
+
+# Switch between worktrees
+cd ../agent-hive-phase2
+
+# List all worktrees
+git worktree list
+
+# Remove worktree when done
+git worktree remove ../agent-hive-phase2
 ```
 
 ## Success Metrics
