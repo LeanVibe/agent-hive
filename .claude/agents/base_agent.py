@@ -29,6 +29,7 @@ class Task:
     created_at: datetime
     deadline: Optional[datetime] = None
     dependencies: List[str] = None
+    timeout_seconds: Optional[int] = None
     
     def __post_init__(self):
         if self.dependencies is None:

@@ -5,7 +5,7 @@ import asyncio
 import heapq
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 from enum import Enum
 import logging
 
@@ -44,12 +44,13 @@ class QueuedTask:
 class TaskQueue:
     """Intelligent task queue with priority management and dependencies."""
     
-    def __init__(self):
+    def __init__(self, max_size: Optional[int] = None):
         self._queue: List[QueuedTask] = []
         self._tasks: Dict[str, QueuedTask] = {}
         self._dependencies: Dict[str, Set[str]] = {}
         self._dependents: Dict[str, Set[str]] = {}
         self._lock = asyncio.Lock()
+        self._max_size = max_size
         
     async def add_task(self, task: Task) -> bool:
         """Add a task to the queue.
@@ -63,6 +64,11 @@ class TaskQueue:
         async with self._lock:
             if task.id in self._tasks:
                 logger.warning(f"Task {task.id} already exists in queue")
+                return False
+            
+            # Check size limit
+            if self._max_size and len(self._tasks) >= self._max_size:
+                logger.warning(f"Queue at maximum capacity ({self._max_size})")
                 return False
             
             queued_task = QueuedTask(task=task)
@@ -305,3 +311,111 @@ class TaskQueue:
             
             logger.info(f"Cleared {cleared_count} completed tasks")
             return cleared_count
+    
+    async def get_timed_out_tasks(self) -> List[Task]:
+        """Get tasks that have exceeded their timeout.
+        
+        Returns:
+            List of timed out tasks
+        """
+        async with self._lock:
+            timed_out = []
+            current_time = datetime.now()
+            
+            for queued_task in self._tasks.values():
+                if (queued_task.status == TaskStatus.IN_PROGRESS and
+                    queued_task.task.timeout_seconds and
+                    queued_task.started_at and
+                    (current_time - queued_task.started_at).total_seconds() > queued_task.task.timeout_seconds):
+                    timed_out.append(queued_task.task)
+            
+            return timed_out
+    
+    async def get_queue_state(self) -> Dict[str, Any]:
+        """Get complete queue state for persistence.
+        
+        Returns:
+            Dictionary with complete queue state
+        """
+        async with self._lock:
+            return {
+                "tasks": {
+                    task_id: {
+                        "task": {
+                            "id": qt.task.id,
+                            "type": qt.task.type,
+                            "description": qt.task.description,
+                            "priority": qt.task.priority,
+                            "data": qt.task.data,
+                            "created_at": qt.task.created_at.isoformat(),
+                            "deadline": qt.task.deadline.isoformat() if qt.task.deadline else None,
+                            "dependencies": qt.task.dependencies,
+                            "timeout_seconds": qt.task.timeout_seconds
+                        },
+                        "status": qt.status.value,
+                        "assigned_agent": qt.assigned_agent,
+                        "attempts": qt.attempts,
+                        "max_attempts": qt.max_attempts,
+                        "created_at": qt.created_at.isoformat(),
+                        "started_at": qt.started_at.isoformat() if qt.started_at else None,
+                        "completed_at": qt.completed_at.isoformat() if qt.completed_at else None
+                    }
+                    for task_id, qt in self._tasks.items()
+                },
+                "dependencies": {k: list(v) for k, v in self._dependencies.items()},
+                "dependents": {k: list(v) for k, v in self._dependents.items()}
+            }
+    
+    async def restore_state(self, state: Dict[str, Any]) -> None:
+        """Restore queue state from persistence data.
+        
+        Args:
+            state: Dictionary with queue state to restore
+        """
+        async with self._lock:
+            from datetime import datetime
+            
+            # Clear current state
+            self._queue.clear()
+            self._tasks.clear()
+            self._dependencies.clear()
+            self._dependents.clear()
+            
+            # Restore tasks
+            for task_id, task_data in state.get("tasks", {}).items():
+                task_info = task_data["task"]
+                
+                # Recreate Task object
+                task = Task(
+                    id=task_info["id"],
+                    type=task_info["type"],
+                    description=task_info["description"],
+                    priority=task_info["priority"],
+                    data=task_info["data"],
+                    created_at=datetime.fromisoformat(task_info["created_at"]),
+                    deadline=datetime.fromisoformat(task_info["deadline"]) if task_info["deadline"] else None,
+                    dependencies=task_info["dependencies"],
+                    timeout_seconds=task_info["timeout_seconds"]
+                )
+                
+                # Recreate QueuedTask
+                queued_task = QueuedTask(
+                    task=task,
+                    status=TaskStatus(task_data["status"]),
+                    assigned_agent=task_data["assigned_agent"],
+                    attempts=task_data["attempts"],
+                    max_attempts=task_data["max_attempts"],
+                    created_at=datetime.fromisoformat(task_data["created_at"]),
+                    started_at=datetime.fromisoformat(task_data["started_at"]) if task_data["started_at"] else None,
+                    completed_at=datetime.fromisoformat(task_data["completed_at"]) if task_data["completed_at"] else None
+                )
+                
+                self._tasks[task_id] = queued_task
+                if queued_task.status == TaskStatus.PENDING:
+                    heapq.heappush(self._queue, queued_task)
+            
+            # Restore dependencies
+            self._dependencies = {k: set(v) for k, v in state.get("dependencies", {}).items()}
+            self._dependents = {k: set(v) for k, v in state.get("dependents", {}).items()}
+            
+            logger.info(f"Restored queue state with {len(self._tasks)} tasks")

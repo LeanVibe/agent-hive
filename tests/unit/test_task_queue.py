@@ -23,27 +23,31 @@ class TestTaskQueue:
     """Test cases for TaskQueue functionality."""
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_task_queue_initialization(self):
         """Test task queue initializes empty."""
         queue = TaskQueue()
         
         status = await queue.get_queue_status()
-        assert status["total_tasks"] == 0
-        assert status["pending_tasks"] == 0
-        assert status["in_progress_tasks"] == 0
-        assert status["completed_tasks"] == 0
+        assert status["pending"] == 0
+        assert status["in_progress"] == 0
+        assert status["completed"] == 0
+        assert status["failed"] == 0
+        assert status["cancelled"] == 0
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_add_single_task(self, task_queue, sample_task):
         """Test adding a single task to the queue."""
         result = await task_queue.add_task(sample_task)
         assert result is True
         
         status = await task_queue.get_queue_status()
-        assert status["total_tasks"] == 1
-        assert status["pending_tasks"] == 1
+        assert status["pending"] == 1
+        assert sum(status.values()) == 1  # Total tasks
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_add_multiple_tasks(self, task_queue, sample_tasks):
         """Test adding multiple tasks to the queue."""
         for task in sample_tasks:
@@ -51,10 +55,11 @@ class TestTaskQueue:
             assert result is True
         
         status = await task_queue.get_queue_status()
-        assert status["total_tasks"] == len(sample_tasks)
-        assert status["pending_tasks"] == len(sample_tasks)
+        assert status["pending"] == len(sample_tasks)
+        assert sum(status.values()) == len(sample_tasks)  # Total tasks
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_get_next_task_priority_order(self, task_queue, sample_tasks):
         """Test tasks are returned in priority order (highest first)."""
         # Add tasks in random order
@@ -76,6 +81,7 @@ class TestTaskQueue:
         assert priorities == sorted(priorities, reverse=True)
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_task_capability_filtering(self, task_queue):
         """Test tasks are filtered by agent capabilities."""
         # Create tasks with different types
@@ -111,6 +117,7 @@ class TestTaskQueue:
         assert next_task.id == "task-2"
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_mark_task_in_progress(self, task_queue, sample_task):
         """Test marking a task as in progress."""
         await task_queue.add_task(sample_task)
@@ -124,10 +131,11 @@ class TestTaskQueue:
         assert result is True
         
         status = await task_queue.get_queue_status()
-        assert status["pending_tasks"] == 0
-        assert status["in_progress_tasks"] == 1
+        assert status["pending"] == 0
+        assert status["in_progress"] == 1
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_mark_task_completed(self, task_queue, sample_task):
         """Test marking a task as completed."""
         await task_queue.add_task(sample_task)
@@ -139,10 +147,11 @@ class TestTaskQueue:
         assert result is True
         
         status = await task_queue.get_queue_status()
-        assert status["in_progress_tasks"] == 0
-        assert status["completed_tasks"] == 1
+        assert status["in_progress"] == 0
+        assert status["completed"] == 1
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_mark_task_failed_with_retry(self, task_queue, sample_task):
         """Test marking a task as failed with retry enabled."""
         await task_queue.add_task(sample_task)
@@ -154,10 +163,11 @@ class TestTaskQueue:
         assert result is True
         
         status = await task_queue.get_queue_status()
-        assert status["in_progress_tasks"] == 0
-        assert status["pending_tasks"] == 1  # Should be back in pending
+        assert status["in_progress"] == 0
+        assert status["pending"] == 1  # Should be back in pending
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_mark_task_failed_no_retry(self, task_queue, sample_task):
         """Test marking a task as failed without retry."""
         await task_queue.add_task(sample_task)
@@ -169,10 +179,11 @@ class TestTaskQueue:
         assert result is True
         
         status = await task_queue.get_queue_status()
-        assert status["in_progress_tasks"] == 0
-        assert status["failed_tasks"] == 1
+        assert status["in_progress"] == 0
+        assert status["failed"] == 1
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_task_timeout_handling(self, task_queue):
         """Test handling of timed-out tasks."""
         # Create task with short timeout for testing
@@ -199,6 +210,7 @@ class TestTaskQueue:
         assert timed_out_tasks[0].id == "timeout-test"
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_task_dependency_basic(self, task_queue):
         """Test basic task dependency functionality."""
         # Create dependent tasks
@@ -233,6 +245,7 @@ class TestTaskQueue:
         assert next_task is None
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_task_dependency_resolution(self, task_queue):
         """Test task dependency resolution when parent completes."""
         # Create dependent tasks
@@ -268,6 +281,7 @@ class TestTaskQueue:
         assert child.id == "child"
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_duplicate_task_prevention(self, task_queue, sample_task):
         """Test prevention of duplicate task IDs."""
         # Add task first time
@@ -279,9 +293,10 @@ class TestTaskQueue:
         assert result2 is False
         
         status = await task_queue.get_queue_status()
-        assert status["total_tasks"] == 1
+        assert sum(status.values()) == 1  # Total tasks
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_queue_size_limit(self):
         """Test queue size limit enforcement."""
         # Create queue with small limit
@@ -314,6 +329,7 @@ class TestTaskQueue:
 
     @pytest.mark.unit
     @pytest.mark.performance
+    @pytest.mark.asyncio
     async def test_queue_performance(self, performance_thresholds):
         """Test queue performance with many tasks."""
         queue = TaskQueue()
@@ -353,6 +369,7 @@ class TestTaskQueue:
         assert retrieved_count == num_tasks
 
     @pytest.mark.unit
+    @pytest.mark.asyncio
     async def test_queue_persistence_simulation(self, task_queue, sample_tasks, temp_directory):
         """Test queue state persistence simulation."""
         # Add tasks
@@ -364,9 +381,16 @@ class TestTaskQueue:
         
         # Simulate persistence
         import json
+        
+        def json_serializer(obj):
+            """JSON serializer for objects not serializable by default json code"""
+            if hasattr(obj, 'isoformat'):
+                return obj.isoformat()
+            return str(obj)
+        
         state_file = temp_directory / "queue_state.json"
         with open(state_file, 'w') as f:
-            json.dump(state, f, default=str)
+            json.dump(state, f, default=json_serializer, indent=2)
         
         # Create new queue and restore state
         new_queue = TaskQueue()
@@ -377,4 +401,4 @@ class TestTaskQueue:
         
         # Verify restoration
         status = await new_queue.get_queue_status()
-        assert status["total_tasks"] == len(sample_tasks)
+        assert sum(status.values()) == len(sample_tasks)

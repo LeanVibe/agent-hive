@@ -5,12 +5,14 @@ This module provides common fixtures and configurations used across all tests.
 """
 
 import pytest
+import pytest_asyncio
 import asyncio
 import tempfile
 import shutil
 from pathlib import Path
 from typing import Dict, Any, AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock
+from datetime import datetime
 
 # Add project root and .claude to path for imports
 import sys
@@ -21,7 +23,7 @@ sys.path.insert(0, str(project_root / ".claude"))
 # Import components for testing
 try:
     from queue.task_queue import Task, TaskQueue
-    from agents.base_agent import BaseAgent, AgentStatus, AgentStatusEnum
+    from agents.base_agent import BaseAgent, AgentStatus, AgentInfo  # Fixed: AgentStatus is the enum
     from config.config_loader import ConfigLoader
     from utils.logging_config import get_logger
 except ImportError as e:
@@ -35,7 +37,7 @@ except ImportError as e:
         pass
     class AgentStatus:
         pass
-    class AgentStatusEnum:
+    class AgentInfo:
         pass
     class ConfigLoader:
         pass
@@ -89,13 +91,12 @@ def sample_tasks():
     return tasks
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def task_queue():
     """Create a TaskQueue instance for testing."""
     queue = TaskQueue()
     yield queue
-    # Cleanup
-    await queue.clear()
+    # Cleanup - no explicit cleanup needed for TaskQueue
 
 
 @pytest.fixture
@@ -105,12 +106,12 @@ def mock_agent():
     agent.agent_id = "mock-agent-001"
     agent.get_capabilities.return_value = ["code_generation", "text_processing"]
     agent.can_handle_task.return_value = True
-    agent.get_status.return_value = AgentStatus(
-        agent_id="mock-agent-001",
-        status=AgentStatusEnum.IDLE,
-        current_task_id=None,
-        last_heartbeat=None,
-        capabilities=["code_generation", "text_processing"]
+    agent.get_status.return_value = AgentInfo(
+        id="mock-agent-001",
+        status=AgentStatus.IDLE,
+        capabilities=["code_generation", "text_processing"],
+        current_task=None,
+        last_activity=datetime.now()
     )
     agent.health_check.return_value = True
     return agent
