@@ -26,15 +26,17 @@
 
 ### ⚡ IMMEDIATE PRIORITIES (Gemini Priority Order) - HIGH PRIORITY
 
-#### ⚡ PRIORITY 1: Fix Async Test Configuration (UNBLOCKS ALL WORK)
-**Status: IN PROGRESS** | **Gemini**: *"Immediately focus on resolving the pytest-asyncio configuration issues"*
+#### ⚡ PRIORITY 1: Fix Async Test Configuration ✅ COMPLETED (UNBLOCKED ALL WORK)
+**Status: ✅ COMPLETED** | **Gemini**: *"Immediately focus on resolving the pytest-asyncio configuration issues"*
 
-- [ ] **Resolve pytest-asyncio configuration issues**
-  - [ ] Fix asyncio mode configuration in pytest.ini
-  - [ ] Add proper async fixtures for TaskQueue testing
-  - [ ] Ensure all 15+ TaskQueue tests pass
-  - [ ] Test async task queue operations (add, get, mark status)
-  - [ ] Validate test coverage reaches >80% target
+- [x] **✅ Resolve pytest-asyncio configuration issues**
+  - [x] ✅ Fix asyncio mode configuration in pytest.ini
+  - [x] ✅ Add proper async fixtures for TaskQueue testing
+  - [x] ✅ Ensure all 16 TaskQueue tests pass (100% success rate)
+  - [x] ✅ Test async task queue operations (add, get, mark status, dependencies, timeout, persistence)
+  - [x] ✅ Enhanced TaskQueue with missing methods for comprehensive testing
+
+**Result**: All async test infrastructure functional. Work is now unblocked to proceed with PRIORITY 2.
 
 #### ⚡ PRIORITY 2: Centralize Configuration (During Legacy Cleanup)
 **Status: PENDING** | **Gemini**: *"Create the config.yaml. This will simplify upcoming implementations"*
@@ -257,8 +259,8 @@
 3. **✅ Planning Workflow** - Updated docs with Gemini validation and clear priorities
 
 ### ⚡ IMMEDIATE PRIORITIES (Gemini Order - Unblocks All Work)
-1. **🔄 Fix Async Configuration** - Resolve TaskQueue pytest-asyncio issues (IN PROGRESS)
-2. **📋 Centralize Configuration** - Create config.yaml during legacy cleanup
+1. **✅ Fix Async Configuration** - Resolve TaskQueue pytest-asyncio issues (COMPLETED)
+2. **📋 Centralize Configuration** - Create config.yaml during legacy cleanup (CURRENT)
 3. **🧹 Legacy Cleanup** - Remove deprecated components (tests provide safety net)
 4. **💾 State Management** - Hybrid checkpoint/rollback system (5 verifiable steps)
 
@@ -278,8 +280,8 @@
 - [x] **Quality Foundation** - Safety-first approach with unit tests before cleanup
 
 ### ⚡ IMMEDIATE COMPLETION TARGETS (Gemini Priority Order)
-- [ ] **Async tests fixed** - All TaskQueue async tests passing (15+ tests) 
-- [ ] **Configuration centralized** - config.yaml created with all settings
+- [x] **✅ Async tests fixed** - All TaskQueue async tests passing (16 tests, 100% success) 
+- [ ] **Configuration centralized** - config.yaml created with all settings (CURRENT)
 - [ ] **Legacy cleanup complete** - task_distributor.py and duplicate methods removed
 - [ ] **>80% test coverage** - Comprehensive test suite validation
 
