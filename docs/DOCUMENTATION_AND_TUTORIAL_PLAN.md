@@ -499,6 +499,34 @@ git checkout -b tutorial/phase2-initialization
 git checkout -b tutorial/phase3-development
 ```
 
+### Gemini CLI Recommendations Integrated ✅
+
+#### 1. Pre-flight Tool Verification
+```bash
+# Tool availability verification script
+./scripts/verify-environment.sh
+```
+- Checks UV, Bun, Git, Docker availability
+- Validates versions and PATH configuration
+- Prevents runtime errors during tutorial
+
+#### 2. Mermaid.js Diagrams
+- **Text-based diagrams**: Version control friendly
+- **Embedded in Markdown**: Direct integration
+- **Agent-generatable**: Automated diagram creation
+
+#### 3. DevContainer Support
+```json
+// .devcontainer/devcontainer.json
+{
+  "name": "LeanVibe Agent Hive",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  }
+}
+```
+
 ### Autonomous Workflow Implementation
 
 #### **🚨 CRITICAL INSTRUCTION FOR ALL SUBAGENTS**
