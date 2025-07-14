@@ -11,6 +11,69 @@ This document defines the autonomous working methodology for the LeanVibe Agent 
 - Once details are clear, Claude + Gemini should work autonomously until entire plan is implemented
 - Minimize human intervention during implementation phases
 
+## 🚨 MANDATORY: Subagent Feature Branch Protocol
+
+### For ALL Subagents Working in Separate Worktrees
+
+**CRITICAL REQUIREMENT**: Every subagent MUST follow this protocol without exception.
+
+#### 1. Create Dedicated Feature Branch
+- **NEVER work directly on main/master branch**
+- **Create feature branch** before any work begins
+- **Name format**: `feature/{subagent-purpose}-{component}`
+- **Examples**: 
+  - `feature/docs-update-comprehensive`
+  - `feature/tutorial-medium-clone`
+  - `feature/tech-debt-analysis`
+  - `feature/phase2-ml-components`
+
+#### 2. Commit Protocol (MANDATORY)
+- **Frequency**: After each individual task completion
+- **Quality Gates**: All tests MUST pass before commit
+- **Message Format**: Descriptive with component and achievement
+- **Template**:
+```
+feat(component): Brief description
+
+✅ Completed: Specific achievements
+✅ Tests passed ✅ Build successful
+
+Technical details and metrics
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+#### 3. Push Immediately After Commit
+- **Push timing**: Immediately after each commit
+- **Command**: `git push origin feature/branch-name`
+- **Purpose**: Maintain visibility and backup of work
+
+#### 4. Integration Request Protocol
+- **Only after feature completion**: Request integration when entire feature is done
+- **Include**: Test results, quality metrics, completion summary
+- **Never**: Partial or incomplete work integration
+
+#### 5. Branch Lifecycle Management
+- **Duration**: Keep branch active only during active development
+- **Cleanup**: Delete after successful integration
+- **No persistence**: Feature branches are temporary working branches
+
+### Worktree Integration and Cleanup Protocol
+
+#### When Work is Complete
+1. **Notify Integration Agent**: Signal that feature branch work is complete
+2. **Provide Integration Summary**: Include test results, achievements, changes
+3. **Wait for Integration**: Do not delete worktree until integration is confirmed
+4. **Verify Integration**: Confirm work appears in main branch
+
+#### Worktree Cleanup (Integration Agent Only)
+1. **Validate Completion**: Ensure all work is properly integrated into main
+2. **Remove Worktree**: `git worktree remove /path/to/worktree`
+3. **Delete Feature Branch**: `git branch -d feature/branch-name`
+4. **Clean Remote**: `git push origin --delete feature/branch-name`
+
 ## Workflow Phases
 
 ### Phase 1: Planning & Breakdown

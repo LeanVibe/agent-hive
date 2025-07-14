@@ -34,6 +34,14 @@ Follow the established workflow documented in `docs/WORKFLOW.md`:
 - Compress completed items in docs/PLAN.md
 - Clear completed todos when switching tasks
 
-Reference: `docs/WORKFLOW.md` for complete methodology
+### 🚨 MANDATORY: Subagent Feature Branch Protocol
+**ALL subagents working in separate worktrees MUST:**
+1. Create dedicated feature branch before any work
+2. Commit after each task completion with quality gates
+3. Push feature branch immediately after each commit
+4. Request integration only after feature completion
+5. Never work directly on main/master branch
+
+**Reference**: See [docs/WORKFLOW.md](docs/WORKFLOW.md) for complete methodology and detailed protocols
 
 # For agents: Use agent_CLAUDE_template.md in each worktree, replacing with specific persona.
