@@ -55,10 +55,11 @@ LeanVibe Agent Hive is a production-ready multi-agent orchestration system that 
 ## Quick Start
 
 **📋 Current Implementation Status**:
-- ✅ **Python API**: Multi-agent coordination, resource management, scaling
-- ✅ **Testing Framework**: 100+ tests with comprehensive coverage
+- ✅ **Python API**: Multi-agent coordination, resource management, scaling, ML enhancements
+- ✅ **Testing Framework**: 190+ tests with comprehensive coverage  
 - ✅ **CLI Interface**: Full command-line interface with orchestrate, spawn, monitor, checkpoint commands
 - ✅ **Git Hooks**: Quality gates with automated testing and validation
+- ✅ **ML Components**: PatternOptimizer, PredictiveAnalytics, AdaptiveLearning (Phase 2.2)
 - ❌ **Orchestrator Script**: `.claude/orchestrator.py` does not exist
 
 ### Prerequisites
@@ -142,12 +143,19 @@ python cli.py checkpoint --list
 
 ```python
 # Using the Python API (also available)
-from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from advanced_orchestration import MultiAgentCoordinator, PatternOptimizer, PredictiveAnalytics, AdaptiveLearning
 from advanced_orchestration.models import CoordinatorConfig
+from ml_enhancements.models import MLConfig
 
 # Initialize coordinator
 config = CoordinatorConfig()
 coordinator = MultiAgentCoordinator(config)
+
+# Initialize ML components
+ml_config = MLConfig()
+pattern_optimizer = PatternOptimizer(config=ml_config)
+predictive_analytics = PredictiveAnalytics(config=ml_config)
+adaptive_learning = AdaptiveLearning(config=ml_config)
 
 # Or run the basic entry point
 uv run python main.py  # Prints "Hello from leanvibe-orchestrator!"
