@@ -13288,3 +13288,246 @@ task: <Task pending name='Task-16' coro=<BaseSubprocessTransport._connect_pipes(
 2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-8 registered successfully
 2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-9 registered successfully
 2025-07-14 20:48:58 INFO     leanvibe.state_manager                                Agent thread-agent-7 registered successfully
+2025-07-14 21:18:30 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:18:36 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpy7cgdfvw.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmprs5dzchd.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpzowiyf22.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpys3xgd0d.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpp9oqceot.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpr5zvvumk.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=test_decision_123, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpv62lai55.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_3, outcome=failure, pattern_success_rate=0.667, total_samples=3
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmppfehincb.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=doc_2, outcome=success, pattern_success_rate=1.000, total_samples=2
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpaletl1_2.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_0, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_1, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Recorded outcome: decision_id=decision_2, outcome=success, pattern_success_rate=1.000, total_samples=1
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp2102v4hu.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpyw0if14f.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpilz962df.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp9dlatn_3.db
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                Cleanup completed: deleted 1 decisions and 0 patterns
+2025-07-14 21:18:36 INFO     leanvibe.confidence_tracker                                ConfidenceTracker initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpkok15r4s.db
+2025-07-14 21:18:41 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:18:41 WARNING  leanvibe.smart_quality_gate                                Test command timed out after 300s
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                Quality gate decision: allow, confidence: 0.825, quality_score: 0.950
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.800, quality_score: 0.500
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.800, quality_score: 0.300
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                Quality gate decision: review, confidence: 0.700, quality_score: 0.950
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 ERROR    leanvibe.smart_quality_gate                                Failed to calculate metrics: Calculation failed
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                Quality gate decision: block, confidence: 0.800, quality_score: 0.000
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 ERROR    leanvibe.smart_quality_gate                                Failed to get quality stats: DB error
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                Final outcome recorded: test_decision_123 -> success
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:41 INFO     leanvibe.smart_quality_gate                                Quality gate decision: allow, confidence: 0.825, quality_score: 0.950
+2025-07-14 21:18:45 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=697b6335]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=697b6335]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=697b6335]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=697b6335]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=697b6335]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=697b6335]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6m4iuwtb.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=697b6335]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=697b6335]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=697b6335]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=f0ffa5fe]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=f0ffa5fe]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=f0ffa5fe]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=f0ffa5fe]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=f0ffa5fe]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=f0ffa5fe]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpvw05nrph.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=f0ffa5fe]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=f0ffa5fe]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=f0ffa5fe]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=f0ffa5fe]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=f0ffa5fe]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=02e07466]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=02e07466]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=02e07466]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=02e07466]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=02e07466]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=02e07466]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp9gjivlfj.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=02e07466]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=02e07466]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=02e07466]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=02e07466]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=02e07466]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=02e07466]                Task test-task added with priority 3
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=dc376012]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=dc376012]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=dc376012]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=dc376012]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=dc376012]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=dc376012]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpwnf9r0tc.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=dc376012]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=dc376012]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=dc376012]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=dc376012]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=dc376012]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=dc376012]                Task priority-task added with priority 1
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=8c3525b2]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=8c3525b2]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=8c3525b2]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=8c3525b2]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=8c3525b2]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=8c3525b2]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmprbl0fon5.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=8c3525b2]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=8c3525b2]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=8c3525b2]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=8c3525b2]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=8c3525b2]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=8c3525b2]                Task exec-task added with priority 5
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=6e8ad79c]                Executing task autonomously: exec-task
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=6e8ad79c]                Task exec-task completed successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=416631e2]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=416631e2]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=416631e2]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=416631e2]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=416631e2]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=416631e2]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6w3niaha.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=416631e2]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=416631e2]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=416631e2]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=416631e2]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=416631e2]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=4ac509ee]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=4ac509ee]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=4ac509ee]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=4ac509ee]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=4ac509ee]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=4ac509ee]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6_mcmlhm.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=4ac509ee]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=4ac509ee]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=4ac509ee]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=4ac509ee]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=4ac509ee]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=4f84132f]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=4f84132f]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=4f84132f]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=4f84132f]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=4f84132f]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=4f84132f]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp_ax13est.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=4f84132f]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=4f84132f]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=4f84132f]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=4f84132f]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=4f84132f]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=4f84132f]                Task confidence-task added with priority 5
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=315f01c4]                Initializing LeanVibe Orchestrator
+2025-07-14 21:18:46 INFO     leanvibe.confidence_tracker [corr=315f01c4]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:18:46 INFO     leanvibe.context_monitor [corr=315f01c4]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:18:46 INFO     leanvibe.smart_quality_gate [corr=315f01c4]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:18:46 INFO     leanvibe.smart_test_enforcer [corr=315f01c4]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=315f01c4]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpxgeqsmrw.db
+2025-07-14 21:18:46 INFO     leanvibe.git_milestone_manager [corr=315f01c4]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:18:46 INFO     leanvibe.trigger_manager [corr=315f01c4]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=315f01c4]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=315f01c4]                Agent claude-primary registered successfully
+2025-07-14 21:18:46 INFO     leanvibe.orchestrator [corr=315f01c4]                Claude agent initialized and registered with StateManager
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=315f01c4]                Task state-task-0 added with priority 1
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=315f01c4]                Task state-task-1 added with priority 2
+2025-07-14 21:18:46 INFO     leanvibe.state_manager [corr=315f01c4]                Task state-task-2 added with priority 3
+2025-07-14 21:18:46 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:18:46 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 21:18:47 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:19:11 INFO     leanvibe.confidence_tracker [corr=315f01c4]                Recorded outcome: decision_id=gate_1752517151.045283, outcome=pending, pattern_success_rate=0.000, total_samples=6
+2025-07-14 21:19:11 INFO     leanvibe.smart_quality_gate [corr=315f01c4]                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 21:19:11 INFO     leanvibe.orchestrator [corr=0a63f25d]                Initializing LeanVibe Orchestrator
+2025-07-14 21:19:11 INFO     leanvibe.confidence_tracker [corr=0a63f25d]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:19:11 INFO     leanvibe.context_monitor [corr=0a63f25d]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:19:11 INFO     leanvibe.smart_quality_gate [corr=0a63f25d]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:19:11 INFO     leanvibe.smart_test_enforcer [corr=0a63f25d]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:19:11 INFO     leanvibe.state_manager [corr=0a63f25d]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmp6zc4vo79.db
+2025-07-14 21:19:11 INFO     leanvibe.git_milestone_manager [corr=0a63f25d]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:19:11 INFO     leanvibe.trigger_manager [corr=0a63f25d]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:19:11 INFO     leanvibe.orchestrator [corr=0a63f25d]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:19:11 INFO     leanvibe.state_manager [corr=0a63f25d]                Agent claude-primary registered successfully
+2025-07-14 21:19:11 INFO     leanvibe.orchestrator [corr=0a63f25d]                Claude agent initialized and registered with StateManager
+2025-07-14 21:19:11 INFO     leanvibe.state_manager [corr=0a63f25d]                Task shutdown-task added with priority 5
+2025-07-14 21:19:11 INFO     leanvibe.orchestrator [corr=0a63f25d]                Shutting down orchestrator...
+2025-07-14 21:19:11 INFO     leanvibe.orchestrator [corr=0a63f25d]                Agent claude-primary shutdown complete
+2025-07-14 21:19:11 INFO     leanvibe.trigger_manager [corr=0a63f25d]                TriggerManager stopped
+2025-07-14 21:19:11 INFO     leanvibe.state_manager [corr=0a63f25d]                Shutting down StateManager...
+2025-07-14 21:19:11 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:19:11 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 21:19:11 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:19:34 INFO     leanvibe.confidence_tracker [corr=0a63f25d]                Recorded outcome: decision_id=gate_1752517174.847172, outcome=pending, pattern_success_rate=0.000, total_samples=7
+2025-07-14 21:19:34 INFO     leanvibe.smart_quality_gate [corr=0a63f25d]                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 21:19:34 INFO     leanvibe.state_manager [corr=0a63f25d]                Checkpoint created: checkpoint_1752517151.071856 (type: shutdown)
+2025-07-14 21:19:34 INFO     leanvibe.state_manager [corr=0a63f25d]                StateManager shutdown complete
+2025-07-14 21:19:34 INFO     leanvibe.orchestrator [corr=0a63f25d]                Orchestrator shutdown complete
+2025-07-14 21:19:34 INFO     leanvibe.orchestrator [corr=6a57a9a8]                Initializing LeanVibe Orchestrator
+2025-07-14 21:19:34 INFO     leanvibe.confidence_tracker [corr=6a57a9a8]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:19:34 INFO     leanvibe.context_monitor [corr=6a57a9a8]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:19:34 INFO     leanvibe.smart_quality_gate [corr=6a57a9a8]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:19:34 INFO     leanvibe.smart_test_enforcer [corr=6a57a9a8]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:19:34 INFO     leanvibe.state_manager [corr=6a57a9a8]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpgja6ll1o.db
+2025-07-14 21:19:34 INFO     leanvibe.git_milestone_manager [corr=6a57a9a8]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:19:34 INFO     leanvibe.trigger_manager [corr=6a57a9a8]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:19:34 INFO     leanvibe.orchestrator [corr=6a57a9a8]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:19:34 INFO     leanvibe.state_manager [corr=6a57a9a8]                Agent claude-primary registered successfully
+2025-07-14 21:19:34 INFO     leanvibe.orchestrator [corr=6a57a9a8]                Claude agent initialized and registered with StateManager
+2025-07-14 21:19:35 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:19:35 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 21:19:35 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:19:58 INFO     leanvibe.confidence_tracker [corr=6a57a9a8]                Recorded outcome: decision_id=gate_1752517198.752479, outcome=pending, pattern_success_rate=0.000, total_samples=8
+2025-07-14 21:19:58 INFO     leanvibe.smart_quality_gate [corr=6a57a9a8]                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 21:19:58 INFO     leanvibe.orchestrator [corr=3c201623]                Initializing LeanVibe Orchestrator
+2025-07-14 21:19:58 INFO     leanvibe.confidence_tracker [corr=3c201623]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:19:58 INFO     leanvibe.context_monitor [corr=3c201623]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:19:58 INFO     leanvibe.smart_quality_gate [corr=3c201623]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:19:58 INFO     leanvibe.smart_test_enforcer [corr=3c201623]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:19:58 INFO     leanvibe.state_manager [corr=3c201623]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpfzrrzh1j.db
+2025-07-14 21:19:58 INFO     leanvibe.git_milestone_manager [corr=3c201623]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:19:58 INFO     leanvibe.trigger_manager [corr=3c201623]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:19:58 INFO     leanvibe.orchestrator [corr=3c201623]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:19:58 INFO     leanvibe.state_manager [corr=3c201623]                Agent claude-primary registered successfully
+2025-07-14 21:19:58 INFO     leanvibe.orchestrator [corr=3c201623]                Claude agent initialized and registered with StateManager
+2025-07-14 21:19:58 WARNING  leanvibe.orchestrator [corr=3c201623]                Handling error: Test error
+2025-07-14 21:19:59 INFO     leanvibe.orchestrator [corr=67d1bfe2]                Initializing LeanVibe Orchestrator
+2025-07-14 21:19:59 INFO     leanvibe.confidence_tracker [corr=67d1bfe2]                ConfidenceTracker initialized with database: .claude/state/confidence.db
+2025-07-14 21:19:59 INFO     leanvibe.context_monitor [corr=67d1bfe2]                ContextMonitor initialized with database: .claude/state/context_history.db
+2025-07-14 21:19:59 INFO     leanvibe.smart_quality_gate [corr=67d1bfe2]                SmartQualityGate initialized with ML-based confidence tracking
+2025-07-14 21:19:59 INFO     leanvibe.smart_test_enforcer [corr=67d1bfe2]                SmartTestEnforcer initialized with multi-language support
+2025-07-14 21:19:59 INFO     leanvibe.state_manager [corr=67d1bfe2]                StateManager initialized with database: /var/folders/h4/rhh6b9dd7779n60jjvzcpx580000gn/T/tmpw7expb4n.db
+2025-07-14 21:19:59 INFO     leanvibe.git_milestone_manager [corr=67d1bfe2]                GitMilestoneManager initialized for repository: /Users/bogdan/work/leanvibe-dev/agent-hive
+2025-07-14 21:19:59 INFO     leanvibe.trigger_manager [corr=67d1bfe2]                TriggerManager initialized with automatic state management triggers
+2025-07-14 21:19:59 INFO     leanvibe.orchestrator [corr=67d1bfe2]                LeanVibe Orchestrator initialized successfully
+2025-07-14 21:19:59 INFO     leanvibe.state_manager [corr=67d1bfe2]                Agent claude-primary registered successfully
+2025-07-14 21:19:59 INFO     leanvibe.orchestrator [corr=67d1bfe2]                Claude agent initialized and registered with StateManager
+2025-07-14 21:19:59 INFO     leanvibe.state_manager [corr=67d1bfe2]                Task concurrent-task-0 added with priority 1
+2025-07-14 21:19:59 INFO     leanvibe.state_manager [corr=67d1bfe2]                Task concurrent-task-1 added with priority 2
+2025-07-14 21:19:59 INFO     leanvibe.state_manager [corr=67d1bfe2]                Task concurrent-task-2 added with priority 3
+2025-07-14 21:19:59 INFO     leanvibe.state_manager [corr=67d1bfe2]                Task concurrent-task-3 added with priority 4
+2025-07-14 21:19:59 INFO     leanvibe.state_manager [corr=67d1bfe2]                Task concurrent-task-4 added with priority 5
+2025-07-14 21:20:00 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:20:00 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-14 21:20:00 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:20:23 INFO     leanvibe.confidence_tracker [corr=67d1bfe2]                Recorded outcome: decision_id=gate_1752517223.658723, outcome=pending, pattern_success_rate=0.000, total_samples=9
+2025-07-14 21:20:23 INFO     leanvibe.smart_quality_gate [corr=67d1bfe2]                Quality gate decision: block, confidence: 0.700, quality_score: 0.336
+2025-07-14 21:20:32 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-14 21:20:32 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
