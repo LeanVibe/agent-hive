@@ -1,0 +1,72 @@
+#!/bin/bash
+#
+# LeanVibe Agent Hive - Post-commit Notification
+#
+# This hook runs after successful commits to provide feedback and
+# trigger any necessary automation.
+#
+
+echo "✅ LeanVibe Agent Hive - Commit Successful"
+echo "========================================="
+
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Get commit information
+commit_hash=$(git rev-parse --short HEAD)
+commit_msg=$(git log -1 --pretty=%B)
+branch_name=$(git branch --show-current)
+commit_author=$(git log -1 --pretty=%an)
+commit_date=$(git log -1 --pretty=%cd --date=format:'%Y-%m-%d %H:%M:%S')
+
+echo -e "${BLUE}📝 Commit: $commit_hash${NC}"
+echo -e "${BLUE}🌿 Branch: $branch_name${NC}"
+echo -e "${BLUE}👤 Author: $commit_author${NC}"
+echo -e "${BLUE}📅 Date: $commit_date${NC}"
+echo ""
+echo -e "${BLUE}💬 Message:${NC}"
+echo "$commit_msg"
+echo ""
+
+# Check if this is a feature branch
+if [[ "$branch_name" == feature/* ]] || [[ "$branch_name" == fix/* ]] || [[ "$branch_name" == hotfix/* ]]; then
+    echo -e "${YELLOW}🚀 Feature Branch Detected${NC}"
+    echo "💡 Next steps:"
+    echo "   1. Continue development on this branch"
+    echo "   2. Push when ready: git push -u origin $branch_name"
+    echo "   3. Create pull request for code review"
+    echo ""
+elif [ "$branch_name" = "main" ] || [ "$branch_name" = "master" ]; then
+    echo -e "${GREEN}🎯 Main Branch Commit${NC}"
+    echo "💡 Consider:"
+    echo "   1. Update documentation if needed"
+    echo "   2. Tag release if this is a milestone"
+    echo "   3. Deploy if this is a release commit"
+    echo ""
+fi
+
+# If CLI exists, show quick status
+if [ -f "cli.py" ]; then
+    echo -e "${GREEN}🔧 LeanVibe CLI Status: Available${NC}"
+    echo "   Run: python cli.py --help for usage"
+fi
+
+# Count files changed in this commit
+files_changed=$(git diff-tree --no-commit-id --name-only -r HEAD | wc -l | tr -d ' ')
+echo -e "${BLUE}📊 Files changed: $files_changed${NC}"
+
+# Show quick stats
+insertions=$(git show --stat | tail -1 | grep -o '[0-9]* insertion' | cut -d' ' -f1 || echo 0)
+deletions=$(git show --stat | tail -1 | grep -o '[0-9]* deletion' | cut -d' ' -f1 || echo 0)
+
+if [ "$insertions" != "0" ] || [ "$deletions" != "0" ]; then
+    echo -e "${BLUE}📈 Changes: +$insertions -$deletions${NC}"
+fi
+
+echo ""
+echo -e "${GREEN}🎉 Ready for next task!${NC}"
+
+exit 0

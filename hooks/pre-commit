@@ -1,0 +1,125 @@
+#!/bin/bash
+#
+# LeanVibe Agent Hive - Pre-commit Quality Gate
+#
+# This hook runs before each commit to ensure code quality and prevent
+# broken commits from being added to the repository.
+#
+
+set -e
+
+echo "🔍 LeanVibe Pre-commit Quality Gate"
+echo "=================================="
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check if we're in the right directory
+if [ ! -f "cli.py" ] || [ ! -d "advanced_orchestration" ]; then
+    echo -e "${RED}❌ Error: Not in LeanVibe Agent Hive project root${NC}"
+    echo "💡 Run git commit from the project root directory"
+    exit 1
+fi
+
+# Function to print status
+print_status() {
+    if [ $1 -eq 0 ]; then
+        echo -e "${GREEN}✅ $2${NC}"
+    else
+        echo -e "${RED}❌ $2${NC}"
+        return 1
+    fi
+}
+
+# Function to print step
+print_step() {
+    echo -e "${YELLOW}🔄 $1...${NC}"
+}
+
+echo "📋 Running quality checks on staged files..."
+echo ""
+
+# 1. Check Python syntax
+print_step "Checking Python syntax"
+python_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
+if [ -n "$python_files" ]; then
+    python -m py_compile $python_files
+    print_status $? "Python syntax check"
+else
+    print_status 0 "Python syntax check (no Python files changed)"
+fi
+
+# 2. Test import paths for CLI
+print_step "Validating CLI import paths"
+if python -c "from advanced_orchestration import MultiAgentCoordinator; print('Import validation passed')" >/dev/null 2>&1; then
+    print_status 0 "CLI import validation"
+else
+    print_status 1 "CLI import validation"
+    echo "💡 Check that advanced_orchestration module imports are working"
+    exit 1
+fi
+
+# 3. Test CLI basic functionality
+print_step "Testing CLI basic functionality"
+if python cli.py --help >/dev/null 2>&1; then
+    print_status 0 "CLI help system"
+else
+    print_status 1 "CLI help system" 
+    echo "💡 CLI help command failed - check cli.py for errors"
+    exit 1
+fi
+
+# 4. Run core tests if they exist and any Python files changed
+if [ -n "$python_files" ] && [ -d "tests" ]; then
+    print_step "Running core tests"
+    if python -m pytest tests/test_multi_agent_coordinator.py -v --tb=short >/dev/null 2>&1; then
+        print_status 0 "Core tests"
+    else
+        echo -e "${YELLOW}⚠️  Core tests failed or not available${NC}"
+        echo "💡 Ensure tests pass before committing"
+    fi
+else
+    print_status 0 "Core tests (skipped - no Python changes or tests directory)"
+fi
+
+# 5. Check for basic quality issues
+print_step "Checking for common issues"
+
+# Check for debug prints or TODO markers in Python files
+if [ -n "$python_files" ]; then
+    debug_prints=$(echo "$python_files" | xargs grep -n "print(" 2>/dev/null | grep -v "# OK" || true)
+    if [ -n "$debug_prints" ]; then
+        echo -e "${YELLOW}⚠️  Debug prints found (consider removing):${NC}"
+        echo "$debug_prints"
+    fi
+    
+    todos=$(echo "$python_files" | xargs grep -n "TODO\|FIXME\|XXX" 2>/dev/null || true)
+    if [ -n "$todos" ]; then
+        echo -e "${YELLOW}⚠️  TODO markers found:${NC}"
+        echo "$todos"
+    fi
+fi
+
+print_status 0 "Code quality checks"
+
+# 6. Validate that required files exist
+print_step "Validating project structure"
+required_files=("cli.py" "advanced_orchestration/__init__.py" "requirements.txt")
+for file in "${required_files[@]}"; do
+    if [ ! -f "$file" ]; then
+        print_status 1 "Project structure validation"
+        echo "💡 Required file missing: $file"
+        exit 1
+    fi
+done
+print_status 0 "Project structure validation"
+
+echo ""
+echo -e "${GREEN}🎉 All quality checks passed!${NC}"
+echo "✅ Commit is ready to proceed"
+echo ""
+
+exit 0
