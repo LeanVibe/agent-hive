@@ -126,6 +126,7 @@ class IntegrationExamples:
         logger.info("🚀 Example 3: API Gateway Setup")
         
         # Configure API Gateway
+        # Note: Using "0.0.0.0" for examples only. Use "127.0.0.1" in production for security
         config = ApiGatewayConfig(
             host="0.0.0.0",
             port=8080,
@@ -200,7 +201,7 @@ class IntegrationExamples:
         
         # Start server
         await gateway.start_server()
-        logger.info("API Gateway started on http://0.0.0.0:8080")
+        logger.info("API Gateway started on http://0.0.0.0:8080 (example only - use 127.0.0.1 in production)")
         
         # Test API call
         test_request = ApiRequest(
@@ -491,7 +492,7 @@ class IntegrationExamples:
         logger.info("Slack webhook URL: http://localhost:8000/webhook/slack")
         
         # Note: In a real application, you would run this server
-        # web.run_app(app, host="0.0.0.0", port=8000)
+        # web.run_app(app, host="0.0.0.0", port=8000)  # Use "127.0.0.1" in production
     
     async def example_7_monitoring_dashboard(self):
         """Example 7: Monitoring dashboard with health checks and metrics."""

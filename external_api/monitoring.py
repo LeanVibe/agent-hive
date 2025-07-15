@@ -602,8 +602,9 @@ class MonitoringEndpoints:
 class MonitoringServer:
     """Complete monitoring server with metrics, alerts, and health checks."""
     
-    def __init__(self, port: int = 9090):
+    def __init__(self, port: int = 9090, host: str = "127.0.0.1"):
         self.port = port
+        self.host = host
         self.metrics_collector = MetricsCollector()
         self.alert_manager = AlertManager(self.metrics_collector)
         self.system_monitor = SystemMonitor(self.metrics_collector)
@@ -707,12 +708,12 @@ class MonitoringServer:
         
         runner = web.AppRunner(app)
         await runner.setup()
-        site = web.TCPSite(runner, "0.0.0.0", self.port)
+        site = web.TCPSite(runner, self.host, self.port)
         await site.start()
         
         self.server = runner
         
-        logger.info(f"Monitoring server started on port {self.port}")
+        logger.info(f"Monitoring server started on {self.host}:{self.port}")
     
     async def stop(self):
         """Stop the monitoring server."""
