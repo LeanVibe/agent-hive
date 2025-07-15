@@ -1234,3 +1234,216 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 task: <Task pending name='Task-53' coro=<MultiAgentCoordinator._load_balancer() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:630> wait_for=<Future pending cb=[Task.task_wakeup()]>>
 2025-07-15 18:18:03 ERROR    asyncio                                             Task was destroyed but it is pending!
 task: <Task pending name='Task-52' coro=<MultiAgentCoordinator._health_monitor() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:610> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-16 02:17:29 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 02:17:31 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-16 02:17:31 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-16 02:17:41 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:41 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
