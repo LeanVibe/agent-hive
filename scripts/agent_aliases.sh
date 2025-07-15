@@ -7,10 +7,10 @@ alias agent-list="tmux list-windows -t agent-hive"
 alias agent-status="python scripts/agent_manager.py --status"
 
 # Agent spawning
-alias spawn-all="python scripts/agent_manager.py --spawn-all"
-alias spawn-doc="python scripts/agent_manager.py --spawn documentation-agent"
-alias spawn-intel="python scripts/agent_manager.py --spawn intelligence-agent"
-alias spawn-orch="python scripts/agent_manager.py --spawn orchestration-agent"
+alias spawn-all="python scripts/agent_manager.py --spawn-all --force"
+alias spawn-doc="python scripts/agent_manager.py --spawn documentation-agent --force"
+alias spawn-intel="python scripts/agent_manager.py --spawn intelligence-agent --force"
+alias spawn-orch="python scripts/agent_manager.py --spawn orchestration-agent --force"
 
 # Agent attachment
 alias attach-doc="tmux select-window -t agent-hive:agent-documentation-agent && tmux attach-session -t agent-hive"
@@ -48,16 +48,16 @@ agent-attach() {
 agent-spawn() {
     case $1 in
         doc|documentation)
-            spawn-doc
+            python scripts/agent_manager.py --spawn documentation-agent --force
             ;;
         intel|intelligence)
-            spawn-intel
+            python scripts/agent_manager.py --spawn intelligence-agent --force
             ;;
         orch|orchestration)
-            spawn-orch
+            python scripts/agent_manager.py --spawn orchestration-agent --force
             ;;
         all)
-            spawn-all
+            python scripts/agent_manager.py --spawn-all --force
             ;;
         *)
             echo "Usage: agent-spawn [doc|intel|orch|all]"
