@@ -68,6 +68,7 @@ class TestApiGateway:
             client_ip="127.0.0.1"
         )
     
+    @pytest.mark.asyncio
     async def test_gateway_initialization(self, api_gateway, gateway_config):
         """Test API gateway initialization."""
         assert api_gateway.config == gateway_config

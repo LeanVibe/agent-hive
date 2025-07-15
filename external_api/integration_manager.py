@@ -16,7 +16,7 @@ from .github_client import GitHubClient, GitHubConfig, GitHubEventType
 from .slack_client import SlackClient, SlackConfig, SlackEventType
 from .api_gateway import ApiGateway
 from .service_discovery import ServiceDiscovery
-from ..advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
 
 
 logger = logging.getLogger(__name__)

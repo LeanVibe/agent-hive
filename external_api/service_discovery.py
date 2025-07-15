@@ -16,8 +16,8 @@ from dataclasses import dataclass, asdict
 import uuid
 import hashlib
 
-from ..advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
-from ..advanced_orchestration.models import AgentStatus
+from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from advanced_orchestration.models import AgentStatus
 
 
 logger = logging.getLogger(__name__)

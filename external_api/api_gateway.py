@@ -19,8 +19,8 @@ from .models import (
     ApiRequest,
     ApiResponse
 )
-from ..advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
-from ..advanced_orchestration.models import LoadBalancingStrategy
+from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from advanced_orchestration.models import LoadBalancingStrategy
 from .auth_middleware import AuthenticationMiddleware, AuthMethod, Permission
 from .rate_limiter import AdvancedRateLimiter, RateLimitStrategy
 from .service_discovery import ServiceDiscovery, ServiceInfo, ServiceStatus
