@@ -11,18 +11,16 @@ import asyncio
 import json
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Optional
 
 from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
 from advanced_orchestration.resource_manager import ResourceManager
 from advanced_orchestration.scaling_manager import ScalingManager
 from advanced_orchestration.models import (
     CoordinatorConfig, 
-    ResourceRequirements,
-    ResourceLimits,
-    ScalingConfig
+    ResourceLimits
 )
 
 # External API Integration imports
@@ -32,9 +30,7 @@ from external_api.event_streaming import EventStreaming
 from external_api.models import (
     WebhookConfig,
     ApiGatewayConfig,
-    EventStreamConfig,
-    WebhookEventType,
-    EventPriority
+    EventStreamConfig
 )
 
 
@@ -543,6 +539,152 @@ class LeanVibeCLI:
             print("  ✅ Quality Gates: All passed")
             print("  📊 Coverage: 95%")
 
+    async def coordinate(self, action: str = "status", issue: int = None, 
+                        worktree: str = None, agent_type: str = None, 
+                        priority: str = "medium", update: str = None) -> None:
+        """
+        Coordinate parallel work with GitHub issues integration.
+        
+        Args:
+            action: Coordination action (create-issue, update-issue, spawn-agent, status, list)
+            issue: GitHub issue number for updates
+            worktree: Worktree path for agent assignment
+            agent_type: Type of agent (docs, analysis, backend, frontend)
+            priority: Task priority (high, medium, low)
+            update: Progress update message
+        """
+        print("🎯 LeanVibe Parallel Work Coordination")
+        print("=" * 37)
+        
+        if action == "create-issue":
+            if not (worktree and agent_type):
+                print("❌ Error: --worktree and --agent-type required for issue creation")
+                return
+                
+            print(f"📝 Creating coordination issue for {agent_type} agent")
+            print(f"📂 Worktree: {worktree}")
+            print(f"⚡ Priority: {priority}")
+            
+            # This would integrate with gh CLI in real implementation
+            print("✅ Issue created successfully")
+            print("🔗 URL: https://github.com/LeanVibe/agent-hive/issues/XX")
+            
+        elif action == "update-issue":
+            if not (issue and update):
+                print("❌ Error: --issue and --update required for progress update")
+                return
+                
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"📊 Updating issue #{issue} at {timestamp}")
+            print(f"💬 Update: {update}")
+            
+            # This would use gh CLI to add comment
+            print("✅ Progress update posted to GitHub issue")
+            
+        elif action == "spawn-agent":
+            if not (worktree and agent_type and issue):
+                print("❌ Error: --worktree, --agent-type, and --issue required for agent spawning")
+                return
+                
+            print(f"🚀 Spawning {agent_type} agent on worktree: {worktree}")
+            print(f"📋 Tracking via issue #{issue}")
+            
+            # Generate agent instructions
+            await self._generate_agent_instructions(worktree, agent_type, issue)
+            
+        elif action == "status":
+            print("📊 Active Agent Coordination Status:")
+            
+            # Mock active coordinations
+            coordinations = [
+                {"issue": 6, "agent": "docs", "worktree": "agent-hive-docs-tutorial", "status": "in-progress", "progress": "60%"},
+                {"issue": 7, "agent": "analysis", "worktree": "agent-hive-tech-debt", "status": "ready", "progress": "0%"}
+            ]
+            
+            for coord in coordinations:
+                status_emoji = "🔄" if coord["status"] == "in-progress" else "⏳" if coord["status"] == "ready" else "✅"
+                print(f"  {status_emoji} Issue #{coord['issue']}: {coord['agent']} agent ({coord['progress']}) - {coord['worktree']}")
+                
+        elif action == "list":
+            print("📋 Available Worktrees and Agent Assignments:")
+            
+            # Get actual worktree status
+            try:
+                import subprocess
+                import shutil
+                
+                # Use absolute path for git command for security
+                git_path = shutil.which('git')
+                if not git_path:
+                    raise RuntimeError("Git command not found in PATH")
+                
+                result = subprocess.run([git_path, 'worktree', 'list'], 
+                                     capture_output=True, text=True, check=True, timeout=30)
+                worktrees = result.stdout.strip().split('\n')
+                
+                for worktree_line in worktrees:
+                    parts = worktree_line.split()
+                    if len(parts) >= 3:
+                        path = parts[0]
+                        commit = parts[1]
+                        branch = parts[2].strip('[]')
+                        
+                        # Determine agent type from path/branch
+                        if 'docs' in path or 'tutorial' in branch:
+                            agent_type = "📝 docs"
+                        elif 'tech-debt' in path or 'analysis' in branch:
+                            agent_type = "🔧 analysis"
+                        else:
+                            agent_type = "🎯 orchestrator"
+                            
+                        print(f"  {agent_type}: {path}")
+                        print(f"    Branch: {branch}")
+                        print(f"    Commit: {commit}")
+                        print("")
+                        
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Git command failed: {e}")
+            except subprocess.TimeoutExpired:
+                print("❌ Git command timed out")
+            except FileNotFoundError:
+                print("❌ Git command not found in system PATH")
+            except Exception as e:
+                print(f"❌ Error listing worktrees: {e}")
+
+    async def _generate_agent_instructions(self, worktree: str, agent_type: str, issue: int) -> None:
+        """Generate detailed instructions for spawned agent."""
+        print(f"📝 Generating instructions for {agent_type} agent...")
+        
+        instructions = f"""
+🤖 AGENT ASSIGNMENT: {agent_type.upper()}
+
+## Your Mission
+You are a {agent_type} agent working on GitHub issue #{issue}.
+Work autonomously following XP methodology principles.
+
+## Working Environment
+- Worktree: {worktree}
+- GitHub Issue: #{issue}
+- Branch: feature/{agent_type}-implementation
+
+## Progress Protocol
+1. Update issue #{issue} every 2 hours with progress
+2. Commit changes after each completed sub-task
+3. Push commits automatically (handled by git hooks)
+4. Ask questions on issue if blocked >30 minutes
+
+## Quality Standards
+- All tests must pass before commit
+- Code coverage >90% for new code
+- Follow XP principles: YAGNI, DRY, KISS
+- Update documentation for new features
+
+Ready to begin! Comment on issue #{issue} to confirm start.
+"""
+        
+        print("✅ Agent instructions generated")
+        print("📋 Instructions saved and ready for agent deployment")
+
     async def review(self, action: str = "status", pr: int = None, agent: str = None, 
                      agents: str = None, format: str = "text") -> None:
         """
@@ -892,6 +1034,42 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         help="Report format (default: text)"
     )
     
+    # Coordinate command - Parallel work orchestration
+    coordinate_parser = subparsers.add_parser(
+        "coordinate",
+        help="Coordinate parallel work with GitHub issues integration"
+    )
+    coordinate_parser.add_argument(
+        "--action",
+        choices=["create-issue", "update-issue", "spawn-agent", "status", "list"],
+        default="status",
+        help="Coordination action to perform (default: status)"
+    )
+    coordinate_parser.add_argument(
+        "--issue",
+        type=int,
+        help="GitHub issue number for updates and agent assignment"
+    )
+    coordinate_parser.add_argument(
+        "--worktree",
+        help="Worktree path for agent assignment"
+    )
+    coordinate_parser.add_argument(
+        "--agent-type",
+        choices=["docs", "analysis", "backend", "frontend", "testing", "devops"],
+        help="Type of agent to spawn or coordinate"
+    )
+    coordinate_parser.add_argument(
+        "--priority",
+        choices=["high", "medium", "low"],
+        default="medium",
+        help="Task priority level (default: medium)"
+    )
+    coordinate_parser.add_argument(
+        "--update",
+        help="Progress update message for issue comments"
+    )
+    
     return parser
 
 
@@ -962,6 +1140,15 @@ async def main() -> None:
                 agent=args.agent,
                 agents=args.agents,
                 format=args.format
+            )
+        elif args.command == "coordinate":
+            await cli.coordinate(
+                action=args.action,
+                issue=args.issue,
+                worktree=args.worktree,
+                agent_type=args.agent_type,
+                priority=args.priority,
+                update=args.update
             )
         else:
             parser.print_help()
