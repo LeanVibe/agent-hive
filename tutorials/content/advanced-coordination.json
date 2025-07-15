@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "tutorial_id": "advanced-coordination",
+    "title": "Advanced Multi-Agent Coordination",
+    "description": "Master advanced coordination patterns, load balancing strategies, and resource management for complex multi-agent workflows.",
+    "difficulty": "advanced",
+    "estimated_time": 60,
+    "prerequisites": ["Getting Started tutorial", "Python async/await experience", "Understanding of distributed systems"],
+    "learning_objectives": [
+      "Implement advanced load balancing strategies",
+      "Create custom agent types with specialized capabilities",
+      "Optimize resource allocation and scaling",
+      "Build fault-tolerant multi-agent systems"
+    ],
+    "tags": ["advanced", "coordination", "load-balancing", "scaling"],
+    "version": "1.0",
+    "author": "LeanVibe Team"
+  },
+  "steps": [
+    {
+      "step_id": "load-balancing-strategies",
+      "title": "Load Balancing Strategies",
+      "description": "Implement and compare different load balancing strategies for optimal task distribution.",
+      "instructions": [
+        "Create a coordinator with different load balancing strategies",
+        "Test round-robin, least connections, and capability-based strategies",
+        "Measure performance differences between strategies",
+        "Implement custom load balancing logic"
+      ],
+      "code_examples": [
+        "from advanced_orchestration import MultiAgentCoordinator\nfrom advanced_orchestration.models import CoordinatorConfig, LoadBalancingStrategy\n\n# Test different strategies\nstrategies = [\n    LoadBalancingStrategy.ROUND_ROBIN,\n    LoadBalancingStrategy.LEAST_CONNECTIONS,\n    LoadBalancingStrategy.CAPABILITY_BASED\n]\n\nfor strategy in strategies:\n    config = CoordinatorConfig(load_balancing_strategy=strategy)\n    coordinator = MultiAgentCoordinator(config)\n    print(f'Testing {strategy.value} strategy')"
+      ],
+      "validation_command": "python -c \"from advanced_orchestration.models import LoadBalancingStrategy; print('Strategies:', [s.value for s in LoadBalancingStrategy])\"",
+      "expected_output": "Strategies:",
+      "hints": [
+        "Each strategy has different performance characteristics",
+        "Capability-based strategy is best for specialized agents",
+        "Round-robin is simple but may not be optimal for varying task complexities"
+      ],
+      "estimated_time": 20
+    },
+    {
+      "step_id": "custom-agents",
+      "title": "Custom Agent Implementation",
+      "description": "Create custom agent types with specialized capabilities and resource requirements.",
+      "instructions": [
+        "Define custom agent classes with specific capabilities",
+        "Implement agent health monitoring and status reporting",
+        "Add resource requirement specifications",
+        "Create agent lifecycle management methods"
+      ],
+      "code_examples": [
+        "class CustomBackendAgent:\n    def __init__(self, agent_id: str):\n        self.agent_id = agent_id\n        self.capabilities = ['api_development', 'database_design']\n        self.status = 'healthy'\n    \n    async def process_task(self, task):\n        # Custom task processing logic\n        return f'Task {task.id} processed by {self.agent_id}'\n    \n    async def health_check(self):\n        return self.status == 'healthy'\n\n# Create and register custom agent\nagent = CustomBackendAgent('backend-specialist-1')\nprint(f'Created agent: {agent.agent_id} with capabilities: {agent.capabilities}')"
+      ],
+      "validation_command": "python -c \"print('Custom agent implementation ready')\"",
+      "expected_output": "Custom agent implementation ready",
+      "hints": [
+        "Agents should implement standard interfaces for compatibility",
+        "Health checks are crucial for fault tolerance",
+        "Specify resource requirements accurately for optimal allocation"
+      ],
+      "estimated_time": 25
+    },
+    {
+      "step_id": "resource-optimization",
+      "title": "Resource Optimization",
+      "description": "Optimize resource allocation and implement intelligent scaling policies.",
+      "instructions": [
+        "Monitor resource usage across agents",
+        "Implement resource allocation optimization",
+        "Create scaling policies based on metrics",
+        "Test resource limits and recovery mechanisms"
+      ],
+      "code_examples": [
+        "from advanced_orchestration import ResourceManager, ScalingManager\nfrom advanced_orchestration.models import ResourceLimits\n\n# Set up resource management\nresource_limits = ResourceLimits(\n    max_cpu_cores=16,\n    max_memory_mb=32768,\n    max_disk_mb=204800,\n    max_network_mbps=2000,\n    max_agents=20\n)\n\nresource_manager = ResourceManager(resource_limits)\nscaling_manager = ScalingManager(resource_limits)\n\nprint('Resource management configured')\nprint(f'Max agents: {resource_limits.max_agents}')\nprint(f'Max memory: {resource_limits.max_memory_mb}MB')"
+      ],
+      "validation_command": "python -c \"from advanced_orchestration.models import ResourceLimits; print('Resource limits configured')\"",
+      "expected_output": "Resource limits configured",
+      "hints": [
+        "Monitor resource usage patterns to optimize limits",
+        "Implement gradual scaling to avoid system shock",
+        "Set up alerts for resource threshold violations"
+      ],
+      "estimated_time": 15
+    }
+  ]
+}

@@ -391,6 +391,10 @@ kubectl set image deployment/agent-hive-orchestrator orchestrator=leanvibe/agent
 
 ## Docker Configuration
 
+**📋 Comprehensive Guide Available**: See [Docker Deployment Guide](docs/guides/docker-deployment.md) for complete Docker setup, from single-node development to multi-node production clusters.
+
+### Quick Docker Setup
+
 ### Multi-Stage Dockerfile
 
 ```dockerfile
@@ -1309,6 +1313,10 @@ async def verify_system_health():
 ```
 
 ## CI/CD Pipeline
+
+**📋 Comprehensive Guide Available**: See [CI/CD Operations Guide](docs/guides/cicd-operations.md) for complete pipeline setup, quality gates, security scanning, and deployment automation.
+
+### Quick CI/CD Overview
 
 ### GitHub Actions Workflow
 
