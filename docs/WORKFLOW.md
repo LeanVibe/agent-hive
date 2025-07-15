@@ -45,10 +45,11 @@ Technical details and metrics
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-#### 3. Push Immediately After Commit
-- **Push timing**: Immediately after each commit
-- **Command**: `git push origin feature/branch-name`
+#### 3. Automatic Branch Pushing
+- **Automated**: Post-commit hook automatically pushes feature branches
+- **Manual backup**: `git push origin feature/branch-name` if hook fails
 - **Purpose**: Maintain visibility and backup of work
+- **Coverage**: Applies to feature/*, fix/*, hotfix/* branches only
 
 #### 4. Integration Request Protocol
 - **Only after feature completion**: Request integration when entire feature is done

@@ -31,13 +31,36 @@ echo -e "${BLUE}💬 Message:${NC}"
 echo "$commit_msg"
 echo ""
 
-# Check if this is a feature branch
+# Check if this is a feature branch and handle automatic pushing
 if [[ "$branch_name" == feature/* ]] || [[ "$branch_name" == fix/* ]] || [[ "$branch_name" == hotfix/* ]]; then
     echo -e "${YELLOW}🚀 Feature Branch Detected${NC}"
+    
+    # Check if remote exists for this branch
+    remote_exists=$(git ls-remote --heads origin "$branch_name" 2>/dev/null | wc -l | tr -d ' ')
+    
+    if [ "$remote_exists" = "0" ]; then
+        echo "📤 Creating remote tracking branch..."
+        if git push -u origin "$branch_name" >/dev/null 2>&1; then
+            echo -e "${GREEN}✅ Branch pushed to remote successfully${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Failed to push branch - manual push required${NC}"
+            echo "   Run: git push -u origin $branch_name"
+        fi
+    else
+        echo "📤 Pushing changes to existing remote branch..."
+        if git push >/dev/null 2>&1; then
+            echo -e "${GREEN}✅ Changes pushed to remote successfully${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Failed to push changes - manual push required${NC}"
+            echo "   Run: git push"
+        fi
+    fi
+    
+    echo ""
     echo "💡 Next steps:"
     echo "   1. Continue development on this branch"
-    echo "   2. Push when ready: git push -u origin $branch_name"
-    echo "   3. Create pull request for code review"
+    echo "   2. Remote branch is up to date"
+    echo "   3. Create pull request for code review when ready"
     echo ""
 elif [ "$branch_name" = "main" ] || [ "$branch_name" = "master" ]; then
     echo -e "${GREEN}🎯 Main Branch Commit${NC}"

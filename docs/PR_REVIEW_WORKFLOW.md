@@ -11,14 +11,20 @@ graph TD
     A[Agent Completes Task] --> B[Validate Completion Criteria]
     B --> C[Create Feature Branch]
     C --> D[Commit Changes with Quality Gates]
-    D --> E[Push Branch to Remote]
+    D --> E[Auto-Push Branch to Remote via Hook]
     E --> F[Create Pull Request]
     F --> G[Assign Review Agent]
     G --> H[Conduct Multi-Agent Review]
     H --> I[Merge or Request Changes]
 ```
 
-### 2. Review Agent Assignment
+### 2. Automatic Branch Management
+The system includes automatic branch pushing via git hooks:
+- **Post-commit Hook**: Automatically detects feature branches (feature/*, fix/*, hotfix/*) and pushes to remote
+- **Error Handling**: Provides fallback instructions if automatic push fails
+- **Remote Tracking**: Creates remote tracking branches for new feature branches
+
+### 3. Review Agent Assignment
 The system selects review agents based on:
 - **Different expertise** from the implementing agent
 - **Complementary perspective** (e.g., security review for feature implementation)
@@ -184,6 +190,50 @@ python cli.py review --pr 123 --apply-suggestions
 python cli.py review --pr 123 --request-changes
 ```
 
+## Git Hooks Integration
+
+The PR review workflow integrates seamlessly with the existing git hooks system:
+
+### Pre-commit Hook
+- Validates code quality before commits
+- Runs linting and basic security checks
+- Ensures proper branch naming conventions
+
+### Post-commit Hook
+- Triggers agent notification of completed work
+- **Automatically pushes feature branches to remote** (feature/*, fix/*, hotfix/*)
+- Updates project status and metrics
+- Prepares for potential PR creation
+
+#### Automatic Branch Pushing
+The post-commit hook automatically handles branch pushing for feature development:
+- **New Feature Branches**: Creates remote tracking branch with `git push -u origin <branch-name>`
+- **Existing Feature Branches**: Pushes changes to existing remote branch with `git push`
+- **Error Handling**: Provides clear feedback and manual fallback instructions if push fails
+- **Branch Detection**: Only affects feature/, fix/, and hotfix/ branches (main/master remain manual)
+
+```bash
+# Example post-commit hook output for feature branch
+✅ LeanVibe Agent Hive - Commit Successful
+=========================================
+📝 Commit: a1b2c3d
+🌿 Branch: feature/user-authentication
+👤 Author: agent-backend
+📅 Date: 2024-01-15 14:30:00
+
+💬 Message:
+feat: Implement JWT authentication system
+
+🚀 Feature Branch Detected
+📤 Creating remote tracking branch...
+✅ Branch pushed to remote successfully
+
+💡 Next steps:
+   1. Continue development on this branch
+   2. Remote branch is up to date
+   3. Create pull request for code review when ready
+```
+
 ## Implementation Details
 
 ### 1. PR Creation Automation
@@ -231,7 +281,8 @@ class PRCreationService:
         commit_message = self.generate_commit_message(task)
         await self.git_service.commit_with_validation(commit_message)
         
-        # 3. Push to remote
+        # 3. Push to remote (handled automatically by post-commit hook)
+        # The post-commit hook automatically pushes feature branches
         await self.git_service.push_branch(branch_name)
         
         # 4. Create PR via GitHub API
