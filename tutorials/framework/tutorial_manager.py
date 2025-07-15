@@ -40,6 +40,7 @@ class TutorialStep:
     expected_output: Optional[str] = None
     hints: List[str] = field(default_factory=list)
     estimated_time: int = 5  # minutes
+    dependencies: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -105,7 +106,8 @@ class Tutorial:
                 validation_command=step_data.get('validation_command'),
                 expected_output=step_data.get('expected_output'),
                 hints=step_data.get('hints', []),
-                estimated_time=step_data.get('estimated_time', 5)
+                estimated_time=step_data.get('estimated_time', 5),
+                dependencies=step_data.get('dependencies', [])
             )
             steps.append(step)
         

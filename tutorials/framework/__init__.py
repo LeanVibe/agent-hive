@@ -9,8 +9,7 @@ This package provides a comprehensive tutorial system with:
 """
 
 from .tutorial_manager import TutorialManager, Tutorial, TutorialStep, TutorialMetadata
-from .cli_interface import TutorialCLI
-from .validation import StepValidator, ValidationResult
+from .validation import StepValidator, ValidationResult, TutorialValidator, TutorialTestRunner
 
 __version__ = "1.0.0"
 __all__ = [
@@ -18,7 +17,8 @@ __all__ = [
     "Tutorial", 
     "TutorialStep",
     "TutorialMetadata",
-    "TutorialCLI",
     "StepValidator",
-    "ValidationResult"
+    "ValidationResult",
+    "TutorialValidator",
+    "TutorialTestRunner"
 ]
