@@ -23,6 +23,7 @@ from ..advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinat
 from ..advanced_orchestration.models import LoadBalancingStrategy
 from .auth_middleware import AuthenticationMiddleware, AuthMethod, Permission
 from .rate_limiter import AdvancedRateLimiter, RateLimitStrategy
+from .service_discovery import ServiceDiscovery, ServiceInfo, ServiceStatus
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,8 @@ class ApiGateway:
     """
     
     def __init__(self, config: ApiGatewayConfig, coordinator: Optional[MultiAgentCoordinator] = None, 
-                 auth_config: Optional[Dict[str, Any]] = None, rate_limit_config: Optional[Dict[str, Any]] = None):
+                 auth_config: Optional[Dict[str, Any]] = None, rate_limit_config: Optional[Dict[str, Any]] = None,
+                 discovery_config: Optional[Dict[str, Any]] = None):
         """
         Initialize API gateway.
         
@@ -46,6 +48,7 @@ class ApiGateway:
             coordinator: Optional multi-agent coordinator for load balancing
             auth_config: Optional authentication configuration
             rate_limit_config: Optional rate limiter configuration
+            discovery_config: Optional service discovery configuration
         """
         self.config = config
         self.coordinator = coordinator
@@ -84,6 +87,19 @@ class ApiGateway:
             }
             self.advanced_rate_limiter = AdvancedRateLimiter(default_rate_config)
         
+        # Initialize service discovery
+        if discovery_config:
+            self.service_discovery = ServiceDiscovery(discovery_config, coordinator)
+        else:
+            # Default discovery config
+            default_discovery_config = {
+                "strategy": "dynamic",
+                "cleanup_enabled": True,
+                "cleanup_interval": 300,
+                "service_ttl": 600
+            }
+            self.service_discovery = ServiceDiscovery(default_discovery_config, coordinator)
+        
         # Load balancing for service routing
         self.service_load_balancer = {
             'round_robin_counters': {},
@@ -101,6 +117,10 @@ class ApiGateway:
             
         try:
             logger.info(f"Starting API gateway on {self.config.host}:{self.config.port}")
+            
+            # Start service discovery
+            await self.service_discovery.start()
+            
             await asyncio.sleep(0.1)  # Simulate startup time
             
             self.server_started = True
@@ -118,6 +138,10 @@ class ApiGateway:
             
         try:
             logger.info("Stopping API gateway...")
+            
+            # Stop service discovery
+            await self.service_discovery.stop()
+            
             self.server_started = False
             logger.info("API gateway stopped")
             
@@ -231,6 +255,18 @@ class ApiGateway:
         Returns:
             Selected agent ID or None if no available agents
         """
+        # First try service discovery
+        healthy_services = await self.service_discovery.discover_services(
+            service_name=service_name,
+            status=ServiceStatus.HEALTHY
+        )
+        
+        if healthy_services:
+            # Use service discovery for selection
+            selected_service = healthy_services[0]  # Services are sorted by weight
+            return selected_service.agent_id or selected_service.service_id
+        
+        # Fallback to legacy service routes
         if service_name not in self.service_routes:
             return None
         
@@ -643,6 +679,7 @@ class ApiGateway:
             "total_requests": self._request_count,
             "authentication": self.auth_middleware.get_auth_stats(),
             "rate_limiting": self.advanced_rate_limiter.get_global_stats(),
+            "service_discovery": self.service_discovery.get_discovery_stats(),
             "coordinator_connected": self.coordinator is not None,
             "supported_versions": self.supported_versions,
             "config": asdict(self.config)
