@@ -2,7 +2,7 @@
 LeanVibe Agent Hive Observability System
 
 This module provides comprehensive real-time observability for the LeanVibe Agent Hive
-system, including hook management, event streaming, and agent monitoring.
+system, including hook management, event streaming, agent monitoring, and baseline metrics.
 """
 
 from .hook_manager import (
@@ -23,8 +23,22 @@ from .hook_manager import (
     track_performance_metrics
 )
 
+from .baseline_metrics import (
+    BaselineMetric,
+    PerformanceBaseline,
+    MetricsCollector,
+    BaselineAnalyzer,
+    metrics_collector,
+    baseline_analyzer,
+    start_baseline_monitoring,
+    stop_baseline_monitoring,
+    get_baseline_report,
+    export_baseline_metrics
+)
+
 __version__ = "1.0.0"
 __all__ = [
+    # Hook Management
     "HookManager",
     "HookType", 
     "EventPriority",
@@ -39,5 +53,17 @@ __all__ = [
     "register_notification_hook",
     "track_tool_use",
     "track_agent_error",
-    "track_performance_metrics"
+    "track_performance_metrics",
+    
+    # Baseline Metrics
+    "BaselineMetric",
+    "PerformanceBaseline",
+    "MetricsCollector",
+    "BaselineAnalyzer",
+    "metrics_collector",
+    "baseline_analyzer",
+    "start_baseline_monitoring",
+    "stop_baseline_monitoring",
+    "get_baseline_report",
+    "export_baseline_metrics"
 ]
