@@ -5,7 +5,10 @@
 **✅ Currently Deployable**:
 - Python API with advanced_orchestration module
 - Multi-agent coordination system as a library
-- Test suite and development environment
+- Intelligence Framework with ML-based decision making
+- External API Integration (WebhookServer, ApiGateway, EventStreaming)
+- Enhanced ML Systems (PatternOptimizer, PredictiveAnalytics, AdaptiveLearning)
+- Test suite and development environment (26 tests with 96% coverage)
 
 **❌ Not Yet Deployable**:
 - CLI interface and orchestrator service
@@ -20,6 +23,7 @@ This guide covers deployment strategies for the current Python API and plans for
 - [Overview](#overview)
 - [Deployment Strategies](#deployment-strategies)
 - [Docker Configuration](#docker-configuration)
+- [External API Integration Deployment](#external-api-integration-deployment)
 - [Production Environment Setup](#production-environment-setup)
 - [Security Considerations](#security-considerations)
 - [Monitoring and Observability](#monitoring-and-observability)
@@ -36,8 +40,14 @@ LeanVibe Agent Hive is designed for production deployment with high availability
 
 **✅ Currently Ready**:
 - [x] **Core Implementation**: MultiAgentCoordinator, ResourceManager, ScalingManager
-- [x] **Testing Foundation**: 100+ tests with comprehensive coverage
-- [x] **Python API**: Stable import paths and data models
+- [x] **Intelligence Framework**: ML-based decision making with confidence scoring
+- [x] **Task Allocation**: Intelligent task routing and agent performance profiling
+- [x] **Agent Coordination**: Multi-agent collaboration protocols and coordination sessions
+- [x] **Performance Monitoring**: Real-time monitoring and optimization with intelligent recommendations
+- [x] **External API Integration**: WebhookServer, ApiGateway, EventStreaming with production-ready capabilities
+- [x] **Enhanced ML Systems**: PatternOptimizer, PredictiveAnalytics, AdaptiveLearning
+- [x] **Testing Foundation**: 26 tests with 96% coverage (comprehensive intelligence framework testing)
+- [x] **Python API**: Stable import paths and data models with Phase 2 integrations
 
 **❌ Not Yet Ready for Production**:
 - [ ] **CLI Interface**: Command-line orchestrator and service wrapper
@@ -508,6 +518,726 @@ docker push leanvibe/agent-hive:v2.1
 docker-compose -f docker-compose.dev.yml up --build
 ```
 
+## External API Integration Deployment
+
+**✅ Status**: Production ready with comprehensive external API integration capabilities.
+
+### External API Services Architecture
+
+The LeanVibe Agent Hive includes three core external API services that provide comprehensive integration capabilities:
+
+1. **WebhookServer** - HTTP endpoint handling with rate limiting and event validation
+2. **ApiGateway** - RESTful API management with authentication and CORS support  
+3. **EventStreaming** - Real-time event distribution with compression and batching
+
+### Multi-Service Docker Compose Configuration
+
+```yaml
+# docker-compose.external-api.yml
+version: '3.8'
+
+services:
+  agent-hive:
+    build: .
+    container_name: agent-hive-core
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - LEANVIBE_SYSTEM_LOG_LEVEL=INFO
+      - LEANVIBE_MULTI_AGENT_MAX_AGENTS=10
+      - LEANVIBE_EXTERNAL_API_WEBHOOK_ENABLED=true
+      - LEANVIBE_EXTERNAL_API_GATEWAY_ENABLED=true
+      - LEANVIBE_EXTERNAL_API_STREAMING_ENABLED=true
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/.claude/config
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - agent-hive-network
+
+  webhook-server:
+    build: .
+    container_name: agent-hive-webhook
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - LEANVIBE_WEBHOOK_PORT=8081
+      - LEANVIBE_WEBHOOK_HOST=0.0.0.0
+      - LEANVIBE_WEBHOOK_RATE_LIMIT=100
+      - LEANVIBE_WEBHOOK_AUTH_REQUIRED=true
+    command: ["python", "-m", "external_api.webhook_server"]
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - agent-hive-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-gateway:
+    build: .
+    container_name: agent-hive-gateway
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      - LEANVIBE_GATEWAY_PORT=8082
+      - LEANVIBE_GATEWAY_CORS_ENABLED=true
+      - LEANVIBE_GATEWAY_AUTH_PROVIDER=jwt
+      - LEANVIBE_GATEWAY_REQUEST_TIMEOUT=30
+    command: ["python", "-m", "external_api.api_gateway"]
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - agent-hive-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  event-streaming:
+    build: .
+    container_name: agent-hive-streaming
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      - LEANVIBE_STREAMING_PORT=8083
+      - LEANVIBE_STREAMING_COMPRESSION=true
+      - LEANVIBE_STREAMING_BATCH_SIZE=10
+      - LEANVIBE_STREAMING_FLUSH_INTERVAL=5.0
+    command: ["python", "-m", "external_api.event_streaming"]
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - agent-hive-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: agent-hive-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - agent-hive-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: agent-hive-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: agent_hive
+      POSTGRES_USER: agent_hive
+      POSTGRES_PASSWORD: secure_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - agent-hive-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: agent-hive-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - agent-hive
+      - webhook-server
+      - api-gateway
+      - event-streaming
+    networks:
+      - agent-hive-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  agent-hive-network:
+    driver: bridge
+```
+
+### Nginx Load Balancer Configuration
+
+```nginx
+# nginx.conf
+events {
+    worker_connections 1024;
+}
+
+http {
+    upstream agent_hive_core {
+        server agent-hive:8080;
+    }
+
+    upstream webhook_servers {
+        server webhook-server:8081;
+    }
+
+    upstream api_gateways {
+        server api-gateway:8082;
+    }
+
+    upstream event_streaming {
+        server event-streaming:8083;
+    }
+
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=100r/m;
+    limit_req_zone $binary_remote_addr zone=webhook_limit:10m rate=50r/m;
+
+    server {
+        listen 80;
+        server_name localhost;
+
+        # Core API
+        location /api/v1/ {
+            limit_req zone=api_limit burst=20 nodelay;
+            proxy_pass http://agent_hive_core;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Webhook endpoints
+        location /webhooks/ {
+            limit_req zone=webhook_limit burst=10 nodelay;
+            proxy_pass http://webhook_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # API Gateway
+        location /gateway/ {
+            limit_req zone=api_limit burst=20 nodelay;
+            proxy_pass http://api_gateways;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Event Streaming
+        location /stream/ {
+            proxy_pass http://event_streaming;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Health checks
+        location /health {
+            access_log off;
+            proxy_pass http://agent_hive_core;
+        }
+    }
+}
+```
+
+### Kubernetes Deployment for External APIs
+
+```yaml
+# k8s/external-api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-hive-webhook-server
+  namespace: agent-hive
+  labels:
+    app: agent-hive
+    component: webhook-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agent-hive
+      component: webhook-server
+  template:
+    metadata:
+      labels:
+        app: agent-hive
+        component: webhook-server
+    spec:
+      containers:
+      - name: webhook-server
+        image: leanvibe/agent-hive:latest
+        command: ["python", "-m", "external_api.webhook_server"]
+        ports:
+        - containerPort: 8081
+          name: webhook-port
+        env:
+        - name: LEANVIBE_WEBHOOK_PORT
+          value: "8081"
+        - name: LEANVIBE_WEBHOOK_HOST
+          value: "0.0.0.0"
+        - name: LEANVIBE_WEBHOOK_RATE_LIMIT
+          value: "100"
+        - name: LEANVIBE_WEBHOOK_AUTH_REQUIRED
+          value: "true"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-hive-api-gateway
+  namespace: agent-hive
+  labels:
+    app: agent-hive
+    component: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agent-hive
+      component: api-gateway
+  template:
+    metadata:
+      labels:
+        app: agent-hive
+        component: api-gateway
+    spec:
+      containers:
+      - name: api-gateway
+        image: leanvibe/agent-hive:latest
+        command: ["python", "-m", "external_api.api_gateway"]
+        ports:
+        - containerPort: 8082
+          name: gateway-port
+        env:
+        - name: LEANVIBE_GATEWAY_PORT
+          value: "8082"
+        - name: LEANVIBE_GATEWAY_CORS_ENABLED
+          value: "true"
+        - name: LEANVIBE_GATEWAY_AUTH_PROVIDER
+          value: "jwt"
+        - name: LEANVIBE_GATEWAY_REQUEST_TIMEOUT
+          value: "30"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8082
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-hive-event-streaming
+  namespace: agent-hive
+  labels:
+    app: agent-hive
+    component: event-streaming
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agent-hive
+      component: event-streaming
+  template:
+    metadata:
+      labels:
+        app: agent-hive
+        component: event-streaming
+    spec:
+      containers:
+      - name: event-streaming
+        image: leanvibe/agent-hive:latest
+        command: ["python", "-m", "external_api.event_streaming"]
+        ports:
+        - containerPort: 8083
+          name: streaming-port
+        env:
+        - name: LEANVIBE_STREAMING_PORT
+          value: "8083"
+        - name: LEANVIBE_STREAMING_COMPRESSION
+          value: "true"
+        - name: LEANVIBE_STREAMING_BATCH_SIZE
+          value: "10"
+        - name: LEANVIBE_STREAMING_FLUSH_INTERVAL
+          value: "5.0"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8083
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8083
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Services for External APIs
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-hive-webhook-service
+  namespace: agent-hive
+  labels:
+    app: agent-hive
+    component: webhook-server
+spec:
+  selector:
+    app: agent-hive
+    component: webhook-server
+  ports:
+  - name: webhook-port
+    port: 8081
+    targetPort: 8081
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-hive-gateway-service
+  namespace: agent-hive
+  labels:
+    app: agent-hive
+    component: api-gateway
+spec:
+  selector:
+    app: agent-hive
+    component: api-gateway
+  ports:
+  - name: gateway-port
+    port: 8082
+    targetPort: 8082
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-hive-streaming-service
+  namespace: agent-hive
+  labels:
+    app: agent-hive
+    component: event-streaming
+spec:
+  selector:
+    app: agent-hive
+    component: event-streaming
+  ports:
+  - name: streaming-port
+    port: 8083
+    targetPort: 8083
+  type: ClusterIP
+```
+
+### External API Configuration
+
+```yaml
+# external-api-config.yaml
+external_api:
+  webhook_server:
+    enabled: true
+    port: 8081
+    host: "0.0.0.0"
+    rate_limit_per_minute: 100
+    authentication_required: true
+    cors_origins: ["https://example.com", "https://app.example.com"]
+    endpoints:
+      - path: "/github/webhook"
+        methods: ["POST"]
+        auth_required: true
+        rate_limit: 50
+      - path: "/slack/webhook"
+        methods: ["POST"]
+        auth_required: true
+        rate_limit: 30
+      - path: "/custom/webhook"
+        methods: ["POST", "PUT"]
+        auth_required: false
+        rate_limit: 20
+
+  api_gateway:
+    enabled: true
+    port: 8082
+    cors_enabled: true
+    cors_origins: ["*"]
+    cors_methods: ["GET", "POST", "PUT", "DELETE"]
+    cors_headers: ["Content-Type", "Authorization"]
+    authentication_provider: "jwt"
+    request_timeout: 30
+    max_request_size: "10MB"
+    routes:
+      - path: "/api/v1/agents"
+        methods: ["GET", "POST"]
+        auth_required: true
+        rate_limit: 100
+      - path: "/api/v1/tasks"
+        methods: ["GET", "POST", "PUT", "DELETE"]
+        auth_required: true
+        rate_limit: 200
+      - path: "/api/v1/status"
+        methods: ["GET"]
+        auth_required: false
+        rate_limit: 50
+
+  event_streaming:
+    enabled: true
+    port: 8083
+    compression_enabled: true
+    compression_algorithm: "gzip"
+    batch_size: 10
+    flush_interval: 5.0
+    max_connections: 1000
+    heartbeat_interval: 30
+    event_types:
+      - "task_completed"
+      - "task_failed"
+      - "agent_status_changed"
+      - "system_health_update"
+      - "performance_metrics"
+    filters:
+      - type: "agent_id"
+        values: ["agent_1", "agent_2"]
+      - type: "priority"
+        values: ["high", "critical"]
+```
+
+### External API Security Configuration
+
+```yaml
+# external-api-security.yaml
+security:
+  webhook_server:
+    authentication:
+      type: "api_key"
+      header_name: "X-API-Key"
+      validation_endpoint: "/auth/validate"
+    rate_limiting:
+      storage: "redis"
+      redis_url: "redis://redis:6379"
+      global_limit: 1000
+      per_endpoint_limit: 100
+    request_validation:
+      max_payload_size: "5MB"
+      required_headers: ["Content-Type", "X-API-Key"]
+      allowed_content_types: ["application/json", "application/xml"]
+    logging:
+      log_requests: true
+      log_responses: false
+      log_errors: true
+      sensitive_headers: ["Authorization", "X-API-Key"]
+
+  api_gateway:
+    authentication:
+      jwt:
+        secret_key: "${JWT_SECRET_KEY}"
+        algorithm: "HS256"
+        expiration: 3600
+        issuer: "agent-hive"
+      oauth2:
+        provider: "custom"
+        authorization_url: "https://auth.example.com/oauth/authorize"
+        token_url: "https://auth.example.com/oauth/token"
+        client_id: "${OAUTH2_CLIENT_ID}"
+        client_secret: "${OAUTH2_CLIENT_SECRET}"
+    cors:
+      credentials: true
+      max_age: 86400
+      exposed_headers: ["X-Request-ID", "X-Rate-Limit"]
+    request_validation:
+      max_payload_size: "10MB"
+      validate_json: true
+      sanitize_input: true
+
+  event_streaming:
+    authentication:
+      type: "token"
+      token_header: "Authorization"
+      token_prefix: "Bearer"
+    encryption:
+      enabled: true
+      algorithm: "AES-256-GCM"
+      key_rotation_interval: 86400
+    access_control:
+      subscription_auth_required: true
+      publish_auth_required: true
+      admin_endpoints_auth_required: true
+```
+
+### External API Monitoring and Alerts
+
+```yaml
+# external-api-monitoring.yaml
+monitoring:
+  webhook_server:
+    metrics:
+      - name: "webhook_requests_total"
+        type: "counter"
+        labels: ["endpoint", "method", "status_code"]
+      - name: "webhook_request_duration_seconds"
+        type: "histogram"
+        labels: ["endpoint", "method"]
+        buckets: [0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
+      - name: "webhook_rate_limit_hits_total"
+        type: "counter"
+        labels: ["endpoint", "client_ip"]
+    alerts:
+      - name: "WebhookHighErrorRate"
+        condition: "rate(webhook_requests_total{status_code=~'5..'}[5m]) > 0.1"
+        severity: "warning"
+        description: "High error rate in webhook server"
+      - name: "WebhookHighLatency"
+        condition: "histogram_quantile(0.95, webhook_request_duration_seconds) > 1.0"
+        severity: "warning"
+        description: "High latency in webhook processing"
+
+  api_gateway:
+    metrics:
+      - name: "gateway_requests_total"
+        type: "counter"
+        labels: ["route", "method", "status_code"]
+      - name: "gateway_request_duration_seconds"
+        type: "histogram"
+        labels: ["route", "method"]
+        buckets: [0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
+      - name: "gateway_concurrent_connections"
+        type: "gauge"
+        labels: ["route"]
+    alerts:
+      - name: "GatewayHighErrorRate"
+        condition: "rate(gateway_requests_total{status_code=~'5..'}[5m]) > 0.1"
+        severity: "critical"
+        description: "High error rate in API gateway"
+      - name: "GatewayConnectionLimit"
+        condition: "gateway_concurrent_connections > 800"
+        severity: "warning"
+        description: "API gateway approaching connection limit"
+
+  event_streaming:
+    metrics:
+      - name: "streaming_events_published_total"
+        type: "counter"
+        labels: ["event_type", "status"]
+      - name: "streaming_events_consumed_total"
+        type: "counter"
+        labels: ["event_type", "subscriber"]
+      - name: "streaming_connections_active"
+        type: "gauge"
+        labels: ["connection_type"]
+      - name: "streaming_batch_size"
+        type: "histogram"
+        buckets: [1, 5, 10, 25, 50, 100]
+    alerts:
+      - name: "StreamingHighEventLoss"
+        condition: "rate(streaming_events_published_total{status='failed'}[5m]) > 0.05"
+        severity: "critical"
+        description: "High event loss rate in streaming service"
+      - name: "StreamingConnectionSpike"
+        condition: "streaming_connections_active > 800"
+        severity: "warning"
+        description: "Unusually high number of streaming connections"
+```
+
+### Deployment Commands
+
+```bash
+# Deploy external API services with Docker Compose
+docker-compose -f docker-compose.external-api.yml up -d
+
+# Deploy to Kubernetes
+kubectl apply -f k8s/external-api-deployment.yaml
+
+# Scale external API services
+kubectl scale deployment agent-hive-webhook-server --replicas=3 -n agent-hive
+kubectl scale deployment agent-hive-api-gateway --replicas=3 -n agent-hive
+kubectl scale deployment agent-hive-event-streaming --replicas=2 -n agent-hive
+
+# Health check all external API services
+curl -f http://localhost:8081/health  # Webhook server
+curl -f http://localhost:8082/health  # API gateway
+curl -f http://localhost:8083/health  # Event streaming
+
+# Test external API endpoints
+curl -X POST http://localhost:8081/webhooks/github \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key" \
+  -d '{"action": "push", "repository": {"name": "test"}}'
+
+curl -X GET http://localhost:8082/api/v1/agents \
+  -H "Authorization: Bearer your-jwt-token"
+
+# Test event streaming
+curl -X POST http://localhost:8083/events \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-token" \
+  -d '{"type": "test_event", "data": {"message": "Hello World"}}'
+```
+
 ## Production Environment Setup
 
 ### Environment Configuration
@@ -598,6 +1328,99 @@ agents:
       memory_mb: 2048
       disk_mb: 1024
 
+# External API Integration for production
+external_api:
+  enabled: true
+  
+  # Intelligence Framework settings
+  intelligence_framework:
+    enabled: true
+    confidence_threshold: 0.85
+    learning_rate: 0.005
+    pattern_recognition_enabled: true
+    adaptive_learning_enabled: true
+    performance_tracking_enabled: true
+    
+  # Task allocation settings
+  intelligent_task_allocation:
+    enabled: true
+    load_balancing_strategy: "performance_weighted"
+    allocation_timeout: 60
+    performance_tracking_enabled: true
+    
+  # Agent coordination settings
+  agent_coordination:
+    enabled: true
+    session_timeout: 600
+    max_participants: 10
+    consensus_threshold: 0.7
+    
+  # Performance monitoring settings
+  performance_monitoring:
+    enabled: true
+    monitoring_interval: 30
+    optimization_enabled: true
+    alert_thresholds:
+      cpu_usage: 0.85
+      memory_usage: 0.90
+      task_queue_length: 100
+      
+  # Webhook server configuration
+  webhook_server:
+    enabled: true
+    port: 8081
+    host: "0.0.0.0"
+    rate_limit_per_minute: 200
+    authentication_required: true
+    cors_origins: ["https://yourdomain.com", "https://app.yourdomain.com"]
+    max_payload_size: "10MB"
+    request_timeout: 60
+    
+  # API gateway configuration
+  api_gateway:
+    enabled: true
+    port: 8082
+    cors_enabled: true
+    cors_origins: ["https://yourdomain.com"]
+    cors_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    cors_headers: ["Content-Type", "Authorization", "X-API-Key"]
+    authentication_provider: "jwt"
+    request_timeout: 60
+    max_request_size: "50MB"
+    rate_limit_per_minute: 500
+    
+  # Event streaming configuration
+  event_streaming:
+    enabled: true
+    port: 8083
+    compression_enabled: true
+    compression_algorithm: "gzip"
+    batch_size: 50
+    flush_interval: 3.0
+    max_connections: 2000
+    heartbeat_interval: 60
+    event_retention_hours: 24
+    
+  # Enhanced ML systems
+  ml_enhancements:
+    pattern_optimizer:
+      enabled: true
+      pattern_detection_sensitivity: 0.8
+      optimization_aggressiveness: 0.6
+      learning_window_size: 5000
+      
+    predictive_analytics:
+      enabled: true
+      prediction_accuracy_threshold: 0.9
+      forecast_horizon_days: 60
+      model_update_frequency: "daily"
+      
+    adaptive_learning:
+      enabled: true
+      learning_rate: 0.005
+      adaptation_threshold: 0.15
+      model_update_frequency: "hourly"
+
 # Production database settings
 database:
   connection_pool_size: 20
@@ -661,6 +1484,59 @@ export LEANVIBE_SECURITY_API_KEY=your-api-key-here
 # External service URLs
 export CLAUDE_API_URL=https://api.anthropic.com
 export GEMINI_API_URL=https://generativelanguage.googleapis.com
+
+# External API Integration settings
+export LEANVIBE_EXTERNAL_API_ENABLED=true
+
+# Intelligence Framework settings
+export LEANVIBE_INTELLIGENCE_FRAMEWORK_ENABLED=true
+export LEANVIBE_INTELLIGENCE_FRAMEWORK_CONFIDENCE_THRESHOLD=0.85
+export LEANVIBE_INTELLIGENCE_FRAMEWORK_LEARNING_RATE=0.005
+
+# Task allocation settings
+export LEANVIBE_INTELLIGENT_TASK_ALLOCATION_ENABLED=true
+export LEANVIBE_INTELLIGENT_TASK_ALLOCATION_STRATEGY=performance_weighted
+export LEANVIBE_INTELLIGENT_TASK_ALLOCATION_TIMEOUT=60
+
+# Agent coordination settings
+export LEANVIBE_AGENT_COORDINATION_ENABLED=true
+export LEANVIBE_AGENT_COORDINATION_SESSION_TIMEOUT=600
+export LEANVIBE_AGENT_COORDINATION_MAX_PARTICIPANTS=10
+
+# Performance monitoring settings
+export LEANVIBE_PERFORMANCE_MONITORING_ENABLED=true
+export LEANVIBE_PERFORMANCE_MONITORING_INTERVAL=30
+export LEANVIBE_PERFORMANCE_MONITORING_OPTIMIZATION_ENABLED=true
+
+# Webhook server settings
+export LEANVIBE_WEBHOOK_SERVER_ENABLED=true
+export LEANVIBE_WEBHOOK_SERVER_PORT=8081
+export LEANVIBE_WEBHOOK_SERVER_HOST=0.0.0.0
+export LEANVIBE_WEBHOOK_SERVER_RATE_LIMIT=200
+export LEANVIBE_WEBHOOK_SERVER_AUTH_REQUIRED=true
+
+# API gateway settings
+export LEANVIBE_API_GATEWAY_ENABLED=true
+export LEANVIBE_API_GATEWAY_PORT=8082
+export LEANVIBE_API_GATEWAY_CORS_ENABLED=true
+export LEANVIBE_API_GATEWAY_AUTH_PROVIDER=jwt
+export LEANVIBE_API_GATEWAY_REQUEST_TIMEOUT=60
+export LEANVIBE_API_GATEWAY_RATE_LIMIT=500
+
+# Event streaming settings
+export LEANVIBE_EVENT_STREAMING_ENABLED=true
+export LEANVIBE_EVENT_STREAMING_PORT=8083
+export LEANVIBE_EVENT_STREAMING_COMPRESSION_ENABLED=true
+export LEANVIBE_EVENT_STREAMING_BATCH_SIZE=50
+export LEANVIBE_EVENT_STREAMING_MAX_CONNECTIONS=2000
+
+# Enhanced ML systems settings
+export LEANVIBE_ML_PATTERN_OPTIMIZER_ENABLED=true
+export LEANVIBE_ML_PATTERN_OPTIMIZER_SENSITIVITY=0.8
+export LEANVIBE_ML_PREDICTIVE_ANALYTICS_ENABLED=true
+export LEANVIBE_ML_PREDICTIVE_ANALYTICS_THRESHOLD=0.9
+export LEANVIBE_ML_ADAPTIVE_LEARNING_ENABLED=true
+export LEANVIBE_ML_ADAPTIVE_LEARNING_RATE=0.005
 ```
 
 ### Performance Tuning
@@ -1547,6 +2423,222 @@ coordinator = MultiAgentCoordinator()
 coordinator.reset_all_agents()
 print('Coordination reset completed')
 "
+```
+
+#### External API Integration Issues
+
+```bash
+# Check webhook server status
+curl -f http://localhost:8081/health || echo "Webhook server down"
+kubectl logs -n agent-hive -l component=webhook-server --tail=50
+
+# Check API gateway status
+curl -f http://localhost:8082/health || echo "API gateway down"
+kubectl logs -n agent-hive -l component=api-gateway --tail=50
+
+# Check event streaming status
+curl -f http://localhost:8083/health || echo "Event streaming down"
+kubectl logs -n agent-hive -l component=event-streaming --tail=50
+
+# Test webhook endpoint functionality
+curl -X POST http://localhost:8081/webhooks/test \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: test-key" \
+  -d '{"test": "webhook"}' \
+  --max-time 10
+
+# Test API gateway functionality
+curl -X GET http://localhost:8082/api/v1/status \
+  -H "Authorization: Bearer test-token" \
+  --max-time 10
+
+# Test event streaming functionality
+curl -X POST http://localhost:8083/events \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test-token" \
+  -d '{"type": "test", "data": {"message": "test"}}' \
+  --max-time 10
+
+# Check external API service resources
+kubectl top pods -n agent-hive -l component=webhook-server
+kubectl top pods -n agent-hive -l component=api-gateway
+kubectl top pods -n agent-hive -l component=event-streaming
+
+# Check external API service connectivity
+kubectl exec -it <webhook-pod> -n agent-hive -- netstat -tlnp
+kubectl exec -it <gateway-pod> -n agent-hive -- netstat -tlnp
+kubectl exec -it <streaming-pod> -n agent-hive -- netstat -tlnp
+```
+
+#### Intelligence Framework Debugging
+
+```bash
+# Check intelligence framework status
+kubectl exec -it <pod-name> -n agent-hive -- python -c "
+from intelligence_framework import IntelligenceFramework
+from intelligence_framework.models import IntelligenceConfig
+
+config = IntelligenceConfig()
+framework = IntelligenceFramework(config)
+
+# Test decision making
+decision = framework.make_decision(
+    context={'task_type': 'test', 'complexity': 'low'},
+    options=[{'approach': 'test', 'confidence': 0.9}]
+)
+print(f'Decision made: {decision}')
+
+# Check learning status
+insights = framework.get_learning_insights(time_period='last_hour')
+print(f'Learning insights: {insights}')
+"
+
+# Check task allocation status
+kubectl exec -it <pod-name> -n agent-hive -- python -c "
+from intelligent_task_allocation import IntelligentTaskAllocator
+from intelligent_task_allocation.models import AllocationConfig
+
+config = AllocationConfig()
+allocator = IntelligentTaskAllocator(config)
+
+# Test task allocation
+allocation = allocator.allocate_task(
+    task={'type': 'test', 'complexity': 5},
+    available_agents=['test_agent_1', 'test_agent_2']
+)
+print(f'Task allocation: {allocation}')
+
+# Check agent performance profiles
+for agent_id in ['test_agent_1', 'test_agent_2']:
+    profile = allocator.get_agent_profile(agent_id)
+    print(f'Agent {agent_id} profile: {profile}')
+"
+
+# Check performance monitoring
+kubectl exec -it <pod-name> -n agent-hive -- python -c "
+from performance_monitoring_optimization import PerformanceMonitoringOptimization
+from performance_monitoring_optimization.models import MonitoringConfig
+
+config = MonitoringConfig()
+monitor = PerformanceMonitoringOptimization(config)
+
+# Get current metrics
+metrics = monitor.get_current_metrics()
+print(f'Performance metrics: {metrics}')
+
+# Check optimization recommendations
+recommendations = monitor.get_optimization_recommendations()
+print(f'Optimization recommendations: {recommendations}')
+"
+```
+
+#### ML Enhancement Systems Debugging
+
+```bash
+# Check pattern optimizer status
+kubectl exec -it <pod-name> -n agent-hive -- python -c "
+from ml_enhancements import PatternOptimizer
+from ml_enhancements.models import MLConfig
+
+config = MLConfig()
+optimizer = PatternOptimizer(config)
+
+# Test pattern analysis
+patterns = optimizer.analyze_patterns(
+    data_source='test_data',
+    time_window='last_hour'
+)
+print(f'Pattern analysis: {patterns}')
+"
+
+# Check predictive analytics status
+kubectl exec -it <pod-name> -n agent-hive -- python -c "
+from ml_enhancements import PredictiveAnalytics
+
+analytics = PredictiveAnalytics()
+
+# Test performance prediction
+prediction = analytics.predict_performance(
+    task_type='test',
+    context={'complexity': 'medium'},
+    forecast_horizon='1_hour'
+)
+print(f'Performance prediction: {prediction}')
+"
+
+# Check adaptive learning status
+kubectl exec -it <pod-name> -n agent-hive -- python -c "
+from ml_enhancements import AdaptiveLearning
+
+learning = AdaptiveLearning()
+
+# Check learning insights
+insights = learning.get_learning_insights(
+    time_period='last_hour',
+    focus_areas=['performance', 'optimization']
+)
+print(f'Learning insights: {insights}')
+
+# Check model performance
+evaluation = learning.evaluate_model_performance()
+print(f'Model evaluation: {evaluation}')
+"
+```
+
+#### External API Rate Limiting Issues
+
+```bash
+# Check rate limiting status
+curl -I http://localhost:8081/webhooks/test
+curl -I http://localhost:8082/api/v1/status
+curl -I http://localhost:8083/events
+
+# Check Redis rate limiting backend
+kubectl exec -it <redis-pod> -n agent-hive -- redis-cli info keyspace
+kubectl exec -it <redis-pod> -n agent-hive -- redis-cli keys "rate_limit:*"
+
+# Reset rate limiting for specific client
+kubectl exec -it <redis-pod> -n agent-hive -- redis-cli del "rate_limit:client_ip:192.168.1.100"
+
+# Check rate limiting configuration
+kubectl exec -it <webhook-pod> -n agent-hive -- python -c "
+import os
+print(f'Rate limit: {os.getenv(\"LEANVIBE_WEBHOOK_SERVER_RATE_LIMIT\", \"default\")}')
+print(f'Auth required: {os.getenv(\"LEANVIBE_WEBHOOK_SERVER_AUTH_REQUIRED\", \"default\")}')
+"
+```
+
+#### External API Security Issues
+
+```bash
+# Check authentication status
+curl -X POST http://localhost:8081/webhooks/test \
+  -H "Content-Type: application/json" \
+  -d '{"test": "data"}' \
+  -w "HTTP Status: %{http_code}\n"
+
+# Test with valid API key
+curl -X POST http://localhost:8081/webhooks/test \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: valid-key" \
+  -d '{"test": "data"}' \
+  -w "HTTP Status: %{http_code}\n"
+
+# Check CORS configuration
+curl -X OPTIONS http://localhost:8082/api/v1/status \
+  -H "Origin: https://example.com" \
+  -H "Access-Control-Request-Method: GET" \
+  -H "Access-Control-Request-Headers: Content-Type,Authorization" \
+  -v
+
+# Check JWT token validation
+curl -X GET http://localhost:8082/api/v1/agents \
+  -H "Authorization: Bearer invalid-token" \
+  -w "HTTP Status: %{http_code}\n"
+
+# Check SSL/TLS configuration
+openssl s_client -connect localhost:8081 -servername localhost -verify_hostname
+openssl s_client -connect localhost:8082 -servername localhost -verify_hostname
 ```
 
 ### Emergency Procedures
