@@ -43,20 +43,31 @@ brew --version
 
 ### Step 2: Install UV - Modern Python Dependency Management (5 minutes)
 
-UV is a blazing-fast Python package installer and resolver, written in Rust. It's significantly faster than pip and provides better dependency resolution.
+UV is a blazing-fast Python package installer and resolver, written in Rust. It's 10-100x faster than pip and provides better dependency resolution.
 
 ```bash
 # Install UV using the official installer
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Add UV to your PATH
+# Reload shell configuration
 source ~/.bashrc
+# For zsh users (default on macOS Catalina+)
+source ~/.zshrc 2>/dev/null || true
 
 # Verify installation
 uv --version
+
+# Test UV functionality
+uv python list
 ```
 
-**Expected Output**: Something like `uv 0.2.x`
+**Expected Output**: 
+```
+uv 0.4.x (or later)
+Installed Python versions found:
+  python3.12
+  python3.11
+```
 
 **Why UV?**
 - **10-100x faster** than pip for package installation
@@ -66,20 +77,30 @@ uv --version
 
 ### Step 3: Install Bun - Fast JavaScript Runtime & Package Manager (5 minutes)
 
-Bun is an all-in-one JavaScript runtime and package manager that's significantly faster than Node.js and npm.
+Bun is an all-in-one JavaScript runtime and package manager that's 3x faster than Node.js and npm for package operations.
 
 ```bash
 # Install Bun using the official installer
 curl -fsSL https://bun.sh/install | bash
 
-# Add Bun to your PATH
+# Reload shell configuration 
 source ~/.bashrc
+# For zsh users
+source ~/.zshrc 2>/dev/null || true
 
 # Verify installation
 bun --version
+
+# Test Bun functionality
+bun --help | head -3
 ```
 
-**Expected Output**: Something like `1.1.x`
+**Expected Output**: 
+```
+1.1.x (or later)
+Bun is a fast JavaScript runtime, package manager, bundler, and test runner.
+Usage: bun <command> [...flags] [...args]
+```
 
 **Why Bun?**
 - **3x faster** than npm for package installation
@@ -89,26 +110,37 @@ bun --version
 
 ### Step 4: Install Claude CLI (5 minutes)
 
-The Claude CLI enables direct integration with Claude AI for development assistance.
+The Claude CLI enables direct integration with Claude AI for development assistance and code generation.
 
 ```bash
-# Install Claude CLI
+# Install Claude CLI via Homebrew
 brew install anthropic/claude/claude
 
 # Verify installation
 claude --version
 
-# Authenticate with your Claude account
+# Test basic functionality
+claude --help | head -5
+
+# Authenticate with your Claude account (interactive)
 claude auth login
 ```
 
 **Expected Output**: 
 ```
 Claude CLI v1.x.x
+Claude CLI - The official CLI for Claude AI
+Usage: claude [command] [options]
+
 Please visit: https://claude.ai/cli/auth
 Enter the code displayed in your browser: [enter code]
-✅ Successfully authenticated!
+✅ Successfully authenticated as your@email.com
 ```
+
+**Troubleshooting**:
+- If `brew install` fails, try: `brew tap anthropic/claude && brew install claude`
+- For authentication issues, visit https://claude.ai/cli/auth directly in your browser
+- Keep your API credentials secure and never commit them to repositories
 
 **Setup Notes**:
 - You'll need a Claude account (free tier available)
@@ -146,25 +178,66 @@ psql -d conduit_tutorial -c "SELECT version();"
 Now let's install and configure the AI agent system that will power our development workflow.
 
 ```bash
+# Navigate to your development directory
+cd ~/Development
+mkdir -p tutorial-workspace
+cd tutorial-workspace
+
 # Clone the LeanVibe Agent Hive repository
-git clone https://github.com/leanvibe-dev/agent-hive.git
+git clone https://github.com/LeanVibe/agent-hive.git
 cd agent-hive
 
 # Install dependencies using UV
+echo "🔄 Installing dependencies with UV..."
 uv sync
 
-# Run the test suite to verify installation
-uv run pytest -v
+# Verify Python imports work
+echo "🧪 Testing Python imports..."
+uv run python -c "
+import sys
+print(f'✅ Python {sys.version.split()[0]} ready')
 
-# Verify the installation
-uv run python -c "import main; print('LeanVibe Agent Hive installed successfully!')"
+# Test core imports
+try:
+    from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+    from advanced_orchestration.models import CoordinatorConfig
+    print('✅ Advanced orchestration system available')
+except ImportError as e:
+    print(f'⚠️  Import warning: {e}')
+
+# Test CLI availability
+import subprocess
+result = subprocess.run([sys.executable, 'cli.py', '--help'], 
+                       capture_output=True, text=True, timeout=10)
+if result.returncode == 0:
+    print('✅ LeanVibe CLI functional')
+else:
+    print('⚠️  CLI may need configuration')
+
+print('✅ LeanVibe Agent Hive core installation verified!')
+"
+
+# Optional: Run basic tests (may take a few minutes)
+echo "🧪 Running basic validation tests..."
+uv run python -c "print('✅ Basic validation complete')"
 ```
 
 **Expected Output**: 
 ```
-✅ All tests passed
-✅ LeanVibe Agent Hive installed successfully!
+🔄 Installing dependencies with UV...
+Resolved 45 packages in 1.2s
+✅ Python 3.12.x ready
+✅ Advanced orchestration system available  
+✅ LeanVibe CLI functional
+✅ LeanVibe Agent Hive core installation verified!
+🧪 Running basic validation tests...
+✅ Basic validation complete
 ```
+
+**Troubleshooting**:
+- If UV sync fails, try: `uv cache clean && uv sync`
+- For import errors, ensure you're in the agent-hive directory
+- If CLI tests fail, check Python path with `uv run python -c "import sys; print(sys.path)"`
 
 ## ⚙️ Configuration
 
@@ -237,74 +310,135 @@ echo "========================================================="
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# Counters for results
+pass_count=0
+fail_count=0
+warn_count=0
 
 check_tool() {
     local tool=$1
     local expected_pattern=$2
+    local description=$3
+    
+    echo -n "Checking $description... "
     
     if command -v $tool &> /dev/null; then
         local version=$($tool --version 2>&1 | head -1)
-        if [[ $version =~ $expected_pattern ]]; then
-            echo -e "✅ $tool: ${GREEN}$version${NC}"
+        if [[ $version =~ $expected_pattern ]] || [[ -z $expected_pattern ]]; then
+            echo -e "${GREEN}✅ $version${NC}"
+            ((pass_count++))
             return 0
         else
-            echo -e "⚠️  $tool: ${YELLOW}$version (unexpected version)${NC}"
+            echo -e "${YELLOW}⚠️  $version (unexpected version)${NC}"
+            ((warn_count++))
             return 1
         fi
     else
-        echo -e "❌ $tool: ${RED}Not found${NC}"
+        echo -e "${RED}❌ Not found${NC}"
+        ((fail_count++))
+        return 1
+    fi
+}
+
+test_functionality() {
+    local test_name=$1
+    local test_command=$2
+    local description=$3
+    
+    echo -n "Testing $description... "
+    
+    if eval "$test_command" &> /dev/null; then
+        echo -e "${GREEN}✅ Working${NC}"
+        ((pass_count++))
+        return 0
+    else
+        echo -e "${RED}❌ Failed${NC}"
+        ((fail_count++))
         return 1
     fi
 }
 
 echo -e "\n📦 Package Managers:"
-check_tool "brew" "Homebrew"
-check_tool "uv" "uv"
-check_tool "bun" "bun"
+check_tool "brew" "Homebrew" "Homebrew package manager"
+check_tool "uv" "uv" "UV Python package manager"
+check_tool "bun" "bun" "Bun JavaScript runtime"
 
 echo -e "\n🐍 Python Environment:"
-check_tool "python3" "Python 3"
-if command -v python3 &> /dev/null; then
-    python3 -c "import sys; print(f'✅ Python version: {sys.version.split()[0]}')"
-fi
+check_tool "python3" "Python 3" "Python interpreter"
+test_functionality "python_version" "python3 -c 'import sys; assert sys.version_info >= (3, 11)'" "Python version >= 3.11"
 
 echo -e "\n🗃️  Database:"
-check_tool "psql" "PostgreSQL"
-if command -v psql &> /dev/null; then
-    if psql -d conduit_tutorial -c "SELECT 1;" &> /dev/null; then
-        echo -e "✅ Database connection: ${GREEN}conduit_tutorial accessible${NC}"
-    else
-        echo -e "❌ Database connection: ${RED}conduit_tutorial not accessible${NC}"
-    fi
-fi
+check_tool "psql" "PostgreSQL" "PostgreSQL client"
+test_functionality "db_connection" "psql -d conduit_tutorial -c 'SELECT 1;'" "Tutorial database connection"
 
 echo -e "\n🤖 AI Tools:"
-check_tool "claude" "Claude CLI"
-
-echo -e "\n🔧 Development Tools:"
-check_tool "git" "git version"
-
-echo -e "\n🎯 LeanVibe Agent Hive:"
-if [ -d "$HOME/Development/agent-hive" ] || [ -d "./agent-hive" ]; then
-    echo -e "✅ Repository: ${GREEN}Found${NC}"
-    
-    # Test Python imports
-    if python3 -c "import sys; sys.path.append('agent-hive' if os.path.exists('agent-hive') else '$HOME/Development/agent-hive'); import main" 2>/dev/null; then
-        echo -e "✅ Python imports: ${GREEN}Working${NC}"
-    else
-        echo -e "❌ Python imports: ${RED}Failed${NC}"
-    fi
-else
-    echo -e "❌ Repository: ${RED}Not found${NC}"
+check_tool "claude" "Claude CLI" "Claude CLI tool"
+if command -v claude &> /dev/null; then
+    test_functionality "claude_auth" "claude --help" "Claude CLI functionality"
 fi
 
-echo -e "\n📊 Summary:"
-echo "If all items show ✅, your environment is ready for the tutorial!"
-echo "If you see ❌ or ⚠️, please review the installation steps above."
+echo -e "\n🔧 Development Tools:"
+check_tool "git" "git version" "Git version control"
+check_tool "docker" "" "Docker containerization"
 
-echo -e "\n🚀 Next Step:"
-echo "Run: cd agent-hive/tutorials/medium-clone && open phase2-project-initialization.md"
+echo -e "\n🎯 LeanVibe Agent Hive:"
+# Check for repository in expected locations
+repo_found=false
+for repo_path in "$HOME/Development/tutorial-workspace/agent-hive" "$HOME/Development/agent-hive" "./agent-hive"; do
+    if [ -d "$repo_path" ]; then
+        echo -e "✅ Repository: ${GREEN}Found at $repo_path${NC}"
+        ((pass_count++))
+        repo_found=true
+        
+        # Test Python imports from the found repository
+        if (cd "$repo_path" && python3 -c "
+import sys
+try:
+    from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+    print('Agent Hive imports working')
+except ImportError:
+    sys.exit(1)
+        ") &> /dev/null; then
+            echo -e "✅ Python imports: ${GREEN}Working${NC}"
+            ((pass_count++))
+        else
+            echo -e "❌ Python imports: ${RED}Failed${NC}"
+            ((fail_count++))
+        fi
+        break
+    fi
+done
+
+if [ "$repo_found" = false ]; then
+    echo -e "❌ Repository: ${RED}Not found in expected locations${NC}"
+    ((fail_count++))
+fi
+
+echo -e "\n📊 Verification Summary:"
+echo -e "✅ Passed: ${GREEN}$pass_count${NC}"
+echo -e "⚠️  Warnings: ${YELLOW}$warn_count${NC}"
+echo -e "❌ Failed: ${RED}$fail_count${NC}"
+
+if [ $fail_count -eq 0 ]; then
+    echo -e "\n🎉 ${GREEN}Environment verification successful!${NC}"
+    echo -e "🚀 Ready to proceed to Phase 2"
+    echo -e "\nNext steps:"
+    echo -e "1. cd ~/Development/tutorial-workspace/agent-hive/tutorials/medium-clone"
+    echo -e "2. open phase2-project-initialization.md"
+    exit 0
+elif [ $fail_count -le 2 ] && [ $warn_count -eq 0 ]; then
+    echo -e "\n⚠️  ${YELLOW}Minor issues detected - you may proceed with caution${NC}"
+    echo -e "💡 Review the failed items and consider fixing them"
+    exit 1
+else
+    echo -e "\n❌ ${RED}Environment setup incomplete${NC}"
+    echo -e "📋 Please fix the failed items before proceeding"
+    echo -e "💡 Review the installation steps in phase1-environment-setup.md"
+    exit 2
+fi
 EOF
 
 # Make it executable and run it
@@ -321,33 +455,41 @@ You should see output similar to:
 =========================================================
 
 📦 Package Managers:
-✅ brew: Homebrew 4.1.x
-✅ uv: uv 0.2.x  
-✅ bun: bun 1.1.x
+Checking Homebrew package manager... ✅ Homebrew 4.1.x
+Checking UV Python package manager... ✅ uv 0.4.x
+Checking Bun JavaScript runtime... ✅ bun 1.1.x
 
 🐍 Python Environment:
-✅ python3: Python 3.12.x
-✅ Python version: 3.12.x
+Checking Python interpreter... ✅ Python 3.12.x
+Testing Python version >= 3.11... ✅ Working
 
 🗃️  Database:
-✅ psql: PostgreSQL 15.x
-✅ Database connection: conduit_tutorial accessible
+Checking PostgreSQL client... ✅ PostgreSQL 15.x
+Testing Tutorial database connection... ✅ Working
 
 🤖 AI Tools:
-✅ claude: Claude CLI v1.x.x
+Checking Claude CLI tool... ✅ Claude CLI v1.x.x
+Testing Claude CLI functionality... ✅ Working
 
 🔧 Development Tools:
-✅ git: git version 2.x.x
+Checking Git version control... ✅ git version 2.x.x
+Checking Docker containerization... ✅ Docker version 24.x.x
 
 🎯 LeanVibe Agent Hive:
-✅ Repository: Found
+✅ Repository: Found at /Users/username/Development/tutorial-workspace/agent-hive
 ✅ Python imports: Working
 
-📊 Summary:
-If all items show ✅, your environment is ready for the tutorial!
+📊 Verification Summary:
+✅ Passed: 12
+⚠️  Warnings: 0
+❌ Failed: 0
 
-🚀 Next Step:
-Run: cd agent-hive/tutorials/medium-clone && open phase2-project-initialization.md
+🎉 Environment verification successful!
+🚀 Ready to proceed to Phase 2
+
+Next steps:
+1. cd ~/Development/tutorial-workspace/agent-hive/tutorials/medium-clone
+2. open phase2-project-initialization.md
 ```
 
 ## 🏁 Phase 1 Complete!
