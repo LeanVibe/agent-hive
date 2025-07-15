@@ -23,6 +23,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
+try:
+    from .prompt_logger import prompt_logger, PromptLog
+except ImportError:
+    # Fallback for direct execution
+    import sys
+    sys.path.append('.')
+    from prompt_logger import prompt_logger, PromptLog
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -139,6 +147,33 @@ class DashboardServer:
         async def get_system_metrics():
             """Get system metrics"""
             return {"metrics": self.system_metrics.to_dict()}
+        
+        @self.app.get("/api/prompts/recent")
+        async def get_recent_prompts():
+            """Get recent prompts for dashboard"""
+            prompts = prompt_logger.get_recent_prompts(limit=20)
+            return {"prompts": [p.to_dict() for p in prompts]}
+        
+        @self.app.get("/api/prompts/stats")
+        async def get_prompt_stats():
+            """Get prompt statistics"""
+            return {"stats": prompt_logger.get_prompt_stats()}
+        
+        @self.app.get("/api/prompts/needs-review")
+        async def get_prompts_needing_review():
+            """Get prompts needing PM review"""
+            prompts = prompt_logger.get_prompts_needing_review()
+            return {"prompts": [p.to_dict() for p in prompts]}
+        
+        @self.app.post("/api/prompts/{prompt_id}/review")
+        async def add_pm_review(prompt_id: int, review_data: dict):
+            """Add PM review to a prompt"""
+            prompt_logger.add_pm_review(
+                prompt_id, 
+                review_data.get('review', ''),
+                review_data.get('suggested_improvement', '')
+            )
+            return {"message": "Review added successfully"}
         
         @self.app.post("/api/agents/{agent_name}/spawn")
         async def spawn_agent(agent_name: str):
