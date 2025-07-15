@@ -205,7 +205,7 @@ class PatternOptimizer:
     def _hash_features(self, features: Dict[str, float]) -> str:
         """Create hash of feature values for pattern matching."""
         # Normalize feature values to create consistent patterns
-        normalized_features = {}
+        normalized_features: Dict[str, Any] = {}
         for key, value in features.items():
             if key in ['task_complexity', 'agent_count', 'queue_size']:
                 # Bin into categories for better pattern matching
@@ -360,7 +360,7 @@ class PatternOptimizer:
             
             result = cursor.fetchone()
             if result:
-                return result[0]
+                return float(result[0])
         
         # Fallback to average performance for workflow type
         with sqlite3.connect(self.db_path) as conn:
@@ -370,7 +370,7 @@ class PatternOptimizer:
             """, (workflow_type,))
             
             result = cursor.fetchone()
-            return result[0] if result and result[0] else 0.5
+            return float(result[0]) if result and result[0] is not None else 0.5
     
     def _generate_optimization_changes(
         self, 
@@ -417,7 +417,7 @@ class PatternOptimizer:
         
         return "medium"  # Default
     
-    def train_models(self) -> Dict[str, float]:
+    def train_models(self) -> Dict[str, Any]:
         """Train ML models for pattern recognition and optimization."""
         
         try:
@@ -434,7 +434,8 @@ class PatternOptimizer:
             try:
                 self.cluster_model = KMeans(n_clusters=min(5, len(training_data) // 10), random_state=42)
                 X_scaled = self.scaler.fit_transform(X)
-                self.cluster_model.fit(X_scaled)
+                if self.cluster_model is not None:
+                    self.cluster_model.fit(X_scaled)
             except (ValueError, MemoryError) as e:
                 logger.error(f"Clustering model training failed: {e}")
                 return {'error': 'clustering_failed', 'details': str(e)}
@@ -446,26 +447,30 @@ class PatternOptimizer:
                     max_depth=10,
                     random_state=42
                 )
-                self.performance_model.fit(X, y)
+                if self.performance_model is not None:
+                    self.performance_model.fit(X, y)
             except (ValueError, MemoryError) as e:
                 logger.error(f"Performance model training failed: {e}")
                 return {'error': 'performance_model_failed', 'details': str(e)}
             
             # Calculate model performance
             try:
-                y_pred = self.performance_model.predict(X)
-                mse = mean_squared_error(y, y_pred)
-                r2 = r2_score(y, y_pred)
+                if self.performance_model is not None:
+                    y_pred = self.performance_model.predict(X)
+                    mse = mean_squared_error(y, y_pred)
+                    r2 = r2_score(y, y_pred)
+                else:
+                    mse, r2 = float('inf'), 0.0
             except Exception as e:
                 logger.error(f"Model evaluation failed: {e}")
                 mse, r2 = float('inf'), 0.0
             
             metrics = {
                 'model_version': self.model_version,
-                'training_samples': len(training_data),
-                'mse': mse,
-                'r2_score': r2,
-                'clusters': self.cluster_model.n_clusters if self.cluster_model else 0
+                'training_samples': float(len(training_data)),
+                'mse': float(mse),
+                'r2_score': float(r2),
+                'clusters': float(self.cluster_model.n_clusters if self.cluster_model else 0)
             }
             
             logger.info(f"Model training completed: {metrics}")
