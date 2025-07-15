@@ -10,8 +10,7 @@ from pathlib import Path
 def ping_agent(agent_name: str, window_name: str):
     """Send resume message to specific agent"""
     
-    resume_message = f"""
-🚨 URGENT: RESUME WORK IMMEDIATELY
+    resume_message = f"""🚨 URGENT: RESUME WORK IMMEDIATELY
 
 Hello {agent_name}! You need to resume work immediately. Here are your instructions:
 
@@ -33,17 +32,24 @@ Hello {agent_name}! You need to resume work immediately. Here are your instructi
 
 6. **CURRENT STATUS**: Resume your work on your current task immediately
 
-START WORKING NOW! Do not wait for further instructions. Begin with your next task and maintain continuous progress.
-
-Type your response and press Enter to acknowledge and begin working.
-"""
+START WORKING NOW! Do not wait for further instructions. Begin with your next task and maintain continuous progress."""
     
     print(f"📡 Pinging {agent_name}...")
     
-    # Send message to agent
+    # Log the prompt
+    try:
+        import sys
+        from pathlib import Path
+        sys.path.append(str(Path(__file__).parent.parent))
+        from dashboard.prompt_logger import prompt_logger
+        prompt_logger.log_prompt(agent_name, resume_message, "Resume work ping sent", True)
+    except ImportError:
+        pass  # Continue without logging if dashboard not available
+    
+    # Send message to agent - simplified approach to avoid manual Enter issues
     try:
         subprocess.run([
-            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", resume_message.strip(), "Enter"
+            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", resume_message, "Enter"
         ], check=True)
         print(f"✅ Message sent to {agent_name}")
     except subprocess.CalledProcessError as e:
