@@ -105,7 +105,52 @@ fi
 
 print_status 0 "Code quality checks"
 
-# 6. Validate that required files exist
+# 6. 🚨 NEW: Critical Documentation Validation
+print_step "Validating critical documentation sync"
+
+# Check if any code changes require documentation updates
+python_changes=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
+feature_changes=$(git diff --cached --name-only --diff-filter=ACM | grep -E '(cli\.py|advanced_orchestration|external_api|ml_enhancements)' || true)
+
+if [ -n "$feature_changes" ]; then
+    echo "🔍 Code changes detected in core features, validating documentation..."
+    
+    # Check critical documentation files exist and are reasonably current
+    critical_docs=("docs/PLAN.md" "README.md" "API_REFERENCE.md")
+    
+    for doc in "${critical_docs[@]}"; do
+        if [ ! -f "$doc" ]; then
+            print_status 1 "Critical documentation validation"
+            echo "💡 Required documentation file missing: $doc"
+            echo "🔧 Create the file or update your feature to include documentation"
+            exit 1
+        fi
+        
+        # Check if documentation is extremely outdated (more than 30 days)
+        if [ $(find "$doc" -mtime +30 | wc -l) -gt 0 ]; then
+            echo -e "${YELLOW}⚠️  Warning: $doc is more than 30 days old${NC}"
+            echo "💡 Consider updating documentation to reflect current system state"
+        fi
+    done
+    
+    # Validate that PLAN.md reflects current phase
+    if ! grep -q "Documentation & Tutorial Implementation" docs/PLAN.md; then
+        echo -e "${YELLOW}⚠️  Warning: docs/PLAN.md may not reflect current project phase${NC}"
+        echo "💡 Ensure PLAN.md shows current Documentation & Tutorial Implementation phase"
+    fi
+    
+    # Validate that README.md has current test count
+    if ! grep -q "409" README.md; then
+        echo -e "${YELLOW}⚠️  Warning: README.md may not show current test count (409)${NC}"
+        echo "💡 Update test count in README.md to match actual system"
+    fi
+    
+    print_status 0 "Critical documentation validation"
+else
+    print_status 0 "Critical documentation validation (no feature changes)"
+fi
+
+# 7. Validate that required files exist
 print_step "Validating project structure"
 required_files=("cli.py" "advanced_orchestration/__init__.py" "requirements.txt")
 for file in "${required_files[@]}"; do
