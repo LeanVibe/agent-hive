@@ -384,19 +384,19 @@ class AdaptiveLearning:
                 return max(0.0, min(1.0, r2_score))
             else:
                 # Single sample - use absolute error
-                mae = abs(y[0] - y_pred[0])
+                mae = abs(float(y[0]) - float(y_pred[0]))
                 return max(0.0, 1.0 - mae)
                 
         except Exception as e:
             logger.error(f"Error measuring performance for {model_type}: {e}")
             return 0.5
     
-    def _estimate_model_complexity(self, model) -> int:
+    def _estimate_model_complexity(self, model: Any) -> int:
         """Estimate model complexity score."""
         
         if hasattr(model, 'n_estimators'):
             # Tree-based models
-            return model.n_estimators
+            return int(model.n_estimators)
         elif hasattr(model, 'coef_'):
             # Linear models
             return len(model.coef_) if hasattr(model.coef_, '__len__') else 1
@@ -502,7 +502,7 @@ class AdaptiveLearning:
             result = cursor.fetchone()
             
             if result:
-                return result[0]
+                return str(result[0])
         
         # Default to performance optimizer
         return 'performance_optimizer'
@@ -523,7 +523,7 @@ class AdaptiveLearning:
         variance = np.var(recent_performance)
         
         convergence_threshold = 0.005  # 0.5% variance threshold
-        converged = variance < convergence_threshold
+        converged = bool(variance < convergence_threshold)
         
         if converged:
             self.learning_state['convergence_tracking'][session_id] = {
@@ -791,7 +791,7 @@ class AdaptiveLearning:
         if session_id and session_id in self.learning_state['model_performance']:
             recent_performance = self.learning_state['model_performance'][session_id]
             if recent_performance:
-                base_confidence = recent_performance[-1]
+                base_confidence = float(recent_performance[-1])
             else:
                 base_confidence = 0.5
         else:
