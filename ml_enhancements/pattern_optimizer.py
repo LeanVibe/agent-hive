@@ -11,7 +11,7 @@ import logging
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Union
 
 import numpy as np
 import pandas as pd
@@ -42,8 +42,8 @@ class PatternOptimizer:
         self.config = config or MLConfig()
         self.db_path = db_path or "pattern_optimizer.db"
         self.scaler = StandardScaler()
-        self.cluster_model = None
-        self.performance_model = None
+        self.cluster_model: Optional[KMeans] = None
+        self.performance_model: Optional[RandomForestRegressor] = None
         self.model_version = "1.0.0"
         
         # Initialize database
@@ -205,7 +205,7 @@ class PatternOptimizer:
     def _hash_features(self, features: Dict[str, float]) -> str:
         """Create hash of feature values for pattern matching."""
         # Normalize feature values to create consistent patterns
-        normalized_features = {}
+        normalized_features: Dict[str, Any] = {}
         for key, value in features.items():
             if key in ['task_complexity', 'agent_count', 'queue_size']:
                 # Bin into categories for better pattern matching
@@ -217,7 +217,7 @@ class PatternOptimizer:
                 normalized_features[key] = value
         
         feature_str = json.dumps(normalized_features, sort_keys=True)
-        return hashlib.md5(feature_str.encode()).hexdigest()[:16]
+        return hashlib.sha256(feature_str.encode()).hexdigest()[:16]
     
     def _calculate_performance_score(self, metrics: Dict[str, float]) -> float:
         """Calculate overall performance score from metrics."""
@@ -360,7 +360,7 @@ class PatternOptimizer:
             
             result = cursor.fetchone()
             if result:
-                return result[0]
+                return float(result[0])
         
         # Fallback to average performance for workflow type
         with sqlite3.connect(self.db_path) as conn:
@@ -370,7 +370,7 @@ class PatternOptimizer:
             """, (workflow_type,))
             
             result = cursor.fetchone()
-            return result[0] if result and result[0] else 0.5
+            return float(result[0]) if result and result[0] is not None else 0.5
     
     def _generate_optimization_changes(
         self, 
@@ -417,7 +417,7 @@ class PatternOptimizer:
         
         return "medium"  # Default
     
-    def train_models(self) -> Dict[str, float]:
+    def train_models(self) -> Dict[str, Any]:
         """Train ML models for pattern recognition and optimization."""
         
         try:
@@ -462,10 +462,10 @@ class PatternOptimizer:
             
             metrics = {
                 'model_version': self.model_version,
-                'training_samples': len(training_data),
-                'mse': mse,
-                'r2_score': r2,
-                'clusters': self.cluster_model.n_clusters if self.cluster_model else 0
+                'training_samples': float(len(training_data)),
+                'mse': float(mse),
+                'r2_score': float(r2),
+                'clusters': float(self.cluster_model.n_clusters if self.cluster_model else 0)
             }
             
             logger.info(f"Model training completed: {metrics}")
@@ -551,12 +551,12 @@ class PatternOptimizer:
         
         # Distance to nearest cluster center
         distances = self.cluster_model.transform(feature_scaled)[0]
-        min_distance = min(distances)
+        min_distance = float(min(distances))
         
         # Convert distance to confidence (lower distance = higher confidence)
         confidence = max(0.1, 1.0 - min_distance / 10.0)
         
-        return min(confidence, 0.95)
+        return float(min(confidence, 0.95))
     
     def get_pattern_statistics(self) -> Dict[str, Any]:
         """Get statistics about stored patterns and performance."""

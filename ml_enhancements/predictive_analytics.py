@@ -56,7 +56,7 @@ class PredictiveAnalytics:
             model_name: StandardScaler() for model_name in self.models.keys()
         }
         
-        self.model_metrics = {}
+        self.model_metrics: Dict[str, Dict[str, float]] = {}
         
         # Initialize database
         self._init_database()
@@ -271,7 +271,7 @@ class PredictiveAnalytics:
             logger.warning(f"Insufficient training data: {len(training_data)} samples")
             return {'error': 'insufficient_data'}
         
-        results = {}
+        results: Dict[str, Any] = {}
         
         # Train each model
         for model_name, model in self.models.items():
@@ -282,7 +282,7 @@ class PredictiveAnalytics:
                     y = self._calculate_performance_score(training_data)
                 else:
                     # Direct metric prediction
-                    y = training_data[model_name].values
+                    y = np.array(training_data[model_name].values)
                 
                 # Prepare features
                 X = self._prepare_feature_matrix(training_data, model_name)
@@ -414,7 +414,7 @@ class PredictiveAnalytics:
         
         return np.array(base_features)
     
-    def _prepare_feature_matrix(self, df: pd.DataFrame, model_type: str) -> np.ndarray:
+    def _prepare_feature_matrix(self, df: pd.DataFrame, model_type: str) -> np.ndarray[Any, np.dtype[Any]]:
         """Prepare feature matrix for training."""
         
         base_cols = ['active_agents', 'queue_size', 'hour', 'day_of_week']
@@ -439,7 +439,7 @@ class PredictiveAnalytics:
         # Fill missing values
         feature_matrix = df[available_cols].fillna(0).values
         
-        return feature_matrix
+        return np.array(feature_matrix, dtype=np.float64)
     
     def _calculate_performance_score(self, df: pd.DataFrame) -> np.ndarray:
         """Calculate overall performance score from metrics."""
@@ -516,7 +516,7 @@ class PredictiveAnalytics:
         
         # Base confidence from model performance
         if model_type in self.model_metrics:
-            base_confidence = max(0.1, self.model_metrics[model_type].get('r2_score', 0.8))
+            base_confidence = max(0.1, float(self.model_metrics[model_type].get('r2_score', 0.8)))
         else:
             base_confidence = 0.5
         
@@ -684,8 +684,8 @@ class PredictiveAnalytics:
             return {'error': 'no_validated_predictions'}
         
         # Calculate accuracy metrics
-        by_type = {}
-        overall_metrics = {'mae': [], 'mse': [], 'r2': []}
+        by_type: Dict[str, Dict[str, List[float]]] = {}
+        overall_metrics: Dict[str, List[float]] = {'mae': [], 'mse': [], 'r2': []}
         
         for pred_type, predicted, actual, accuracy, pred_time in predictions:
             if pred_type not in by_type:

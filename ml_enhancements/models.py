@@ -34,7 +34,7 @@ class MLConfig:
     confidence_threshold: float = 0.75
     max_model_age_days: int = 30
     
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration parameters."""
         if not 0 < self.learning_rate < 1:
             raise ValueError(f"Learning rate must be between 0 and 1, got {self.learning_rate}")

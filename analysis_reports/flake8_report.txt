@@ -1,0 +1,1311 @@
+advanced_orchestration/__init__.py:20:5: F401 'ml_enhancements.PatternOptimizer' imported but unused
+advanced_orchestration/__init__.py:20:5: F401 'ml_enhancements.PredictiveAnalytics' imported but unused
+advanced_orchestration/__init__.py:20:5: F401 'ml_enhancements.AdaptiveLearning' imported but unused
+advanced_orchestration/__init__.py:20:5: F401 'ml_enhancements.MLConfig' imported but unused
+advanced_orchestration/__init__.py:20:5: F401 'ml_enhancements.PatternData' imported but unused
+advanced_orchestration/__init__.py:20:5: F401 'ml_enhancements.AnalyticsResult' imported but unused
+advanced_orchestration/__init__.py:20:5: F401 'ml_enhancements.LearningMetrics' imported but unused
+advanced_orchestration/__init__.py:29:1: W293 blank line contains whitespace
+advanced_orchestration/__init__.py:31:1: W293 blank line contains whitespace
+advanced_orchestration/__init__.py:34:27: W291 trailing whitespace
+advanced_orchestration/__init__.py:45:1: W293 blank line contains whitespace
+advanced_orchestration/__init__.py:48:1: W293 blank line contains whitespace
+advanced_orchestration/__init__.py:51:27: W291 trailing whitespace
+advanced_orchestration/__init__.py:55:53: W292 no newline at end of file
+advanced_orchestration/models.py:7:1: F401 'typing.Tuple' imported but unused
+advanced_orchestration/models.py:238:9: W292 no newline at end of file
+advanced_orchestration/multi_agent_coordinator.py:11:1: F401 'typing.Tuple' imported but unused
+advanced_orchestration/multi_agent_coordinator.py:15:1: F401 '.models.ScalingReason' imported but unused
+advanced_orchestration/multi_agent_coordinator.py:15:1: F401 '.models.ScalingException' imported but unused
+advanced_orchestration/multi_agent_coordinator.py:15:1: F401 '.models.ResourceAllocation' imported but unused
+advanced_orchestration/multi_agent_coordinator.py:28:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:40:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:46:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:52:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:57:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:63:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:67:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:76:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:83:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:97:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:100:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:103:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:109:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:113:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:116:101: E501 line too long (112 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:117:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:122:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:133:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:137:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:140:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:148:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:151:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:159:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:160:13: F841 local variable 'agent_info' is assigned to but never used
+advanced_orchestration/multi_agent_coordinator.py:161:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:164:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:167:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:172:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:175:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:180:101: E501 line too long (110 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:183:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:187:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:190:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:209:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:218:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:222:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:225:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:233:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:237:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:245:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:248:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:251:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:257:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:261:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:267:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:268:101: E501 line too long (105 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:270:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:278:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:281:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:290:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:296:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:299:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:302:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:316:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:319:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:322:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:325:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:328:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:330:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:337:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:344:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:348:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:351:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:356:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:358:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:362:101: E501 line too long (102 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:365:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:369:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:377:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:380:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:382:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:398:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:407:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:414:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:428:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:431:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:439:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:449:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:453:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:457:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:460:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:467:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:470:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:478:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:483:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:504:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:511:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:521:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:527:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:534:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:541:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:562:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:570:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:575:17: F841 local variable 'allocation' is assigned to but never used
+advanced_orchestration/multi_agent_coordinator.py:582:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:587:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:594:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:597:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:611:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:617:101: E501 line too long (104 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:620:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:622:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:632:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:641:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:644:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:648:101: E501 line too long (105 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:651:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:655:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:661:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:664:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:667:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:673:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:678:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:682:101: E501 line too long (103 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:686:101: E501 line too long (103 > 100 characters)
+advanced_orchestration/multi_agent_coordinator.py:691:1: W293 blank line contains whitespace
+advanced_orchestration/multi_agent_coordinator.py:692:23: W292 no newline at end of file
+advanced_orchestration/resource_manager.py:11:1: F401 'typing.Tuple' imported but unused
+advanced_orchestration/resource_manager.py:23:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:34:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:40:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:49:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:53:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:56:101: E501 line too long (112 > 100 characters)
+advanced_orchestration/resource_manager.py:59:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:63:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:66:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:73:101: E501 line too long (102 > 100 characters)
+advanced_orchestration/resource_manager.py:74:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:78:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:88:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:95:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:98:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:106:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:109:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:117:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:119:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:125:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:128:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:131:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:139:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:148:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:154:101: E501 line too long (107 > 100 characters)
+advanced_orchestration/resource_manager.py:155:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:163:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:168:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:170:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:183:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:186:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:193:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:196:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:199:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:200:101: E501 line too long (106 > 100 characters)
+advanced_orchestration/resource_manager.py:202:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:205:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:209:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:212:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:215:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:221:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:226:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:231:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:238:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:247:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:250:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:256:40: E128 continuation line under-indented for visual indent
+advanced_orchestration/resource_manager.py:257:40: E128 continuation line under-indented for visual indent
+advanced_orchestration/resource_manager.py:260:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:268:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:274:101: E501 line too long (104 > 100 characters)
+advanced_orchestration/resource_manager.py:275:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:281:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:290:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:292:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:298:101: E501 line too long (122 > 100 characters)
+advanced_orchestration/resource_manager.py:300:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:306:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:312:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:322:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:324:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:330:101: E501 line too long (127 > 100 characters)
+advanced_orchestration/resource_manager.py:332:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:338:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:343:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:377:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:400:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:403:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:412:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:426:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:432:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:434:101: E501 line too long (104 > 100 characters)
+advanced_orchestration/resource_manager.py:435:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:440:1: W293 blank line contains whitespace
+advanced_orchestration/resource_manager.py:446:10: W292 no newline at end of file
+advanced_orchestration/scaling_manager.py:7:1: F401 'asyncio' imported but unused
+advanced_orchestration/scaling_manager.py:9:1: F401 'datetime.timedelta' imported but unused
+advanced_orchestration/scaling_manager.py:45:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:57:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:63:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:68:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:73:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:77:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:80:101: E501 line too long (107 > 100 characters)
+advanced_orchestration/scaling_manager.py:83:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:86:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:93:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:97:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:101:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:104:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:107:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:110:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:112:101: E501 line too long (105 > 100 characters)
+advanced_orchestration/scaling_manager.py:114:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:116:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:121:101: E501 line too long (114 > 100 characters)
+advanced_orchestration/scaling_manager.py:124:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:127:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:133:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:137:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:146:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:155:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:164:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:168:101: E501 line too long (133 > 100 characters)
+advanced_orchestration/scaling_manager.py:169:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:177:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:179:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:184:101: E501 line too long (116 > 100 characters)
+advanced_orchestration/scaling_manager.py:187:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:190:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:196:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:200:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:204:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:209:5: E129 visually indented line with same indent as next logical line
+advanced_orchestration/scaling_manager.py:210:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:217:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:222:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:230:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:232:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:240:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:244:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:247:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:254:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:255:101: E501 line too long (109 > 100 characters)
+advanced_orchestration/scaling_manager.py:256:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:260:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:263:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:270:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:273:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:278:101: E501 line too long (101 > 100 characters)
+advanced_orchestration/scaling_manager.py:281:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:285:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:288:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:295:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:300:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:304:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:307:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:313:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:319:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:322:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:330:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:333:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:342:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:345:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:354:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:360:101: E501 line too long (106 > 100 characters)
+advanced_orchestration/scaling_manager.py:361:101: E501 line too long (110 > 100 characters)
+advanced_orchestration/scaling_manager.py:362:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:367:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:374:101: E501 line too long (107 > 100 characters)
+advanced_orchestration/scaling_manager.py:398:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:405:101: E501 line too long (127 > 100 characters)
+advanced_orchestration/scaling_manager.py:408:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:411:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:419:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:421:101: E501 line too long (103 > 100 characters)
+advanced_orchestration/scaling_manager.py:424:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:427:101: E501 line too long (112 > 100 characters)
+advanced_orchestration/scaling_manager.py:432:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:441:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:450:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:459:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:462:101: E501 line too long (114 > 100 characters)
+advanced_orchestration/scaling_manager.py:467:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:471:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:476:5: E129 visually indented line with same indent as next logical line
+advanced_orchestration/scaling_manager.py:477:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:484:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:488:40: E128 continuation line under-indented for visual indent
+advanced_orchestration/scaling_manager.py:491:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:496:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:501:101: E501 line too long (108 > 100 characters)
+advanced_orchestration/scaling_manager.py:502:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:507:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:512:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:515:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:525:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:528:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:532:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:534:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:541:101: E501 line too long (111 > 100 characters)
+advanced_orchestration/scaling_manager.py:546:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:555:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:563:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:566:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:570:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:574:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:582:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:589:1: W293 blank line contains whitespace
+advanced_orchestration/scaling_manager.py:592:101: E501 line too long (103 > 100 characters)
+advanced_orchestration/scaling_manager.py:592:104: W292 no newline at end of file
+cli.py:14:1: F401 'datetime.timedelta' imported but unused
+cli.py:16:1: F401 'typing.Dict' imported but unused
+cli.py:16:1: F401 'typing.Any' imported but unused
+cli.py:21:1: F401 'advanced_orchestration.models.ResourceRequirements' imported but unused
+cli.py:21:1: F401 'advanced_orchestration.models.ScalingConfig' imported but unused
+cli.py:22:23: W291 trailing whitespace
+cli.py:32:1: F401 'external_api.models.WebhookEventType' imported but unused
+cli.py:32:1: F401 'external_api.models.EventPriority' imported but unused
+cli.py:43:1: W293 blank line contains whitespace
+cli.py:47:1: W293 blank line contains whitespace
+cli.py:56:1: W293 blank line contains whitespace
+cli.py:60:1: W293 blank line contains whitespace
+cli.py:65:1: W293 blank line contains whitespace
+cli.py:72:1: W293 blank line contains whitespace
+cli.py:77:1: W293 blank line contains whitespace
+cli.py:81:1: W293 blank line contains whitespace
+cli.py:86:101: E501 line too long (101 > 100 characters)
+cli.py:92:1: W293 blank line contains whitespace
+cli.py:96:1: W293 blank line contains whitespace
+cli.py:102:1: W293 blank line contains whitespace
+cli.py:105:1: W293 blank line contains whitespace
+cli.py:114:1: W293 blank line contains whitespace
+cli.py:117:1: W293 blank line contains whitespace
+cli.py:121:101: E501 line too long (108 > 100 characters)
+cli.py:122:1: W293 blank line contains whitespace
+cli.py:127:1: W293 blank line contains whitespace
+cli.py:129:1: W293 blank line contains whitespace
+cli.py:133:1: W293 blank line contains whitespace
+cli.py:140:1: W293 blank line contains whitespace
+cli.py:144:1: W293 blank line contains whitespace
+cli.py:148:1: W293 blank line contains whitespace
+cli.py:151:1: W293 blank line contains whitespace
+cli.py:156:1: W293 blank line contains whitespace
+cli.py:159:1: W293 blank line contains whitespace
+cli.py:163:1: W293 blank line contains whitespace
+cli.py:169:1: W293 blank line contains whitespace
+cli.py:172:1: W293 blank line contains whitespace
+cli.py:180:1: W293 blank line contains whitespace
+cli.py:184:1: W293 blank line contains whitespace
+cli.py:189:1: W293 blank line contains whitespace
+cli.py:193:1: W293 blank line contains whitespace
+cli.py:200:1: W293 blank line contains whitespace
+cli.py:210:101: E501 line too long (149 > 100 characters)
+cli.py:213:1: W293 blank line contains whitespace
+cli.py:217:1: W293 blank line contains whitespace
+cli.py:224:1: W293 blank line contains whitespace
+cli.py:234:1: W293 blank line contains whitespace
+cli.py:236:1: W293 blank line contains whitespace
+cli.py:239:1: W293 blank line contains whitespace
+cli.py:241:1: W293 blank line contains whitespace
+cli.py:257:45: W291 trailing whitespace
+cli.py:261:1: W293 blank line contains whitespace
+cli.py:266:1: W293 blank line contains whitespace
+cli.py:268:1: W293 blank line contains whitespace
+cli.py:272:1: W293 blank line contains whitespace
+cli.py:278:1: W293 blank line contains whitespace
+cli.py:282:1: W293 blank line contains whitespace
+cli.py:284:1: W293 blank line contains whitespace
+cli.py:288:1: W293 blank line contains whitespace
+cli.py:293:1: W293 blank line contains whitespace
+cli.py:296:1: W293 blank line contains whitespace
+cli.py:301:1: W293 blank line contains whitespace
+cli.py:305:1: W293 blank line contains whitespace
+cli.py:311:1: W293 blank line contains whitespace
+cli.py:315:1: W293 blank line contains whitespace
+cli.py:321:1: W293 blank line contains whitespace
+cli.py:325:1: W293 blank line contains whitespace
+cli.py:327:1: W293 blank line contains whitespace
+cli.py:331:1: W293 blank line contains whitespace
+cli.py:338:1: W293 blank line contains whitespace
+cli.py:341:40: W291 trailing whitespace
+cli.py:344:1: W293 blank line contains whitespace
+cli.py:348:1: W293 blank line contains whitespace
+cli.py:353:1: W293 blank line contains whitespace
+cli.py:357:1: W293 blank line contains whitespace
+cli.py:363:1: W293 blank line contains whitespace
+cli.py:367:1: W293 blank line contains whitespace
+cli.py:373:1: W293 blank line contains whitespace
+cli.py:377:1: W293 blank line contains whitespace
+cli.py:379:1: W293 blank line contains whitespace
+cli.py:383:1: W293 blank line contains whitespace
+cli.py:388:1: W293 blank line contains whitespace
+cli.py:391:1: W293 blank line contains whitespace
+cli.py:401:1: W293 blank line contains whitespace
+cli.py:406:1: W293 blank line contains whitespace
+cli.py:411:1: W293 blank line contains whitespace
+cli.py:418:1: W293 blank line contains whitespace
+cli.py:422:1: W293 blank line contains whitespace
+cli.py:427:1: W293 blank line contains whitespace
+cli.py:429:1: W293 blank line contains whitespace
+cli.py:432:1: W293 blank line contains whitespace
+cli.py:436:1: W293 blank line contains whitespace
+cli.py:440:1: W293 blank line contains whitespace
+cli.py:444:1: W293 blank line contains whitespace
+cli.py:446:1: W293 blank line contains whitespace
+cli.py:449:1: W293 blank line contains whitespace
+cli.py:453:1: W293 blank line contains whitespace
+cli.py:457:1: W293 blank line contains whitespace
+cli.py:461:1: W293 blank line contains whitespace
+cli.py:463:1: W293 blank line contains whitespace
+cli.py:466:1: W293 blank line contains whitespace
+cli.py:470:1: W293 blank line contains whitespace
+cli.py:474:1: W293 blank line contains whitespace
+cli.py:478:1: W293 blank line contains whitespace
+cli.py:480:1: W293 blank line contains whitespace
+cli.py:481:87: W291 trailing whitespace
+cli.py:485:1: W293 blank line contains whitespace
+cli.py:495:1: W293 blank line contains whitespace
+cli.py:500:1: W293 blank line contains whitespace
+cli.py:503:1: W293 blank line contains whitespace
+cli.py:510:1: W293 blank line contains whitespace
+cli.py:515:1: W293 blank line contains whitespace
+cli.py:518:1: W293 blank line contains whitespace
+cli.py:523:101: E501 line too long (117 > 100 characters)
+cli.py:524:101: E501 line too long (121 > 100 characters)
+cli.py:525:101: E501 line too long (124 > 100 characters)
+cli.py:527:1: W293 blank line contains whitespace
+cli.py:529:101: E501 line too long (107 > 100 characters)
+cli.py:531:1: W293 blank line contains whitespace
+cli.py:536:1: W293 blank line contains whitespace
+cli.py:546:74: W291 trailing whitespace
+cli.py:547:25: E128 continuation line under-indented for visual indent
+cli.py:547:70: W291 trailing whitespace
+cli.py:548:25: E128 continuation line under-indented for visual indent
+cli.py:551:1: W293 blank line contains whitespace
+cli.py:562:1: W293 blank line contains whitespace
+cli.py:567:1: W293 blank line contains whitespace
+cli.py:571:1: W293 blank line contains whitespace
+cli.py:575:1: W293 blank line contains whitespace
+cli.py:580:1: W293 blank line contains whitespace
+cli.py:584:1: W293 blank line contains whitespace
+cli.py:587:1: W293 blank line contains whitespace
+cli.py:592:1: W293 blank line contains whitespace
+cli.py:595:1: W293 blank line contains whitespace
+cli.py:598:1: W293 blank line contains whitespace
+cli.py:601:1: W293 blank line contains whitespace
+cli.py:604:101: E501 line too long (130 > 100 characters)
+cli.py:605:101: E501 line too long (122 > 100 characters)
+cli.py:607:1: W293 blank line contains whitespace
+cli.py:609:101: E501 line too long (118 > 100 characters)
+cli.py:610:101: E501 line too long (134 > 100 characters)
+cli.py:611:1: W293 blank line contains whitespace
+cli.py:614:1: W293 blank line contains whitespace
+cli.py:620:1: W293 blank line contains whitespace
+cli.py:627:1: W293 blank line contains whitespace
+cli.py:635:1: W293 blank line contains whitespace
+cli.py:640:1: W293 blank line contains whitespace
+cli.py:644:101: E501 line too long (101 > 100 characters)
+cli.py:647:1: W293 blank line contains whitespace
+cli.py:648:9: F841 local variable 'instructions' is assigned to but never used
+cli.py:674:1: W293 blank line contains whitespace
+cli.py:678:86: W291 trailing whitespace
+cli.py:682:1: W293 blank line contains whitespace
+cli.py:692:1: W293 blank line contains whitespace
+cli.py:696:101: E501 line too long (106 > 100 characters)
+cli.py:697:101: E501 line too long (102 > 100 characters)
+cli.py:698:101: E501 line too long (104 > 100 characters)
+cli.py:702:1: W293 blank line contains whitespace
+cli.py:705:1: W293 blank line contains whitespace
+cli.py:710:1: W293 blank line contains whitespace
+cli.py:716:1: W293 blank line contains whitespace
+cli.py:720:1: W293 blank line contains whitespace
+cli.py:724:1: W293 blank line contains whitespace
+cli.py:729:1: W293 blank line contains whitespace
+cli.py:732:1: W293 blank line contains whitespace
+cli.py:738:1: W293 blank line contains whitespace
+cli.py:741:1: W293 blank line contains whitespace
+cli.py:755:1: W293 blank line contains whitespace
+cli.py:760:1: W293 blank line contains whitespace
+cli.py:762:1: W293 blank line contains whitespace
+cli.py:769:101: E501 line too long (103 > 100 characters)
+cli.py:789:1: W293 blank line contains whitespace
+cli.py:795:1: W293 blank line contains whitespace
+cli.py:799:1: W293 blank line contains whitespace
+cli.py:813:41: W291 trailing whitespace
+cli.py:822:1: W293 blank line contains whitespace
+cli.py:824:21: W291 trailing whitespace
+cli.py:825:26: W291 trailing whitespace
+cli.py:828:1: W293 blank line contains whitespace
+cli.py:830:1: W293 blank line contains whitespace
+cli.py:833:23: W291 trailing whitespace
+cli.py:837:22: W291 trailing whitespace
+cli.py:842:22: W291 trailing whitespace
+cli.py:846:1: W293 blank line contains whitespace
+cli.py:865:29: W291 trailing whitespace
+cli.py:868:1: W293 blank line contains whitespace
+cli.py:884:1: W293 blank line contains whitespace
+cli.py:899:1: W293 blank line contains whitespace
+cli.py:917:1: W293 blank line contains whitespace
+cli.py:926:26: W291 trailing whitespace
+cli.py:935:1: W293 blank line contains whitespace
+cli.py:952:1: W293 blank line contains whitespace
+cli.py:964:1: W293 blank line contains whitespace
+cli.py:994:1: W293 blank line contains whitespace
+cli.py:1013:101: E501 line too long (121 > 100 characters)
+cli.py:1026:1: W293 blank line contains whitespace
+cli.py:1062:1: W293 blank line contains whitespace
+cli.py:1070:1: W293 blank line contains whitespace
+cli.py:1074:1: W293 blank line contains whitespace
+cli.py:1076:1: W293 blank line contains whitespace
+cli.py:1145:1: W293 blank line contains whitespace
+cli.py:1150:101: E501 line too long (115 > 100 characters)
+cli.py:1168:24: W292 no newline at end of file
+external_api/__init__.py:13:22: W291 trailing whitespace
+external_api/__init__.py:22:18: W291 trailing whitespace
+external_api/__init__.py:28:18: W291 trailing whitespace
+external_api/__init__.py:30:2: W292 no newline at end of file
+external_api/api_gateway.py:9:1: F401 'json' imported but unused
+external_api/api_gateway.py:12:1: F401 'uuid' imported but unused
+external_api/api_gateway.py:30:1: W293 blank line contains whitespace
+external_api/api_gateway.py:34:1: W293 blank line contains whitespace
+external_api/api_gateway.py:38:1: W293 blank line contains whitespace
+external_api/api_gateway.py:49:1: W293 blank line contains whitespace
+external_api/api_gateway.py:51:1: W293 blank line contains whitespace
+external_api/api_gateway.py:57:1: W293 blank line contains whitespace
+external_api/api_gateway.py:61:1: W293 blank line contains whitespace
+external_api/api_gateway.py:64:1: W293 blank line contains whitespace
+external_api/api_gateway.py:68:1: W293 blank line contains whitespace
+external_api/api_gateway.py:74:1: W293 blank line contains whitespace
+external_api/api_gateway.py:79:1: W293 blank line contains whitespace
+external_api/api_gateway.py:83:1: W293 blank line contains whitespace
+external_api/api_gateway.py:87:1: W293 blank line contains whitespace
+external_api/api_gateway.py:95:1: W293 blank line contains whitespace
+external_api/api_gateway.py:98:1: W293 blank line contains whitespace
+external_api/api_gateway.py:101:1: W293 blank line contains whitespace
+external_api/api_gateway.py:105:1: W293 blank line contains whitespace
+external_api/api_gateway.py:109:1: W293 blank line contains whitespace
+external_api/api_gateway.py:120:1: W293 blank line contains whitespace
+external_api/api_gateway.py:124:1: W293 blank line contains whitespace
+external_api/api_gateway.py:130:1: W293 blank line contains whitespace
+external_api/api_gateway.py:133:1: W293 blank line contains whitespace
+external_api/api_gateway.py:137:1: W293 blank line contains whitespace
+external_api/api_gateway.py:149:1: W293 blank line contains whitespace
+external_api/api_gateway.py:153:1: W293 blank line contains whitespace
+external_api/api_gateway.py:156:1: W293 blank line contains whitespace
+external_api/api_gateway.py:161:1: W293 blank line contains whitespace
+external_api/api_gateway.py:173:1: W293 blank line contains whitespace
+external_api/api_gateway.py:183:1: W293 blank line contains whitespace
+external_api/api_gateway.py:187:1: W293 blank line contains whitespace
+external_api/api_gateway.py:197:1: W293 blank line contains whitespace
+external_api/api_gateway.py:207:1: W293 blank line contains whitespace
+external_api/api_gateway.py:214:1: W293 blank line contains whitespace
+external_api/api_gateway.py:218:1: W293 blank line contains whitespace
+external_api/api_gateway.py:227:1: W293 blank line contains whitespace
+external_api/api_gateway.py:229:101: E501 line too long (106 > 100 characters)
+external_api/api_gateway.py:231:1: W293 blank line contains whitespace
+external_api/api_gateway.py:240:1: W293 blank line contains whitespace
+external_api/api_gateway.py:249:1: W293 blank line contains whitespace
+external_api/api_gateway.py:253:1: W293 blank line contains whitespace
+external_api/api_gateway.py:256:1: W293 blank line contains whitespace
+external_api/api_gateway.py:261:1: W293 blank line contains whitespace
+external_api/api_gateway.py:267:1: W293 blank line contains whitespace
+external_api/api_gateway.py:273:1: W293 blank line contains whitespace
+external_api/api_gateway.py:281:1: W293 blank line contains whitespace
+external_api/api_gateway.py:287:1: W293 blank line contains whitespace
+external_api/api_gateway.py:291:1: W293 blank line contains whitespace
+external_api/api_gateway.py:294:1: W293 blank line contains whitespace
+external_api/api_gateway.py:300:1: W293 blank line contains whitespace
+external_api/api_gateway.py:303:1: W293 blank line contains whitespace
+external_api/api_gateway.py:312:1: W293 blank line contains whitespace
+external_api/api_gateway.py:320:1: W293 blank line contains whitespace
+external_api/api_gateway.py:327:1: W293 blank line contains whitespace
+external_api/api_gateway.py:331:1: W293 blank line contains whitespace
+external_api/api_gateway.py:335:1: W293 blank line contains whitespace
+external_api/api_gateway.py:342:1: W293 blank line contains whitespace
+external_api/api_gateway.py:344:1: W293 blank line contains whitespace
+external_api/api_gateway.py:351:1: W293 blank line contains whitespace
+external_api/api_gateway.py:358:1: W293 blank line contains whitespace
+external_api/api_gateway.py:360:1: W293 blank line contains whitespace
+external_api/api_gateway.py:361:101: E501 line too long (120 > 100 characters)
+external_api/api_gateway.py:371:1: W293 blank line contains whitespace
+external_api/api_gateway.py:382:1: W293 blank line contains whitespace
+external_api/api_gateway.py:383:101: E501 line too long (133 > 100 characters)
+external_api/api_gateway.py:393:1: W293 blank line contains whitespace
+external_api/api_gateway.py:399:1: W293 blank line contains whitespace
+external_api/api_gateway.py:405:43: W291 trailing whitespace
+external_api/api_gateway.py:413:1: W293 blank line contains whitespace
+external_api/api_gateway.py:423:1: W293 blank line contains whitespace
+external_api/api_gateway.py:427:1: W293 blank line contains whitespace
+external_api/api_gateway.py:438:10: W292 no newline at end of file
+external_api/event_streaming.py:11:1: F401 'time' imported but unused
+external_api/event_streaming.py:14:1: F401 'datetime.timedelta' imported but unused
+external_api/event_streaming.py:15:1: F401 'typing.AsyncGenerator' imported but unused
+external_api/event_streaming.py:31:1: W293 blank line contains whitespace
+external_api/event_streaming.py:39:1: W293 blank line contains whitespace
+external_api/event_streaming.py:43:1: W293 blank line contains whitespace
+external_api/event_streaming.py:46:1: W293 blank line contains whitespace
+external_api/event_streaming.py:54:1: W293 blank line contains whitespace
+external_api/event_streaming.py:58:1: W293 blank line contains whitespace
+external_api/event_streaming.py:62:1: W293 blank line contains whitespace
+external_api/event_streaming.py:65:1: W293 blank line contains whitespace
+external_api/event_streaming.py:75:1: W293 blank line contains whitespace
+external_api/event_streaming.py:91:1: W293 blank line contains whitespace
+external_api/event_streaming.py:95:1: W293 blank line contains whitespace
+external_api/event_streaming.py:99:1: W293 blank line contains whitespace
+external_api/event_streaming.py:116:1: W293 blank line contains whitespace
+external_api/event_streaming.py:118:1: W293 blank line contains whitespace
+external_api/event_streaming.py:124:1: W293 blank line contains whitespace
+external_api/event_streaming.py:127:1: W293 blank line contains whitespace
+external_api/event_streaming.py:130:1: W293 blank line contains whitespace
+external_api/event_streaming.py:132:1: W293 blank line contains whitespace
+external_api/event_streaming.py:136:1: W293 blank line contains whitespace
+external_api/event_streaming.py:142:1: W293 blank line contains whitespace
+external_api/event_streaming.py:145:1: W293 blank line contains whitespace
+external_api/event_streaming.py:147:1: W293 blank line contains whitespace
+external_api/event_streaming.py:154:1: W293 blank line contains whitespace
+external_api/event_streaming.py:157:1: W293 blank line contains whitespace
+external_api/event_streaming.py:159:1: W293 blank line contains whitespace
+external_api/event_streaming.py:163:1: W293 blank line contains whitespace
+external_api/event_streaming.py:164:73: W291 trailing whitespace
+external_api/event_streaming.py:165:27: E128 continuation line under-indented for visual indent
+external_api/event_streaming.py:166:27: E128 continuation line under-indented for visual indent
+external_api/event_streaming.py:169:1: W293 blank line contains whitespace
+external_api/event_streaming.py:176:1: W293 blank line contains whitespace
+external_api/event_streaming.py:183:1: W293 blank line contains whitespace
+external_api/event_streaming.py:194:1: W293 blank line contains whitespace
+external_api/event_streaming.py:200:1: W293 blank line contains whitespace
+external_api/event_streaming.py:209:1: W293 blank line contains whitespace
+external_api/event_streaming.py:211:1: W293 blank line contains whitespace
+external_api/event_streaming.py:216:1: W293 blank line contains whitespace
+external_api/event_streaming.py:220:1: W293 blank line contains whitespace
+external_api/event_streaming.py:227:1: W293 blank line contains whitespace
+external_api/event_streaming.py:230:1: W293 blank line contains whitespace
+external_api/event_streaming.py:234:1: W293 blank line contains whitespace
+external_api/event_streaming.py:237:1: W293 blank line contains whitespace
+external_api/event_streaming.py:246:1: W293 blank line contains whitespace
+external_api/event_streaming.py:250:1: W293 blank line contains whitespace
+external_api/event_streaming.py:257:1: W293 blank line contains whitespace
+external_api/event_streaming.py:260:1: W293 blank line contains whitespace
+external_api/event_streaming.py:264:1: W293 blank line contains whitespace
+external_api/event_streaming.py:267:1: W293 blank line contains whitespace
+external_api/event_streaming.py:276:1: W293 blank line contains whitespace
+external_api/event_streaming.py:287:1: W293 blank line contains whitespace
+external_api/event_streaming.py:292:1: W293 blank line contains whitespace
+external_api/event_streaming.py:298:1: W293 blank line contains whitespace
+external_api/event_streaming.py:301:1: W293 blank line contains whitespace
+external_api/event_streaming.py:306:1: W293 blank line contains whitespace
+external_api/event_streaming.py:309:1: W293 blank line contains whitespace
+external_api/event_streaming.py:312:1: W293 blank line contains whitespace
+external_api/event_streaming.py:313:101: E501 line too long (109 > 100 characters)
+external_api/event_streaming.py:321:1: W293 blank line contains whitespace
+external_api/event_streaming.py:325:1: W293 blank line contains whitespace
+external_api/event_streaming.py:328:1: W293 blank line contains whitespace
+external_api/event_streaming.py:339:1: W293 blank line contains whitespace
+external_api/event_streaming.py:343:1: W293 blank line contains whitespace
+external_api/event_streaming.py:345:1: W293 blank line contains whitespace
+external_api/event_streaming.py:349:1: W293 blank line contains whitespace
+external_api/event_streaming.py:352:1: W293 blank line contains whitespace
+external_api/event_streaming.py:360:1: W293 blank line contains whitespace
+external_api/event_streaming.py:364:1: W293 blank line contains whitespace
+external_api/event_streaming.py:372:1: W293 blank line contains whitespace
+external_api/event_streaming.py:379:1: W293 blank line contains whitespace
+external_api/event_streaming.py:383:1: W293 blank line contains whitespace
+external_api/event_streaming.py:387:1: W293 blank line contains whitespace
+external_api/event_streaming.py:392:1: W293 blank line contains whitespace
+external_api/event_streaming.py:398:1: W293 blank line contains whitespace
+external_api/event_streaming.py:402:1: W293 blank line contains whitespace
+external_api/event_streaming.py:406:1: W293 blank line contains whitespace
+external_api/event_streaming.py:409:1: W293 blank line contains whitespace
+external_api/event_streaming.py:410:84: W291 trailing whitespace
+external_api/event_streaming.py:411:34: E128 continuation line under-indented for visual indent
+external_api/event_streaming.py:414:1: W293 blank line contains whitespace
+external_api/event_streaming.py:425:1: W293 blank line contains whitespace
+external_api/event_streaming.py:427:101: E501 line too long (102 > 100 characters)
+external_api/event_streaming.py:428:1: W293 blank line contains whitespace
+external_api/event_streaming.py:434:1: W293 blank line contains whitespace
+external_api/event_streaming.py:445:1: W293 blank line contains whitespace
+external_api/event_streaming.py:449:1: W293 blank line contains whitespace
+external_api/event_streaming.py:453:1: W293 blank line contains whitespace
+external_api/event_streaming.py:458:1: W293 blank line contains whitespace
+external_api/event_streaming.py:468:10: W292 no newline at end of file
+external_api/models.py:39:1: W293 blank line contains whitespace
+external_api/models.py:50:11: W291 trailing whitespace
+external_api/models.py:63:1: W293 blank line contains whitespace
+external_api/models.py:83:1: W293 blank line contains whitespace
+external_api/models.py:105:1: W293 blank line contains whitespace
+external_api/models.py:125:1: W293 blank line contains whitespace
+external_api/models.py:144:1: W293 blank line contains whitespace
+external_api/models.py:167:1: W293 blank line contains whitespace
+external_api/models.py:187:1: W293 blank line contains whitespace
+external_api/models.py:193:98: W292 no newline at end of file
+external_api/webhook_server.py:4:67: W291 trailing whitespace
+external_api/webhook_server.py:32:1: W293 blank line contains whitespace
+external_api/webhook_server.py:36:1: W293 blank line contains whitespace
+external_api/webhook_server.py:40:1: W293 blank line contains whitespace
+external_api/webhook_server.py:50:1: W293 blank line contains whitespace
+external_api/webhook_server.py:52:1: W293 blank line contains whitespace
+external_api/webhook_server.py:58:1: W293 blank line contains whitespace
+external_api/webhook_server.py:63:1: W293 blank line contains whitespace
+external_api/webhook_server.py:66:1: W293 blank line contains whitespace
+external_api/webhook_server.py:70:1: W293 blank line contains whitespace
+external_api/webhook_server.py:76:1: W293 blank line contains whitespace
+external_api/webhook_server.py:79:1: W293 blank line contains whitespace
+external_api/webhook_server.py:86:1: W293 blank line contains whitespace
+external_api/webhook_server.py:89:1: W293 blank line contains whitespace
+external_api/webhook_server.py:93:1: W293 blank line contains whitespace
+external_api/webhook_server.py:97:1: W293 blank line contains whitespace
+external_api/webhook_server.py:104:1: W293 blank line contains whitespace
+external_api/webhook_server.py:107:1: W293 blank line contains whitespace
+external_api/webhook_server.py:111:1: W293 blank line contains whitespace
+external_api/webhook_server.py:114:1: W293 blank line contains whitespace
+external_api/webhook_server.py:123:1: W293 blank line contains whitespace
+external_api/webhook_server.py:124:101: E501 line too long (106 > 100 characters)
+external_api/webhook_server.py:127:1: W293 blank line contains whitespace
+external_api/webhook_server.py:131:1: W293 blank line contains whitespace
+external_api/webhook_server.py:144:1: W293 blank line contains whitespace
+external_api/webhook_server.py:150:39: W291 trailing whitespace
+external_api/webhook_server.py:154:1: W293 blank line contains whitespace
+external_api/webhook_server.py:163:1: W293 blank line contains whitespace
+external_api/webhook_server.py:166:101: E501 line too long (144 > 100 characters)
+external_api/webhook_server.py:173:1: W293 blank line contains whitespace
+external_api/webhook_server.py:176:1: W293 blank line contains whitespace
+external_api/webhook_server.py:188:1: W293 blank line contains whitespace
+external_api/webhook_server.py:191:1: W293 blank line contains whitespace
+external_api/webhook_server.py:199:1: W293 blank line contains whitespace
+external_api/webhook_server.py:203:1: W293 blank line contains whitespace
+external_api/webhook_server.py:206:1: W293 blank line contains whitespace
+external_api/webhook_server.py:211:1: W293 blank line contains whitespace
+external_api/webhook_server.py:219:1: W293 blank line contains whitespace
+external_api/webhook_server.py:226:1: W293 blank line contains whitespace
+external_api/webhook_server.py:233:1: W293 blank line contains whitespace
+external_api/webhook_server.py:237:35: W291 trailing whitespace
+external_api/webhook_server.py:248:1: W293 blank line contains whitespace
+external_api/webhook_server.py:252:1: W293 blank line contains whitespace
+external_api/webhook_server.py:255:1: W293 blank line contains whitespace
+external_api/webhook_server.py:261:1: W293 blank line contains whitespace
+external_api/webhook_server.py:270:1: W293 blank line contains whitespace
+external_api/webhook_server.py:275:1: W293 blank line contains whitespace
+external_api/webhook_server.py:279:1: W293 blank line contains whitespace
+external_api/webhook_server.py:283:1: W293 blank line contains whitespace
+external_api/webhook_server.py:286:1: W293 blank line contains whitespace
+external_api/webhook_server.py:291:1: W293 blank line contains whitespace
+external_api/webhook_server.py:295:1: W293 blank line contains whitespace
+external_api/webhook_server.py:305:1: W293 blank line contains whitespace
+external_api/webhook_server.py:309:1: W293 blank line contains whitespace
+external_api/webhook_server.py:315:1: W293 blank line contains whitespace
+external_api/webhook_server.py:321:1: W293 blank line contains whitespace
+external_api/webhook_server.py:330:1: W293 blank line contains whitespace
+external_api/webhook_server.py:334:1: W293 blank line contains whitespace
+external_api/webhook_server.py:345:10: W292 no newline at end of file
+ml_enhancements/__init__.py:9:71: W291 trailing whitespace
+ml_enhancements/__init__.py:18:17: W291 trailing whitespace
+ml_enhancements/__init__.py:25:27: W291 trailing whitespace
+ml_enhancements/__init__.py:33:22: W292 no newline at end of file
+ml_enhancements/adaptive_learning.py:12:1: F401 'pathlib.Path' imported but unused
+ml_enhancements/adaptive_learning.py:13:1: F401 'typing.Callable' imported but unused
+ml_enhancements/adaptive_learning.py:16:1: F401 'pandas as pd' imported but unused
+ml_enhancements/adaptive_learning.py:20:1: F401 'sklearn.metrics.mean_squared_error' imported but unused
+ml_enhancements/adaptive_learning.py:20:1: F401 'sklearn.metrics.mean_absolute_error' imported but unused
+ml_enhancements/adaptive_learning.py:31:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:34:38: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:38:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:44:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:53:42: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:63:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:67:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:76:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:83:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:86:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:88:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:108:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:123:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:139:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:153:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:156:67: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:159:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:161:69: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:164:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:166:72: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:169:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:171:72: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:174:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:176:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:184:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:186:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:195:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:199:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:203:46: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:204:74: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:212:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:215:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:225:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:227:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:237:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:244:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:254:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:257:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:259:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:268:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:271:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:274:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:276:101: E501 line too long (102 > 100 characters)
+ml_enhancements/adaptive_learning.py:277:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:280:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:284:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:288:101: E501 line too long (114 > 100 characters)
+ml_enhancements/adaptive_learning.py:294:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:296:101: E501 line too long (101 > 100 characters)
+ml_enhancements/adaptive_learning.py:297:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:301:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:306:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:318:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:320:101: E501 line too long (102 > 100 characters)
+ml_enhancements/adaptive_learning.py:321:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:324:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:327:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:334:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:337:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:342:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:344:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:350:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:352:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:360:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:363:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:366:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:371:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:374:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:385:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:389:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:392:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:401:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:404:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:406:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:409:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:414:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:417:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:419:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:422:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:429:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:432:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:436:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:446:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:453:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:460:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:464:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:467:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:470:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:480:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:482:101: E501 line too long (101 > 100 characters)
+ml_enhancements/adaptive_learning.py:484:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:486:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:489:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:496:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:499:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:502:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:505:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:507:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:510:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:514:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:517:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:525:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:527:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:529:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:539:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:541:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:548:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:557:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:566:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:568:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:571:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:582:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:585:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:589:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:592:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:602:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:607:41: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:608:79: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:616:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:620:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:623:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:626:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:629:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:632:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:636:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:640:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:642:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:645:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:648:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:651:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:654:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:656:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:659:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:662:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:668:43: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:675:43: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:678:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:680:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:683:45: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:685:39: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:688:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:695:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:699:41: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:703:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:705:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:727:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:735:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:738:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:741:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:744:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:749:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:752:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:755:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:760:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:764:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:771:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:782:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:786:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:788:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:791:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:793:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:796:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:804:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:814:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:824:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:834:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:836:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:839:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:841:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:846:39: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:849:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:860:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:862:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:865:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:867:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:874:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:877:42: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:881:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:884:46: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:888:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:891:48: W291 trailing whitespace
+ml_enhancements/adaptive_learning.py:895:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:897:1: W293 blank line contains whitespace
+ml_enhancements/adaptive_learning.py:900:29: W292 no newline at end of file
+ml_enhancements/models.py:8:1: F401 'typing.Union' imported but unused
+ml_enhancements/models.py:16:1: W293 blank line contains whitespace
+ml_enhancements/models.py:21:1: W293 blank line contains whitespace
+ml_enhancements/models.py:26:1: W293 blank line contains whitespace
+ml_enhancements/models.py:31:1: W293 blank line contains whitespace
+ml_enhancements/models.py:36:1: W293 blank line contains whitespace
+ml_enhancements/models.py:41:1: W293 blank line contains whitespace
+ml_enhancements/models.py:43:101: E501 line too long (110 > 100 characters)
+ml_enhancements/models.py:44:1: W293 blank line contains whitespace
+ml_enhancements/models.py:46:101: E501 line too long (106 > 100 characters)
+ml_enhancements/models.py:47:1: W293 blank line contains whitespace
+ml_enhancements/models.py:49:101: E501 line too long (130 > 100 characters)
+ml_enhancements/models.py:50:1: W293 blank line contains whitespace
+ml_enhancements/models.py:52:101: E501 line too long (109 > 100 characters)
+ml_enhancements/models.py:53:1: W293 blank line contains whitespace
+ml_enhancements/models.py:55:101: E501 line too long (101 > 100 characters)
+ml_enhancements/models.py:56:1: W293 blank line contains whitespace
+ml_enhancements/models.py:59:1: W293 blank line contains whitespace
+ml_enhancements/models.py:62:1: W293 blank line contains whitespace
+ml_enhancements/models.py:70:1: W293 blank line contains whitespace
+ml_enhancements/models.py:79:1: W293 blank line contains whitespace
+ml_enhancements/models.py:94:11: W291 trailing whitespace
+ml_enhancements/models.py:97:1: W293 blank line contains whitespace
+ml_enhancements/models.py:106:1: W293 blank line contains whitespace
+ml_enhancements/models.py:124:1: W293 blank line contains whitespace
+ml_enhancements/models.py:134:1: W293 blank line contains whitespace
+ml_enhancements/models.py:141:1: W293 blank line contains whitespace
+ml_enhancements/models.py:146:1: W293 blank line contains whitespace
+ml_enhancements/models.py:150:1: W293 blank line contains whitespace
+ml_enhancements/models.py:153:1: W293 blank line contains whitespace
+ml_enhancements/models.py:158:1: W293 blank line contains whitespace
+ml_enhancements/models.py:178:1: W293 blank line contains whitespace
+ml_enhancements/models.py:189:1: W293 blank line contains whitespace
+ml_enhancements/models.py:209:1: W293 blank line contains whitespace
+ml_enhancements/models.py:218:1: W293 blank line contains whitespace
+ml_enhancements/models.py:236:1: W293 blank line contains whitespace
+ml_enhancements/models.py:246:1: W293 blank line contains whitespace
+ml_enhancements/models.py:259:10: W292 no newline at end of file
+ml_enhancements/pattern_optimizer.py:13:1: F401 'pathlib.Path' imported but unused
+ml_enhancements/pattern_optimizer.py:16:1: F401 'numpy as np' imported but unused
+ml_enhancements/pattern_optimizer.py:32:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:39:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:48:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:51:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:58:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:60:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:78:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:92:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:94:61: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:97:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:99:68: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:102:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:104:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:117:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:133:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:137:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:139:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:147:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:150:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:153:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:156:67: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:157:39: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:160:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:162:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:167:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:171:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:174:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:178:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:180:45: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:181:71: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:194:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:202:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:204:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:218:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:221:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:231:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:234:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:240:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:243:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:246:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:248:14: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:249:34: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:250:27: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:256:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:259:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:261:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:264:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:268:52: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:275:52: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:280:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:285:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:297:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:300:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:302:14: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:307:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:311:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:314:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:318:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:322:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:325:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:336:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:338:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:341:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:344:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:346:14: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:347:28: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:351:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:354:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:357:64: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:360:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:364:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:368:69: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:371:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:374:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:376:14: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:377:30: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:382:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:385:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:388:101: E501 line too long (103 > 100 characters)
+ml_enhancements/pattern_optimizer.py:389:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:392:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:395:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:398:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:400:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:405:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:411:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:417:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:419:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:422:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:429:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:432:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:435:101: E501 line too long (105 > 100 characters)
+ml_enhancements/pattern_optimizer.py:441:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:453:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:462:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:470:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:473:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:477:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:480:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:484:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:488:41: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:493:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:495:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:498:66: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:500:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:504:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:519:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:521:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:524:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:528:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:533:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:536:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:539:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:541:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:544:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:547:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:551:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:555:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:558:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:560:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:563:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:566:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:569:72: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:571:39: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:574:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:584:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:591:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:592:101: E501 line too long (105 > 100 characters)
+ml_enhancements/pattern_optimizer.py:593:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:596:54: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:598:41: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:601:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:603:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:620:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:623:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:625:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:628:46: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:631:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:633:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:635:48: W291 trailing whitespace
+ml_enhancements/pattern_optimizer.py:638:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:641:1: W293 blank line contains whitespace
+ml_enhancements/pattern_optimizer.py:643:53: W292 no newline at end of file
+ml_enhancements/predictive_analytics.py:12:1: F401 'pathlib.Path' imported but unused
+ml_enhancements/predictive_analytics.py:13:1: F401 'typing.List' imported but unused
+ml_enhancements/predictive_analytics.py:32:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:39:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:45:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:54:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:58:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:60:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:63:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:65:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:87:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:105:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:122:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:125:65: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:128:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:130:69: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:133:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:135:71: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:138:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:140:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:156:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:159:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:169:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:172:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:179:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:183:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:186:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:189:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:194:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:205:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:208:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:209:101: E501 line too long (102 > 100 characters)
+ml_enhancements/predictive_analytics.py:211:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:220:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:224:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:230:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:233:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:236:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:239:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:242:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:247:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:258:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:261:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:264:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:267:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:273:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:275:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:286:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:289:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:294:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:298:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:301:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:304:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:308:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:318:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:320:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:322:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:326:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:330:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:332:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:335:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:339:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:341:45: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:346:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:348:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:351:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:359:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:361:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:367:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:370:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:375:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:377:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:380:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:388:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:395:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:401:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:407:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:414:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:416:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:419:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:421:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:425:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:428:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:431:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:434:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:438:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:441:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:443:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:446:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:454:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:459:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:472:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:475:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:478:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:480:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:482:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:490:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:497:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:501:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:504:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:507:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:509:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:516:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:522:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:530:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:536:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:538:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:541:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:544:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:551:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:560:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:567:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:569:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:572:101: E501 line too long (113 > 100 characters)
+ml_enhancements/predictive_analytics.py:575:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:578:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:581:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:583:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:591:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:602:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:610:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:613:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:623:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:626:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:627:101: E501 line too long (102 > 100 characters)
+ml_enhancements/predictive_analytics.py:629:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:641:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:644:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:645:101: E501 line too long (106 > 100 characters)
+ml_enhancements/predictive_analytics.py:647:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:659:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:662:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:666:75: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:668:37: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:674:75: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:676:37: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:680:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:682:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:685:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:689:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:693:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:697:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:700:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:711:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:716:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:720:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:729:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:731:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:734:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:737:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:745:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:748:49: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:749:33: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:754:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:757:47: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:758:40: W291 trailing whitespace
+ml_enhancements/predictive_analytics.py:763:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:770:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:790:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:793:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:795:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:801:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:806:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:811:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:813:1: W293 blank line contains whitespace
+ml_enhancements/predictive_analytics.py:816:29: W292 no newline at end of file
