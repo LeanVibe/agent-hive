@@ -155,7 +155,13 @@ class TmuxAgentManager:
             
             "intelligence-agent": "Hello! I'm the Intelligence Agent. I'm ready to implement advanced AI capabilities for agent-hive. Let me start by analyzing the current system architecture and begin implementing the intelligence framework as outlined in my instructions.",
             
-            "orchestration-agent": "Hello! I'm the Orchestration Agent. I'm ready to coordinate multi-agent workflows and optimize system orchestration. Let me start by analyzing the current agent coordination patterns and begin implementing enhanced orchestration capabilities."
+            "orchestration-agent": "Hello! I'm the Orchestration Agent. I'm ready to coordinate multi-agent workflows and optimize system orchestration. Let me start by analyzing the current agent coordination patterns and begin implementing enhanced orchestration capabilities.",
+            
+            "pm-agent": "Hello! I'm the PM/XP Methodology Enforcer Agent. I'm ready to enforce XP practices and manage GitHub workflows for agent-hive. Let me start by reading the current XP methodology implementation and GitHub processes, then begin with PM.1.1: Sprint Coordination as outlined in my CLAUDE.md instructions.",
+            
+            "integration-agent": "Hello! I'm the Integration Agent. I'm ready to work on system integration and external API connections for agent-hive. Let me start by reading the current system architecture and external integrations, then begin with I.1.1: API Gateway Implementation as outlined in my CLAUDE.md instructions.",
+            
+            "quality-agent": "Hello! I'm the Quality Agent. I'm ready to implement comprehensive testing and quality assurance for agent-hive. Let me start by reading the current test infrastructure and quality processes, then begin with Q.1.1: Comprehensive Test Suite as outlined in my CLAUDE.md instructions."
         }
         
         return prompts.get(agent_name)
