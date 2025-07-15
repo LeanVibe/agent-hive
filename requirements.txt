@@ -25,6 +25,9 @@ aiohttp>=3.8.0
 # HTTP and API clients
 aiohttp>=3.8.0
 
+# HTTP and API clients
+aiohttp>=3.8.0
+
 # Configuration and utilities
 python-dotenv>=1.0.0
 psutil>=5.9.0
