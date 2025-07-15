@@ -1,0 +1,97 @@
+{
+  "timestamp": "2025-07-15T18:58:27.238496",
+  "test_execution": {
+    "execution_time_ms": 472.7790355682373
+  },
+  "performance_metrics": {
+    "test_suite_performance": [],
+    "slow_tests": [],
+    "memory_usage": 32.71875,
+    "cpu_usage": 18.3
+  },
+  "coverage_analysis": {},
+  "quality_trends": {
+    "status": "no_data",
+    "trends": []
+  },
+  "regression_detection": {
+    "regressions_detected": 0,
+    "regressions": []
+  },
+  "quality_gates": {
+    "gates_passed": 2,
+    "total_gates": 4,
+    "overall_passed": false,
+    "pass_rate": 50.0,
+    "gates": {
+      "coverage_gate": {
+        "threshold": 85.0,
+        "current": 0,
+        "passed": false,
+        "description": "Code coverage must be >= 85.0%"
+      },
+      "performance_gate": {
+        "threshold_ms": 2000,
+        "current_ms": 466.2137031555176,
+        "passed": true,
+        "description": "Test execution time must be <= 2000ms"
+      },
+      "success_rate_gate": {
+        "threshold": 95.0,
+        "current": 0,
+        "passed": false,
+        "description": "Test success rate must be >= 95%"
+      },
+      "no_failed_tests_gate": {
+        "threshold": 0,
+        "current": 0,
+        "passed": true,
+        "description": "No failed tests allowed"
+      }
+    }
+  },
+  "overall_quality_score": 29.090262055397034,
+  "quality_grade": "F",
+  "alerts": [
+    {
+      "type": "coverage_below_threshold",
+      "severity": "high",
+      "message": "Code coverage (0.0%) below threshold (85.0%)",
+      "current_value": 0,
+      "threshold": 85.0
+    },
+    {
+      "type": "low_quality_score",
+      "severity": "high",
+      "message": "Overall quality score (29.1) is below acceptable level",
+      "current_value": 29.090262055397034,
+      "threshold": 80
+    }
+  ],
+  "recommendations": [
+    {
+      "category": "coverage",
+      "priority": "high",
+      "title": "Improve Test Coverage",
+      "description": "Code coverage (0.0%) is below threshold (85.0%)",
+      "actions": [
+        "Add unit tests for uncovered code paths",
+        "Focus on files with low coverage: ",
+        "Consider integration tests for complex workflows",
+        "Review and remove dead code if applicable"
+      ]
+    },
+    {
+      "category": "quality_gates",
+      "priority": "high",
+      "title": "Fix Quality Gate Failures",
+      "description": "Quality gates failing: coverage_gate, success_rate_gate",
+      "actions": [
+        "Address failing quality gates before deployment",
+        "Review quality gate thresholds if needed",
+        "Implement automated quality gate enforcement",
+        "Monitor quality gates in CI/CD pipeline"
+      ]
+    }
+  ]
+}
