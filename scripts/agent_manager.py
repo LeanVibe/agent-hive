@@ -29,25 +29,77 @@ class TmuxAgentManager:
         """Discover all agent worktrees and their configurations."""
         agents = {}
         
-        if not self.worktrees_dir.exists():
-            return agents
+        # First, discover agents in standard worktrees/ directory
+        if self.worktrees_dir.exists():
+            for worktree_dir in self.worktrees_dir.iterdir():
+                if worktree_dir.is_dir():
+                    agent_name = worktree_dir.name
+                    claude_file = worktree_dir / "CLAUDE.md"
+                    
+                    if claude_file.exists():
+                        agents[agent_name] = {
+                            "name": agent_name,
+                            "path": worktree_dir,
+                            "claude_file": claude_file,
+                            "window_name": f"agent-{agent_name}",
+                            "last_activity": self._get_last_activity(worktree_dir),
+                            "status": "unknown"
+                        }
+        
+        # Then, discover agents from git worktree list (for agents outside worktrees/)
+        try:
+            result = subprocess.run(
+                ["git", "worktree", "list", "--porcelain"],
+                capture_output=True,
+                text=True,
+                cwd=self.base_dir
+            )
             
-        for worktree_dir in self.worktrees_dir.iterdir():
-            if worktree_dir.is_dir():
-                agent_name = worktree_dir.name
-                claude_file = worktree_dir / "CLAUDE.md"
-                
-                if claude_file.exists():
-                    agents[agent_name] = {
-                        "name": agent_name,
-                        "path": worktree_dir,
-                        "claude_file": claude_file,
-                        "window_name": f"agent-{agent_name}",
-                        "last_activity": self._get_last_activity(worktree_dir),
-                        "status": "unknown"
-                    }
+            if result.returncode == 0:
+                current_worktree = None
+                for line in result.stdout.splitlines():
+                    if line.startswith("worktree "):
+                        current_worktree = Path(line.split(" ", 1)[1])
+                    elif line.startswith("branch ") and current_worktree:
+                        # Check if this is an agent worktree (not main repo)
+                        if (current_worktree != self.base_dir and 
+                            current_worktree.name not in agents and
+                            current_worktree.name != "agent-hive"):
+                            claude_file = current_worktree / "CLAUDE.md"
+                            if claude_file.exists():
+                                # Extract agent name from path
+                                agent_name = current_worktree.name
+                                if agent_name.endswith("-worktree"):
+                                    agent_name = agent_name[:-9]  # Remove "-worktree" suffix
+                                
+                                # Skip if this agent looks like a generic orchestrator
+                                if self._is_agent_specific_claude(claude_file):
+                                    agents[agent_name] = {
+                                        "name": agent_name,
+                                        "path": current_worktree,
+                                        "claude_file": claude_file,
+                                        "window_name": f"agent-{agent_name}",
+                                        "last_activity": self._get_last_activity(current_worktree),
+                                        "status": "unknown"
+                                    }
+        except Exception as e:
+            print(f"Warning: Could not discover git worktrees: {e}")
         
         return agents
+    
+    def _is_agent_specific_claude(self, claude_file: Path) -> bool:
+        """Check if CLAUDE.md file is agent-specific (not generic orchestrator)."""
+        try:
+            content = claude_file.read_text()
+            # Skip if it looks like a generic orchestrator file
+            if "LeanVibe Orchestrator" in content and "Role: Orchestrator" in content:
+                return False
+            # Must contain agent-specific content
+            if any(term in content.lower() for term in ["agent identity", "agent instructions", "specialization", "mission statement"]):
+                return True
+            return False
+        except Exception:
+            return False
     
     def _get_last_activity(self, worktree_dir: Path) -> Optional[datetime]:
         """Get last git activity in worktree."""

@@ -20,16 +20,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 import uvicorn
-
-try:
-    from .prompt_logger import prompt_logger, PromptLog
-except ImportError:
-    # Fallback for direct execution
-    import sys
-    sys.path.append('.')
-    from prompt_logger import prompt_logger, PromptLog
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -90,27 +81,10 @@ class DashboardServer:
         self.session_name = session_name
         self.base_dir = Path(base_dir)
         self.worktrees_dir = self.base_dir / "worktrees"
+        self.app = FastAPI(title="LeanVibe Agent Hive Dashboard", version="1.0.0")
         self.websocket_connections: List[WebSocket] = []
         self.agents: Dict[str, AgentInfo] = {}
         self.system_metrics = SystemMetrics(0, 0, 0.0, 0.0, 0.0, 0.0, 0)
-        
-        # Create lifespan context manager
-        @asynccontextmanager
-        async def lifespan(app: FastAPI):
-            # Startup
-            logger.info("Starting monitoring tasks")
-            asyncio.create_task(self._monitor_agents())
-            asyncio.create_task(self._monitor_system())
-            asyncio.create_task(self._broadcast_updates())
-            yield
-            # Shutdown
-            logger.info("Shutting down monitoring tasks")
-        
-        self.app = FastAPI(
-            title="LeanVibe Agent Hive Dashboard", 
-            version="1.0.0",
-            lifespan=lifespan
-        )
         
         # Configure CORS
         self.app.add_middleware(
@@ -122,6 +96,7 @@ class DashboardServer:
         )
         
         self._setup_routes()
+        self._setup_periodic_updates()
     
     def _setup_routes(self):
         """Setup FastAPI routes"""
@@ -147,33 +122,6 @@ class DashboardServer:
         async def get_system_metrics():
             """Get system metrics"""
             return {"metrics": self.system_metrics.to_dict()}
-        
-        @self.app.get("/api/prompts/recent")
-        async def get_recent_prompts():
-            """Get recent prompts for dashboard"""
-            prompts = prompt_logger.get_recent_prompts(limit=20)
-            return {"prompts": [p.to_dict() for p in prompts]}
-        
-        @self.app.get("/api/prompts/stats")
-        async def get_prompt_stats():
-            """Get prompt statistics"""
-            return {"stats": prompt_logger.get_prompt_stats()}
-        
-        @self.app.get("/api/prompts/needs-review")
-        async def get_prompts_needing_review():
-            """Get prompts needing PM review"""
-            prompts = prompt_logger.get_prompts_needing_review()
-            return {"prompts": [p.to_dict() for p in prompts]}
-        
-        @self.app.post("/api/prompts/{prompt_id}/review")
-        async def add_pm_review(prompt_id: int, review_data: dict):
-            """Add PM review to a prompt"""
-            prompt_logger.add_pm_review(
-                prompt_id, 
-                review_data.get('review', ''),
-                review_data.get('suggested_improvement', '')
-            )
-            return {"message": "Review added successfully"}
         
         @self.app.post("/api/agents/{agent_name}/spawn")
         async def spawn_agent(agent_name: str):
@@ -203,6 +151,16 @@ class DashboardServer:
         async def websocket_endpoint(websocket: WebSocket):
             """WebSocket endpoint for real-time updates"""
             await self._handle_websocket(websocket)
+    
+    def _setup_periodic_updates(self):
+        """Setup periodic updates for monitoring"""
+        
+        @self.app.on_event("startup")
+        async def startup_event():
+            """Start periodic monitoring tasks"""
+            asyncio.create_task(self._monitor_agents())
+            asyncio.create_task(self._monitor_system())
+            asyncio.create_task(self._broadcast_updates())
     
     async def _get_dashboard_html(self) -> str:
         """Generate dashboard HTML"""
@@ -467,76 +425,27 @@ class DashboardServer:
         """Discover all agents from worktrees"""
         agents = {}
         
-        # First, discover agents in standard worktrees/ directory
-        if self.worktrees_dir.exists():
-            for worktree_dir in self.worktrees_dir.iterdir():
-                if worktree_dir.is_dir():
-                    agent_name = worktree_dir.name
-                    claude_file = worktree_dir / "CLAUDE.md"
-                    
-                    if claude_file.exists():
-                        status = await self._get_agent_status(agent_name)
-                        last_activity = await self._get_last_activity(worktree_dir)
-                        
-                        agents[agent_name] = AgentInfo(
-                            name=agent_name,
-                            status=status,
-                            window_name=f"agent-{agent_name}",
-                            path=str(worktree_dir),
-                            last_activity=last_activity
-                        )
+        if not self.worktrees_dir.exists():
+            return agents
         
-        # Then, discover agents from git worktree list (for agents outside worktrees/)
-        try:
-            result = await self._run_command(["git", "worktree", "list", "--porcelain"])
-            
-            if result.returncode == 0:
-                current_worktree = None
-                for line in result.stdout.splitlines():
-                    if line.startswith("worktree "):
-                        current_worktree = Path(line.split(" ", 1)[1])
-                    elif line.startswith("branch ") and current_worktree:
-                        # Check if this is an agent worktree (not main repo)
-                        if (current_worktree != self.base_dir and 
-                            current_worktree.name not in agents and
-                            current_worktree.name != "agent-hive"):
-                            claude_file = current_worktree / "CLAUDE.md"
-                            if claude_file.exists():
-                                # Extract agent name from path
-                                agent_name = current_worktree.name
-                                if agent_name.endswith("-worktree"):
-                                    agent_name = agent_name[:-9]  # Remove "-worktree" suffix
-                                
-                                # Skip if this agent looks like a generic orchestrator
-                                if self._is_agent_specific_claude(claude_file):
-                                    status = await self._get_agent_status(agent_name)
-                                    last_activity = await self._get_last_activity(current_worktree)
-                                    
-                                    agents[agent_name] = AgentInfo(
-                                        name=agent_name,
-                                        status=status,
-                                        window_name=f"agent-{agent_name}",
-                                        path=str(current_worktree),
-                                        last_activity=last_activity
-                                    )
-        except Exception as e:
-            logger.warning(f"Could not discover git worktrees: {e}")
+        for worktree_dir in self.worktrees_dir.iterdir():
+            if worktree_dir.is_dir():
+                agent_name = worktree_dir.name
+                claude_file = worktree_dir / "CLAUDE.md"
+                
+                if claude_file.exists():
+                    status = await self._get_agent_status(agent_name)
+                    last_activity = await self._get_last_activity(worktree_dir)
+                    
+                    agents[agent_name] = AgentInfo(
+                        name=agent_name,
+                        status=status,
+                        window_name=f"agent-{agent_name}",
+                        path=str(worktree_dir),
+                        last_activity=last_activity
+                    )
         
         return agents
-    
-    def _is_agent_specific_claude(self, claude_file: Path) -> bool:
-        """Check if CLAUDE.md file is agent-specific (not generic orchestrator)."""
-        try:
-            content = claude_file.read_text()
-            # Skip if it looks like a generic orchestrator file
-            if "LeanVibe Orchestrator" in content and "Role: Orchestrator" in content:
-                return False
-            # Must contain agent-specific content
-            if any(term in content.lower() for term in ["agent identity", "agent instructions", "specialization", "mission statement"]):
-                return True
-            return False
-        except Exception:
-            return False
     
     async def _get_agent_status(self, agent_name: str) -> AgentStatus:
         """Get agent status from tmux"""
