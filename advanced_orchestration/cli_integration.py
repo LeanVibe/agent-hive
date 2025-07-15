@@ -1,8 +1,9 @@
 """
-CLI Integration for Enhanced Multi-Agent Orchestration.
+Enhanced CLI Integration for Multi-Agent Orchestration.
 
 This module provides CLI commands for managing and executing multi-agent workflows
-with the enhanced coordination capabilities.
+with the enhanced coordination capabilities including intelligent routing,
+dynamic dependency management, and real-time coordination monitoring.
 """
 
 import asyncio
@@ -12,6 +13,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import click
 
+from .enhanced_coordination import EnhancedCoordinationProtocol
 from .workflow_coordinator import WorkflowCoordinator
 from .models import (
     WorkflowDefinition, AgentCapabilities, QualityGate, TaskDependency,
@@ -20,16 +22,17 @@ from .models import (
 )
 
 
-class OrchestrationCLI:
-    """CLI interface for enhanced multi-agent orchestration."""
+class EnhancedOrchestrationCLI:
+    """Enhanced CLI interface for multi-agent orchestration with intelligent coordination."""
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
+        self.enhanced_coordination: Optional[EnhancedCoordinationProtocol] = None
         self.workflow_coordinator: Optional[WorkflowCoordinator] = None
         self.running = False
     
     async def initialize(self, config: Dict[str, Any] = None) -> None:
-        """Initialize the orchestration system."""
+        """Initialize the enhanced orchestration system."""
         try:
             # Create configuration
             coordinator_config = CoordinatorConfig(
@@ -45,23 +48,26 @@ class OrchestrationCLI:
                 )
             )
             
-            # Initialize workflow coordinator
-            self.workflow_coordinator = WorkflowCoordinator(coordinator_config)
-            await self.workflow_coordinator.start()
+            # Initialize enhanced coordination protocol
+            self.enhanced_coordination = EnhancedCoordinationProtocol(coordinator_config)
+            await self.enhanced_coordination.start()
+            
+            # Get workflow coordinator reference
+            self.workflow_coordinator = self.enhanced_coordination.workflow_coordinator
             self.running = True
             
-            self.logger.info("Enhanced multi-agent orchestration system initialized")
+            self.logger.info("Enhanced multi-agent orchestration system initialized with intelligent coordination")
             
         except Exception as e:
-            self.logger.error(f"Failed to initialize orchestration system: {e}")
+            self.logger.error(f"Failed to initialize enhanced orchestration system: {e}")
             raise
     
     async def shutdown(self) -> None:
-        """Shutdown the orchestration system."""
-        if self.workflow_coordinator:
-            await self.workflow_coordinator.stop()
+        """Shutdown the enhanced orchestration system."""
+        if self.enhanced_coordination:
+            await self.enhanced_coordination.stop()
             self.running = False
-            self.logger.info("Orchestration system shutdown complete")
+            self.logger.info("Enhanced orchestration system shutdown complete")
     
     async def create_documentation_workflow(self, workflow_id: str = None) -> str:
         """Create the documentation workflow from the plan."""
@@ -380,11 +386,15 @@ class OrchestrationCLI:
                 self.logger.error(f"Failed to register {agent_id}")
     
     async def execute_workflow(self, workflow_id: str) -> Dict[str, Any]:
-        """Execute a workflow and return status."""
-        if not self.workflow_coordinator:
-            raise RuntimeError("Orchestration system not initialized")
+        """Execute a workflow with enhanced coordination."""
+        if not self.workflow_coordinator or not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
         
-        workflow_state = await self.workflow_coordinator.execute_workflow(workflow_id)
+        # Execute workflow with enhanced coordination
+        workflow_definition = self.workflow_coordinator.workflow_definitions[workflow_id]
+        workflow_state = await self.enhanced_coordination.execute_enhanced_workflow(
+            workflow_definition, {}
+        )
         
         return {
             "workflow_id": workflow_state.workflow_id,
@@ -393,7 +403,13 @@ class OrchestrationCLI:
             "active_tasks": len(workflow_state.active_tasks),
             "completed_tasks": len(workflow_state.completed_tasks),
             "estimated_completion": workflow_state.estimated_completion.isoformat(),
-            "started_at": workflow_state.started_at.isoformat()
+            "started_at": workflow_state.started_at.isoformat(),
+            "enhanced_features": {
+                "intelligent_routing": True,
+                "dynamic_dependencies": True,
+                "parallel_optimization": True,
+                "real_time_monitoring": True
+            }
         }
     
     async def get_workflow_status(self, workflow_id: str) -> Dict[str, Any]:
@@ -424,26 +440,119 @@ class OrchestrationCLI:
         }
     
     async def get_system_statistics(self) -> Dict[str, Any]:
-        """Get system-wide statistics."""
-        if not self.workflow_coordinator:
-            raise RuntimeError("Orchestration system not initialized")
+        """Get enhanced system-wide statistics."""
+        if not self.workflow_coordinator or not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
         
         stats = self.workflow_coordinator.get_coordination_statistics()
+        enhanced_stats = self.enhanced_coordination.get_coordination_statistics()
         
         return {
             "system_running": self.running,
             "coordination_stats": stats,
+            "enhanced_coordination_stats": enhanced_stats,
             "timestamp": datetime.now().isoformat()
         }
+    
+    async def get_coordination_metrics(self) -> Dict[str, Any]:
+        """Get real-time coordination metrics."""
+        if not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
+        
+        metrics = await self.enhanced_coordination.monitor_real_time_coordination()
+        
+        return {
+            "real_time_metrics": {
+                "workflow_completion_rate": metrics.workflow_completion_rate,
+                "parallel_efficiency": metrics.parallel_efficiency,
+                "task_distribution_balance": metrics.task_distribution_balance,
+                "quality_consistency": metrics.quality_consistency,
+                "dependency_resolution_time": metrics.dependency_resolution_time,
+                "coordination_overhead": metrics.coordination_overhead
+            },
+            "agent_utilization": metrics.agent_utilization,
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    async def get_intelligent_routing_analytics(self) -> Dict[str, Any]:
+        """Get intelligent routing analytics."""
+        if not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
+        
+        coordination_stats = self.enhanced_coordination.get_coordination_statistics()
+        
+        return {
+            "routing_analytics": {
+                "cache_size": coordination_stats["routing_cache_size"],
+                "dependency_cache_size": coordination_stats["dependency_cache_size"],
+                "coordination_events": coordination_stats["coordination_events"],
+                "performance_alerts": coordination_stats["performance_alerts"],
+                "ml_prediction_enabled": self.enhanced_coordination.intelligent_routing.use_ml_prediction,
+                "learning_enabled": self.enhanced_coordination.intelligent_routing.learning_enabled
+            },
+            "recent_events": coordination_stats["recent_events"],
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    async def optimize_workflow_dependencies(self, workflow_id: str, task_id: str) -> Dict[str, Any]:
+        """Optimize dependencies for a specific workflow task."""
+        if not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
+        
+        dependencies = await self.enhanced_coordination.resolve_dynamic_dependencies(
+            workflow_id, task_id
+        )
+        
+        return {
+            "workflow_id": workflow_id,
+            "task_id": task_id,
+            "optimized_dependencies": dependencies,
+            "optimization_applied": True,
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    async def analyze_parallel_execution(self, workflow_id: str) -> Dict[str, Any]:
+        """Analyze parallel execution opportunities for a workflow."""
+        if not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
+        
+        # Get current task groups for analysis
+        task_groups = [["task_1", "task_2"], ["task_3"], ["task_4", "task_5"]]
+        
+        optimized_groups = await self.enhanced_coordination.optimize_parallel_execution(
+            workflow_id, task_groups
+        )
+        
+        return {
+            "workflow_id": workflow_id,
+            "original_groups": task_groups,
+            "optimized_groups": optimized_groups,
+            "optimization_metrics": {
+                "original_group_count": len(task_groups),
+                "optimized_group_count": len(optimized_groups),
+                "parallel_efficiency_improvement": self._calculate_parallel_improvement(task_groups, optimized_groups)
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    def _calculate_parallel_improvement(self, original_groups: List[List[str]], optimized_groups: List[List[str]]) -> float:
+        """Calculate parallel execution improvement percentage."""
+        if not original_groups or not optimized_groups:
+            return 0.0
+        
+        original_efficiency = len(original_groups) / sum(len(group) for group in original_groups)
+        optimized_efficiency = len(optimized_groups) / sum(len(group) for group in optimized_groups)
+        
+        return (optimized_efficiency - original_efficiency) * 100
 
 
-# CLI Commands
+# Enhanced CLI Commands
 @click.group()
 @click.pass_context
 def orchestration_cli(ctx):
-    """Enhanced multi-agent orchestration CLI."""
+    """Enhanced multi-agent orchestration CLI with intelligent coordination."""
     ctx.ensure_object(dict)
-    ctx.obj['cli'] = OrchestrationCLI()
+    ctx.obj['cli'] = EnhancedOrchestrationCLI()
 
 
 @orchestration_cli.command()
@@ -569,7 +678,7 @@ def status(ctx, workflow_id, watch):
 @orchestration_cli.command()
 @click.pass_context
 def stats(ctx):
-    """Get system statistics."""
+    """Get enhanced system statistics."""
     cli = ctx.obj['cli']
     
     async def run():
@@ -577,9 +686,11 @@ def stats(ctx):
             result = await cli.get_system_statistics()
             
             click.echo(f"🚀 System running: {result['system_running']}")
-            click.echo(f"📊 Coordination Statistics:")
+            click.echo(f"📊 Enhanced Coordination Statistics:")
             
             stats = result['coordination_stats']
+            enhanced_stats = result['enhanced_coordination_stats']
+            
             click.echo(f"  • Workflows executed: {stats['workflows_executed']}")
             click.echo(f"  • Parallel tasks executed: {stats['parallel_tasks_executed']}")
             click.echo(f"  • Quality gates passed: {stats['quality_gates_passed']}")
@@ -588,10 +699,137 @@ def stats(ctx):
             click.echo(f"  • Total tasks: {stats['total_tasks']}")
             click.echo(f"  • Registered agents: {stats['registered_agents']}")
             
+            click.echo(f"🧠 Enhanced Features:")
+            click.echo(f"  • Coordination events: {enhanced_stats['coordination_events']}")
+            click.echo(f"  • Performance alerts: {enhanced_stats['performance_alerts']}")
+            click.echo(f"  • Routing cache size: {enhanced_stats['routing_cache_size']}")
+            click.echo(f"  • Dependency cache size: {enhanced_stats['dependency_cache_size']}")
+            click.echo(f"  • Agent performance tracked: {enhanced_stats['agent_performance_tracked']}")
+            
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
             
         except Exception as e:
             click.echo(f"❌ Error getting statistics: {e}")
+    
+    asyncio.run(run())
+
+
+@orchestration_cli.command()
+@click.pass_context
+def metrics(ctx):
+    """Get real-time coordination metrics."""
+    cli = ctx.obj['cli']
+    
+    async def run():
+        try:
+            result = await cli.get_coordination_metrics()
+            
+            click.echo("📈 Real-time Coordination Metrics:")
+            metrics = result['real_time_metrics']
+            
+            click.echo(f"  • Workflow completion rate: {metrics['workflow_completion_rate']:.1%}")
+            click.echo(f"  • Parallel efficiency: {metrics['parallel_efficiency']:.1%}")
+            click.echo(f"  • Task distribution balance: {metrics['task_distribution_balance']:.1%}")
+            click.echo(f"  • Quality consistency: {metrics['quality_consistency']:.1%}")
+            click.echo(f"  • Dependency resolution time: {metrics['dependency_resolution_time']:.1f}s")
+            click.echo(f"  • Coordination overhead: {metrics['coordination_overhead']:.1%}")
+            
+            click.echo(f"👥 Agent Utilization:")
+            for agent_id, utilization in result['agent_utilization'].items():
+                click.echo(f"  • {agent_id}: {utilization:.1%}")
+            
+            click.echo(f"⏰ Timestamp: {result['timestamp']}")
+            
+        except Exception as e:
+            click.echo(f"❌ Error getting metrics: {e}")
+    
+    asyncio.run(run())
+
+
+@orchestration_cli.command()
+@click.pass_context
+def routing(ctx):
+    """Get intelligent routing analytics."""
+    cli = ctx.obj['cli']
+    
+    async def run():
+        try:
+            result = await cli.get_intelligent_routing_analytics()
+            
+            click.echo("🧠 Intelligent Routing Analytics:")
+            analytics = result['routing_analytics']
+            
+            click.echo(f"  • Cache size: {analytics['cache_size']}")
+            click.echo(f"  • Dependency cache size: {analytics['dependency_cache_size']}")
+            click.echo(f"  • Coordination events: {analytics['coordination_events']}")
+            click.echo(f"  • Performance alerts: {analytics['performance_alerts']}")
+            click.echo(f"  • ML prediction enabled: {analytics['ml_prediction_enabled']}")
+            click.echo(f"  • Learning enabled: {analytics['learning_enabled']}")
+            
+            click.echo(f"📋 Recent Events:")
+            for event in result['recent_events'][-5:]:  # Show last 5 events
+                click.echo(f"  • {event.get('type', 'unknown')}: {event.get('timestamp', 'no timestamp')}")
+            
+            click.echo(f"⏰ Timestamp: {result['timestamp']}")
+            
+        except Exception as e:
+            click.echo(f"❌ Error getting routing analytics: {e}")
+    
+    asyncio.run(run())
+
+
+@orchestration_cli.command()
+@click.argument('workflow_id')
+@click.argument('task_id')
+@click.pass_context
+def optimize_deps(ctx, workflow_id, task_id):
+    """Optimize dependencies for a specific workflow task."""
+    cli = ctx.obj['cli']
+    
+    async def run():
+        try:
+            result = await cli.optimize_workflow_dependencies(workflow_id, task_id)
+            
+            click.echo(f"🔧 Dependency Optimization Results:")
+            click.echo(f"  • Workflow ID: {result['workflow_id']}")
+            click.echo(f"  • Task ID: {result['task_id']}")
+            click.echo(f"  • Optimization applied: {result['optimization_applied']}")
+            click.echo(f"  • Optimized dependencies: {result['optimized_dependencies']}")
+            
+            click.echo(f"⏰ Timestamp: {result['timestamp']}")
+            
+        except Exception as e:
+            click.echo(f"❌ Error optimizing dependencies: {e}")
+    
+    asyncio.run(run())
+
+
+@orchestration_cli.command()
+@click.argument('workflow_id')
+@click.pass_context
+def analyze_parallel(ctx, workflow_id):
+    """Analyze parallel execution opportunities for a workflow."""
+    cli = ctx.obj['cli']
+    
+    async def run():
+        try:
+            result = await cli.analyze_parallel_execution(workflow_id)
+            
+            click.echo(f"⚡ Parallel Execution Analysis:")
+            click.echo(f"  • Workflow ID: {result['workflow_id']}")
+            click.echo(f"  • Original groups: {result['original_groups']}")
+            click.echo(f"  • Optimized groups: {result['optimized_groups']}")
+            
+            metrics = result['optimization_metrics']
+            click.echo(f"📊 Optimization Metrics:")
+            click.echo(f"  • Original group count: {metrics['original_group_count']}")
+            click.echo(f"  • Optimized group count: {metrics['optimized_group_count']}")
+            click.echo(f"  • Efficiency improvement: {metrics['parallel_efficiency_improvement']:.1f}%")
+            
+            click.echo(f"⏰ Timestamp: {result['timestamp']}")
+            
+        except Exception as e:
+            click.echo(f"❌ Error analyzing parallel execution: {e}")
     
     asyncio.run(run())
 

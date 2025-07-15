@@ -15,7 +15,8 @@ from .multi_agent_coordinator import MultiAgentCoordinator
 from .resource_manager import ResourceManager
 from .scaling_manager import ScalingManager
 from .workflow_coordinator import WorkflowCoordinator
-from .cli_integration import OrchestrationCLI
+from .enhanced_coordination import EnhancedCoordinationProtocol
+from .cli_integration import EnhancedOrchestrationCLI
 from .models import *
 
 # ML Enhancement imports
@@ -37,7 +38,8 @@ try:
         'ResourceManager', 
         'ScalingManager',
         'WorkflowCoordinator',
-        'OrchestrationCLI',
+        'EnhancedCoordinationProtocol',
+        'EnhancedOrchestrationCLI',
         # ML components
         'PatternOptimizer',
         'PredictiveAnalytics',
@@ -56,7 +58,8 @@ except ImportError:
         'ResourceManager', 
         'ScalingManager',
         'WorkflowCoordinator',
-        'OrchestrationCLI'
+        'EnhancedCoordinationProtocol',
+        'EnhancedOrchestrationCLI'
     ]
 
 __version__ = '2.2.0'  # Updated for ML enhancements
