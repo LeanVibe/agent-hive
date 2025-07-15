@@ -75,7 +75,7 @@ config = ApiGatewayConfig(
     host="localhost",
     port=8081,
     enable_cors=True,
-    rate_limit=100
+    rate_limit_requests=100
 )
 gateway = ApiGateway(config)
 
@@ -147,8 +147,8 @@ from external_api.models import WebhookConfig
 config = WebhookConfig(
     host="localhost",
     port=8080,
-    rate_limit=50,
-    payload_size_limit=1024000
+    rate_limit_requests=50,
+    max_payload_size=1024000
 )
 webhook_server = WebhookServer(config)
 
@@ -200,7 +200,7 @@ from external_api.models import EventStreamConfig
 config = EventStreamConfig(
     compression_enabled=True,
     batch_size=100,
-    flush_interval=5000  # milliseconds
+    flush_interval=5  # seconds
 )
 event_streaming = EventStreaming(config)
 
@@ -246,7 +246,7 @@ from advanced_orchestration.models import CoordinatorConfig, LoadBalancingStrate
 # Initialize coordinator
 config = CoordinatorConfig(
     max_agents=20,
-    load_balancing_strategy=LoadBalancingStrategy.LEAST_LOADED,
+    load_balancing_strategy=LoadBalancingStrategy.LEAST_CONNECTIONS,
     health_check_interval=30
 )
 coordinator = MultiAgentCoordinator(config)
@@ -284,11 +284,11 @@ from advanced_orchestration.models import LoadBalancingStrategy
 
 # Available strategies
 strategies = [
-    LoadBalancingStrategy.ROUND_ROBIN,    # Sequential assignment
-    LoadBalancingStrategy.LEAST_LOADED,   # Assign to least loaded agent
-    LoadBalancingStrategy.CAPABILITY_BASED, # Match task to agent capabilities
-    LoadBalancingStrategy.PRIORITY_WEIGHTED, # Priority-based assignment
-    LoadBalancingStrategy.PREDICTIVE      # ML-based assignment prediction
+    LoadBalancingStrategy.ROUND_ROBIN,        # Sequential assignment
+    LoadBalancingStrategy.LEAST_CONNECTIONS,  # Assign to least loaded agent
+    LoadBalancingStrategy.RESOURCE_BASED,     # Resource-based assignment
+    LoadBalancingStrategy.CAPABILITY_BASED,   # Match task to agent capabilities
+    LoadBalancingStrategy.WEIGHTED            # Weighted assignment
 ]
 ```
 
@@ -357,8 +357,15 @@ Intelligent resource allocation and monitoring system with real-time usage track
 from advanced_orchestration import ResourceManager
 from advanced_orchestration.models import ResourceRequirements
 
-# Initialize resource manager
-resource_manager = ResourceManager()
+# Initialize resource manager with resource limits
+from advanced_orchestration.models import ResourceLimits
+resource_limits = ResourceLimits(
+    max_cpu_cores=8,
+    max_memory_mb=16384,
+    max_disk_mb=102400,
+    max_network_mbps=1000
+)
+resource_manager = ResourceManager(resource_limits)
 
 # Check system resources
 resources = await resource_manager.get_system_resources()
@@ -367,11 +374,10 @@ print(f"Memory: {resources.memory_used_mb}MB / {resources.memory_available_mb}MB
 
 # Allocate resources to agent
 requirements = ResourceRequirements(
-    cpu_cores=2.0,
+    cpu_cores=2,
     memory_mb=1024,
     disk_mb=500,
-    network_bandwidth_mbps=10.0,
-    priority=5
+    network_mbps=10
 )
 
 allocation = await resource_manager.allocate_resources(
@@ -433,26 +439,23 @@ Automated scaling system that dynamically adjusts agent count based on demand an
 
 ```python
 from advanced_orchestration import ScalingManager
-from advanced_orchestration.models import ScalingPolicy
+from advanced_orchestration.models import ResourceLimits
 
-# Initialize scaling manager
-scaling_manager = ScalingManager()
-
-# Set scaling policy
-policy = ScalingPolicy(
-    min_instances=2,
-    max_instances=10,
-    scale_up_threshold=0.8,
-    scale_down_threshold=0.3,
-    cooldown_period=timedelta(minutes=5)
+# Initialize scaling manager with resource limits
+resource_limits = ResourceLimits(
+    max_cpu_cores=8,
+    max_memory_mb=16384,
+    max_disk_mb=102400,
+    max_network_mbps=1000,
+    max_agents=10
 )
+scaling_manager = ScalingManager(resource_limits)
 
-await scaling_manager.set_scaling_policy("backend-agents", policy)
-
-# Perform auto-scaling
-report = await scaling_manager.auto_scale()
-for action in report.actions_taken:
-    print(f"Scaled {action.operation} {action.agent_type}: {action.actual_count} instances")
+# Check scaling needs (requires coordinator)
+# scaling_decision = await scaling_manager.check_scaling_needs(coordinator)
+# if scaling_decision:
+#     print(f"Scaling decision: {scaling_decision.value}")
+print("ScalingManager ready for coordination")
 ```
 
 #### Key Features
@@ -479,26 +482,26 @@ Self-improving machine learning system that adapts to user patterns and optimize
 
 ```python
 from ml_enhancements import AdaptiveLearning
-from ml_enhancements.models import MLConfig, LearningFeedback
+from ml_enhancements.models import MLConfig
 
 # Initialize adaptive learning
 config = MLConfig(
     learning_rate=0.01,
     confidence_threshold=0.8,
-    batch_size=32
+    update_frequency=100
 )
 adaptive_learning = AdaptiveLearning(config)
 
 # Provide feedback for learning
-feedback = LearningFeedback(
-    task_id="task-123",
-    outcome="success",
-    confidence_score=0.85,
-    execution_time=2.5,
-    user_satisfaction=9
-)
+feedback_data = {
+    "task_id": "task-123",
+    "outcome": "success",
+    "confidence_score": 0.85,
+    "execution_time": 2.5,
+    "user_satisfaction": 9
+}
 
-learning_result = await adaptive_learning.learn_from_feedback(feedback)
+learning_result = await adaptive_learning.learn_from_feedback(feedback_data)
 print(f"Learning improvement: {learning_result.improvement_score}")
 ```
 
@@ -518,18 +521,19 @@ Advanced pattern recognition system for development workflow optimization.
 
 ```python
 from ml_enhancements import PatternOptimizer
-from ml_enhancements.models import WorkflowData
+from ml_enhancements.models import MLConfig
 
 # Initialize pattern optimizer
-pattern_optimizer = PatternOptimizer()
+config = MLConfig()
+pattern_optimizer = PatternOptimizer(config)
 
 # Analyze development patterns
-workflow_data = WorkflowData(
-    task_sequence=["design", "implement", "test", "deploy"],
-    agent_utilization={"backend": 0.8, "frontend": 0.6},
-    completion_times=[120, 300, 90, 60],
-    success_rates=[0.95, 0.88, 0.92, 0.98]
-)
+workflow_data = {
+    "task_sequence": ["design", "implement", "test", "deploy"],
+    "agent_utilization": {"backend": 0.8, "frontend": 0.6},
+    "completion_times": [120, 300, 90, 60],
+    "success_rates": [0.95, 0.88, 0.92, 0.98]
+}
 
 optimization = await pattern_optimizer.optimize_workflow(workflow_data)
 print(f"Optimization suggestions: {optimization.recommendations}")
@@ -551,18 +555,20 @@ Performance prediction and resource forecasting system.
 
 ```python
 from ml_enhancements import PredictiveAnalytics
-from ml_enhancements.models import PredictionRequest
+from ml_enhancements.models import MLConfig
+from datetime import timedelta
 
 # Initialize predictive analytics
-predictive_analytics = PredictiveAnalytics()
+config = MLConfig()
+predictive_analytics = PredictiveAnalytics(config)
 
 # Predict resource needs
-prediction_request = PredictionRequest(
-    time_horizon=timedelta(hours=4),
-    current_load=0.7,
-    historical_data=load_history,
-    project_type="web_application"
-)
+prediction_request = {
+    "time_horizon": timedelta(hours=4),
+    "current_load": 0.7,
+    "historical_data": {},  # placeholder for load history
+    "project_type": "web_application"
+}
 
 prediction = await predictive_analytics.predict_resource_needs(prediction_request)
 print(f"Predicted CPU usage: {prediction.cpu_forecast}")
@@ -757,17 +763,26 @@ except Exception as e:
 ```python
 import asyncio
 from advanced_orchestration import MultiAgentCoordinator, ResourceManager
+from advanced_orchestration.models import ResourceLimits
 from external_api import ApiGateway
 from ml_enhancements import AdaptiveLearning
+from ml_enhancements.models import MLConfig
 
 async def complete_workflow_example():
     """Complete example of multi-agent workflow with API integration."""
     
     # Initialize components
     coordinator = MultiAgentCoordinator()
-    resource_manager = ResourceManager()
+    resource_limits = ResourceLimits(
+        max_cpu_cores=8,
+        max_memory_mb=16384,
+        max_disk_mb=102400,
+        max_network_mbps=1000
+    )
+    resource_manager = ResourceManager(resource_limits)
     api_gateway = ApiGateway()
-    adaptive_learning = AdaptiveLearning()
+    ml_config = MLConfig()
+    adaptive_learning = AdaptiveLearning(ml_config)
     
     # Start API gateway
     await api_gateway.start()
@@ -814,15 +829,15 @@ async def complete_workflow_example():
     print(f"CPU utilization: {resources.cpu_percent}%")
     
     # Learn from execution
-    feedback = LearningFeedback(
-        task_id=backend_task.task_id,
-        outcome="success",
-        confidence_score=0.9,
-        execution_time=120,
-        user_satisfaction=8
-    )
+    feedback_data = {
+        "task_id": backend_task.task_id,
+        "outcome": "success",
+        "confidence_score": 0.9,
+        "execution_time": 120,
+        "user_satisfaction": 8
+    }
     
-    await adaptive_learning.learn_from_feedback(feedback)
+    await adaptive_learning.learn_from_feedback(feedback_data)
     
     print("Workflow completed successfully!")
 
