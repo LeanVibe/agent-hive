@@ -398,6 +398,62 @@ class PatternOptimizer:
         
         return changes
     
+    async def get_task_patterns(self, task_type: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Get task execution patterns for intelligent decision making."""
+        
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                if task_type:
+                    query = """
+                        SELECT workflow_type, performance_score, optimization_score, confidence, sample_count, metadata
+                        FROM workflow_patterns 
+                        WHERE workflow_type LIKE ? AND sample_count >= ?
+                        ORDER BY performance_score DESC
+                    """
+                    cursor = conn.execute(query, (f"%{task_type}%", self.config.min_data_points))
+                else:
+                    query = """
+                        SELECT workflow_type, performance_score, optimization_score, confidence, sample_count, metadata
+                        FROM workflow_patterns 
+                        WHERE sample_count >= ?
+                        ORDER BY performance_score DESC
+                    """
+                    cursor = conn.execute(query, (self.config.min_data_points,))
+                
+                patterns = []
+                for row in cursor.fetchall():
+                    workflow_type, perf_score, opt_score, confidence, sample_count, metadata = row
+                    
+                    pattern = {
+                        'workflow_type': workflow_type,
+                        'performance_score': perf_score,
+                        'optimization_score': opt_score,
+                        'confidence': confidence,
+                        'sample_count': sample_count,
+                        'metadata': json.loads(metadata or '{}'),
+                        'recommended_strategy': self._get_recommended_strategy(perf_score, opt_score)
+                    }
+                    patterns.append(pattern)
+                
+                logger.info(f"Retrieved {len(patterns)} task patterns for type: {task_type}")
+                return patterns
+                
+        except Exception as e:
+            logger.error(f"Error retrieving task patterns: {e}")
+            return []
+    
+    def _get_recommended_strategy(self, performance_score: float, optimization_score: float) -> str:
+        """Get recommended allocation strategy based on pattern analysis."""
+        
+        if performance_score > 0.8 and optimization_score < 0.3:
+            return "maintain_current"
+        elif performance_score > 0.6 and optimization_score < 0.5:
+            return "minor_optimization"
+        elif performance_score < 0.5 or optimization_score > 0.7:
+            return "major_restructure"
+        else:
+            return "gradual_improvement"
+    
     def _estimate_effort(self, changes: List[str]) -> str:
         """Estimate implementation effort for optimization changes."""
         if not changes:

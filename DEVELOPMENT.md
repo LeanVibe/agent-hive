@@ -346,9 +346,28 @@ bun run build
 bun test
 ```
 
-### Development Workflow with UV
+### CLI-Driven Development Workflow
 
-#### Dependency Management
+#### LeanVibe CLI Commands (8 Commands Available)
+```bash
+# Orchestration and coordination
+uv run python cli.py orchestrate --workflow feature-dev --validate
+uv run python cli.py spawn --task "implement new feature" --depth ultrathink
+
+# Monitoring and system management
+uv run python cli.py monitor --metrics --real-time
+uv run python cli.py checkpoint --name milestone-1
+
+# External API management (Phase 2.3)
+uv run python cli.py webhook --action start --port 8080
+uv run python cli.py gateway --action start --port 8081
+uv run python cli.py streaming --action start --publish-test
+uv run python cli.py external-api --api-command status
+```
+
+#### Development Workflow with UV
+
+##### Dependency Management
 ```bash
 # Add new dependencies
 uv add requests pytest-asyncio
@@ -396,10 +415,11 @@ git checkout -b feature/auto-scaling-triggers
 #### Commit Conventions
 ```bash
 # Phase 2 specific commits
-git commit -m "feat(multi-agent): implement load balancing strategies"
-git commit -m "feat(scaling): add auto-scaling with cooldown"
-git commit -m "test(resource): add comprehensive resource monitoring tests"
-git commit -m "perf(coordinator): optimize agent assignment latency"
+git commit -m "feat(intelligence): implement ML-based decision making framework"
+git commit -m "feat(external-api): add webhook server and API gateway"
+git commit -m "feat(ml-enhancements): implement pattern optimizer and predictive analytics"
+git commit -m "test(intelligence): add comprehensive intelligence framework tests"
+git commit -m "perf(coordinator): optimize task allocation latency"
 ```
 
 ### XP Principles Implementation
@@ -537,7 +557,7 @@ def mock_resource_environment():
 
 #### Multi-Agent Configuration
 ```yaml
-# .claude/config/config.yaml (Phase 2)
+# .claude/config/config.yaml (Phase 2 - Future Implementation)
 system:
   log_level: INFO
   debug_mode: true
@@ -552,6 +572,40 @@ multi_agent:
   health_check_interval: 30
   failure_threshold: 3
   coordination_timeout: 60
+
+# Intelligence Framework (Phase 2.2)
+intelligence:
+  enabled: true
+  confidence_threshold: 0.75
+  learning_rate: 0.01
+  ml_decision_making: true
+  
+# External API Integration (Phase 2.3)
+external_api:
+  webhook_server:
+    enabled: true
+    port: 8080
+    rate_limit: 1000
+  api_gateway:
+    enabled: true
+    port: 8081
+    auth_type: "jwt"
+  event_streaming:
+    enabled: true
+    max_connections: 100
+    compression: true
+
+# ML Enhancements (Phase 2.4)
+ml_enhancements:
+  pattern_optimizer:
+    enabled: true
+    recognition_threshold: 0.8
+  predictive_analytics:
+    enabled: true
+    prediction_window: 3600
+  adaptive_learning:
+    enabled: true
+    adaptation_threshold: 0.7
 
 # Resource management
 resources:
@@ -951,19 +1005,27 @@ uv run pytest tests/integration/test_agent_communication.py -v --trace
 #### 1. Documentation Resources
 - **README.md**: Overview and quick start
 - **DEVELOPMENT.md**: This comprehensive guide
-- **API_REFERENCE.md**: Complete API documentation (planned)
+- **API_REFERENCE.md**: Complete API documentation with Phase 2 components
+- **TROUBLESHOOTING.md**: Comprehensive troubleshooting guide with Phase 2 scenarios
+- **DEPLOYMENT.md**: Production deployment guide with external API configurations
 - **Phase 2 Progress**: `docs/PHASE2_PROGRESS_SUMMARY.md`
 
 #### 2. Debugging Tools (Enhanced)
 ```bash
-# Comprehensive system health check
-uv run python .claude/orchestrator.py --health-check --verbose
+# Comprehensive system health check via CLI
+uv run python cli.py monitor --metrics --real-time
 
-# Multi-agent system diagnostics
-uv run python .claude/tools/system_diagnostics.py --multi-agent
+# Intelligence framework diagnostics
+uv run python -c "from intelligence_framework import IntelligenceFramework; framework = IntelligenceFramework(); print(framework.health_check())"
+
+# External API status check
+uv run python cli.py external-api --api-command status
 
 # Performance analysis
-uv run python .claude/tools/performance_analyzer.py --full-analysis
+uv run pytest tests/performance/ -v --detailed
+
+# ML enhancements monitoring
+uv run python -c "from ml_enhancements import PatternOptimizer; optimizer = PatternOptimizer(); print(optimizer.get_status())"
 ```
 
 #### 3. Community Support
@@ -974,6 +1036,6 @@ uv run python .claude/tools/performance_analyzer.py --full-analysis
 
 ---
 
-**Status**: Phase 2 Advanced Orchestration 20% complete | Multi-Agent Coordination operational | Ready for ML enhancement implementation
+**Status**: Phase 2 Advanced Orchestration 100% complete | Intelligence Framework operational | External API Integration active | ML Enhancements deployed
 
 This development guide evolves with the project. Please keep it updated as Phase 2 progresses and new capabilities are added.

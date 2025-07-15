@@ -7,7 +7,7 @@ This module provides auto-scaling capabilities for the multi-agent system.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, Any, TYPE_CHECKING
 from dataclasses import dataclass
 from enum import Enum
 
@@ -234,7 +234,7 @@ class ScalingManager:
             self.logger.error(f"Error checking scale down conditions: {e}")
             return False, None
 
-    async def scale_up(self, coordinator: 'MultiAgentCoordinator', count: int = None) -> List[str]:
+    async def scale_up(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
         """
         Scale up the number of agents.
         
@@ -275,7 +275,7 @@ class ScalingManager:
             self.logger.error(f"Failed to scale up: {e}")
             raise ScalingException(f"Scale up failed: {e}")
 
-    async def scale_down(self, coordinator: 'MultiAgentCoordinator', count: int = None) -> List[str]:
+    async def scale_down(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
         """
         Scale down the number of agents.
         
@@ -348,7 +348,7 @@ class ScalingManager:
         """
         return self.scaling_history[-limit:]
 
-    def get_scaling_statistics(self) -> Dict[str, any]:
+    def get_scaling_statistics(self) -> Dict[str, Any]:
         """
         Get scaling statistics.
         

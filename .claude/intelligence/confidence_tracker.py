@@ -273,7 +273,7 @@ class ConfidenceTracker:
         }
 
         feature_str = json.dumps(features, sort_keys=True)
-        return hashlib.md5(feature_str.encode()).hexdigest()[:16]
+        return hashlib.sha256(feature_str.encode()).hexdigest()[:16]
 
     def _calculate_risk(self, context: Dict) -> float:
         """Calculate risk score for decision context.
