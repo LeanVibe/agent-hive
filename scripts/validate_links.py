@@ -74,7 +74,7 @@ class LinkValidator:
         anchors = set()
         
         # Find all headers (# ## ### etc.)
-        header_pattern = r'^#+\\s+(.+)$'
+        header_pattern = r'^#+\s+(.+)$'
         for match in re.finditer(header_pattern, content, re.MULTILINE):
             header_text = match.group(1).strip()
             
@@ -83,7 +83,7 @@ class LinkValidator:
             anchors.add(anchor)
         
         # Find explicit anchor tags
-        anchor_pattern = r'<a\\s+(?:name|id)="([^"]+)"'
+        anchor_pattern = r'<a\s+(?:name|id)="([^"]+)"'
         for match in re.finditer(anchor_pattern, content, re.IGNORECASE):
             anchors.add(match.group(1))
         
@@ -95,8 +95,8 @@ class LinkValidator:
         anchor = text.lower()
         
         # Replace spaces and special chars with hyphens
-        anchor = re.sub(r'[^a-z0-9\\s-]', '', anchor)
-        anchor = re.sub(r'\\s+', '-', anchor)
+        anchor = re.sub(r'[^a-z0-9\s-]', '', anchor)
+        anchor = re.sub(r'\s+', '-', anchor)
         anchor = re.sub(r'-+', '-', anchor)
         anchor = anchor.strip('-')
         
@@ -126,7 +126,7 @@ class LinkValidator:
             lines = content.split('\\n')
             
             # Find all markdown links
-            link_pattern = r'\\[([^\\]]+)\\]\\(([^)]+)\\)'
+            link_pattern = r'\[([^\]]+)\]\(([^)]+)\)'
             
             for line_num, line in enumerate(lines, 1):
                 for match in re.finditer(link_pattern, line):
@@ -258,10 +258,10 @@ class LinkValidator:
         
         # Common cross-reference patterns
         ref_patterns = [
-            (r'see\\s+\\[([^\\]]+)\\]\\(([^)]+)\\)', "see_reference"),
-            (r'refer\\s+to\\s+\\[([^\\]]+)\\]\\(([^)]+)\\)', "refer_reference"),
-            (r'documented\\s+in\\s+\\[([^\\]]+)\\]\\(([^)]+)\\)', "documentation_reference"),
-            (r'\\*\\*\\[([^\\]]+)\\]\\(([^)]+)\\)\\*\\*', "important_reference"),
+            (r'see\s+\[([^\]]+)\]\(([^)]+)\)', "see_reference"),
+            (r'refer\s+to\s+\[([^\]]+)\]\(([^)]+)\)', "refer_reference"),
+            (r'documented\s+in\s+\[([^\]]+)\]\(([^)]+)\)', "documentation_reference"),
+            (r'\*\*\[([^\]]+)\]\(([^)]+)\)\*\*', "important_reference"),
         ]
         
         for file_path in self.markdown_files:
@@ -296,8 +296,8 @@ class LinkValidator:
         
         # Patterns for file references
         file_patterns = [
-            (r'`([^`]+\\.(py|md|yaml|yml|json|txt|sh|js|ts))`', "inline_file"),
-            (r'\\*\\*([^*]+\\.(py|md|yaml|yml|json|txt|sh|js|ts))\\*\\*', "bold_file"),
+            (r'`([^`]+\.(py|md|yaml|yml|json|txt|sh|js|ts))`', "inline_file"),
+            (r'\*\*([^*]+\.(py|md|yaml|yml|json|txt|sh|js|ts))\*\*', "bold_file"),
             (r'`([^`]*/)([^/`]+)`', "path_reference"),
         ]
         
