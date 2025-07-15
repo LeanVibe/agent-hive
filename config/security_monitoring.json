@@ -1,0 +1,98 @@
+{
+  "security_monitoring": {
+    "description": "LeanVibe Quality Agent Security Monitoring Configuration",
+    "version": "1.0.0",
+    
+    "alerting": {
+      "email_alerts": false,
+      "slack_alerts": false,
+      "github_alerts": true,
+      "console_alerts": true
+    },
+    
+    "thresholds": {
+      "critical_threshold": 0,
+      "high_threshold": 3,
+      "medium_threshold": 15,
+      "security_score_threshold": 85
+    },
+    
+    "monitoring_intervals": {
+      "scan_interval_hours": 6,
+      "dependency_check_hours": 24,
+      "vulnerability_check_hours": 12,
+      "quick_scan_minutes": 30
+    },
+    
+    "automation": {
+      "auto_update_security": true,
+      "auto_update_minor": false,
+      "auto_create_issues": true,
+      "auto_assign_security_issues": true
+    },
+    
+    "scan_configuration": {
+      "bandit": {
+        "enabled": true,
+        "severity_levels": ["high", "medium", "low"],
+        "exclude_paths": ["tests", "tutorials", "docs", ".venv", "venv"],
+        "timeout_seconds": 120
+      },
+      "safety": {
+        "enabled": true,
+        "check_full_report": true,
+        "timeout_seconds": 60
+      },
+      "pip_audit": {
+        "enabled": true,
+        "include_descriptions": true,
+        "timeout_seconds": 60
+      },
+      "custom_checks": {
+        "enabled": true,
+        "check_secrets": true,
+        "check_configurations": true,
+        "check_permissions": true,
+        "check_environment": true
+      }
+    },
+    
+    "reporting": {
+      "generate_html_reports": true,
+      "generate_json_reports": true,
+      "generate_markdown_reports": true,
+      "reports_retention_days": 90,
+      "detailed_vulnerability_info": true
+    },
+    
+    "notification_settings": {
+      "critical_immediate": true,
+      "high_within_hours": 4,
+      "medium_within_hours": 24,
+      "summary_reports_daily": true
+    },
+    
+    "security_policies": {
+      "zero_critical_policy": true,
+      "max_high_severity": 2,
+      "max_medium_severity": 10,
+      "require_security_review": true,
+      "block_deployment_on_critical": true
+    },
+    
+    "dependency_management": {
+      "auto_update_security_patches": true,
+      "auto_update_minor_versions": false,
+      "create_update_prs": true,
+      "test_before_update": true,
+      "security_update_priority": "immediate"
+    },
+    
+    "compliance": {
+      "enable_audit_logging": true,
+      "security_compliance_checks": true,
+      "regulatory_reporting": false,
+      "security_metrics_tracking": true
+    }
+  }
+}

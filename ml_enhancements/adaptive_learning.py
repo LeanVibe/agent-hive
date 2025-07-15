@@ -65,7 +65,7 @@ class AdaptiveLearning:
             model_name: StandardScaler() for model_name in self.adaptive_models.keys()
         }
         
-        # Learning state tracking
+        # Learning state tracking - properly typed
         self.learning_state: Dict[str, Any] = {
             'current_session': None,
             'model_performance': {},
@@ -74,8 +74,12 @@ class AdaptiveLearning:
             'convergence_tracking': {}
         }
         
-        # Feedback integration
-        self.feedback_buffer: Dict[str, List[Any]] = {
+        # Type-safe accessors
+        self.model_performance: Dict[str, List[float]] = {}
+        self.convergence_tracking: Dict[str, Dict[str, Any]] = {}
+        
+        # Feedback integration - properly typed
+        self.feedback_buffer: Dict[str, List[Dict[str, Any]]] = {
             'positive_feedback': [],
             'negative_feedback': [],
             'performance_feedback': []
@@ -186,7 +190,7 @@ class AdaptiveLearning:
         
         # Initialize session state
         self.learning_state['current_session'] = session_id
-        self.learning_state['model_performance'][session_id] = []
+        self.model_performance[session_id] = []
         self.learning_state['adaptation_history'].append({
             'session_id': session_id,
             'start_time': datetime.now(),
@@ -300,13 +304,9 @@ class AdaptiveLearning:
         accuracy_change = after_performance - before_performance
         
         # Update learning state
-        model_performance = self.learning_state['model_performance']
-        if not isinstance(model_performance, dict):
-            model_performance = {}
-            self.learning_state['model_performance'] = model_performance
-        session_performance = model_performance.get(session_id, [])
+        session_performance = self.model_performance.get(session_id, [])
         session_performance.append(after_performance)
-        model_performance[session_id] = session_performance
+        self.model_performance[session_id] = session_performance
         
         # Create learning metrics
         metrics = LearningMetrics(
@@ -344,7 +344,7 @@ class AdaptiveLearning:
         for data_point in training_data:
             feature_keys_set.update(data_point.keys())
         
-        feature_keys = sorted(list(feature_keys_set))
+        feature_keys: List[str] = sorted(list(feature_keys_set))
         
         # Create feature matrix
         X = []
@@ -406,10 +406,7 @@ class AdaptiveLearning:
     def _calculate_convergence_time(self, session_id: str) -> float:
         """Calculate time to convergence for learning session."""
         
-        model_performance = self.learning_state['model_performance']
-        if not isinstance(model_performance, dict):
-            return 0.0
-        performance_history = model_performance.get(session_id, [])
+        performance_history = self.model_performance.get(session_id, [])
         
         if len(performance_history) < 3:
             return 0.0
@@ -510,10 +507,7 @@ class AdaptiveLearning:
     def _check_convergence(self, session_id: str, model_type: str) -> bool:
         """Check if model has converged and should stop learning."""
         
-        model_performance = self.learning_state['model_performance']
-        if not isinstance(model_performance, dict):
-            return False
-        performance_history = model_performance.get(session_id, [])
+        performance_history = self.model_performance.get(session_id, [])
         
         if len(performance_history) < 5:
             return False
@@ -526,7 +520,7 @@ class AdaptiveLearning:
         converged = bool(variance < convergence_threshold)
         
         if converged:
-            self.learning_state['convergence_tracking'][session_id] = {
+            self.convergence_tracking[session_id] = {
                 'converged': True,
                 'convergence_time': self._calculate_convergence_time(session_id),
                 'final_performance': recent_performance[-1],
@@ -594,17 +588,11 @@ class AdaptiveLearning:
         """End learning session and return summary metrics."""
         
         # Get final performance
-        model_performance = self.learning_state['model_performance']
-        if not isinstance(model_performance, dict):
-            model_performance = {}
-        performance_history = model_performance.get(session_id, [])
+        performance_history = self.model_performance.get(session_id, [])
         final_performance = performance_history[-1] if performance_history else 0.5
         
         # Calculate session metrics
-        convergence_tracking = self.learning_state['convergence_tracking']
-        if not isinstance(convergence_tracking, dict):
-            convergence_tracking = {}
-        convergence_info = convergence_tracking.get(session_id, {})
+        convergence_info = self.convergence_tracking.get(session_id, {})
         
         session_summary = {
             'session_id': session_id,
@@ -631,9 +619,8 @@ class AdaptiveLearning:
             conn.commit()
         
         # Clean up session state
-        model_performance = self.learning_state['model_performance']
-        if isinstance(model_performance, dict) and session_id in model_performance:
-            del model_performance[session_id]
+        if session_id in self.model_performance:
+            del self.model_performance[session_id]
         
         if self.learning_state['current_session'] == session_id:
             self.learning_state['current_session'] = None
@@ -733,7 +720,7 @@ class AdaptiveLearning:
                 'model_status': {
                     'current_session': self.learning_state['current_session'],
                     'active_models': list(self.adaptive_models.keys()),
-                    'convergence_tracking': len(self.learning_state['convergence_tracking']) if isinstance(self.learning_state['convergence_tracking'], dict) else 0
+                    'convergence_tracking': len(self.convergence_tracking)
                 },
                 'config': {
                     'learning_rate': self.config.learning_rate,
@@ -788,8 +775,8 @@ class AdaptiveLearning:
         
         # Base confidence from recent performance
         session_id = self.learning_state['current_session']
-        if session_id and session_id in self.learning_state['model_performance']:
-            recent_performance = self.learning_state['model_performance'][session_id]
+        if session_id and session_id in self.model_performance:
+            recent_performance = self.model_performance[session_id]
             if recent_performance:
                 base_confidence = float(recent_performance[-1])
             else:

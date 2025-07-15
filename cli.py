@@ -474,8 +474,8 @@ class LeanVibeCLI:
             
             print("✅ External API status check complete")
     
-    async def pr(self, action: str = "list", title: str = None, pr_number: int = None, 
-                 auto_review: bool = False, reviewers: str = None) -> None:
+    async def pr(self, action: str = "list", title: Optional[str] = None, pr_number: Optional[int] = None, 
+                 auto_review: bool = False, reviewers: Optional[str] = None) -> None:
         """
         Pull Request management command.
         
@@ -707,9 +707,9 @@ class LeanVibeCLI:
         print("• Tech debt improvements ready for production deployment")
         print("")
 
-    async def coordinate(self, action: str = "status", issue: int = None, 
-                        worktree: str = None, agent_type: str = None, 
-                        priority: str = "medium", update: str = None) -> None:
+    async def coordinate(self, action: str = "status", issue: Optional[int] = None, 
+                        worktree: Optional[str] = None, agent_type: Optional[str] = None, 
+                        priority: str = "medium", update: Optional[str] = None) -> None:
         """
         Coordinate parallel work with GitHub issues integration.
         
@@ -853,8 +853,8 @@ Ready to begin! Comment on issue #{issue} to confirm start.
         print("✅ Agent instructions generated")
         print("📋 Instructions saved and ready for agent deployment")
 
-    async def review(self, action: str = "status", pr: int = None, agent: str = None, 
-                     agents: str = None, format: str = "text") -> None:
+    async def review(self, action: str = "status", pr: Optional[int] = None, agent: Optional[str] = None, 
+                     agents: Optional[str] = None, format: str = "text") -> None:
         """
         Multi-agent code review command.
         
@@ -961,7 +961,7 @@ Ready to begin! Comment on issue #{issue} to confirm start.
                 print("2. Add additional input validation tests")
                 print("3. Consider implementing rate limiting")
 
-    async def _assign_reviewers(self, pr_number: int, reviewers: str = None) -> None:
+    async def _assign_reviewers(self, pr_number: int, reviewers: Optional[str] = None) -> None:
         """Helper method to assign review agents to a PR."""
         print(f"👥 Auto-assigning review agents to PR #{pr_number}")
         

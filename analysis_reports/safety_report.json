@@ -19,11 +19,11 @@ We highly encourage switching to the new `scan` command which is easier to use, 
         "scan_target": "environment",
         "scanned": [
             "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/lib-dynload",
-            "/Users/bogdan/.local/share/mise/installs/python/3.13.5/bin",
             "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13",
-            "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python313.zip",
             "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages",
-            "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages/setuptools/_vendor"
+            "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages/setuptools/_vendor",
+            "/Users/bogdan/.local/share/mise/installs/python/3.13.5/bin",
+            "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python313.zip"
         ],
         "scanned_full_path": [
             "/Users/bogdan/.local/share/mise/installs/python/3.13.5/bin",
@@ -43,8 +43,8 @@ We highly encourage switching to the new `scan` command which is easier to use, 
         "account": "",
         "local_database_path": null,
         "safety_version": "3.6.0",
-        "timestamp": "2025-07-15 09:51:12",
-        "packages_found": 96,
+        "timestamp": "2025-07-15 18:33:02",
+        "packages_found": 130,
         "vulnerabilities_found": 1,
         "vulnerabilities_ignored": 0,
         "remediations_recommended": 0,
@@ -63,9 +63,9 @@ We highly encourage switching to the new `scan` command which is easier to use, 
             "safety_command": "check"
         },
         "git": {
-            "branch": "main",
+            "branch": "feature/quality-agent-testing-validation",
             "tag": "",
-            "commit": "66dff300d5ccc1cf821464e027248a7a17dfd4c7",
+            "commit": "87921414d5160a171a2943eaa4388653faa233a7",
             "dirty": "True",
             "origin": "https://github.com/LeanVibe/agent-hive.git"
         },
@@ -76,6 +76,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
         "remediation_mode": "NON_INTERACTIVE"
     },
     "scanned_packages": {
+        "gitpython": {
+            "name": "gitpython",
+            "version": "3.1.44",
+            "requirements": [
+                {
+                    "raw": "gitpython==3.1.44",
+                    "extras": [],
+                    "marker": null,
+                    "name": "gitpython",
+                    "specifier": "==3.1.44",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "markupsafe": {
             "name": "markupsafe",
             "version": "3.0.2",
@@ -101,6 +116,51 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "pyyaml",
                     "specifier": "==6.0.2",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "aiohappyeyeballs": {
+            "name": "aiohappyeyeballs",
+            "version": "2.6.1",
+            "requirements": [
+                {
+                    "raw": "aiohappyeyeballs==2.6.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "aiohappyeyeballs",
+                    "specifier": "==2.6.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "aiohttp": {
+            "name": "aiohttp",
+            "version": "3.12.14",
+            "requirements": [
+                {
+                    "raw": "aiohttp==3.12.14",
+                    "extras": [],
+                    "marker": null,
+                    "name": "aiohttp",
+                    "specifier": "==3.12.14",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "aiosignal": {
+            "name": "aiosignal",
+            "version": "1.4.0",
+            "requirements": [
+                {
+                    "raw": "aiosignal==1.4.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "aiosignal",
+                    "specifier": "==1.4.0",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -146,6 +206,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "astroid",
                     "specifier": "==3.3.11",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "attrs": {
+            "name": "attrs",
+            "version": "25.3.0",
+            "requirements": [
+                {
+                    "raw": "attrs==25.3.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "attrs",
+                    "specifier": "==25.3.0",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -286,6 +361,36 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "contourpy": {
+            "name": "contourpy",
+            "version": "1.3.2",
+            "requirements": [
+                {
+                    "raw": "contourpy==1.3.2",
+                    "extras": [],
+                    "marker": null,
+                    "name": "contourpy",
+                    "specifier": "==1.3.2",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "coverage": {
+            "name": "coverage",
+            "version": "7.9.2",
+            "requirements": [
+                {
+                    "raw": "coverage==7.9.2",
+                    "extras": [],
+                    "marker": null,
+                    "name": "coverage",
+                    "specifier": "==7.9.2",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "cryptography": {
             "name": "cryptography",
             "version": "45.0.5",
@@ -296,6 +401,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "cryptography",
                     "specifier": "==45.0.5",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "cycler": {
+            "name": "cycler",
+            "version": "0.12.1",
+            "requirements": [
+                {
+                    "raw": "cycler==0.12.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "cycler",
+                    "specifier": "==0.12.1",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -361,6 +481,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "fastapi": {
+            "name": "fastapi",
+            "version": "0.116.1",
+            "requirements": [
+                {
+                    "raw": "fastapi==0.116.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "fastapi",
+                    "specifier": "==0.116.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "filelock": {
             "name": "filelock",
             "version": "3.16.1",
@@ -386,6 +521,51 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "flake8",
                     "specifier": "==7.3.0",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "fonttools": {
+            "name": "fonttools",
+            "version": "4.58.5",
+            "requirements": [
+                {
+                    "raw": "fonttools==4.58.5",
+                    "extras": [],
+                    "marker": null,
+                    "name": "fonttools",
+                    "specifier": "==4.58.5",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "frozenlist": {
+            "name": "frozenlist",
+            "version": "1.7.0",
+            "requirements": [
+                {
+                    "raw": "frozenlist==1.7.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "frozenlist",
+                    "specifier": "==1.7.0",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "gitdb": {
+            "name": "gitdb",
+            "version": "4.0.12",
+            "requirements": [
+                {
+                    "raw": "gitdb==4.0.12",
+                    "extras": [],
+                    "marker": null,
+                    "name": "gitdb",
+                    "specifier": "==4.0.12",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -511,6 +691,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "kiwisolver": {
+            "name": "kiwisolver",
+            "version": "1.4.8",
+            "requirements": [
+                {
+                    "raw": "kiwisolver==1.4.8",
+                    "extras": [],
+                    "marker": null,
+                    "name": "kiwisolver",
+                    "specifier": "==1.4.8",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "license-expression": {
             "name": "license-expression",
             "version": "30.4.3",
@@ -571,6 +766,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "matplotlib": {
+            "name": "matplotlib",
+            "version": "3.10.3",
+            "requirements": [
+                {
+                    "raw": "matplotlib==3.10.3",
+                    "extras": [],
+                    "marker": null,
+                    "name": "matplotlib",
+                    "specifier": "==3.10.3",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "mccabe": {
             "name": "mccabe",
             "version": "0.7.0",
@@ -611,6 +821,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "msgpack",
                     "specifier": "==1.1.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "multidict": {
+            "name": "multidict",
+            "version": "6.6.3",
+            "requirements": [
+                {
+                    "raw": "multidict==6.6.3",
+                    "extras": [],
+                    "marker": null,
+                    "name": "multidict",
+                    "specifier": "==6.6.3",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -661,6 +886,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "numpy": {
+            "name": "numpy",
+            "version": "2.3.1",
+            "requirements": [
+                {
+                    "raw": "numpy==2.3.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "numpy",
+                    "specifier": "==2.3.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "packageurl-python": {
             "name": "packageurl-python",
             "version": "0.17.1",
@@ -691,6 +931,36 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "pandas": {
+            "name": "pandas",
+            "version": "2.3.1",
+            "requirements": [
+                {
+                    "raw": "pandas==2.3.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pandas",
+                    "specifier": "==2.3.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "pandas-stubs": {
+            "name": "pandas-stubs",
+            "version": "2.3.0.250703",
+            "requirements": [
+                {
+                    "raw": "pandas-stubs==2.3.0.250703",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pandas-stubs",
+                    "specifier": "==2.3.0.250703",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "pathspec": {
             "name": "pathspec",
             "version": "0.12.1",
@@ -716,6 +986,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "pbr",
                     "specifier": "==6.1.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "pillow": {
+            "name": "pillow",
+            "version": "11.3.0",
+            "requirements": [
+                {
+                    "raw": "pillow==11.3.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pillow",
+                    "specifier": "==11.3.0",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -806,6 +1091,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "pluggy",
                     "specifier": "==1.6.0",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "propcache": {
+            "name": "propcache",
+            "version": "0.3.2",
+            "requirements": [
+                {
+                    "raw": "propcache==0.3.2",
+                    "extras": [],
+                    "marker": null,
+                    "name": "propcache",
+                    "specifier": "==0.3.2",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -991,6 +1291,51 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "pytest-cov": {
+            "name": "pytest-cov",
+            "version": "6.2.1",
+            "requirements": [
+                {
+                    "raw": "pytest-cov==6.2.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pytest-cov",
+                    "specifier": "==6.2.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "python-dateutil": {
+            "name": "python-dateutil",
+            "version": "2.9.0.post0",
+            "requirements": [
+                {
+                    "raw": "python-dateutil==2.9.0.post0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "python-dateutil",
+                    "specifier": "==2.9.0.post0",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "pytz": {
+            "name": "pytz",
+            "version": "2025.2",
+            "requirements": [
+                {
+                    "raw": "pytz==2025.2",
+                    "extras": [],
+                    "marker": null,
+                    "name": "pytz",
+                    "specifier": "==2025.2",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "radon": {
             "name": "radon",
             "version": "6.0.1",
@@ -1111,6 +1456,36 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "scikit-learn": {
+            "name": "scikit-learn",
+            "version": "1.7.0",
+            "requirements": [
+                {
+                    "raw": "scikit-learn==1.7.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "scikit-learn",
+                    "specifier": "==1.7.0",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "scipy": {
+            "name": "scipy",
+            "version": "1.16.0",
+            "requirements": [
+                {
+                    "raw": "scipy==1.16.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "scipy",
+                    "specifier": "==1.16.0",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "setuptools": {
             "name": "setuptools",
             "version": "80.9.0",
@@ -1156,6 +1531,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "smmap": {
+            "name": "smmap",
+            "version": "5.0.2",
+            "requirements": [
+                {
+                    "raw": "smmap==5.0.2",
+                    "extras": [],
+                    "marker": null,
+                    "name": "smmap",
+                    "specifier": "==5.0.2",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "sniffio": {
             "name": "sniffio",
             "version": "1.3.1",
@@ -1186,6 +1576,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "starlette": {
+            "name": "starlette",
+            "version": "0.47.1",
+            "requirements": [
+                {
+                    "raw": "starlette==0.47.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "starlette",
+                    "specifier": "==0.47.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "stevedore": {
             "name": "stevedore",
             "version": "5.4.1",
@@ -1211,6 +1616,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "tenacity",
                     "specifier": "==9.1.2",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "threadpoolctl": {
+            "name": "threadpoolctl",
+            "version": "3.6.0",
+            "requirements": [
+                {
+                    "raw": "threadpoolctl==3.6.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "threadpoolctl",
+                    "specifier": "==3.6.0",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -1276,6 +1696,36 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "types-pytz": {
+            "name": "types-pytz",
+            "version": "2025.2.0.20250516",
+            "requirements": [
+                {
+                    "raw": "types-pytz==2025.2.0.20250516",
+                    "extras": [],
+                    "marker": null,
+                    "name": "types-pytz",
+                    "specifier": "==2025.2.0.20250516",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "types-requests": {
+            "name": "types-requests",
+            "version": "2.32.4.20250611",
+            "requirements": [
+                {
+                    "raw": "types-requests==2.32.4.20250611",
+                    "extras": [],
+                    "marker": null,
+                    "name": "types-requests",
+                    "specifier": "==2.32.4.20250611",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "typing-extensions": {
             "name": "typing-extensions",
             "version": "4.14.1",
@@ -1286,6 +1736,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "typing-extensions",
                     "specifier": "==4.14.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "tzdata": {
+            "name": "tzdata",
+            "version": "2025.2",
+            "requirements": [
+                {
+                    "raw": "tzdata==2025.2",
+                    "extras": [],
+                    "marker": null,
+                    "name": "tzdata",
+                    "specifier": "==2025.2",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
@@ -1306,6 +1771,21 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                 }
             ]
         },
+        "uvicorn": {
+            "name": "uvicorn",
+            "version": "0.35.0",
+            "requirements": [
+                {
+                    "raw": "uvicorn==0.35.0",
+                    "extras": [],
+                    "marker": null,
+                    "name": "uvicorn",
+                    "specifier": "==0.35.0",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
         "vulture": {
             "name": "vulture",
             "version": "2.14",
@@ -1316,6 +1796,36 @@ We highly encourage switching to the new `scan` command which is easier to use, 
                     "marker": null,
                     "name": "vulture",
                     "specifier": "==2.14",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "websockets": {
+            "name": "websockets",
+            "version": "15.0.1",
+            "requirements": [
+                {
+                    "raw": "websockets==15.0.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "websockets",
+                    "specifier": "==15.0.1",
+                    "url": null,
+                    "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
+                }
+            ]
+        },
+        "yarl": {
+            "name": "yarl",
+            "version": "1.20.1",
+            "requirements": [
+                {
+                    "raw": "yarl==1.20.1",
+                    "extras": [],
+                    "marker": null,
+                    "name": "yarl",
+                    "specifier": "==1.20.1",
                     "url": null,
                     "found": "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages"
                 }
