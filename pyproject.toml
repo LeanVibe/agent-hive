@@ -14,6 +14,9 @@ dependencies = [
     "psutil>=7.0.0",
     "pyyaml>=6.0.2",
     "numpy>=2.3.1",
+    "pandas-stubs>=2.3.0.250703",
+    "types-requests>=2.32.4.20250611",
+    "scikit-learn>=1.7.0",
 ]
 
 [project.optional-dependencies]
@@ -32,3 +35,27 @@ dev = [
     "pytest-asyncio>=1.0.0",
     "ruff>=0.12.3",
 ]
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "sklearn.*",
+    "pandas.*",
+    "numpy.*",
+]
+ignore_missing_imports = true

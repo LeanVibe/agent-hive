@@ -282,7 +282,7 @@ class PredictiveAnalytics:
                     y = self._calculate_performance_score(training_data)
                 else:
                     # Direct metric prediction
-                    y = training_data[model_name].values
+                    y = np.array(training_data[model_name].values)
                 
                 # Prepare features
                 X = self._prepare_feature_matrix(training_data, model_name)

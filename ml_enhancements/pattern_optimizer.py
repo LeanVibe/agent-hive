@@ -11,7 +11,7 @@ import logging
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Union
 
 import numpy as np
 import pandas as pd
@@ -42,8 +42,8 @@ class PatternOptimizer:
         self.config = config or MLConfig()
         self.db_path = db_path or "pattern_optimizer.db"
         self.scaler = StandardScaler()
-        self.cluster_model = None
-        self.performance_model = None
+        self.cluster_model: Optional[KMeans] = None
+        self.performance_model: Optional[RandomForestRegressor] = None
         self.model_version = "1.0.0"
         
         # Initialize database
@@ -434,8 +434,7 @@ class PatternOptimizer:
             try:
                 self.cluster_model = KMeans(n_clusters=min(5, len(training_data) // 10), random_state=42)
                 X_scaled = self.scaler.fit_transform(X)
-                if self.cluster_model is not None:
-                    self.cluster_model.fit(X_scaled)
+                self.cluster_model.fit(X_scaled)
             except (ValueError, MemoryError) as e:
                 logger.error(f"Clustering model training failed: {e}")
                 return {'error': 'clustering_failed', 'details': str(e)}
@@ -447,20 +446,16 @@ class PatternOptimizer:
                     max_depth=10,
                     random_state=42
                 )
-                if self.performance_model is not None:
-                    self.performance_model.fit(X, y)
+                self.performance_model.fit(X, y)
             except (ValueError, MemoryError) as e:
                 logger.error(f"Performance model training failed: {e}")
                 return {'error': 'performance_model_failed', 'details': str(e)}
             
             # Calculate model performance
             try:
-                if self.performance_model is not None:
-                    y_pred = self.performance_model.predict(X)
-                    mse = mean_squared_error(y, y_pred)
-                    r2 = r2_score(y, y_pred)
-                else:
-                    mse, r2 = float('inf'), 0.0
+                y_pred = self.performance_model.predict(X)
+                mse = mean_squared_error(y, y_pred)
+                r2 = r2_score(y, y_pred)
             except Exception as e:
                 logger.error(f"Model evaluation failed: {e}")
                 mse, r2 = float('inf'), 0.0
@@ -556,12 +551,12 @@ class PatternOptimizer:
         
         # Distance to nearest cluster center
         distances = self.cluster_model.transform(feature_scaled)[0]
-        min_distance = min(distances)
+        min_distance = float(min(distances))
         
         # Convert distance to confidence (lower distance = higher confidence)
         confidence = max(0.1, 1.0 - min_distance / 10.0)
         
-        return min(confidence, 0.95)
+        return float(min(confidence, 0.95))
     
     def get_pattern_statistics(self) -> Dict[str, Any]:
         """Get statistics about stored patterns and performance."""
