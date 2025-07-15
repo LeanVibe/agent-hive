@@ -239,10 +239,26 @@ class TmuxAgentManager:
                 except ImportError:
                     pass  # Continue without logging if dashboard not available
                 
-                # Send prompt directly with automatic Enter - more reliable than buffer
+                # Use buffer method for reliable prompt sending
+                # Set prompt in buffer
+                self._tmux_command(["set-buffer", starting_prompt])
+                
+                # Clear any existing input
                 self._tmux_command([
-                    "send-keys", "-t", f"{self.session_name}:{window_name}", 
-                    starting_prompt, "Enter"
+                    "send-keys", "-t", f"{self.session_name}:{window_name}", "C-c"
+                ])
+                
+                time.sleep(0.3)  # Brief pause
+                
+                # Paste buffer content
+                self._tmux_command([
+                    "paste-buffer", "-t", f"{self.session_name}:{window_name}"
+                ])
+                
+                # Send Enter to submit
+                time.sleep(0.2)
+                self._tmux_command([
+                    "send-keys", "-t", f"{self.session_name}:{window_name}", "Enter"
                 ])
         
         print(f"✅ Spawned agent '{agent_name}' in window '{window_name}'")

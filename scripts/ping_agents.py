@@ -46,13 +46,43 @@ START WORKING NOW! Do not wait for further instructions. Begin with your next ta
     except ImportError:
         pass  # Continue without logging if dashboard not available
     
-    # Send message to agent - simplified approach to avoid manual Enter issues
+    # Send message to agent using improved buffer method for reliability
     try:
+        # Method 1: Use tmux buffer for reliable message handling
+        # Set the message in tmux buffer
+        result = subprocess.run([
+            "tmux", "set-buffer", resume_message
+        ], capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            print(f"❌ Failed to set buffer for {agent_name}: {result.stderr}")
+            return
+        
+        # Clear any existing input first
         subprocess.run([
-            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", resume_message, "Enter"
-        ], check=True)
+            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", "C-c"
+        ], capture_output=True)
+        
+        time.sleep(0.3)  # Brief pause to ensure clear
+        
+        # Paste the buffer content
+        result = subprocess.run([
+            "tmux", "paste-buffer", "-t", f"agent-hive:{window_name}"
+        ], capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            print(f"❌ Failed to paste buffer for {agent_name}: {result.stderr}")
+            return
+        
+        # Auto-submit with Enter
+        time.sleep(0.2)  # Brief pause before Enter
+        subprocess.run([
+            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", "Enter"
+        ], capture_output=True)
+        
         print(f"✅ Message sent to {agent_name}")
-    except subprocess.CalledProcessError as e:
+        
+    except Exception as e:
         print(f"❌ Failed to send message to {agent_name}: {e}")
 
 def main():
