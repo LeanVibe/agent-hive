@@ -30,6 +30,8 @@ from .multi_agent_coordinator import MultiAgentCoordinator
 from .workflow_coordinator import WorkflowCoordinator
 from .performance_monitor import PerformanceMonitor, PerformanceMetric, PerformanceMetricType
 from .analytics_dashboard import AnalyticsDashboard, DashboardView
+from .continuous_improvement import ContinuousImprovementEngine
+from .feedback_loops import RealTimeFeedbackEngine
 
 
 class EnhancedCoordinationProtocol:
@@ -61,6 +63,16 @@ class EnhancedCoordinationProtocol:
         # Performance monitoring and analytics
         self.performance_monitor = PerformanceMonitor()
         self.analytics_dashboard = AnalyticsDashboard(self.performance_monitor)
+        
+        # Continuous improvement and feedback systems
+        self.continuous_improvement = ContinuousImprovementEngine(
+            self.performance_monitor, 
+            self.analytics_dashboard
+        )
+        self.feedback_engine = RealTimeFeedbackEngine(
+            self.performance_monitor,
+            self.continuous_improvement
+        )
         
         # Enhanced coordination state
         self.coordination_history: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
@@ -97,6 +109,10 @@ class EnhancedCoordinationProtocol:
         # Start performance monitoring
         self.performance_monitor.start_monitoring()
         
+        # Start continuous improvement and feedback systems
+        self.continuous_improvement.start()
+        await self.feedback_engine.start()
+        
         # Start enhanced monitoring tasks
         asyncio.create_task(self._enhanced_coordination_monitor())
         asyncio.create_task(self._intelligent_routing_optimizer())
@@ -111,6 +127,10 @@ class EnhancedCoordinationProtocol:
         
         # Stop performance monitoring
         self.performance_monitor.stop_monitoring()
+        
+        # Stop continuous improvement and feedback systems
+        self.continuous_improvement.stop()
+        await self.feedback_engine.stop()
         
         await self.workflow_coordinator.stop()
         await self.multi_agent_coordinator.stop()
@@ -151,6 +171,15 @@ class EnhancedCoordinationProtocol:
                 "workflow_id": workflow_def.workflow_id,
                 "task_count": len(workflow_def.tasks),
                 "parallel_execution": workflow_def.parallel_execution
+            })
+            
+            # Record coordination event for improvement engine
+            self.continuous_improvement.record_coordination_event({
+                "event_type": "workflow_started",
+                "workflow_id": workflow_def.workflow_id,
+                "task_count": len(workflow_def.tasks),
+                "parallel_execution": workflow_def.parallel_execution,
+                "agents_involved": len(workflow_def.agent_assignments) if hasattr(workflow_def, 'agent_assignments') else 0
             })
             
             return workflow_state
