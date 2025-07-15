@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from .github_client import GitHubClient, GitHubConfig, GitHubEventType
+from .slack_client import SlackClient, SlackConfig, SlackEventType
 from .api_gateway import ApiGateway
 from .service_discovery import ServiceDiscovery
 from ..advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
@@ -33,8 +34,7 @@ class IntegrationStatus(Enum):
 class IntegrationConfig:
     """Configuration for external integrations."""
     github: Optional[GitHubConfig] = None
-    slack_webhook_url: Optional[str] = None
-    slack_token: Optional[str] = None
+    slack: Optional[SlackConfig] = None
     notification_channels: Optional[List[str]] = None
     auto_sync_interval: int = 300  # 5 minutes
     health_check_interval: int = 60  # 1 minute
@@ -81,7 +81,7 @@ class IntegrationManager:
         
         # Integration clients
         self.github_client: Optional[GitHubClient] = None
-        self.slack_client: Optional[Any] = None  # To be implemented
+        self.slack_client: Optional[SlackClient] = None
         
         # Integration health tracking
         self.integration_health: Dict[str, IntegrationHealth] = {}
@@ -193,18 +193,39 @@ class IntegrationManager:
                     error_message=str(e)
                 )
         
-        # Initialize Slack integration (placeholder)
-        if self.config.slack_token or self.config.slack_webhook_url:
+        # Initialize Slack integration
+        if self.config.slack:
             try:
-                # TODO: Implement Slack client
-                self.integration_health["slack"] = IntegrationHealth(
-                    name="slack",
-                    status=IntegrationStatus.INITIALIZING,
-                    last_check=datetime.now()
+                self.slack_client = SlackClient(self.config.slack)
+                await self.slack_client.connect()
+                
+                # Register event handlers
+                self.slack_client.register_event_handler(
+                    SlackEventType.MESSAGE, self._handle_slack_message
+                )
+                self.slack_client.register_event_handler(
+                    SlackEventType.APP_MENTION, self._handle_slack_mention
                 )
                 
-                logger.info("Slack integration placeholder initialized")
+                # Test connection
+                connection_test = await self.slack_client.test_connection()
                 
+                if connection_test["status"] == "connected":
+                    self.integration_health["slack"] = IntegrationHealth(
+                        name="slack",
+                        status=IntegrationStatus.CONNECTED,
+                        last_check=datetime.now(),
+                        success_rate=1.0
+                    )
+                    logger.info("Slack integration initialized successfully")
+                else:
+                    self.integration_health["slack"] = IntegrationHealth(
+                        name="slack",
+                        status=IntegrationStatus.ERROR,
+                        last_check=datetime.now(),
+                        error_message=connection_test.get("error")
+                    )
+                    
             except Exception as e:
                 logger.error(f"Failed to initialize Slack integration: {e}")
                 self.integration_health["slack"] = IntegrationHealth(
@@ -219,6 +240,10 @@ class IntegrationManager:
         if self.github_client:
             await self.github_client.disconnect()
             self.github_client = None
+        
+        if self.slack_client:
+            await self.slack_client.disconnect()
+            self.slack_client = None
         
         # Update health status
         for integration_name in self.integration_health:
@@ -461,6 +486,77 @@ class IntegrationManager:
             logger.error(f"Error handling GitHub issue event: {e}")
             self.stats["integration_failures"] += 1
     
+    # Slack event handlers
+    
+    async def _handle_slack_message(self, event: Any) -> None:
+        """Handle Slack message events."""
+        try:
+            event_data = event.event_data
+            
+            # Skip bot messages
+            if event_data.get("bot_id"):
+                return
+            
+            logger.info(f"Slack message event: {event_data.get('text', '')[:50]}...")
+            
+            # Notify coordinator of Slack messages
+            if self.coordinator:
+                task_data = {
+                    "type": "slack_message",
+                    "channel": event_data.get("channel"),
+                    "user": event_data.get("user"),
+                    "text": event_data.get("text"),
+                    "timestamp": event_data.get("ts")
+                }
+                
+                await self.coordinator.distribute_task(task_data, priority=5)
+            
+            # Trigger custom event handlers
+            await self._trigger_event_handlers("slack_message", event)
+            
+            self.stats["slack_events"] += 1
+            self.stats["total_events_processed"] += 1
+            
+        except Exception as e:
+            logger.error(f"Error handling Slack message event: {e}")
+            self.stats["integration_failures"] += 1
+    
+    async def _handle_slack_mention(self, event: Any) -> None:
+        """Handle Slack app mention events."""
+        try:
+            event_data = event.event_data
+            
+            logger.info(f"Slack mention event: {event_data.get('text', '')[:50]}...")
+            
+            # Notify coordinator of mentions
+            if self.coordinator:
+                task_data = {
+                    "type": "slack_mention",
+                    "channel": event_data.get("channel"),
+                    "user": event_data.get("user"),
+                    "text": event_data.get("text"),
+                    "timestamp": event_data.get("ts")
+                }
+                
+                await self.coordinator.distribute_task(task_data, priority=1)
+            
+            # Auto-respond to mentions
+            if self.slack_client:
+                await self.slack_client.send_message(
+                    event_data.get("channel"),
+                    "👋 Hello! I'm the LeanVibe Agent Hive integration bot. How can I help you?"
+                )
+            
+            # Trigger custom event handlers
+            await self._trigger_event_handlers("slack_mention", event)
+            
+            self.stats["slack_events"] += 1
+            self.stats["total_events_processed"] += 1
+            
+        except Exception as e:
+            logger.error(f"Error handling Slack mention event: {e}")
+            self.stats["integration_failures"] += 1
+    
     async def _trigger_event_handlers(self, event_type: str, event_data: Any) -> None:
         """Trigger registered event handlers."""
         handlers = self.event_handlers.get(event_type, [])
@@ -490,21 +586,29 @@ class IntegrationManager:
         self.event_handlers[event_type].append(handler)
         logger.info(f"Registered event handler for {event_type}")
     
-    async def send_notification(self, message: str, channels: Optional[List[str]] = None) -> None:
+    async def send_notification(self, message: str, channels: Optional[List[str]] = None, 
+                              level: str = "info") -> None:
         """
         Send notification to configured channels.
         
         Args:
             message: Notification message
             channels: Target channels (defaults to configured channels)
+            level: Notification level (info, warning, error, success)
         """
         target_channels = channels or self.config.notification_channels or []
         
         for channel in target_channels:
             try:
                 if channel.startswith("slack:"):
-                    # TODO: Implement Slack notification
-                    logger.info(f"Would send Slack notification to {channel}: {message}")
+                    # Extract channel name
+                    slack_channel = channel[6:]  # Remove "slack:" prefix
+                    
+                    if self.slack_client:
+                        await self.slack_client.send_notification(message, slack_channel, level)
+                    else:
+                        logger.warning("Slack client not available for notification")
+                        
                 elif channel.startswith("email:"):
                     # TODO: Implement email notification
                     logger.info(f"Would send email notification to {channel}: {message}")
