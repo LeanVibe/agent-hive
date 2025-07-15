@@ -28,6 +28,8 @@ from .models import (
 )
 from .multi_agent_coordinator import MultiAgentCoordinator
 from .workflow_coordinator import WorkflowCoordinator
+from .performance_monitor import PerformanceMonitor, PerformanceMetric, PerformanceMetricType
+from .analytics_dashboard import AnalyticsDashboard, DashboardView
 
 
 class EnhancedCoordinationProtocol:
@@ -55,6 +57,10 @@ class EnhancedCoordinationProtocol:
         # Core coordinators
         self.multi_agent_coordinator = MultiAgentCoordinator(config)
         self.workflow_coordinator = WorkflowCoordinator(config)
+        
+        # Performance monitoring and analytics
+        self.performance_monitor = PerformanceMonitor()
+        self.analytics_dashboard = AnalyticsDashboard(self.performance_monitor)
         
         # Enhanced coordination state
         self.coordination_history: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
@@ -88,6 +94,9 @@ class EnhancedCoordinationProtocol:
         await self.multi_agent_coordinator.start()
         await self.workflow_coordinator.start()
         
+        # Start performance monitoring
+        self.performance_monitor.start_monitoring()
+        
         # Start enhanced monitoring tasks
         asyncio.create_task(self._enhanced_coordination_monitor())
         asyncio.create_task(self._intelligent_routing_optimizer())
@@ -99,6 +108,10 @@ class EnhancedCoordinationProtocol:
     async def stop(self) -> None:
         """Stop the enhanced coordination protocol."""
         self.running = False
+        
+        # Stop performance monitoring
+        self.performance_monitor.stop_monitoring()
+        
         await self.workflow_coordinator.stop()
         await self.multi_agent_coordinator.stop()
         self.logger.info("Enhanced coordination protocol stopped")

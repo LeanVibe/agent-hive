@@ -459,20 +459,41 @@ class EnhancedOrchestrationCLI:
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
         
-        metrics = await self.enhanced_coordination.monitor_real_time_coordination()
+        # Get enhanced metrics from performance monitor
+        real_time_metrics = self.enhanced_coordination.performance_monitor.get_real_time_metrics()
         
-        return {
-            "real_time_metrics": {
-                "workflow_completion_rate": metrics.workflow_completion_rate,
-                "parallel_efficiency": metrics.parallel_efficiency,
-                "task_distribution_balance": metrics.task_distribution_balance,
-                "quality_consistency": metrics.quality_consistency,
-                "dependency_resolution_time": metrics.dependency_resolution_time,
-                "coordination_overhead": metrics.coordination_overhead
-            },
-            "agent_utilization": metrics.agent_utilization,
-            "timestamp": datetime.now().isoformat()
-        }
+        # Get coordination metrics from enhanced coordination
+        try:
+            coordination_metrics = await self.enhanced_coordination.monitor_real_time_coordination()
+            
+            return {
+                "real_time_metrics": {
+                    "workflow_completion_rate": coordination_metrics.workflow_completion_rate,
+                    "parallel_efficiency": coordination_metrics.parallel_efficiency,
+                    "task_distribution_balance": coordination_metrics.task_distribution_balance,
+                    "quality_consistency": coordination_metrics.quality_consistency,
+                    "dependency_resolution_time": coordination_metrics.dependency_resolution_time,
+                    "coordination_overhead": coordination_metrics.coordination_overhead
+                },
+                "agent_utilization": coordination_metrics.agent_utilization,
+                "performance_metrics": real_time_metrics,
+                "timestamp": datetime.now().isoformat()
+            }
+        except Exception as e:
+            self.logger.warning(f"Error getting coordination metrics: {e}")
+            return {
+                "real_time_metrics": {
+                    "workflow_completion_rate": 1.0,
+                    "parallel_efficiency": 0.0,
+                    "task_distribution_balance": 0.0,
+                    "quality_consistency": 0.0,
+                    "dependency_resolution_time": 0.0,
+                    "coordination_overhead": 0.0
+                },
+                "agent_utilization": {},
+                "performance_metrics": real_time_metrics,
+                "timestamp": datetime.now().isoformat()
+            }
     
     async def get_intelligent_routing_analytics(self) -> Dict[str, Any]:
         """Get intelligent routing analytics."""
@@ -544,6 +565,125 @@ class EnhancedOrchestrationCLI:
         optimized_efficiency = len(optimized_groups) / sum(len(group) for group in optimized_groups)
         
         return (optimized_efficiency - original_efficiency) * 100
+    
+    async def get_analytics_dashboard(self, view_type: str = "overview", 
+                                    hours: int = 24) -> Dict[str, Any]:
+        """Get analytics dashboard data."""
+        if not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
+        
+        from .analytics_dashboard import DashboardView
+        
+        # Map string to enum
+        view_type_enum = {
+            "overview": DashboardView.OVERVIEW,
+            "real_time": DashboardView.REAL_TIME,
+            "agent_performance": DashboardView.AGENT_PERFORMANCE,
+            "workflow_analysis": DashboardView.WORKFLOW_ANALYSIS,
+            "system_health": DashboardView.SYSTEM_HEALTH,
+            "optimization": DashboardView.OPTIMIZATION,
+            "alerts": DashboardView.ALERTS,
+            "historical": DashboardView.HISTORICAL
+        }.get(view_type, DashboardView.OVERVIEW)
+        
+        # Define time range
+        end_time = datetime.now()
+        start_time = end_time - timedelta(hours=hours)
+        time_range = (start_time, end_time)
+        
+        # Get dashboard data
+        dashboard_data = await self.enhanced_coordination.analytics_dashboard.generate_dashboard_data(
+            view_type_enum, time_range
+        )
+        
+        # Export to dict format
+        return {
+            "view_type": dashboard_data.view_type.value,
+            "generated_at": dashboard_data.generated_at.isoformat(),
+            "time_range": [t.isoformat() for t in dashboard_data.time_range],
+            "metrics": [
+                {
+                    "name": m.name,
+                    "value": m.value,
+                    "unit": m.unit,
+                    "trend": m.trend,
+                    "status": m.status,
+                    "description": m.description,
+                    "chart_type": m.chart_type,
+                    "color": m.color,
+                    "target_value": m.target_value,
+                    "historical_data": m.historical_data
+                } for m in dashboard_data.metrics
+            ],
+            "alerts": [
+                {
+                    "id": a.id,
+                    "title": a.title,
+                    "severity": a.severity,
+                    "message": a.message,
+                    "timestamp": a.timestamp.isoformat(),
+                    "action_items": a.action_items,
+                    "auto_fix_available": a.auto_fix_available,
+                    "estimated_fix_time": a.estimated_fix_time
+                } for a in dashboard_data.alerts
+            ],
+            "insights": [
+                {
+                    "title": i.title,
+                    "description": i.description,
+                    "impact": i.impact,
+                    "effort": i.effort,
+                    "category": i.category,
+                    "action_items": i.action_items,
+                    "estimated_improvement": i.estimated_improvement
+                } for i in dashboard_data.insights
+            ],
+            "agent_status": dashboard_data.agent_status,
+            "workflow_status": dashboard_data.workflow_status,
+            "system_health": dashboard_data.system_health,
+            "performance_summary": dashboard_data.performance_summary
+        }
+    
+    async def get_performance_report(self, hours: int = 24) -> Dict[str, Any]:
+        """Get comprehensive performance report."""
+        if not self.enhanced_coordination:
+            raise RuntimeError("Enhanced orchestration system not initialized")
+        
+        # Define time range
+        end_time = datetime.now()
+        start_time = end_time - timedelta(hours=hours)
+        time_range = (start_time, end_time)
+        
+        # Generate performance report
+        report = self.enhanced_coordination.performance_monitor.generate_performance_report(time_range)
+        
+        return {
+            "report_id": report.report_id,
+            "generated_at": report.generated_at.isoformat(),
+            "time_period": [t.isoformat() for t in report.time_period],
+            "metrics_summary": {
+                metric_type.value: stats for metric_type, stats in report.metrics_summary.items()
+            },
+            "agent_performance": report.agent_performance,
+            "workflow_analysis": report.workflow_analysis,
+            "recommendations": report.recommendations,
+            "performance_trends": report.performance_trends,
+            "optimization_opportunities": report.optimization_opportunities,
+            "alerts_summary": [
+                {
+                    "id": a.alert_id,
+                    "metric_type": a.metric_type.value,
+                    "severity": a.severity,
+                    "current_value": a.current_value,
+                    "threshold_value": a.threshold_value,
+                    "agent_id": a.agent_id,
+                    "workflow_id": a.workflow_id,
+                    "timestamp": a.timestamp.isoformat(),
+                    "recommendation": a.recommendation,
+                    "auto_fix_available": a.auto_fix_available
+                } for a in report.alerts_summary
+            ]
+        }
 
 
 # Enhanced CLI Commands
