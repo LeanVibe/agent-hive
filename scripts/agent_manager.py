@@ -231,18 +231,18 @@ class TmuxAgentManager:
             time.sleep(3)  # Wait for Claude to initialize
             starting_prompt = self._get_starting_prompt(agent_name)
             if starting_prompt:
-                # Use tmux buffer for reliable prompt sending
-                # Write prompt to tmux buffer
+                # Log the prompt
+                try:
+                    sys.path.append(str(self.base_dir))
+                    from dashboard.prompt_logger import prompt_logger
+                    prompt_logger.log_prompt(agent_name, starting_prompt, "Starting prompt sent", True)
+                except ImportError:
+                    pass  # Continue without logging if dashboard not available
+                
+                # Send prompt directly with automatic Enter - more reliable than buffer
                 self._tmux_command([
-                    "set-buffer", starting_prompt
-                ])
-                # Paste buffer content
-                self._tmux_command([
-                    "paste-buffer", "-t", f"{self.session_name}:{window_name}"
-                ])
-                # Send Enter to submit
-                self._tmux_command([
-                    "send-keys", "-t", f"{self.session_name}:{window_name}", "Enter"
+                    "send-keys", "-t", f"{self.session_name}:{window_name}", 
+                    starting_prompt, "Enter"
                 ])
         
         print(f"✅ Spawned agent '{agent_name}' in window '{window_name}'")
