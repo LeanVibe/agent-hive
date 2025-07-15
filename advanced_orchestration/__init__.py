@@ -14,6 +14,9 @@ This package provides components for:
 from .multi_agent_coordinator import MultiAgentCoordinator
 from .resource_manager import ResourceManager
 from .scaling_manager import ScalingManager
+from .workflow_coordinator import WorkflowCoordinator
+from .cli_integration import OrchestrationCLI
+from .models import *
 
 # ML Enhancement imports
 try:
@@ -33,6 +36,8 @@ try:
         'MultiAgentCoordinator',
         'ResourceManager', 
         'ScalingManager',
+        'WorkflowCoordinator',
+        'OrchestrationCLI',
         # ML components
         'PatternOptimizer',
         'PredictiveAnalytics',
@@ -49,7 +54,9 @@ except ImportError:
     __all__ = [
         'MultiAgentCoordinator',
         'ResourceManager', 
-        'ScalingManager'
+        'ScalingManager',
+        'WorkflowCoordinator',
+        'OrchestrationCLI'
     ]
 
 __version__ = '2.2.0'  # Updated for ML enhancements
