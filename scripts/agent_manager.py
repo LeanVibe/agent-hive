@@ -170,12 +170,21 @@ class TmuxAgentManager:
         
         # Send starting prompt if requested
         if with_prompt:
-            time.sleep(2)  # Wait for Claude to initialize
+            time.sleep(3)  # Wait for Claude to initialize
             starting_prompt = self._get_starting_prompt(agent_name)
             if starting_prompt:
-                # Send the prompt
+                # Use tmux buffer for reliable prompt sending
+                # Write prompt to tmux buffer
                 self._tmux_command([
-                    "send-keys", "-t", f"{self.session_name}:{window_name}", starting_prompt, "Enter"
+                    "set-buffer", starting_prompt
+                ])
+                # Paste buffer content
+                self._tmux_command([
+                    "paste-buffer", "-t", f"{self.session_name}:{window_name}"
+                ])
+                # Send Enter to submit
+                self._tmux_command([
+                    "send-keys", "-t", f"{self.session_name}:{window_name}", "Enter"
                 ])
         
         print(f"✅ Spawned agent '{agent_name}' in window '{window_name}'")
