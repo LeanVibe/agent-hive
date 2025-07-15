@@ -19,6 +19,10 @@ from .models import (
     ApiRequest,
     ApiResponse
 )
+from ..advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from ..advanced_orchestration.models import LoadBalancingStrategy
+from .auth_middleware import AuthenticationMiddleware, AuthMethod, Permission
+from .rate_limiter import AdvancedRateLimiter, RateLimitStrategy
 
 
 logger = logging.getLogger(__name__)
@@ -32,20 +36,60 @@ class ApiGateway:
     and response formatting for the orchestration system.
     """
     
-    def __init__(self, config: ApiGatewayConfig):
+    def __init__(self, config: ApiGatewayConfig, coordinator: Optional[MultiAgentCoordinator] = None, 
+                 auth_config: Optional[Dict[str, Any]] = None, rate_limit_config: Optional[Dict[str, Any]] = None):
         """
         Initialize API gateway.
         
         Args:
             config: API gateway configuration
+            coordinator: Optional multi-agent coordinator for load balancing
+            auth_config: Optional authentication configuration
+            rate_limit_config: Optional rate limiter configuration
         """
         self.config = config
+        self.coordinator = coordinator
         self.routes: Dict[str, Dict[str, Callable]] = {}  # {path: {method: handler}}
+        self.versioned_routes: Dict[str, Dict[str, Dict[str, Callable]]] = {}  # {version: {path: {method: handler}}}
+        self.service_routes: Dict[str, List[str]] = {}  # {service_name: [agent_ids]}
         self.middleware: List[Callable] = []
-        self.rate_limiter: Dict[str, List[float]] = {}
+        self.rate_limiter: Dict[str, List[float]] = {}  # Legacy rate limiter (kept for compatibility)
         self.api_keys: Dict[str, Dict[str, Any]] = {}
         self.server_started = False
         self._request_count = 0
+        self.supported_versions = ["v1", "v2"]  # Default supported versions
+        
+        # Initialize authentication middleware
+        if auth_config:
+            self.auth_middleware = AuthenticationMiddleware(auth_config)
+        else:
+            # Default auth config
+            default_auth_config = {
+                "enabled_methods": [AuthMethod.API_KEY],
+                "max_auth_attempts": 5,
+                "auth_window_minutes": 15
+            }
+            self.auth_middleware = AuthenticationMiddleware(default_auth_config)
+        
+        # Initialize advanced rate limiter
+        if rate_limit_config:
+            self.advanced_rate_limiter = AdvancedRateLimiter(rate_limit_config)
+        else:
+            # Default rate limiter config
+            default_rate_config = {
+                "strategy": "token_bucket",
+                "default_limit": 1000,
+                "window_size": 3600,
+                "enable_adaptive": True
+            }
+            self.advanced_rate_limiter = AdvancedRateLimiter(default_rate_config)
+        
+        # Load balancing for service routing
+        self.service_load_balancer = {
+            'round_robin_counters': {},
+            'health_cache': {},
+            'last_health_check': {}
+        }
         
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
     
@@ -81,23 +125,35 @@ class ApiGateway:
             logger.error(f"Error stopping API gateway: {e}")
             raise
     
-    def register_route(self, path: str, method: str, handler: Callable) -> None:
+    def register_route(self, path: str, method: str, handler: Callable, version: Optional[str] = None) -> None:
         """
-        Register a route handler.
+        Register a route handler with optional versioning.
         
         Args:
             path: API endpoint path
             method: HTTP method (GET, POST, PUT, DELETE, PATCH)
             handler: Async function to handle the request
+            version: API version (e.g., "v1", "v2")
         """
         if not asyncio.iscoroutinefunction(handler):
             raise ValueError("Handler must be an async function")
+        
+        if version:
+            # Register versioned route
+            if version not in self.versioned_routes:
+                self.versioned_routes[version] = {}
+            if path not in self.versioned_routes[version]:
+                self.versioned_routes[version][path] = {}
             
-        if path not in self.routes:
-            self.routes[path] = {}
-            
-        self.routes[path][method.upper()] = handler
-        logger.info(f"Registered route: {method.upper()} {path}")
+            self.versioned_routes[version][path][method.upper()] = handler
+            logger.info(f"Registered versioned route: {method.upper()} {path} ({version})")
+        else:
+            # Register unversioned route
+            if path not in self.routes:
+                self.routes[path] = {}
+                
+            self.routes[path][method.upper()] = handler
+            logger.info(f"Registered route: {method.upper()} {path}")
     
     def unregister_route(self, path: str, method: str) -> bool:
         """
@@ -131,6 +187,111 @@ class ApiGateway:
         self.middleware.append(middleware)
         logger.info(f"Added middleware: {middleware.__name__}")
     
+    def register_service(self, service_name: str, agent_ids: List[str]) -> None:
+        """
+        Register a service with associated agent IDs for load balancing.
+        
+        Args:
+            service_name: Name of the service
+            agent_ids: List of agent IDs that can handle this service
+        """
+        self.service_routes[service_name] = agent_ids
+        self.service_load_balancer['round_robin_counters'][service_name] = 0
+        self.service_load_balancer['health_cache'][service_name] = {}
+        self.service_load_balancer['last_health_check'][service_name] = time.time()
+        logger.info(f"Registered service {service_name} with {len(agent_ids)} agents")
+    
+    def unregister_service(self, service_name: str) -> bool:
+        """
+        Unregister a service.
+        
+        Args:
+            service_name: Name of the service to unregister
+            
+        Returns:
+            True if service was removed, False if not found
+        """
+        if service_name in self.service_routes:
+            del self.service_routes[service_name]
+            self.service_load_balancer['round_robin_counters'].pop(service_name, None)
+            self.service_load_balancer['health_cache'].pop(service_name, None)
+            self.service_load_balancer['last_health_check'].pop(service_name, None)
+            logger.info(f"Unregistered service: {service_name}")
+            return True
+        return False
+    
+    async def select_agent_for_service(self, service_name: str, strategy: str = "round_robin") -> Optional[str]:
+        """
+        Select an agent for a service based on load balancing strategy.
+        
+        Args:
+            service_name: Name of the service
+            strategy: Load balancing strategy (round_robin, least_connections, health_based)
+            
+        Returns:
+            Selected agent ID or None if no available agents
+        """
+        if service_name not in self.service_routes:
+            return None
+        
+        agent_ids = self.service_routes[service_name]
+        if not agent_ids:
+            return None
+        
+        # If coordinator is available, use its load balancing
+        if self.coordinator:
+            return await self._select_agent_with_coordinator(agent_ids, strategy)
+        
+        # Fallback to simple round-robin
+        return self._select_agent_round_robin(service_name, agent_ids)
+    
+    async def _select_agent_with_coordinator(self, agent_ids: List[str], strategy: str) -> Optional[str]:
+        """
+        Select agent using the multi-agent coordinator.
+        
+        Args:
+            agent_ids: Available agent IDs
+            strategy: Load balancing strategy
+            
+        Returns:
+            Selected agent ID or None
+        """
+        # Get healthy agents from coordinator
+        healthy_agents = []
+        for agent_id in agent_ids:
+            agent_info = await self.coordinator.get_agent_status(agent_id)
+            if agent_info and agent_info.status.value == "healthy":
+                healthy_agents.append(agent_id)
+        
+        if not healthy_agents:
+            return None
+        
+        if strategy == "least_connections":
+            # Select agent with least active tasks
+            return min(healthy_agents, key=lambda a: self.coordinator.agents[a].active_tasks)
+        elif strategy == "resource_based":
+            # Use coordinator's resource-based selection
+            return await self.coordinator._select_resource_based(healthy_agents)
+        else:
+            # Default to round-robin
+            return healthy_agents[0]
+    
+    def _select_agent_round_robin(self, service_name: str, agent_ids: List[str]) -> str:
+        """
+        Select agent using round-robin strategy.
+        
+        Args:
+            service_name: Name of the service
+            agent_ids: Available agent IDs
+            
+        Returns:
+            Selected agent ID
+        """
+        counter = self.service_load_balancer['round_robin_counters'][service_name]
+        selected_agent = agent_ids[counter % len(agent_ids)]
+        self.service_load_balancer['round_robin_counters'][service_name] = counter + 1
+        return selected_agent
+    
     def register_api_key(self, api_key: str, metadata: Dict[str, Any]) -> None:
         """
         Register an API key with associated metadata.
@@ -162,24 +323,43 @@ class ApiGateway:
         try:
             # Authentication check
             if self.config.auth_required:
-                auth_result = await self._authenticate_request(request)
-                if not auth_result["success"]:
+                auth_result = await self.auth_middleware.authenticate_request(request)
+                if not auth_result.success:
                     return self._create_error_response(
                         request.request_id,
                         401,
-                        auth_result["message"],
+                        auth_result.error or "Authentication failed",
                         start_time
                     )
+                
+                # Store auth context for downstream use
+                request.auth_context = {
+                    "user_id": auth_result.user_id,
+                    "permissions": auth_result.permissions,
+                    "metadata": auth_result.metadata
+                }
             
             # Rate limiting check
-            rate_limit_result = await self._check_rate_limit(request)
-            if not rate_limit_result["success"]:
-                return self._create_error_response(
+            rate_limit_result = await self.advanced_rate_limiter.check_rate_limit(request)
+            if not rate_limit_result.allowed:
+                response = self._create_error_response(
                     request.request_id,
                     429,
-                    rate_limit_result["message"],
+                    rate_limit_result.error_message or "Rate limit exceeded",
                     start_time
                 )
+                
+                # Add rate limit headers
+                response.headers.update({
+                    "X-RateLimit-Remaining": str(rate_limit_result.remaining),
+                    "X-RateLimit-Reset": str(int(rate_limit_result.reset_time)),
+                    "X-RateLimit-Throttle-Level": rate_limit_result.throttle_level.value
+                })
+                
+                if rate_limit_result.retry_after:
+                    response.headers["Retry-After"] = str(int(rate_limit_result.retry_after))
+                
+                return response
             
             # CORS handling
             if self.config.enable_cors and request.method == "OPTIONS":
@@ -327,7 +507,7 @@ class ApiGateway:
     
     def _find_handler(self, path: str, method: str) -> Optional[Callable]:
         """
-        Find handler for the given path and method.
+        Find handler for the given path and method with version support.
         
         Args:
             path: Request path
@@ -340,7 +520,49 @@ class ApiGateway:
         if path.startswith(self.config.api_prefix):
             path = path[len(self.config.api_prefix):]
         
+        # Check for versioned routes first
+        version = self._extract_version_from_path(path)
+        if version:
+            versioned_path = self._remove_version_from_path(path, version)
+            if version in self.versioned_routes:
+                handler = self.versioned_routes[version].get(versioned_path, {}).get(method.upper())
+                if handler:
+                    return handler
+        
+        # Fallback to unversioned routes
         return self.routes.get(path, {}).get(method.upper())
+    
+    def _extract_version_from_path(self, path: str) -> Optional[str]:
+        """
+        Extract API version from path.
+        
+        Args:
+            path: Request path
+            
+        Returns:
+            API version or None
+        """
+        path_parts = path.strip('/').split('/')
+        if path_parts and path_parts[0] in self.supported_versions:
+            return path_parts[0]
+        return None
+    
+    def _remove_version_from_path(self, path: str, version: str) -> str:
+        """
+        Remove version from path.
+        
+        Args:
+            path: Request path
+            version: API version to remove
+            
+        Returns:
+            Path without version
+        """
+        if path.startswith(f'/{version}/'):
+            return path[len(f'/{version}'):]
+        elif path.startswith(f'{version}/'):
+            return path[len(f'{version}'):]
+        return path
     
     def _get_response_headers(self) -> Dict[str, str]:
         """Get response headers including CORS if enabled."""
@@ -398,28 +620,107 @@ class ApiGateway:
             self.api_keys[api_key]["request_count"] += 1
     
     def get_gateway_info(self) -> Dict[str, Any]:
-        """Get API gateway information."""
+        """Get comprehensive API gateway information."""
         return {
             "server_status": "running" if self.server_started else "stopped",
             "registered_routes": {
                 path: list(methods.keys()) 
                 for path, methods in self.routes.items()
             },
+            "versioned_routes": {
+                version: {
+                    path: list(methods.keys())
+                    for path, methods in routes.items()
+                }
+                for version, routes in self.versioned_routes.items()
+            },
+            "services": {
+                service: len(agents)
+                for service, agents in self.service_routes.items()
+            },
             "middleware_count": len(self.middleware),
             "api_keys_count": len(self.api_keys),
             "total_requests": self._request_count,
+            "authentication": self.auth_middleware.get_auth_stats(),
+            "rate_limiting": self.advanced_rate_limiter.get_global_stats(),
+            "coordinator_connected": self.coordinator is not None,
+            "supported_versions": self.supported_versions,
             "config": asdict(self.config)
         }
     
     def get_route_statistics(self) -> Dict[str, Any]:
         """Get route usage statistics."""
-        # In a real implementation, this would track actual usage
+        # Count versioned routes
+        versioned_count = sum(
+            len(version_routes) for version_routes in self.versioned_routes.values()
+        )
+        
         return {
             "total_routes": len(self.routes),
+            "versioned_routes": versioned_count,
             "routes_by_method": {},
             "request_count": self._request_count,
             "average_response_time": "15ms"  # Placeholder
         }
+    
+    def get_api_documentation(self) -> Dict[str, Any]:
+        """
+        Generate API documentation.
+        
+        Returns:
+            API documentation structure
+        """
+        documentation = {
+            "title": "LeanVibe Agent Hive API",
+            "version": "1.0.0",
+            "description": "API Gateway for the LeanVibe Agent Hive orchestration system",
+            "base_url": f"http://{self.config.host}:{self.config.port}{self.config.api_prefix}",
+            "supported_versions": self.supported_versions,
+            "authentication": {
+                "type": "API Key",
+                "header": self.config.api_key_header,
+                "required": self.config.auth_required
+            },
+            "rate_limiting": {
+                "requests_per_window": self.config.rate_limit_requests,
+                "window_seconds": self.config.rate_limit_window
+            },
+            "endpoints": {
+                "unversioned": self._format_routes_for_docs(self.routes),
+                "versioned": {
+                    version: self._format_routes_for_docs(routes)
+                    for version, routes in self.versioned_routes.items()
+                }
+            },
+            "services": {
+                service: {
+                    "agent_count": len(agents),
+                    "load_balancing": "round_robin"
+                }
+                for service, agents in self.service_routes.items()
+            }
+        }
+        
+        return documentation
+    
+    def _format_routes_for_docs(self, routes: Dict[str, Dict[str, Callable]]) -> Dict[str, Any]:
+        """
+        Format routes for documentation.
+        
+        Args:
+            routes: Route dictionary
+            
+        Returns:
+            Formatted routes for documentation
+        """
+        formatted_routes = {}
+        for path, methods in routes.items():
+            formatted_routes[path] = {
+                "methods": list(methods.keys()),
+                "handler_names": [handler.__name__ for handler in methods.values()]
+            }
+        
+        return formatted_routes
     
     async def health_check(self) -> Dict[str, Any]:
         """
