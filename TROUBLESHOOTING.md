@@ -4,7 +4,12 @@
 
 **✅ Currently Troubleshootable**:
 - Python API imports and advanced_orchestration module
-- Testing infrastructure and test execution
+- Intelligence Framework with ML-based decision making
+- External API Integration (WebhookServer, ApiGateway, EventStreaming)
+- Enhanced ML Systems (PatternOptimizer, PredictiveAnalytics, AdaptiveLearning)
+- Task allocation and agent coordination protocols
+- Performance monitoring and optimization
+- Testing infrastructure and test execution (26 tests with 96% coverage)
 - UV/Python environment and dependency issues
 
 **❌ Not Yet Available**:
@@ -20,6 +25,9 @@ Comprehensive troubleshooting guide for LeanVibe Agent Hive - covering installat
 - [Installation Issues](#installation-issues)
 - [Configuration Problems](#configuration-problems)
 - [Phase 2 Multi-Agent Issues](#phase-2-multi-agent-issues)
+- [Intelligence Framework Issues](#intelligence-framework-issues)
+- [External API Integration Issues](#external-api-integration-issues)
+- [Enhanced ML Systems Issues](#enhanced-ml-systems-issues)
 - [Performance Problems](#performance-problems)
 - [Testing Issues](#testing-issues)
 - [Development Environment](#development-environment)
@@ -452,6 +460,381 @@ sm = ScalingManager()
 result = sm.scale_up('backend', count=1)
 print(f'Scaling result: {result.success}')
 "
+```
+
+## Intelligence Framework Issues
+
+### ML-based Decision Making Problems
+
+#### Issue: Confidence scoring inconsistencies
+```bash
+# Error message
+IntelligenceError: Confidence score calculation failed or returned invalid value
+```
+
+**Diagnostics**:
+```bash
+# Check intelligence framework status
+uv run python -c "
+from intelligence_framework import IntelligenceFramework
+from intelligence_framework.models import IntelligenceConfig
+config = IntelligenceConfig()
+framework = IntelligenceFramework(config)
+health = framework.health_check()
+print(f'Framework health: {health.status}')
+print(f'Confidence system: {health.confidence_system_active}')
+"
+
+# Test confidence scoring
+uv run pytest tests/test_intelligence_framework.py::test_confidence_scoring -v
+```
+
+**Solutions**:
+```bash
+# Reset confidence system
+uv run python -c "
+from intelligence_framework import IntelligenceFramework
+framework = IntelligenceFramework()
+framework.reset_confidence_system()
+print('✅ Confidence system reset')
+"
+
+# Recalibrate confidence scoring
+export LEANVIBE_INTELLIGENCE_CONFIDENCE_THRESHOLD=0.75
+export LEANVIBE_INTELLIGENCE_LEARNING_RATE=0.01
+```
+
+#### Issue: Intelligent task allocation failures
+```bash
+# Error message
+TaskAllocationError: No suitable agent found for task based on intelligence analysis
+```
+
+**Diagnostics**:
+```bash
+# Check task allocation system
+uv run python -c "
+from intelligent_task_allocation import IntelligentTaskAllocator
+from intelligent_task_allocation.models import TaskAllocationConfig
+config = TaskAllocationConfig()
+allocator = IntelligentTaskAllocator(config)
+status = allocator.get_system_status()
+print(f'Available agents: {status.available_agents}')
+print(f'Performance scores: {status.agent_performance_scores}')
+"
+
+# Test task allocation
+uv run pytest tests/test_intelligent_task_allocation.py::test_allocation_logic -v
+```
+
+**Solutions**:
+```bash
+# Refresh agent performance profiles
+uv run python -c "
+from intelligent_task_allocation import IntelligentTaskAllocator
+allocator = IntelligentTaskAllocator()
+allocator.refresh_agent_profiles()
+print('✅ Agent profiles refreshed')
+"
+
+# Adjust allocation parameters
+export LEANVIBE_TASK_ALLOCATION_MIN_CONFIDENCE=0.6
+export LEANVIBE_TASK_ALLOCATION_LEARNING_ENABLED=true
+```
+
+### Agent Coordination Protocol Issues
+
+#### Issue: Coordination session failures
+```bash
+# Error message
+CoordinationProtocolError: Failed to establish coordination session between agents
+```
+
+**Diagnostics**:
+```bash
+# Check coordination protocols
+uv run python -c "
+from agent_coordination_protocols import AgentCoordinationProtocols
+from agent_coordination_protocols.models import CoordinationConfig
+config = CoordinationConfig()
+protocols = AgentCoordinationProtocols(config)
+sessions = protocols.get_active_sessions()
+print(f'Active sessions: {len(sessions)}')
+for session in sessions:
+    print(f'  Session {session.id}: {session.participants} participants')
+"
+
+# Test coordination protocols
+uv run pytest tests/test_agent_coordination_protocols.py::test_session_management -v
+```
+
+**Solutions**:
+```bash
+# Reset coordination state
+uv run python -c "
+from agent_coordination_protocols import AgentCoordinationProtocols
+protocols = AgentCoordinationProtocols()
+protocols.reset_coordination_state()
+print('✅ Coordination state reset')
+"
+
+# Optimize coordination settings
+export LEANVIBE_COORDINATION_SESSION_TIMEOUT=300
+export LEANVIBE_COORDINATION_MAX_PARTICIPANTS=5
+```
+
+## External API Integration Issues
+
+### WebhookServer Problems
+
+#### Issue: Webhook event processing failures
+```bash
+# Error message
+WebhookError: Failed to process incoming webhook event
+```
+
+**Diagnostics**:
+```bash
+# Check webhook server status
+uv run python -c "
+from external_api import WebhookServer
+from external_api.models import WebhookConfig
+config = WebhookConfig()
+server = WebhookServer(config)
+status = server.get_status()
+print(f'Server status: {status.is_running}')
+print(f'Processed events: {status.processed_events}')
+print(f'Failed events: {status.failed_events}')
+"
+
+# Test webhook processing
+uv run pytest tests/test_webhook_server.py::test_event_processing -v
+```
+
+**Solutions**:
+```bash
+# Restart webhook server
+uv run python -c "
+from external_api import WebhookServer
+server = WebhookServer()
+server.stop()
+server.start()
+print('✅ Webhook server restarted')
+"
+
+# Adjust webhook settings
+export LEANVIBE_WEBHOOK_RATE_LIMIT=1000
+export LEANVIBE_WEBHOOK_TIMEOUT=30
+export LEANVIBE_WEBHOOK_MAX_PAYLOAD_SIZE=10485760
+```
+
+#### Issue: API Gateway authentication failures
+```bash
+# Error message
+ApiGatewayError: Authentication failed for API request
+```
+
+**Diagnostics**:
+```bash
+# Check API gateway status
+uv run python -c "
+from external_api import ApiGateway
+from external_api.models import ApiGatewayConfig
+config = ApiGatewayConfig()
+gateway = ApiGateway(config)
+status = gateway.get_status()
+print(f'Gateway status: {status.is_running}')
+print(f'Auth system: {status.auth_system_active}')
+print(f'Request count: {status.total_requests}')
+"
+
+# Test API gateway authentication
+uv run pytest tests/test_api_gateway.py::test_authentication -v
+```
+
+**Solutions**:
+```bash
+# Reset API gateway authentication
+uv run python -c "
+from external_api import ApiGateway
+gateway = ApiGateway()
+gateway.reset_auth_system()
+print('✅ API gateway auth system reset')
+"
+
+# Configure authentication settings
+export LEANVIBE_API_GATEWAY_AUTH_TYPE=jwt
+export LEANVIBE_API_GATEWAY_JWT_SECRET=your-secret-key
+export LEANVIBE_API_GATEWAY_TOKEN_EXPIRY=3600
+```
+
+### Event Streaming Issues
+
+#### Issue: Event streaming connection failures
+```bash
+# Error message
+EventStreamError: Failed to establish streaming connection
+```
+
+**Diagnostics**:
+```bash
+# Check event streaming status
+uv run python -c "
+from external_api import EventStreaming
+from external_api.models import EventStreamConfig
+config = EventStreamConfig()
+streaming = EventStreaming(config)
+status = streaming.get_status()
+print(f'Streaming status: {status.is_active}')
+print(f'Active connections: {status.active_connections}')
+print(f'Events processed: {status.events_processed}')
+"
+
+# Test event streaming
+uv run pytest tests/test_event_streaming.py::test_connection_management -v
+```
+
+**Solutions**:
+```bash
+# Restart event streaming
+uv run python -c "
+from external_api import EventStreaming
+streaming = EventStreaming()
+streaming.stop()
+streaming.start()
+print('✅ Event streaming restarted')
+"
+
+# Optimize streaming settings
+export LEANVIBE_EVENT_STREAMING_MAX_CONNECTIONS=100
+export LEANVIBE_EVENT_STREAMING_BUFFER_SIZE=1024
+export LEANVIBE_EVENT_STREAMING_COMPRESSION=true
+```
+
+## Enhanced ML Systems Issues
+
+### PatternOptimizer Problems
+
+#### Issue: Pattern recognition failures
+```bash
+# Error message
+PatternOptimizerError: Failed to identify optimization patterns
+```
+
+**Diagnostics**:
+```bash
+# Check pattern optimizer status
+uv run python -c "
+from ml_enhancements import PatternOptimizer
+from ml_enhancements.models import MLConfig
+config = MLConfig()
+optimizer = PatternOptimizer(config)
+status = optimizer.get_status()
+print(f'Optimizer status: {status.is_active}')
+print(f'Patterns learned: {status.patterns_learned}')
+print(f'Optimization score: {status.optimization_score}')
+"
+
+# Test pattern recognition
+uv run pytest tests/test_pattern_optimizer.py::test_pattern_recognition -v
+```
+
+**Solutions**:
+```bash
+# Reset pattern optimizer
+uv run python -c "
+from ml_enhancements import PatternOptimizer
+optimizer = PatternOptimizer()
+optimizer.reset_patterns()
+print('✅ Pattern optimizer reset')
+"
+
+# Adjust optimization parameters
+export LEANVIBE_ML_PATTERN_RECOGNITION_THRESHOLD=0.8
+export LEANVIBE_ML_LEARNING_RATE=0.005
+```
+
+### PredictiveAnalytics Issues
+
+#### Issue: Performance prediction inaccuracies
+```bash
+# Error message
+PredictiveAnalyticsError: Prediction accuracy below acceptable threshold
+```
+
+**Diagnostics**:
+```bash
+# Check predictive analytics status
+uv run python -c "
+from ml_enhancements import PredictiveAnalytics
+from ml_enhancements.models import MLConfig
+config = MLConfig()
+analytics = PredictiveAnalytics(config)
+status = analytics.get_status()
+print(f'Analytics status: {status.is_active}')
+print(f'Prediction accuracy: {status.prediction_accuracy}')
+print(f'Models trained: {status.models_trained}')
+"
+
+# Test predictive analytics
+uv run pytest tests/test_predictive_analytics.py::test_prediction_accuracy -v
+```
+
+**Solutions**:
+```bash
+# Retrain predictive models
+uv run python -c "
+from ml_enhancements import PredictiveAnalytics
+analytics = PredictiveAnalytics()
+analytics.retrain_models()
+print('✅ Predictive models retrained')
+"
+
+# Optimize prediction settings
+export LEANVIBE_ML_PREDICTION_WINDOW=3600
+export LEANVIBE_ML_MODEL_UPDATE_INTERVAL=86400
+```
+
+### AdaptiveLearning Problems
+
+#### Issue: Learning system adaptation failures
+```bash
+# Error message
+AdaptiveLearningError: Failed to adapt learning parameters
+```
+
+**Diagnostics**:
+```bash
+# Check adaptive learning status
+uv run python -c "
+from ml_enhancements import AdaptiveLearning
+from ml_enhancements.models import MLConfig
+config = MLConfig()
+learning = AdaptiveLearning(config)
+status = learning.get_status()
+print(f'Learning status: {status.is_active}')
+print(f'Adaptation rate: {status.adaptation_rate}')
+print(f'Learning efficiency: {status.learning_efficiency}')
+"
+
+# Test adaptive learning
+uv run pytest tests/test_adaptive_learning.py::test_adaptation_logic -v
+```
+
+**Solutions**:
+```bash
+# Reset adaptive learning system
+uv run python -c "
+from ml_enhancements import AdaptiveLearning
+learning = AdaptiveLearning()
+learning.reset_learning_state()
+print('✅ Adaptive learning system reset')
+"
+
+# Adjust learning parameters
+export LEANVIBE_ML_ADAPTIVE_LEARNING_RATE=0.01
+export LEANVIBE_ML_ADAPTATION_THRESHOLD=0.7
+export LEANVIBE_ML_LEARNING_MEMORY_SIZE=10000
 ```
 
 ## Performance Problems
