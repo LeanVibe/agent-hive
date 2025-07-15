@@ -122,7 +122,7 @@ class TmuxAgentManager:
             print(f"❌ Failed to create session: {result.stderr}")
             return False
     
-    def spawn_agent(self, agent_name: str, with_prompt: bool = True) -> bool:
+    def spawn_agent(self, agent_name: str, with_prompt: bool = True, force_recreate: bool = False) -> bool:
         """Spawn an agent in a new tmux window."""
         if agent_name not in self.agents:
             print(f"❌ Agent '{agent_name}' not found")
@@ -137,13 +137,21 @@ class TmuxAgentManager:
         
         # Check if window already exists
         if self._window_exists(window_name):
-            print(f"⚠️  Window '{window_name}' already exists")
-            choice = input("Kill existing window and recreate? (y/N): ")
-            if choice.lower() == 'y':
+            if force_recreate:
+                print(f"🔄 Force recreating window '{window_name}'")
                 self._tmux_command(["kill-window", "-t", f"{self.session_name}:{window_name}"])
             else:
-                print("Aborted")
-                return False
+                print(f"⚠️  Window '{window_name}' already exists")
+                try:
+                    choice = input("Kill existing window and recreate? (y/N): ")
+                    if choice.lower() == 'y':
+                        self._tmux_command(["kill-window", "-t", f"{self.session_name}:{window_name}"])
+                    else:
+                        print("Aborted")
+                        return False
+                except EOFError:
+                    print("Non-interactive mode - skipping existing window")
+                    return False
         
         # Create new window
         result = self._tmux_command([
@@ -178,7 +186,7 @@ class TmuxAgentManager:
         
         return True
     
-    def spawn_all_agents(self, with_prompt: bool = True) -> Dict[str, bool]:
+    def spawn_all_agents(self, with_prompt: bool = True, force_recreate: bool = False) -> Dict[str, bool]:
         """Spawn all discovered agents."""
         results = {}
         
@@ -186,7 +194,7 @@ class TmuxAgentManager:
         
         for agent_name in self.agents:
             print(f"\n🔄 Spawning {agent_name}...")
-            results[agent_name] = self.spawn_agent(agent_name, with_prompt)
+            results[agent_name] = self.spawn_agent(agent_name, with_prompt, force_recreate)
         
         return results
     
@@ -308,7 +316,7 @@ class TmuxAgentManager:
         
         self.kill_agent(agent_name)
         time.sleep(1)  # Brief pause
-        return self.spawn_agent(agent_name, with_prompt)
+        return self.spawn_agent(agent_name, with_prompt, force_recreate=True)
     
     def get_session_overview(self) -> Dict:
         """Get comprehensive session overview."""
@@ -366,6 +374,7 @@ def main():
     parser.add_argument("--create-session", action="store_true", help="Create tmux session")
     parser.add_argument("--attach-script", action="store_true", help="Create attach script")
     parser.add_argument("--no-prompt", action="store_true", help="Don't send starting prompt when spawning")
+    parser.add_argument("--force", action="store_true", help="Force recreate existing windows without prompting")
     parser.add_argument("--json", action="store_true", help="Output status in JSON format")
     
     args = parser.parse_args()
@@ -377,10 +386,10 @@ def main():
         manager.create_session()
     
     elif args.spawn:
-        manager.spawn_agent(args.spawn, with_prompt=with_prompt)
+        manager.spawn_agent(args.spawn, with_prompt=with_prompt, force_recreate=args.force)
     
     elif args.spawn_all:
-        results = manager.spawn_all_agents(with_prompt=with_prompt)
+        results = manager.spawn_all_agents(with_prompt=with_prompt, force_recreate=args.force)
         success_count = sum(1 for success in results.values() if success)
         print(f"\n📊 Results: {success_count}/{len(results)} agents spawned successfully")
     
