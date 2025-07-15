@@ -10,7 +10,8 @@ from pathlib import Path
 def ping_agent(agent_name: str, window_name: str):
     """Send resume message to specific agent"""
     
-    resume_message = f"""🚨 URGENT: RESUME WORK IMMEDIATELY
+    resume_message = f"""
+🚨 URGENT: RESUME WORK IMMEDIATELY
 
 Hello {agent_name}! You need to resume work immediately. Here are your instructions:
 
@@ -32,57 +33,20 @@ Hello {agent_name}! You need to resume work immediately. Here are your instructi
 
 6. **CURRENT STATUS**: Resume your work on your current task immediately
 
-START WORKING NOW! Do not wait for further instructions. Begin with your next task and maintain continuous progress."""
+START WORKING NOW! Do not wait for further instructions. Begin with your next task and maintain continuous progress.
+
+Type your response and press Enter to acknowledge and begin working.
+"""
     
     print(f"📡 Pinging {agent_name}...")
     
-    # Log the prompt
+    # Send message to agent
     try:
-        import sys
-        from pathlib import Path
-        sys.path.append(str(Path(__file__).parent.parent))
-        from dashboard.prompt_logger import prompt_logger
-        prompt_logger.log_prompt(agent_name, resume_message, "Resume work ping sent", True)
-    except ImportError:
-        pass  # Continue without logging if dashboard not available
-    
-    # Send message to agent using improved buffer method for reliability
-    try:
-        # Method 1: Use tmux buffer for reliable message handling
-        # Set the message in tmux buffer
-        result = subprocess.run([
-            "tmux", "set-buffer", resume_message
-        ], capture_output=True, text=True)
-        
-        if result.returncode != 0:
-            print(f"❌ Failed to set buffer for {agent_name}: {result.stderr}")
-            return
-        
-        # Clear any existing input first
         subprocess.run([
-            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", "C-c"
-        ], capture_output=True)
-        
-        time.sleep(0.3)  # Brief pause to ensure clear
-        
-        # Paste the buffer content
-        result = subprocess.run([
-            "tmux", "paste-buffer", "-t", f"agent-hive:{window_name}"
-        ], capture_output=True, text=True)
-        
-        if result.returncode != 0:
-            print(f"❌ Failed to paste buffer for {agent_name}: {result.stderr}")
-            return
-        
-        # Auto-submit with Enter
-        time.sleep(0.2)  # Brief pause before Enter
-        subprocess.run([
-            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", "Enter"
-        ], capture_output=True)
-        
+            "tmux", "send-keys", "-t", f"agent-hive:{window_name}", resume_message.strip(), "Enter"
+        ], check=True)
         print(f"✅ Message sent to {agent_name}")
-        
-    except Exception as e:
+    except subprocess.CalledProcessError as e:
         print(f"❌ Failed to send message to {agent_name}: {e}")
 
 def main():
