@@ -78,6 +78,7 @@ class AuthenticationMiddleware:
         self.jwt_tokens: Dict[str, Dict[str, Any]] = {}
         self.oauth_tokens: Dict[str, Dict[str, Any]] = {}
         self.signing_secrets: Dict[str, str] = {}
+        self.basic_auth_users: Dict[str, Dict[str, Any]] = {}
         
         # Rate limiting for auth attempts
         self.auth_attempts: Dict[str, List[float]] = {}
@@ -247,8 +248,45 @@ class AuthenticationMiddleware:
         if not auth_header.startswith("Basic "):
             return AuthResult(success=False, error="Basic auth credentials not provided")
         
-        # In production, implement proper basic auth validation
-        return AuthResult(success=False, error="Basic authentication not implemented")
+        try:
+            # Decode basic auth credentials
+            import base64
+            encoded_credentials = auth_header[6:]  # Remove "Basic " prefix
+            decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
+            
+            if ':' not in decoded_credentials:
+                return AuthResult(success=False, error="Invalid basic auth format")
+            
+            username, password = decoded_credentials.split(':', 1)
+            
+            # Check if user exists in basic auth users
+            if username not in self.basic_auth_users:
+                return AuthResult(success=False, error="Invalid username or password")
+            
+            user_data = self.basic_auth_users[username]
+            
+            # Verify password (in production, use proper password hashing)
+            if user_data.get("password") != password:
+                return AuthResult(success=False, error="Invalid username or password")
+            
+            # Check if account is active
+            if not user_data.get("active", True):
+                return AuthResult(success=False, error="Account is deactivated")
+            
+            # Update login statistics
+            user_data["last_login"] = datetime.now().isoformat()
+            user_data["login_count"] = user_data.get("login_count", 0) + 1
+            
+            return AuthResult(
+                success=True,
+                user_id=username,
+                permissions=user_data.get("permissions", []),
+                metadata={"basic_auth": True, "username": username}
+            )
+            
+        except Exception as e:
+            logger.error(f"Basic authentication failed: {e}")
+            return AuthResult(success=False, error="Invalid basic auth credentials")
     
     async def _authenticate_signature(self, request: ApiRequest) -> AuthResult:
         """Authenticate using request signature."""
@@ -372,6 +410,55 @@ class AuthenticationMiddleware:
         if api_key in self.api_keys:
             self.api_keys[api_key]["active"] = False
             logger.info(f"Revoked API key: {api_key}")
+            return True
+        return False
+    
+    def create_basic_auth_user(self, username: str, password: str, permissions: List[Permission],
+                              active: bool = True) -> bool:
+        """Create a basic auth user."""
+        # WARNING: In production, use proper password hashing (bcrypt, scrypt, etc.)
+        user_data = {
+            "password": password,  # In production: hash this!
+            "permissions": permissions,
+            "active": active,
+            "created_at": datetime.now().isoformat(),
+            "last_login": None,
+            "login_count": 0
+        }
+        
+        self.basic_auth_users[username] = user_data
+        logger.info(f"Created basic auth user: {username}")
+        
+        return True
+    
+    def update_basic_auth_user(self, username: str, password: Optional[str] = None,
+                              permissions: Optional[List[Permission]] = None,
+                              active: Optional[bool] = None) -> bool:
+        """Update a basic auth user."""
+        if username not in self.basic_auth_users:
+            return False
+        
+        user_data = self.basic_auth_users[username]
+        
+        if password is not None:
+            user_data["password"] = password  # In production: hash this!
+        
+        if permissions is not None:
+            user_data["permissions"] = permissions
+        
+        if active is not None:
+            user_data["active"] = active
+        
+        user_data["updated_at"] = datetime.now().isoformat()
+        
+        logger.info(f"Updated basic auth user: {username}")
+        return True
+    
+    def delete_basic_auth_user(self, username: str) -> bool:
+        """Delete a basic auth user."""
+        if username in self.basic_auth_users:
+            del self.basic_auth_users[username]
+            logger.info(f"Deleted basic auth user: {username}")
             return True
         return False
     
