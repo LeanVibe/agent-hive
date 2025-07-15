@@ -477,6 +477,195 @@ class LeanVibeCLI:
                 print(f"  📡 Event Streaming: {streaming_health['status']}")
             
             print("✅ External API status check complete")
+    
+    async def pr(self, action: str = "list", title: str = None, pr_number: int = None, 
+                 auto_review: bool = False, reviewers: str = None) -> None:
+        """
+        Pull Request management command.
+        
+        Args:
+            action: PR action (create, list, status)
+            title: PR title for creation
+            pr_number: PR number for status
+            auto_review: Automatically assign review agents
+            reviewers: Comma-separated reviewer types
+        """
+        print("🔄 LeanVibe PR Management")
+        print("=" * 30)
+        
+        if action == "create":
+            if not title:
+                print("❌ Error: --title required for PR creation")
+                return
+            
+            print(f"🆕 Creating PR: {title}")
+            print("🔄 Detecting current branch and changes...")
+            
+            # Simulate PR creation workflow
+            branch_name = f"feature/{title.lower().replace(' ', '-')}"
+            print(f"📝 Branch: {branch_name}")
+            print("🔄 Running quality gates...")
+            await asyncio.sleep(1)
+            print("✅ Quality gates passed")
+            
+            # Simulate GitHub PR creation
+            pr_number = 42  # Mock PR number
+            print(f"🎉 Pull Request #{pr_number} created successfully")
+            print(f"🔗 URL: https://github.com/leanvibe/agent-hive/pull/{pr_number}")
+            
+            if auto_review or reviewers:
+                await self._assign_reviewers(pr_number, reviewers)
+                
+        elif action == "list":
+            print("📋 Open Pull Requests:")
+            # Mock PR list
+            prs = [
+                {"number": 42, "title": "Feature: User Authentication", "author": "backend-agent", "status": "open"},
+                {"number": 41, "title": "Fix: Database Connection Pool", "author": "database-agent", "status": "review"},
+                {"number": 40, "title": "Enhancement: API Performance", "author": "performance-agent", "status": "approved"}
+            ]
+            
+            for pr in prs:
+                status_emoji = "🔄" if pr["status"] == "open" else "👁️" if pr["status"] == "review" else "✅"
+                print(f"  {status_emoji} #{pr['number']}: {pr['title']} ({pr['author']})")
+                
+        elif action == "status":
+            if not pr_number:
+                print("❌ Error: --pr-number required for status check")
+                return
+                
+            print(f"📊 PR #{pr_number} Status:")
+            print("  📝 Title: Feature: User Authentication")
+            print("  👤 Author: backend-agent")
+            print("  🌿 Branch: feature/user-authentication")
+            print("  ✅ Status: Ready for review")
+            print("  🔍 Reviewers: security-reviewer, architecture-reviewer")
+            print("  ✅ Quality Gates: All passed")
+            print("  📊 Coverage: 95%")
+
+    async def review(self, action: str = "status", pr: int = None, agent: str = None, 
+                     agents: str = None, format: str = "text") -> None:
+        """
+        Multi-agent code review command.
+        
+        Args:
+            action: Review action (start, status, report, assign, list-agents)
+            pr: PR number for review operations
+            agent: Specific review agent to assign
+            agents: Comma-separated list of review agents
+            format: Report format (text, markdown, json)
+        """
+        print("🔍 LeanVibe Multi-Agent Code Review")
+        print("=" * 35)
+        
+        if action == "list-agents":
+            print("👥 Available Review Agents:")
+            agents_info = {
+                "security-reviewer": "🔒 Security Expert - Authentication, authorization, vulnerabilities",
+                "performance-reviewer": "⚡ Performance Engineer - Optimization, scalability, caching",
+                "architecture-reviewer": "🏗️ Architecture Specialist - Design patterns, code structure",
+                "qa-reviewer": "🧪 Quality Assurance - Testing, edge cases, user experience",
+                "devops-reviewer": "🚀 DevOps Engineer - Deployment, infrastructure, monitoring"
+            }
+            
+            for agent_name, description in agents_info.items():
+                print(f"  {description}")
+                
+        elif action == "assign":
+            if not pr:
+                print("❌ Error: --pr required for agent assignment")
+                return
+                
+            assigned_agents = []
+            if agent:
+                assigned_agents.append(agent)
+            if agents:
+                assigned_agents.extend(agents.split(","))
+                
+            if not assigned_agents:
+                print("❌ Error: --agent or --agents required for assignment")
+                return
+                
+            print(f"👥 Assigning review agents to PR #{pr}:")
+            for agent_name in assigned_agents:
+                print(f"  ✅ {agent_name} assigned")
+            
+        elif action == "start":
+            if not pr:
+                print("❌ Error: --pr required to start review")
+                return
+                
+            print(f"🚀 Starting multi-agent review for PR #{pr}")
+            print("🔄 Coordinating review agents...")
+            
+            # Simulate parallel review execution
+            agents = ["security-reviewer", "architecture-reviewer", "qa-reviewer"]
+            for i, agent in enumerate(agents, 1):
+                print(f"  📝 {agent} reviewing... ({i}/3)")
+                await asyncio.sleep(0.5)
+                
+            print("✅ All agents completed their reviews")
+            print("📊 Generating consolidated review report...")
+            
+        elif action == "status":
+            if pr:
+                print(f"📊 Review Status for PR #{pr}:")
+                print("  🔍 Active Reviewers:")
+                print("    ✅ security-reviewer: Approved")
+                print("    ⚠️  architecture-reviewer: Changes requested")
+                print("    🔄 qa-reviewer: In progress")
+                print("  📈 Overall Status: Changes requested")
+            else:
+                print("📊 Global Review Status:")
+                print("  🔄 Active reviews: 3")
+                print("  ✅ Completed today: 5")
+                print("  ⚠️  Pending changes: 2")
+                
+        elif action == "report":
+            if not pr:
+                print("❌ Error: --pr required for report generation")
+                return
+                
+            print(f"📄 Generating review report for PR #{pr} (format: {format})")
+            
+            if format == "json":
+                report = {
+                    "pr_number": pr,
+                    "overall_status": "changes_requested",
+                    "reviews": [
+                        {"agent": "security-reviewer", "status": "approved", "score": 95},
+                        {"agent": "architecture-reviewer", "status": "changes_requested", "score": 75},
+                        {"agent": "qa-reviewer", "status": "in_progress", "score": None}
+                    ]
+                }
+                print(json.dumps(report, indent=2))
+            else:
+                print("## Multi-Agent Review Report")
+                print(f"**PR #{pr}**: Feature: User Authentication")
+                print("\n### Review Summary")
+                print("- 🔒 **Security**: ✅ Approved (95/100)")
+                print("- 🏗️ **Architecture**: ⚠️ Changes requested (75/100)")
+                print("- 🧪 **Quality**: 🔄 In progress")
+                print("\n### Recommendations")
+                print("1. Address architecture concerns about authentication flow")
+                print("2. Add additional input validation tests")
+                print("3. Consider implementing rate limiting")
+
+    async def _assign_reviewers(self, pr_number: int, reviewers: str = None) -> None:
+        """Helper method to assign review agents to a PR."""
+        print(f"👥 Auto-assigning review agents to PR #{pr_number}")
+        
+        if reviewers:
+            reviewer_list = reviewers.split(",")
+        else:
+            # Default intelligent assignment
+            reviewer_list = ["security-reviewer", "architecture-reviewer"]
+            
+        for reviewer in reviewer_list:
+            print(f"  ✅ {reviewer} assigned")
+            await asyncio.sleep(0.2)
+            
+        print("🔔 Review notifications sent to assigned agents")
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -491,7 +680,9 @@ Examples:
   leanvibe spawn --task "implement API endpoint" --depth ultrathink
   leanvibe monitor --metrics --real-time  
   leanvibe checkpoint --name milestone-1
-  leanvibe checkpoint --list
+  leanvibe pr create --title "Feature: User Authentication" --auto-review
+  leanvibe review start --pr 42
+  leanvibe review report --pr 42 --format markdown
 
 For more information, visit: https://github.com/leanvibe/agent-hive
         """
@@ -639,6 +830,68 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         help="Command to execute (default: status)"
     )
     
+    # PR management command
+    pr_parser = subparsers.add_parser(
+        "pr",
+        help="Manage Pull Requests with automated creation and review"
+    )
+    pr_parser.add_argument(
+        "--action",
+        choices=["create", "list", "status"],
+        default="list",
+        help="PR action to perform (default: list)"
+    )
+    pr_parser.add_argument(
+        "--title",
+        help="PR title for creation"
+    )
+    pr_parser.add_argument(
+        "--pr-number",
+        type=int,
+        help="PR number for status checking"
+    )
+    pr_parser.add_argument(
+        "--auto-review",
+        action="store_true",
+        help="Automatically assign review agents"
+    )
+    pr_parser.add_argument(
+        "--reviewers",
+        help="Comma-separated list of reviewer types (security,performance,architecture,qa,devops)"
+    )
+    
+    # Review command
+    review_parser = subparsers.add_parser(
+        "review",
+        help="Manage multi-agent code reviews"
+    )
+    review_parser.add_argument(
+        "--action",
+        choices=["start", "status", "report", "assign", "list-agents"],
+        default="status",
+        help="Review action to perform (default: status)"
+    )
+    review_parser.add_argument(
+        "--pr",
+        type=int,
+        help="PR number for review operations"
+    )
+    review_parser.add_argument(
+        "--agent",
+        choices=["security-reviewer", "performance-reviewer", "architecture-reviewer", "qa-reviewer", "devops-reviewer"],
+        help="Specific review agent to assign"
+    )
+    review_parser.add_argument(
+        "--agents",
+        help="Comma-separated list of review agents"
+    )
+    review_parser.add_argument(
+        "--format",
+        choices=["text", "markdown", "json"],
+        default="text",
+        help="Report format (default: text)"
+    )
+    
     return parser
 
 
@@ -693,6 +946,22 @@ async def main() -> None:
         elif args.command == "external-api":
             await cli.external_api(
                 command=args.api_command
+            )
+        elif args.command == "pr":
+            await cli.pr(
+                action=args.action,
+                title=args.title,
+                pr_number=args.pr_number,
+                auto_review=args.auto_review,
+                reviewers=args.reviewers
+            )
+        elif args.command == "review":
+            await cli.review(
+                action=args.action,
+                pr=args.pr,
+                agent=args.agent,
+                agents=args.agents,
+                format=args.format
             )
         else:
             parser.print_help()

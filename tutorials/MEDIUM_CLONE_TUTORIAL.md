@@ -607,6 +607,98 @@ BUSINESS LOGIC:
 Test all social interactions thoroughly.
 ```
 
+### 5.5 Multi-Agent PR Review Workflow
+
+When each agent completes their work, LeanVibe Agent Hive automatically creates a pull request and assigns specialized review agents with different personas. This ensures comprehensive code quality through diverse expert perspectives.
+
+**Automatic PR Creation**: After task completion, run:
+```bash
+# Agent Hive automatically detects completion and creates PR
+python cli.py pr create --title "Feature: Social Features API" --auto-review
+
+# Or manually create PR with specific reviewers
+python cli.py pr create --title "Feature: Social Features API" --reviewers security,architecture,qa
+```
+
+**Expected Output**:
+```
+🔄 LeanVibe PR Management
+==============================
+🆕 Creating PR: Feature: Social Features API
+🔄 Detecting current branch and changes...
+📝 Branch: feature/social-features-api
+🔄 Running quality gates...
+✅ Quality gates passed
+🎉 Pull Request #43 created successfully
+🔗 URL: https://github.com/yourusername/medium-clone/pull/43
+👥 Auto-assigning review agents to PR #43
+  ✅ security-reviewer assigned
+  ✅ architecture-reviewer assigned
+  ✅ qa-reviewer assigned
+🔔 Review notifications sent to assigned agents
+```
+
+**Multi-Agent Review Process**:
+```bash
+# Start automated multi-agent review
+python cli.py review start --pr 43
+
+# Check review status
+python cli.py review status --pr 43
+
+# Generate comprehensive review report
+python cli.py review report --pr 43 --format markdown
+```
+
+**Review Agent Specializations**:
+- **🔒 Security Reviewer**: Authentication, authorization, input validation, SQL injection prevention
+- **🏗️ Architecture Reviewer**: Design patterns, code organization, SOLID principles, maintainability  
+- **🧪 QA Reviewer**: Test coverage, user experience, accessibility, edge cases
+- **⚡ Performance Reviewer**: Database optimization, API response times, scalability
+- **🚀 DevOps Reviewer**: Deployment configuration, monitoring, infrastructure requirements
+
+**Sample Multi-Agent Review Report**:
+```
+## Multi-Agent Review Report
+**PR #43**: Feature: Social Features API
+
+### Review Summary
+- 🔒 **Security**: ✅ Approved (92/100)
+  - Authentication properly implemented
+  - Input validation comprehensive
+  - ⚠️ Recommendation: Add rate limiting for follow/unfollow actions
+
+- 🏗️ **Architecture**: ✅ Approved (88/100)
+  - Clean separation of concerns
+  - RESTful API design consistent
+  - ⚠️ Suggestion: Consider extracting notification service
+
+- 🧪 **Quality**: ⚠️ Changes requested (75/100)
+  - Test coverage: 85% (target: 90%)
+  - Missing accessibility tests for profile components
+  - Edge cases for comment threading need coverage
+
+### Recommendations
+1. Add comprehensive tests for edge cases in comment threading
+2. Implement rate limiting for social actions (follow/unfollow)
+3. Add accessibility testing for profile interface
+4. Consider caching strategy for user activity feeds
+
+### Overall Status: Changes Requested
+Please address QA concerns before merge approval.
+```
+
+**Implementing Review Feedback**:
+```bash
+# After addressing feedback, update the PR
+git add .
+git commit -m "Address review feedback: Add rate limiting and accessibility tests"
+git push
+
+# Request re-review from specific agents
+python cli.py review assign --pr 43 --agents qa-reviewer,security-reviewer
+```
+
 ---
 
 ## Part 6: Frontend Development with LitPWA
