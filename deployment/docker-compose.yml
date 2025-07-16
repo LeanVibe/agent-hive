@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Redis Message Bus
+  redis:
+    image: redis:7-alpine
+    container_name: agent_hive_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Redis Monitoring
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: agent_hive_redis_insight
+    ports:
+      - "8001:8001"
+    volumes:
+      - redis_insight_data:/db
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Message Bus Monitoring Dashboard
+  monitoring:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile.monitoring
+    container_name: agent_hive_monitoring
+    ports:
+      - "8080:8080"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+  redis_insight_data:
+    driver: local
+
+networks:
+  default:
+    name: agent_hive_network

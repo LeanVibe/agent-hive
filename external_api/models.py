@@ -125,7 +125,7 @@ class ApiRequest:
     
     def __post_init__(self):
         """Validate request data."""
-        if self.method not in ["GET", "POST", "PUT", "DELETE", "PATCH"]:
+        if self.method not in ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]:
             raise ValueError(f"Invalid HTTP method: {self.method}")
         if not self.request_id:
             raise ValueError("Request ID cannot be empty")

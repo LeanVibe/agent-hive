@@ -30,11 +30,11 @@ class ServiceStatus(Enum):
 @dataclass
 class ServiceInstance:
     """Service instance information."""
-    service_id: str
     service_name: str
+    instance_id: str
     host: str
     port: int
-    metadata: Dict[str, Any]
+    metadata: Dict[str, Any] = None
     health_check_url: Optional[str] = None
     tags: List[str] = None
     version: str = "1.0.0"
@@ -42,6 +42,13 @@ class ServiceInstance:
     def __post_init__(self):
         if self.tags is None:
             self.tags = []
+        if self.metadata is None:
+            self.metadata = {}
+    
+    @property
+    def service_id(self) -> str:
+        """Backward compatibility property."""
+        return self.instance_id
 
 
 @dataclass
@@ -477,3 +484,21 @@ class ServiceDiscovery:
                 await callback(event, instance)
             except Exception as e:
                 logger.error(f"Watcher callback error: {e}")
+
+    async def health_check(self) -> Dict[str, Any]:
+        """
+        Perform health check on service discovery system.
+        
+        Returns:
+            Health status information
+        """
+        return {
+            "status": "healthy" if self._running else "unhealthy",
+            "running": self._running,
+            "total_services": len(self.services),
+            "healthy_services": sum(
+                1 for reg in self.services.values() 
+                if reg.status == ServiceStatus.HEALTHY
+            ),
+            "timestamp": datetime.now().isoformat()
+        }
