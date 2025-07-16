@@ -27,12 +27,12 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         fetch-depth: 0  # Full history for comprehensive analysis
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v4.7.1
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
@@ -200,7 +200,7 @@ jobs:
     
     - name: Upload Coverage Reports
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
       with:
         name: coverage-reports
         path: |
@@ -212,7 +212,7 @@ jobs:
     
     - name: Upload XP Methodology Report
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
       with:
         name: xp-methodology-report
         path: xp_methodology_report.md
@@ -220,7 +220,7 @@ jobs:
     
     - name: Comment PR with XP Analysis
       if: github.event_name == 'pull_request' && always()
-      uses: actions/github-script@v6
+      uses: actions/github-script@e69ef5462fd455e02edcaf4dd7708eda96b9eda0 # v6.4.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
@@ -307,10 +307,10 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v4.7.1
       with:
         python-version: ${{ env.PYTHON_VERSION }}
     

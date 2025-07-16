@@ -32,12 +32,12 @@ jobs:
     
     steps:
     - name: 📥 Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         fetch-depth: 0
 
     - name: 🐍 Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
       with:
         python-version: '3.13'
         cache: 'pip'
@@ -113,7 +113,7 @@ jobs:
         "
 
     - name: 📄 Upload Security Reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
       with:
         name: security-reports-${{ github.run_number }}
         path: |
@@ -124,7 +124,7 @@ jobs:
 
     - name: 🚨 Create Security Issue (if vulnerabilities found)
       if: steps.parse_results.outputs.has_critical_issues == 'true'
-      uses: actions/github-script@v7
+      uses: actions/github-script@60a0d83039c74a4adc543d1de228d68b8b90b10e # v7.0.1
       with:
         script: |
           const safetyVulns = '${{ steps.parse_results.outputs.safety_vulnerabilities }}';
@@ -215,12 +215,12 @@ jobs:
     
     steps:
     - name: 📥 Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 🐍 Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
       with:
         python-version: '3.13'
 
@@ -282,7 +282,7 @@ jobs:
 
     - name: 🔄 Create Dependency Update Issue
       if: steps.check_updates.outputs.has_updates == 'true'
-      uses: actions/github-script@v7
+      uses: actions/github-script@60a0d83039c74a4adc543d1de228d68b8b90b10e # v7.0.1
       with:
         script: |
           const updateCount = '${{ steps.check_updates.outputs.update_count }}';
