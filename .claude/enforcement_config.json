@@ -1,0 +1,34 @@
+{
+  "enabled": true,
+  "check_interval": 60,
+  "max_escalations": 3,
+  "auto_git_execution": true,
+  "auto_restart_agents": false,
+  "auto_push": false,
+  "notification_webhooks": [],
+  "excluded_agents": ["pm-agent"],
+  "git_commands": {
+    "status_check": ["git", "status", "--porcelain"],
+    "force_commit": ["git", "add", ".", "&&", "git", "commit", "-m", "🤖 Auto-commit by status enforcer"],
+    "force_push": ["git", "push", "origin", "HEAD"]
+  },
+  "escalation_actions": {
+    "warning_5min": {
+      "send_notification": true,
+      "log_warning": true
+    },
+    "critical_10min": {
+      "send_alert": true,
+      "detailed_git_check": true
+    },
+    "emergency_15min": {
+      "auto_git_execution": true,
+      "mark_as_blocked": true
+    },
+    "terminal_20min": {
+      "force_git_cleanup": true,
+      "attempt_restart": false,
+      "mark_as_terminated": true
+    }
+  }
+}
