@@ -501,8 +501,7 @@ Your mission details are in CLAUDE.md. Start by sending your [ACK] message, then
 
 def main():
     parser = argparse.ArgumentParser(description="Enhanced Agent Spawner with Communication Protocol")
-    parser.add_argument("--agent-type", required=True, 
-                       help="Type of agent to spawn (integration-specialist, frontend-dashboard, etc.)")
+    parser.add_argument("--agent-type", help="Type of agent to spawn (integration-specialist, frontend-dashboard, etc.)")
     parser.add_argument("--task", help="Specific task description")
     parser.add_argument("--priority", type=float, help="Priority level (lower = higher priority)")
     parser.add_argument("--session", default="agent-hive", help="Tmux session name")
@@ -537,11 +536,17 @@ def main():
         return
     
     # Validate agent type
+    if not args.agent_type:
+        print("❌ Error: --agent-type is required")
+        print("Available types: " + ", ".join(spawner.agent_configs.keys()))
+        print("Use --list-types to see detailed descriptions")
+        return 1
+    
     if args.agent_type not in spawner.agent_configs:
         print(f"❌ Unknown agent type: {args.agent_type}")
         print(f"Available types: {list(spawner.agent_configs.keys())}")
         print("Use --list-types to see detailed descriptions")
-        return
+        return 1
     
     # Create and spawn agent
     try:
