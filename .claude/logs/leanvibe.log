@@ -2130,3 +2130,585 @@ task: <Task pending name='Task-53' coro=<MultiAgentCoordinator._load_balancer() 
 2025-07-16 09:11:36 ERROR    asyncio                                             Task was destroyed but it is pending!
 task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor() running at /Users/bogdan/work/leanvibe-dev/agent-hive/new-worktrees/service-mesh-Jul-16-0207/advanced_orchestration/multi_agent_coordinator.py:640> wait_for=<Future pending cb=[Task.task_wakeup()]>>
 >>>>>>> Stashed changes
+2025-07-16 13:40:31 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Revoked API key: 7a2d7788-530a-4314-8aa0-f6be4d33638d
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created basic auth user: testuser
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Updated basic auth user: testuser
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Deleted basic auth user: testuser
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Revoked API key: 4902c3d4-d29f-4088-bf3e-5820d0f893b5
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created basic auth user: testuser
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 ERROR    external_api.auth_middleware                                Basic authentication failed: Invalid base64-encoded string: number of data characters (13) cannot be 1 more than a multiple of 4
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created basic auth user: testuser
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created JWT token for user test_user
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created API key for user api_user
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created basic auth user: basic_user
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 13:40:31 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High CPU Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
+2025-07-16 13:40:31 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 13:40:31 WARNING  external_api.service_discovery                                Service discovery already running
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Deregistered service test-service-001
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 WARNING  external_api.service_discovery                                Service non-existent-service not found for deregistration
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 WARNING  external_api.service_discovery                                Heartbeat from unknown service unknown-service
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 WARNING  external_api.service_discovery                                Health check client error for test-service-001: Cannot connect to host localhost:8080 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8080, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8080)]
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:31 WARNING  external_api.service_discovery                                Service test-service-001 expired, removing from registry
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Deregistered service test-service-001
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 13:40:31 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:31 WARNING  external_api.service_discovery                                Health check client error for test-service-001: Cannot connect to host localhost:8080 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8080, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8080)]
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-0 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-1 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-2 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-3 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-4 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-5 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-6 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-7 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-8 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-9 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:40:32 ERROR    external_api.service_discovery                                Watcher callback error: Test error
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/health "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/test-api-service-001 "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Deregistered service test-api-service-001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: DELETE http://testserver/services/test-api-service-001 "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 WARNING  external_api.service_discovery                                Service nonexistent-service not found for deregistration
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: DELETE http://testserver/services/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/test-api-service?healthy_only=false "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/test-api-service?healthy_only=true "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/test-api-service-001/heartbeat "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 WARNING  external_api.service_discovery                                Heartbeat from unknown service nonexistent-service
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/nonexistent-service/heartbeat "HTTP/1.1 404 Not Found"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/system/info "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/system/info "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/test-api-service-001/status "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/nonexistent-service/status "HTTP/1.1 404 Not Found"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/healthy/test-api-service "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/healthy/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 0.0.0.0:8000
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:9000
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service test-minimal (test-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/ "HTTP/1.1 307 Temporary Redirect"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover "HTTP/1.1 404 Not Found"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/%20 "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service concurrent-test-0 (concurrent-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service concurrent-test-1 (concurrent-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service concurrent-test-2 (concurrent-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service concurrent-test-3 (concurrent-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service concurrent-test-4 (concurrent-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/concurrent-service "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                Registered service metadata-test (metadata-service)
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/metadata-test "HTTP/1.1 200 OK"
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.api_gateway                                ApiGateway initialized on 127.0.0.1:8080
+2025-07-16 13:40:32 INFO     external_api.api_gateway                                Service discovery integration enabled
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.api_gateway                                ApiGateway initialized on 127.0.0.1:8080
+2025-07-16 13:40:32 INFO     external_api.api_gateway                                Service discovery integration enabled
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:40:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:32 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 13:40:46 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 13:40:46 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 13:41:02 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 13:41:02 WARNING  external_api.service_discovery                                Service discovery already running
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Deregistered service test-service-001
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 WARNING  external_api.service_discovery                                Service non-existent-service not found for deregistration
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 WARNING  external_api.service_discovery                                Heartbeat from unknown service unknown-service
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 WARNING  external_api.service_discovery                                Health check client error for test-service-001: Cannot connect to host localhost:8080 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8080, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8080)]
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 WARNING  external_api.service_discovery                                Service test-service-001 expired, removing from registry
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Deregistered service test-service-001
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 WARNING  external_api.service_discovery                                Health check client error for test-service-001: Cannot connect to host localhost:8080 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8080, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8080)]
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-0 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-1 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-2 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-3 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-4 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-5 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-6 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-7 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-8 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-9 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:41:02 ERROR    external_api.service_discovery                                Watcher callback error: Test error
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 13:41:02 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 13:41:08 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/health "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/test-api-service-001 "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Deregistered service test-api-service-001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: DELETE http://testserver/services/test-api-service-001 "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 WARNING  external_api.service_discovery                                Service nonexistent-service not found for deregistration
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: DELETE http://testserver/services/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/test-api-service?healthy_only=false "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/test-api-service?healthy_only=true "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/test-api-service-001/heartbeat "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 WARNING  external_api.service_discovery                                Heartbeat from unknown service nonexistent-service
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/nonexistent-service/heartbeat "HTTP/1.1 404 Not Found"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/system/info "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/system/info "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/test-api-service-001/status "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/nonexistent-service/status "HTTP/1.1 404 Not Found"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/healthy/test-api-service "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/healthy/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 0.0.0.0:8000
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:9000
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service test-minimal (test-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/ "HTTP/1.1 307 Temporary Redirect"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover "HTTP/1.1 404 Not Found"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/%20 "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service concurrent-test-0 (concurrent-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service concurrent-test-1 (concurrent-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service concurrent-test-2 (concurrent-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service concurrent-test-3 (concurrent-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service concurrent-test-4 (concurrent-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/concurrent-service "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:08 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:08 INFO     external_api.service_discovery                                Registered service metadata-test (metadata-service)
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 13:41:08 INFO     httpx                                               HTTP Request: GET http://testserver/services/metadata-test "HTTP/1.1 200 OK"
+2025-07-16 13:41:13 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.api_gateway                                ApiGateway initialized on 127.0.0.1:8080
+2025-07-16 13:41:14 INFO     external_api.api_gateway                                Service discovery integration enabled
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.api_gateway                                ApiGateway initialized on 127.0.0.1:8080
+2025-07-16 13:41:14 INFO     external_api.api_gateway                                Service discovery integration enabled
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 13:41:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 13:41:14 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001

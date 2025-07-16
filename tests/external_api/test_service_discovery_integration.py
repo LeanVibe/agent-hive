@@ -93,6 +93,7 @@ class TestServiceDiscoveryIntegration:
             )
         ]
     
+    @pytest.mark.asyncio
     async def test_end_to_end_service_lifecycle(self, service_discovery, sample_services):
         """Test complete service lifecycle from registration to cleanup."""
         await service_discovery.start()
