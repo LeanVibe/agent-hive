@@ -351,11 +351,26 @@ class EventStreaming:
             batch_data: Raw batch data
             
         Returns:
-            Compressed batch data
+            Compressed batch data with preserved metadata
         """
         try:
+            # Convert datetime and enum objects for JSON serialization
+            def serialize_objects(obj):
+                if isinstance(obj, datetime):
+                    return obj.isoformat()
+                elif hasattr(obj, 'value'):  # Handle enum objects
+                    return obj.value
+                elif isinstance(obj, dict):
+                    return {k: serialize_objects(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [serialize_objects(item) for item in obj]
+                return obj
+            
+            # Prepare data for JSON serialization
+            serializable_data = serialize_objects(batch_data)
+            
             # Serialize to JSON
-            json_data = json.dumps(batch_data).encode('utf-8')
+            json_data = json.dumps(serializable_data).encode('utf-8')
             original_size = len(json_data)
             
             # Compress with gzip
@@ -370,11 +385,17 @@ class EventStreaming:
                     if self.stats["compression_ratio"] > 0 else compression_ratio
                 )
             
+            # Preserve essential metadata for consumers
             return {
                 "compressed": True,
                 "original_size": original_size,
                 "compressed_size": compressed_size,
-                "data": compressed_data.hex()  # Store as hex string
+                "data": compressed_data.hex(),  # Store as hex string
+                # Preserve key metadata that consumers expect
+                "batch_id": batch_data.get("batch_id"),
+                "stream_name": batch_data.get("stream_name"),
+                "timestamp": batch_data.get("timestamp"),
+                "event_count": batch_data.get("event_count")
             }
             
         except Exception as e:
