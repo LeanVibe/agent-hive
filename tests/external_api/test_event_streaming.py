@@ -36,12 +36,18 @@ class TestEventBuffer:
             partition_key="tasks"
         )
     
+    @pytest.mark.asyncio
+
+    
     async def test_buffer_initialization(self, event_buffer):
         """Test event buffer initialization."""
         assert event_buffer.max_size == 5
         assert len(event_buffer.buffer) == 0
         assert event_buffer._total_events == 0
         assert event_buffer._dropped_events == 0
+    
+    @pytest.mark.asyncio
+
     
     async def test_add_event_success(self, event_buffer, sample_event):
         """Test successful event addition."""
@@ -50,6 +56,9 @@ class TestEventBuffer:
         assert len(event_buffer.buffer) == 1
         assert event_buffer._total_events == 1
         assert event_buffer._dropped_events == 0
+    
+    @pytest.mark.asyncio
+
     
     async def test_add_event_buffer_full(self, event_buffer, sample_event):
         """Test adding events when buffer is full."""
@@ -70,6 +79,9 @@ class TestEventBuffer:
         assert result is False
         assert len(event_buffer.buffer) == 5  # Still at max
         assert event_buffer._dropped_events == 1
+    
+    @pytest.mark.asyncio
+
     
     async def test_get_events(self, event_buffer):
         """Test event retrieval."""
@@ -95,6 +107,9 @@ class TestEventBuffer:
         for i, event in enumerate(retrieved):
             assert event.event_id == f"test-{i}"
     
+    @pytest.mark.asyncio
+
+    
     async def test_get_events_partial(self, event_buffer):
         """Test partial event retrieval."""
         # Add test events
@@ -117,6 +132,9 @@ class TestEventBuffer:
         remaining = await event_buffer.get_events(1)
         assert len(remaining) == 1
         assert remaining[0].event_id == "test-2"
+    
+    @pytest.mark.asyncio
+
     
     async def test_get_stats(self, event_buffer):
         """Test buffer statistics."""
@@ -175,6 +193,9 @@ class TestEventStreaming:
             "status": "created"
         }
     
+    @pytest.mark.asyncio
+
+    
     async def test_streaming_initialization(self, event_streaming, stream_config):
         """Test event streaming initialization."""
         assert event_streaming.config == stream_config
@@ -184,6 +205,9 @@ class TestEventStreaming:
         assert not event_streaming.stream_active
         assert event_streaming.flush_task is None
         assert event_streaming.stats["events_processed"] == 0
+    
+    @pytest.mark.asyncio
+
     
     async def test_start_stop_streaming(self, event_streaming):
         """Test streaming start and stop functionality."""
@@ -205,6 +229,9 @@ class TestEventStreaming:
         await event_streaming.stop_streaming()  # Should not raise error
         assert not event_streaming.stream_active
     
+    @pytest.mark.asyncio
+
+    
     async def test_publish_event_success(self, event_streaming, sample_event_data):
         """Test successful event publishing."""
         await event_streaming.start_streaming()
@@ -219,6 +246,9 @@ class TestEventStreaming:
         assert result is True
         assert event_streaming.stats["events_processed"] == 1
     
+    @pytest.mark.asyncio
+
+    
     async def test_publish_event_stream_not_active(self, event_streaming, sample_event_data):
         """Test publishing when streaming is not active."""
         result = await event_streaming.publish_event(
@@ -230,8 +260,13 @@ class TestEventStreaming:
         assert result is False
         assert event_streaming.stats["events_processed"] == 0
     
+    @pytest.mark.asyncio
+
+    
     async def test_register_consumer(self, event_streaming):
         """Test consumer registration."""
+        @pytest.mark.asyncio
+
         async def test_consumer(batch_data):
             return {"processed": True}
         
@@ -247,8 +282,13 @@ class TestEventStreaming:
         with pytest.raises(ValueError, match="Consumer function must be async"):
             event_streaming.register_consumer("sync-consumer", sync_consumer)
     
+    @pytest.mark.asyncio
+
+    
     async def test_unregister_consumer(self, event_streaming):
         """Test consumer unregistration."""
+        @pytest.mark.asyncio
+
         async def test_consumer(batch_data):
             return {"processed": True}
         
@@ -264,8 +304,13 @@ class TestEventStreaming:
         result = event_streaming.unregister_consumer("non-existent")
         assert result is False
     
+    @pytest.mark.asyncio
+
+    
     async def test_add_filter(self, event_streaming):
         """Test filter addition."""
+        @pytest.mark.asyncio
+
         async def test_filter(event):
             return event.priority == EventPriority.HIGH
         
@@ -281,8 +326,13 @@ class TestEventStreaming:
         with pytest.raises(ValueError, match="Filter function must be async"):
             event_streaming.add_filter("sync-filter", sync_filter)
     
+    @pytest.mark.asyncio
+
+    
     async def test_remove_filter(self, event_streaming):
         """Test filter removal."""
+        @pytest.mark.asyncio
+
         async def test_filter(event):
             return True
         
@@ -297,6 +347,9 @@ class TestEventStreaming:
         # Test removal of non-existent filter
         result = event_streaming.remove_filter("non-existent")
         assert result is False
+    
+    @pytest.mark.asyncio
+
     
     async def test_event_filtering(self, event_streaming, sample_event_data):
         """Test event filtering during publishing."""
@@ -317,9 +370,15 @@ class TestEventStreaming:
         assert result is False
         assert event_streaming.stats["events_processed"] == 0
     
+    @pytest.mark.asyncio
+
+    
     async def test_flush_events_to_consumers(self, event_streaming, sample_event_data):
         """Test event flushing to consumers."""
         consumed_batches = []
+        
+        @pytest.mark.asyncio
+
         
         async def test_consumer(batch_data):
             consumed_batches.append(batch_data)
@@ -346,6 +405,9 @@ class TestEventStreaming:
         assert batch["stream_name"] == "test-stream"
         assert "events" in batch
     
+    @pytest.mark.asyncio
+
+    
     async def test_compression(self, event_streaming, sample_event_data):
         """Test batch compression."""
         events = []
@@ -367,6 +429,9 @@ class TestEventStreaming:
             assert "compressed_size" in batch_data
             assert "original_size" in batch_data
             assert batch_data["compressed_size"] < batch_data["original_size"]
+    
+    @pytest.mark.asyncio
+
     
     async def test_consumer_retry_logic(self, event_streaming, sample_event_data):
         """Test consumer retry logic on failures."""
@@ -400,6 +465,9 @@ class TestEventStreaming:
         )
         
         assert attempt_count == 3  # Initial + 2 retries
+    
+    @pytest.mark.asyncio
+
     
     async def test_priority_grouping(self, event_streaming):
         """Test event grouping by priority."""
@@ -439,6 +507,9 @@ class TestEventStreaming:
         assert groups[EventPriority.HIGH][1].event_id == "high-2"
         assert groups[EventPriority.LOW][0].event_id == "low-1"
     
+    @pytest.mark.asyncio
+
+    
     async def test_get_stream_info(self, event_streaming):
         """Test stream information retrieval."""
         async def consumer1(batch):
@@ -459,6 +530,9 @@ class TestEventStreaming:
         assert "config" in info
         assert "statistics" in info
     
+    @pytest.mark.asyncio
+
+    
     async def test_get_buffer_stats(self, event_streaming):
         """Test buffer statistics retrieval."""
         stats = await event_streaming.get_buffer_stats()
@@ -468,6 +542,9 @@ class TestEventStreaming:
         assert "total_events" in stats
         assert "dropped_events" in stats
         assert "utilization" in stats
+    
+    @pytest.mark.asyncio
+
     
     async def test_health_check(self, event_streaming):
         """Test health check functionality."""
@@ -483,6 +560,9 @@ class TestEventStreaming:
         assert health["stream_active"] is True
         assert "timestamp" in health
     
+    @pytest.mark.asyncio
+
+    
     async def test_stream_config_validation(self):
         """Test event stream configuration validation."""
         # Test invalid buffer size
@@ -496,6 +576,9 @@ class TestEventStreaming:
         # Test invalid max retries
         with pytest.raises(ValueError, match="Max retries must be non-negative"):
             EventStreamConfig(max_retries=-1)
+    
+    @pytest.mark.asyncio
+
     
     async def test_stream_event_validation(self):
         """Test stream event validation."""
