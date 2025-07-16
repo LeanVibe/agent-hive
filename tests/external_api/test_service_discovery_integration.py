@@ -93,6 +93,7 @@ class TestServiceDiscoveryIntegration:
             )
         ]
     
+    @pytest.mark.asyncio
     async def test_end_to_end_service_lifecycle(self, service_discovery, sample_services):
         """Test complete service lifecycle from registration to cleanup."""
         await service_discovery.start()
@@ -111,9 +112,18 @@ class TestServiceDiscoveryIntegration:
             assert "notification-service" in all_services
             
             # Test service discovery
-            user_services = await service_discovery.discover_services("user-service")
+            user_services = await service_discovery.discover_services("user-service", healthy_only=False)
             assert len(user_services) == 1
             assert user_services[0].service_id == "user-service-001"
+            
+            # Test service status (newly registered services start in 'starting' status)
+            service_status = await service_discovery.get_service_status("user-service-001")
+            assert service_status is not None
+            
+            # Update service to healthy status for testing healthy instance retrieval
+            registration = service_discovery.services.get("user-service-001")
+            if registration:
+                registration.status = ServiceStatus.HEALTHY
             
             # Test healthy instance retrieval
             healthy_user_service = await service_discovery.get_healthy_instance("user-service")
@@ -135,6 +145,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
     
+    @pytest.mark.asyncio
     async def test_api_gateway_service_routing(self, api_gateway, service_discovery, sample_services):
         """Test API Gateway routing to services via service discovery."""
         await service_discovery.start()
@@ -171,6 +182,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
     
+    @pytest.mark.asyncio
     async def test_rest_api_complete_workflow(self, test_client_api, sample_services):
         """Test complete REST API workflow."""
         # Test system info before registration
@@ -254,6 +266,7 @@ class TestServiceDiscoveryIntegration:
                 # Don't assert success here as some might already be cleaned up
     
     @patch('aiohttp.ClientSession')
+    @pytest.mark.asyncio
     async def test_real_health_checks(self, mock_session, service_discovery):
         """Test real HTTP health checks implementation."""
         await service_discovery.start()
@@ -344,6 +357,7 @@ class TestServiceDiscoveryIntegration:
                 "unsupported", "http://localhost:8000", "test-service"
             )
     
+    @pytest.mark.asyncio
     async def test_service_discovery_api_creation(self):
         """Test ServiceDiscoveryAPI creation via convenience function."""
         # Test with default configuration
@@ -363,6 +377,7 @@ class TestServiceDiscoveryIntegration:
         assert api_custom.port == 9000
         assert api_custom.service_discovery.config["health_check_interval"] == 5
     
+    @pytest.mark.asyncio
     async def test_service_watcher_integration(self, service_discovery, sample_services):
         """Test service watcher functionality in integration."""
         await service_discovery.start()
@@ -397,6 +412,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
     
+    @pytest.mark.asyncio
     async def test_concurrent_operations_integration(self, service_discovery, test_client_api):
         """Test concurrent operations across the entire system."""
         await service_discovery.start()
@@ -454,6 +470,7 @@ class TestServiceDiscoveryIntegration:
             await service_discovery.stop()
     
     @patch('aiohttp.ClientSession')
+    @pytest.mark.asyncio
     async def test_api_gateway_service_proxying(self, mock_session, api_gateway, service_discovery, sample_services):
         """Test API Gateway proxying requests to discovered services."""
         await service_discovery.start()
@@ -498,6 +515,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
     
+    @pytest.mark.asyncio
     async def test_error_scenarios_integration(self, service_discovery, test_client_api):
         """Test error scenarios across the integrated system."""
         await service_discovery.start()
@@ -535,6 +553,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
     
+    @pytest.mark.asyncio
     async def test_system_metrics_and_monitoring(self, service_discovery, test_client_api, sample_services):
         """Test system metrics and monitoring capabilities."""
         await service_discovery.start()
