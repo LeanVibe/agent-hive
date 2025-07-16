@@ -149,7 +149,13 @@ class TmuxAgentManager:
         return None
     
     def _get_starting_prompt(self, agent_name: str) -> Optional[str]:
-        """Get appropriate starting prompt for agent."""
+        """Get protocol-aware starting prompt for agent."""
+        # Check if agent has protocol-enabled CLAUDE.md
+        agent_info = self.agents.get(agent_name)
+        if agent_info and self._has_protocol_enabled(agent_info["claude_file"]):
+            return self._generate_protocol_aware_prompt(agent_name)
+        
+        # Fallback to legacy prompts for older agents
         prompts = {
             "documentation-agent": "Hello! I'm the Documentation Agent. I'm ready to work on creating comprehensive documentation for agent-hive. Let me start by reading the existing documentation structure and begin with D.1.1: Documentation Audit & Reorganization as outlined in my CLAUDE.md instructions.",
             
@@ -165,6 +171,32 @@ class TmuxAgentManager:
         }
         
         return prompts.get(agent_name)
+    
+    def _has_protocol_enabled(self, claude_file: Path) -> bool:
+        """Check if CLAUDE.md has hybrid communication protocol."""
+        try:
+            content = claude_file.read_text()
+            return "HYBRID COMMUNICATION PROTOCOL" in content
+        except Exception:
+            return False
+    
+    def _generate_protocol_aware_prompt(self, agent_name: str) -> str:
+        """Generate protocol-aware starting prompt."""
+        return f"""AGENT SPAWN COMPLETE: {agent_name}
+
+🚨 HYBRID COMMUNICATION PROTOCOL ACTIVE
+
+IMMEDIATE ACTIONS REQUIRED:
+1. Send acknowledgment: [ACK] - Agent {agent_name} ready - Current task: Reading mission instructions
+2. Read your CLAUDE.md file for detailed mission instructions and communication protocol
+3. Begin implementation as specified in your mission
+
+PROTOCOL REQUIREMENTS:
+- Respond to pings within 2 minutes using [ACK] format
+- Push urgent updates immediately using [URGENT] format for: task completion, critical blockers, merge conflicts, PR ready
+- Provide concrete evidence in all status updates
+
+Your mission details are in CLAUDE.md. Start by sending your [ACK] message, then read your instructions and begin implementation immediately."""
     
     def create_session(self) -> bool:
         """Create tmux session if it doesn't exist."""
