@@ -1,0 +1,98 @@
+{
+  "summary": {
+    "total_tasks": 2,
+    "on_track": 2,
+    "warnings": 0,
+    "critical": 0,
+    "emergency": 0,
+    "completion_rate": 0.0,
+    "generated_at": "2025-07-17T00:24:21.101269"
+  },
+  "detailed_status": {
+    "on_track": [
+      {
+        "task_id": "on-track",
+        "agent_id": "agent1",
+        "description": "On track task",
+        "assigned_time": "2025-07-17T00:24:21.101025",
+        "deadline": "2025-07-18T00:24:21.101019",
+        "status": "assigned",
+        "evidence_requirements": [
+          {
+            "type": "commit",
+            "description": "Code committed",
+            "required": true,
+            "validator": null
+          },
+          {
+            "type": "test",
+            "description": "Tests passing",
+            "required": true,
+            "validator": null
+          }
+        ],
+        "evidence_submitted": [],
+        "last_update": "2025-07-17T00:24:21.101027",
+        "update_count": 0,
+        "escalation_level": "green",
+        "warnings_sent": 0,
+        "escalations_sent": 0,
+        "reassignment_count": 0,
+        "time_remaining": "23:59:59.999768",
+        "is_overdue": false,
+        "progress_percentage": 0.0
+      },
+      {
+        "task_id": "warning",
+        "agent_id": "agent2",
+        "description": "Warning task",
+        "assigned_time": "2025-07-17T00:24:21.101170",
+        "deadline": "2025-07-17T00:54:21.101168",
+        "status": "assigned",
+        "evidence_requirements": [
+          {
+            "type": "commit",
+            "description": "Code committed",
+            "required": true,
+            "validator": null
+          },
+          {
+            "type": "test",
+            "description": "Tests passing",
+            "required": true,
+            "validator": null
+          }
+        ],
+        "evidence_submitted": [],
+        "last_update": "2025-07-17T00:24:21.101172",
+        "update_count": 0,
+        "escalation_level": "green",
+        "warnings_sent": 0,
+        "escalations_sent": 0,
+        "reassignment_count": 0,
+        "time_remaining": "0:29:59.999905",
+        "is_overdue": false,
+        "progress_percentage": 0.0
+      }
+    ],
+    "warnings": [],
+    "critical": [],
+    "emergency": []
+  },
+  "escalation_rules": {
+    "warning_intervals": [
+      0.5,
+      0.7,
+      0.9
+    ],
+    "escalation_contacts": [
+      "pm-agent",
+      "human-lead"
+    ],
+    "auto_reassign_threshold": 2.0,
+    "emergency_protocols": [
+      "system-wide-alert",
+      "coordination-freeze"
+    ]
+  }
+}
