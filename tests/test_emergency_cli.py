@@ -16,7 +16,9 @@ class TestEmergencyCLI(unittest.TestCase):
     
     def setUp(self):
         """Set up test environment."""
-        self.script_path = Path("scripts/emergency_cli.py")
+        # Get absolute path to script from tests directory
+        test_dir = Path(__file__).parent
+        self.script_path = test_dir.parent / "scripts" / "emergency_cli.py"
         self.assertTrue(self.script_path.exists(), "Emergency CLI script must exist")
     
     def test_script_size_compliance(self):
@@ -43,8 +45,9 @@ class TestEmergencyCLI(unittest.TestCase):
     def test_component_isolation(self):
         """Test component works independently."""
         # Test that CLI wrapper doesn't depend on large components
+        scripts_dir = self.script_path.parent
         result = subprocess.run(['python', '-c', 
-                               'import sys; sys.path.insert(0, "scripts"); import emergency_cli'],
+                               f'import sys; sys.path.insert(0, "{scripts_dir}"); import emergency_cli'],
                               capture_output=True, text=True)
         
         self.assertEqual(result.returncode, 0, "CLI component must import cleanly")
