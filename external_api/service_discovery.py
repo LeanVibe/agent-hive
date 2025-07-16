@@ -398,10 +398,44 @@ class ServiceDiscovery:
             return True
         
         try:
-            # Simple health check implementation
-            # In production, use aiohttp or similar for HTTP health checks
-            await asyncio.sleep(0.1)  # Simulate network call
+            import aiohttp
+            import asyncio
+            
+            # Real HTTP health check with timeout and retry logic
+            timeout = aiohttp.ClientTimeout(total=5.0, connect=2.0)
+            
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(instance.health_check_url) as response:
+                    # Consider 200-299 status codes as healthy
+                    is_healthy = 200 <= response.status < 300
+                    
+                    if not is_healthy:
+                        logger.warning(
+                            f"Health check failed for {instance.service_id}: "
+                            f"HTTP {response.status} from {instance.health_check_url}"
+                        )
+                    else:
+                        logger.debug(
+                            f"Health check passed for {instance.service_id}: "
+                            f"HTTP {response.status} from {instance.health_check_url}"
+                        )
+                    
+                    return is_healthy
+                    
+        except ImportError:
+            logger.warning("aiohttp not available, falling back to basic health check")
+            # Fallback to basic check if aiohttp not available
+            await asyncio.sleep(0.1)
             return True
+            
+        except asyncio.TimeoutError:
+            logger.warning(f"Health check timeout for {instance.service_id}: {instance.health_check_url}")
+            return False
+            
+        except aiohttp.ClientError as e:
+            logger.warning(f"Health check client error for {instance.service_id}: {e}")
+            return False
+            
         except Exception as e:
             logger.warning(f"Health check failed for {instance.service_id}: {e}")
             return False

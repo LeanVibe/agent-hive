@@ -1234,6 +1234,7 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 task: <Task pending name='Task-53' coro=<MultiAgentCoordinator._load_balancer() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:630> wait_for=<Future pending cb=[Task.task_wakeup()]>>
 2025-07-15 18:18:03 ERROR    asyncio                                             Task was destroyed but it is pending!
 task: <Task pending name='Task-52' coro=<MultiAgentCoordinator._health_monitor() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:610> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+<<<<<<< HEAD
 2025-07-16 02:17:29 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-16 02:17:31 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
 2025-07-16 02:17:31 INFO     personas.persona_manager                                Loaded 5 personas
@@ -1447,3 +1448,141 @@ task: <Task pending name='Task-52' coro=<MultiAgentCoordinator._health_monitor()
 2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: High Memory Usage
 2025-07-16 02:17:50 INFO     external_api.monitoring_system                                Added alert rule: Low Disk Space
 2025-07-16 02:17:50 INFO     external_api.monitoring_system                                MonitoringSystem initialized
+||||||| parent of b45401a (feat: Complete Service Discovery Integration - 12 REST endpoints, real health checks, API Gateway integration)
+=======
+2025-07-16 08:02:56 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/health "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/test-api-service-001 "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Deregistered service test-api-service-001
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: DELETE http://testserver/services/test-api-service-001 "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 WARNING  external_api.service_discovery                                Service nonexistent-service not found for deregistration
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: DELETE http://testserver/services/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/test-api-service "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/test-api-service?healthy_only=true "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/test-api-service-001/heartbeat "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 WARNING  external_api.service_discovery                                Heartbeat from unknown service nonexistent-service
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/nonexistent-service/heartbeat "HTTP/1.1 404 Not Found"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/system/info "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/system/info "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/test-api-service-001/status "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/nonexistent-service/status "HTTP/1.1 404 Not Found"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/healthy/test-api-service "HTTP/1.1 200 OK"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     httpx                                               HTTP Request: GET http://testserver/services/healthy/nonexistent-service "HTTP/1.1 404 Not Found"
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:56 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:56 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:57 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 422 Unprocessable Entity"
+2025-07-16 08:02:57 INFO     external_api.service_discovery                                Registered service test-minimal (test-service)
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:57 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:57 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/ "HTTP/1.1 307 Temporary Redirect"
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover "HTTP/1.1 404 Not Found"
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/%20 "HTTP/1.1 200 OK"
+2025-07-16 08:02:57 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:57 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:57 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:02:57 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:02:57 INFO     external_api.service_discovery                                Registered service metadata-test (metadata-service)
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:02:57 INFO     httpx                                               HTTP Request: GET http://testserver/services/metadata-test "HTTP/1.1 200 OK"
+2025-07-16 08:03:31 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:03:32 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:32 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:03:32 INFO     external_api.service_discovery                                Registered service test-api-service-001 (test-api-service)
+2025-07-16 08:03:32 INFO     httpx                                               HTTP Request: POST http://testserver/services/register "HTTP/1.1 200 OK"
+2025-07-16 08:03:32 INFO     httpx                                               HTTP Request: GET http://testserver/services/discover/test-api-service?healthy_only=false "HTTP/1.1 200 OK"
+2025-07-16 08:03:38 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:38 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:03:51 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:03:51 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:04:08 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:04:08 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:04:14 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:04:14 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:04:14 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 08:04:29 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:04:29 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 08:04:29 INFO     external_api.service_discovery_api                                ServiceDiscoveryAPI initialized on 127.0.0.1:8001
+2025-07-16 08:04:29 INFO     httpx                                               HTTP Request: GET http://testserver/health "HTTP/1.1 200 OK"
+>>>>>>> b45401a (feat: Complete Service Discovery Integration - 12 REST endpoints, real health checks, API Gateway integration)
