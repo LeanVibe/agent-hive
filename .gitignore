@@ -72,3 +72,4 @@ dmypy.json
 .claude/state/
 worktrees/
 sample_tasks.json
+temp/
