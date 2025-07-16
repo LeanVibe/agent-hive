@@ -1234,3 +1234,363 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 task: <Task pending name='Task-53' coro=<MultiAgentCoordinator._load_balancer() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:630> wait_for=<Future pending cb=[Task.task_wakeup()]>>
 2025-07-15 18:18:03 ERROR    asyncio                                             Task was destroyed but it is pending!
 task: <Task pending name='Task-52' coro=<MultiAgentCoordinator._health_monitor() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:610> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-16 01:18:03 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Revoked API key: 56293489-9322-4e77-98c6-e20a5880d108
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created basic auth user: testuser
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Updated basic auth user: testuser
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Deleted basic auth user: testuser
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Revoked API key: b7bfa124-ff60-4dd4-af2a-c5d392c9fa8d
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created basic auth user: testuser
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 ERROR    external_api.auth_middleware                                Basic authentication failed: Invalid base64-encoded string: number of data characters (13) cannot be 1 more than a multiple of 4
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created basic auth user: testuser
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created JWT token for user test_user
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created API key for user api_user
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created basic auth user: basic_user
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:18:03 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:03 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:04 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:04 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:04 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:04 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:04 INFO     external_api.webhook_server                                WebhookServer initialized on localhost:8080
+2025-07-16 01:18:17 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 01:18:17 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-16 01:18:28 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 01:18:28 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
+2025-07-16 01:22:44 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:44 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:22:59 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 01:22:59 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 01:23:05 WARNING  external_api.service_discovery                                Service discovery already running
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Deregistered service test-service-001
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 WARNING  external_api.service_discovery                                Service non-existent-service not found for deregistration
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 WARNING  external_api.service_discovery                                Heartbeat from unknown service unknown-service
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-002 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Service discovery started
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 WARNING  external_api.service_discovery                                Service test-service-001 expired, removing from registry
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Deregistered service test-service-001
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Service discovery stopped
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-0 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-1 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-2 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-3 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-4 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-5 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-6 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-7 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-8 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-9 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 01:23:05 ERROR    external_api.service_discovery                                Watcher callback error: Test error
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                ServiceDiscovery initialized
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Added watcher for service test-service
+2025-07-16 01:23:05 INFO     external_api.service_discovery                                Registered service test-service-001 (test-service)
+2025-07-16 08:20:09 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator started
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator stopped
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 ERROR    advanced_orchestration.multi_agent_coordinator                                Failed to register agent test-agent-001: Agent test-agent-001 already registered
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-3 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-4 registered successfully
+2025-07-16 08:20:10 ERROR    advanced_orchestration.multi_agent_coordinator                                Failed to register agent test-agent-001: Maximum number of agents (5) reached
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 unregistered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task a8a76b3b-9d66-4494-b458-9bd4d4094cf4 added to pending queue
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 835071f4-7a0e-4c68-9442-0db17f784e69 assigned to agent test-agent-001
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 62663913-f82a-4914-9ec1-0dd50095b3ad assigned to agent test-agent-001
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 62663913-f82a-4914-9ec1-0dd50095b3ad completed successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task dcdb6db0-f581-4468-9a74-ae31d5669490 assigned to agent test-agent-001
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task dcdb6db0-f581-4468-9a74-ae31d5669490 completed with failure
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task c0f5bc57-2d00-4632-82c8-4def41172e5c assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 4566e6a9-17de-41af-8e6e-b94943b4b674 assigned to agent agent-1
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task af9ed9be-03e0-4044-9ff5-aa0295fb68cb assigned to agent agent-2
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task e0933a99-8f93-462f-853c-786a37f379b4 assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task d9617aba-5acd-4a33-b921-31c88af9e864 assigned to agent agent-1
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 6f59dd16-d3e1-4508-add1-87362c128ee2 assigned to agent agent-2
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 7744b65a-b295-4271-9e53-8cff16360126 assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 1e0ce132-e37a-4977-bf11-42858e8ed668 assigned to agent agent-1
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task f798c31a-fb49-4738-a346-56e183c4e95a assigned to agent agent-2
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task de46e455-509f-413e-a483-9ae8aeec264f assigned to agent test-agent-001
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task de46e455-509f-413e-a483-9ae8aeec264f reassigned from failed agent test-agent-001
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 WARNING  advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 exceeded failure threshold, removing
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 unregistered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 9ef24aeb-1af8-4971-92bc-fdaccd8e7dd0 assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task ef1bffca-6887-4fb7-be87-6c6a1849537d assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 8fd3a708-f75c-4989-96a9-5d08c435c240 assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Starting load rebalancing
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Load rebalancing completed
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator started
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator stopped
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=10)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=10, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=10, min_agents=2, health_check_interval=30.0, load_balance_interval=60.0, task_timeout=300.0, agent_startup_timeout=60.0, failure_threshold=3, scaling_check_interval=120.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=10))
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=10, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=10, min_agents=2, health_check_interval=30.0, load_balance_interval=60.0, task_timeout=300.0, agent_startup_timeout=60.0, failure_threshold=3, scaling_check_interval=120.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10))
+2025-07-16 08:20:10 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10)
+2025-07-16 08:20:10 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=10, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=3, min_agents=2, health_check_interval=0.1, load_balance_interval=0.2, task_timeout=300.0, agent_startup_timeout=60.0, failure_threshold=3, scaling_check_interval=120.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10))
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator started
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task e312ed0a-a945-4d0a-b9c5-f9f592829f47 assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 7d9ccdff-cc60-4167-ba6e-ab7445784a1f assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 5d337d33-308a-47c4-bce7-e11a00d3aed8 assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 48f8fc9d-a7fa-46d6-96c6-2936afdcaa9d assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 18b2a612-c24e-4459-be38-b38148ab22f5 assigned to agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task e312ed0a-a945-4d0a-b9c5-f9f592829f47 completed successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 7d9ccdff-cc60-4167-ba6e-ab7445784a1f completed successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 5d337d33-308a-47c4-bce7-e11a00d3aed8 completed successfully
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 48f8fc9d-a7fa-46d6-96c6-2936afdcaa9d reassigned from failed agent agent-0
+2025-07-16 08:20:10 INFO     advanced_orchestration.multi_agent_coordinator                                Task 18b2a612-c24e-4459-be38-b38148ab22f5 reassigned from failed agent agent-0
+2025-07-16 08:20:11 INFO     advanced_orchestration.multi_agent_coordinator                                Starting load rebalancing
+2025-07-16 08:20:11 INFO     advanced_orchestration.multi_agent_coordinator                                Load rebalancing completed
+2025-07-16 08:20:11 INFO     advanced_orchestration.multi_agent_coordinator                                Task 48f8fc9d-a7fa-46d6-96c6-2936afdcaa9d reassigned from failed agent agent-1
+2025-07-16 08:20:11 INFO     advanced_orchestration.multi_agent_coordinator                                Task 18b2a612-c24e-4459-be38-b38148ab22f5 reassigned from failed agent agent-1
+2025-07-16 08:20:11 ERROR    asyncio                                             Task was destroyed but it is pending!
+task: <Task pending name='Task-43' coro=<MultiAgentCoordinator._health_monitor() done, defined at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:606> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-16 08:20:11 ERROR    asyncio                                             Task was destroyed but it is pending!
+task: <Task pending name='Task-44' coro=<MultiAgentCoordinator._load_balancer() done, defined at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:626> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-16 08:20:11 ERROR    asyncio                                             Task was destroyed but it is pending!
+task: <Task pending name='Task-45' coro=<MultiAgentCoordinator._scaling_monitor() done, defined at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:636> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-16 08:20:11 ERROR    asyncio                                             Task was destroyed but it is pending!
+task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:640> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-16 08:20:11 ERROR    asyncio                                             Task was destroyed but it is pending!
+task: <Task pending name='Task-53' coro=<MultiAgentCoordinator._load_balancer() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:630> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+2025-07-16 08:20:11 ERROR    asyncio                                             Task was destroyed but it is pending!
+task: <Task pending name='Task-52' coro=<MultiAgentCoordinator._health_monitor() running at /Users/bogdan/work/leanvibe-dev/agent-hive/advanced_orchestration/multi_agent_coordinator.py:610> wait_for=<Future pending cb=[Task.task_wakeup()]>>
