@@ -1,0 +1,36 @@
+2025-07-17 00:48:31 [INFO] __main__: 🚀 Starting real-time coordination event monitoring...
+2025-07-17 00:48:31 [INFO] __main__: 📡 Monitoring /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/pm-agent-new/new-worktrees/performance-Jul-16-1339/scripts/../coordination_alerts.json for real-time coordination events
+2025-07-17 00:48:31 [INFO] __main__: 📨 Processing event: COORDINATION_CRISIS at 2025-07-16T19:03:54.363748
+2025-07-17 00:48:31 [WARNING] __main__: 🚨 COORDINATION CRISIS: Task reassign-task, Agent unresponsive-agent, Level red
+2025-07-17 00:48:31 [WARNING] __main__: 🔄 Triggering emergency reassignment for task reassign-task
+2025-07-17 00:48:31 [INFO] __main__: ✅ Emergency reassignment initiated for reassign-task
+2025-07-17 00:48:31 [WARNING] __main__: 📡 Ping failed for unresponsive-agent
+2025-07-17 00:48:32 [INFO] __main__: ✅ PM agent notified: CRITICAL: Coordination crisis for task reassign-task
+2025-07-17 00:48:32 [INFO] __main__: 📨 Processing event: COORDINATION_CRISIS at 2025-07-16T19:46:58.806713
+2025-07-17 00:48:32 [WARNING] __main__: 🚨 COORDINATION CRISIS: Task reassign-task, Agent unresponsive-agent, Level red
+2025-07-17 00:48:32 [WARNING] __main__: 🔄 Triggering emergency reassignment for task reassign-task
+2025-07-17 00:48:32 [INFO] __main__: ✅ Emergency reassignment initiated for reassign-task
+2025-07-17 00:48:32 [WARNING] __main__: 📡 Ping failed for unresponsive-agent
+2025-07-17 00:48:33 [INFO] __main__: ✅ PM agent notified: CRITICAL: Coordination crisis for task reassign-task
+2025-07-17 00:48:33 [INFO] __main__: 📨 Processing event: COORDINATION_CRISIS at 2025-07-16T19:47:20.571039
+2025-07-17 00:48:33 [WARNING] __main__: 🚨 COORDINATION CRISIS: Task reassign-task, Agent unresponsive-agent, Level red
+2025-07-17 00:48:33 [WARNING] __main__: 🔄 Triggering emergency reassignment for task reassign-task
+2025-07-17 00:48:33 [INFO] __main__: ✅ Emergency reassignment initiated for reassign-task
+2025-07-17 00:48:33 [WARNING] __main__: 📡 Ping failed for unresponsive-agent
+2025-07-17 00:48:33 [INFO] __main__: ✅ PM agent notified: CRITICAL: Coordination crisis for task reassign-task
+2025-07-17 00:48:33 [INFO] __main__: 📨 Processing event: COORDINATION_CRISIS at 2025-07-16T20:52:42.553843
+2025-07-17 00:48:33 [WARNING] __main__: 🚨 COORDINATION CRISIS: Task reassign-task, Agent unresponsive-agent, Level red
+2025-07-17 00:48:33 [WARNING] __main__: 🔄 Triggering emergency reassignment for task reassign-task
+2025-07-17 00:48:33 [INFO] __main__: ✅ Emergency reassignment initiated for reassign-task
+2025-07-17 00:48:33 [WARNING] __main__: 📡 Ping failed for unresponsive-agent
+2025-07-17 00:48:34 [INFO] __main__: ✅ PM agent notified: CRITICAL: Coordination crisis for task reassign-task
+2025-07-17 00:48:34 [INFO] __main__: 📨 Processing event: COORDINATION_CRISIS at 2025-07-17T00:38:38.973768
+2025-07-17 00:48:34 [WARNING] __main__: 🚨 COORDINATION CRISIS: Task reassign-task, Agent unresponsive-agent, Level red
+2025-07-17 00:48:34 [WARNING] __main__: 🔄 Triggering emergency reassignment for task reassign-task
+2025-07-17 00:48:34 [INFO] __main__: ✅ Emergency reassignment initiated for reassign-task
+2025-07-17 00:48:34 [WARNING] __main__: 📡 Ping failed for unresponsive-agent
+2025-07-17 00:48:35 [INFO] __main__: ✅ PM agent notified: CRITICAL: Coordination crisis for task reassign-task
+2025-07-17 00:48:35 [INFO] __main__: 📨 Processing event: DEADLINE_WARNING at 2025-07-16T21:44:26.3NZ
+2025-07-17 00:48:35 [WARNING] __main__: ⏰ DEADLINE WARNING: Task test-task-123, Agent test-agent, Time: 30 minutes
+2025-07-17 00:48:35 [WARNING] __main__: ⚠️ Could not reach agent test-agent: 
+2025-07-17 00:48:36 [INFO] __main__: ✅ PM agent notified: Deadline approaching for task test-task-123
