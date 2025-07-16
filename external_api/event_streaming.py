@@ -354,8 +354,16 @@ class EventStreaming:
             Compressed batch data
         """
         try:
-            # Serialize to JSON
-            json_data = json.dumps(batch_data).encode('utf-8')
+            # Custom JSON encoder for datetime and enum serialization
+            def json_serializer(obj):
+                if isinstance(obj, datetime):
+                    return obj.isoformat()
+                elif hasattr(obj, 'value'):  # Handle enums
+                    return obj.value
+                raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+            
+            # Serialize to JSON with custom encoder
+            json_data = json.dumps(batch_data, default=json_serializer).encode('utf-8')
             original_size = len(json_data)
             
             # Compress with gzip

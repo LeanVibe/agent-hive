@@ -9,6 +9,8 @@ import gzip
 from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
+pytestmark = pytest.mark.asyncio
+
 from external_api.event_streaming import EventStreaming, EventBuffer
 from external_api.models import (
     EventStreamConfig,
