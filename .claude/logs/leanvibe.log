@@ -2130,6 +2130,7 @@ task: <Task pending name='Task-53' coro=<MultiAgentCoordinator._load_balancer() 
 2025-07-16 09:11:36 ERROR    asyncio                                             Task was destroyed but it is pending!
 task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor() running at /Users/bogdan/work/leanvibe-dev/agent-hive/new-worktrees/service-mesh-Jul-16-0207/advanced_orchestration/multi_agent_coordinator.py:640> wait_for=<Future pending cb=[Task.task_wakeup()]>>
 >>>>>>> Stashed changes
+<<<<<<< HEAD
 2025-07-16 18:22:24 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-16 18:22:24 INFO     external_api.event_streaming                                EventStreaming initialized for stream: test-stream
 2025-07-16 18:22:24 ERROR    external_api.event_streaming                                Compression failed: Object of type <enum 'EventPriority'> is not JSON serializable
@@ -2813,3 +2814,9 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-16 20:53:27 INFO     scripts.accountability_framework                                Accountability monitoring started
 2025-07-16 20:53:27 INFO     scripts.accountability_framework                                Task task_1752688407_test-agent assigned to test-agent, deadline: 2025-07-16 22:53:27.086666
 2025-07-16 20:53:27 INFO     scripts.accountability_framework                                AccountabilityFramework initialized
+||||||| parent of f34f637 (chore: Clean up logs and instructions for dashboard integration completion)
+=======
+2025-07-16 13:41:08 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-16 13:41:11 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-16 13:41:11 INFO     personas.persona_manager                                Loaded 5 personas
+>>>>>>> f34f637 (chore: Clean up logs and instructions for dashboard integration completion)
