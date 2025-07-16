@@ -1,0 +1,1 @@
+{"type": "COORDINATION_CRISIS", "task_id": "reassign-task", "agent_id": "unresponsive-agent", "description": "Reassign test", "overdue_hours": 9.99525e-05, "escalation_level": "red", "timestamp": "2025-07-16T19:03:54.363748"}
