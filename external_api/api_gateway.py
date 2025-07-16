@@ -19,6 +19,7 @@ from .models import (
     ApiRequest,
     ApiResponse
 )
+from .service_discovery import ServiceDiscovery, ServiceInstance
 
 
 logger = logging.getLogger(__name__)
@@ -32,15 +33,18 @@ class ApiGateway:
     and response formatting for the orchestration system.
     """
     
-    def __init__(self, config: ApiGatewayConfig):
+    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
         """
         Initialize API gateway.
         
         Args:
             config: API gateway configuration
+            service_discovery: Service discovery instance for dynamic routing
         """
         self.config = config
+        self.service_discovery = service_discovery
         self.routes: Dict[str, Dict[str, Callable]] = {}  # {path: {method: handler}}
+        self.service_routes: Dict[str, str] = {}  # {path_prefix: service_name}
         self.middleware: List[Callable] = []
         self.rate_limiter: Dict[str, List[float]] = {}
         self.api_keys: Dict[str, Dict[str, Any]] = {}
@@ -48,6 +52,8 @@ class ApiGateway:
         self._request_count = 0
         
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
+        if service_discovery:
+            logger.info("Service discovery integration enabled")
     
     async def start_server(self) -> None:
         """Start the API gateway server."""
@@ -147,6 +153,130 @@ class ApiGateway:
         }
         logger.info(f"Registered API key with metadata: {list(metadata.keys())}")
     
+    def register_service_route(self, path_prefix: str, service_name: str) -> None:
+        """
+        Register a path prefix to be routed to a specific service.
+        
+        Args:
+            path_prefix: Path prefix to match (e.g., "/api/v1/users")
+            service_name: Service name to route to
+        """
+        self.service_routes[path_prefix] = service_name
+        logger.info(f"Registered service route: {path_prefix} -> {service_name}")
+    
+    def unregister_service_route(self, path_prefix: str) -> bool:
+        """
+        Unregister a service route.
+        
+        Args:
+            path_prefix: Path prefix to remove
+            
+        Returns:
+            True if route was removed, False if not found
+        """
+        if path_prefix in self.service_routes:
+            del self.service_routes[path_prefix]
+            logger.info(f"Unregistered service route: {path_prefix}")
+            return True
+        return False
+    
+    async def get_service_instance(self, service_name: str) -> Optional[ServiceInstance]:
+        """
+        Get a healthy service instance for routing.
+        
+        Args:
+            service_name: Name of the service
+            
+        Returns:
+            Service instance if available, None otherwise
+        """
+        if not self.service_discovery:
+            return None
+        
+        try:
+            instance = await self.service_discovery.get_healthy_instance(service_name)
+            if instance:
+                logger.debug(f"Found healthy instance for {service_name}: {instance.host}:{instance.port}")
+            else:
+                logger.warning(f"No healthy instances found for service: {service_name}")
+            return instance
+        except Exception as e:
+            logger.error(f"Error getting service instance for {service_name}: {e}")
+            return None
+    
+    async def proxy_to_service(self, request: ApiRequest, service_name: str) -> Dict[str, Any]:
+        """
+        Proxy request to a service instance.
+        
+        Args:
+            request: API request to proxy
+            service_name: Target service name
+            
+        Returns:
+            Response from the service
+        """
+        instance = await self.get_service_instance(service_name)
+        if not instance:
+            return {
+                "status_code": 503,
+                "body": {"error": f"Service {service_name} not available"}
+            }
+        
+        try:
+            import aiohttp
+            
+            # Build target URL
+            target_url = f"http://{instance.host}:{instance.port}{request.path}"
+            
+            # Prepare headers (exclude host header to avoid conflicts)
+            headers = {k: v for k, v in request.headers.items() if k.lower() != 'host'}
+            
+            timeout = aiohttp.ClientTimeout(total=self.config.request_timeout)
+            
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.request(
+                    method=request.method,
+                    url=target_url,
+                    headers=headers,
+                    params=request.query_params,
+                    json=request.body if request.method in ["POST", "PUT", "PATCH"] else None
+                ) as response:
+                    body = await response.text()
+                    
+                    # Try to parse as JSON, fallback to text
+                    try:
+                        import json
+                        body = json.loads(body)
+                    except (json.JSONDecodeError, ValueError):
+                        pass
+                    
+                    return {
+                        "status_code": response.status,
+                        "headers": dict(response.headers),
+                        "body": body
+                    }
+                    
+        except ImportError:
+            logger.error("aiohttp not available for service proxying")
+            return {
+                "status_code": 500,
+                "body": {"error": "Service proxying not available"}
+            }
+            
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout proxying request to {service_name}")
+            return {
+                "status_code": 504,
+                "body": {"error": "Gateway timeout"}
+            }
+            
+        except Exception as e:
+            logger.error(f"Error proxying request to {service_name}: {e}")
+            return {
+                "status_code": 502,
+                "body": {"error": "Bad gateway"}
+            }
+    
     async def handle_request(self, request: ApiRequest) -> ApiResponse:
         """
         Handle incoming API request.
@@ -185,15 +315,45 @@ class ApiGateway:
             if self.config.enable_cors and request.method == "OPTIONS":
                 return self._create_cors_response(request.request_id, start_time)
             
-            # Route matching
+            # Route matching - first try direct handlers
             handler = self._find_handler(request.path, request.method)
+            
+            # If no direct handler found, try service routing
             if not handler:
-                return self._create_error_response(
-                    request.request_id,
-                    404,
-                    "Route not found",
-                    start_time
-                )
+                service_name = self._find_service_route(request.path)
+                if service_name:
+                    # Proxy to service
+                    try:
+                        result = await self.proxy_to_service(request, service_name)
+                        
+                        response = ApiResponse(
+                            status_code=result.get("status_code", 200),
+                            headers={**self._get_response_headers(), **result.get("headers", {})},
+                            body=result.get("body"),
+                            timestamp=datetime.now(),
+                            processing_time=(time.time() - start_time) * 1000,
+                            request_id=request.request_id
+                        )
+                        
+                        self._request_count += 1
+                        logger.info(f"Proxied request {request.request_id} to {service_name} in {response.processing_time:.2f}ms")
+                        return response
+                        
+                    except Exception as e:
+                        logger.error(f"Error proxying to service {service_name}: {e}")
+                        return self._create_error_response(
+                            request.request_id,
+                            502,
+                            "Bad gateway",
+                            start_time
+                        )
+                else:
+                    return self._create_error_response(
+                        request.request_id,
+                        404,
+                        "Route not found",
+                        start_time
+                    )
             
             # Process middleware
             for middleware in self.middleware:
@@ -341,6 +501,31 @@ class ApiGateway:
             path = path[len(self.config.api_prefix):]
         
         return self.routes.get(path, {}).get(method.upper())
+    
+    def _find_service_route(self, path: str) -> Optional[str]:
+        """
+        Find service name for the given path based on registered service routes.
+        
+        Args:
+            path: Request path
+            
+        Returns:
+            Service name or None
+        """
+        # Remove API prefix if present
+        if path.startswith(self.config.api_prefix):
+            path = path[len(self.config.api_prefix):]
+        
+        # Find the longest matching prefix
+        best_match = None
+        best_length = 0
+        
+        for prefix, service_name in self.service_routes.items():
+            if path.startswith(prefix) and len(prefix) > best_length:
+                best_match = service_name
+                best_length = len(prefix)
+        
+        return best_match
     
     def _get_response_headers(self) -> Dict[str, str]:
         """Get response headers including CORS if enabled."""

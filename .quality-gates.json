@@ -1,0 +1,25 @@
+{
+  "agent_name": "service-mesh",
+  "task_description": "Priority 1.2 Service Discovery Integration",
+  "created_at": "2025-07-16T02:07:59.671197",
+  "quality_gates": {
+    "max_pr_size": 500,
+    "required_tests": true,
+    "required_docs": true,
+    "required_security_review": true,
+    "required_performance_check": true,
+    "max_complexity": 15,
+    "min_coverage": 85
+  },
+  "enforcement_level": "strict",
+  "rules": {
+    "pr_size_limit": 500,
+    "test_coverage_required": 85,
+    "documentation_required": true,
+    "security_review_required": true,
+    "performance_check_required": true,
+    "code_review_required": true,
+    "linting_required": true,
+    "type_checking_required": true
+  }
+}

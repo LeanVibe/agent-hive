@@ -7,6 +7,8 @@ import asyncio
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
+pytestmark = pytest.mark.asyncio
+
 from external_api.service_discovery import (
     ServiceDiscovery,
     ServiceInstance,
