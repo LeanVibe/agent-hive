@@ -46,7 +46,8 @@ class TestAuthenticationMiddleware:
             client_ip="127.0.0.1"
         )
     
-    def test_middleware_initialization(self, auth_middleware, auth_config):
+    @pytest.mark.asyncio
+    async def test_middleware_initialization(self, auth_middleware, auth_config):
         """Test authentication middleware initialization."""
         assert auth_middleware.config == auth_config
         assert AuthMethod.API_KEY in auth_middleware.enabled_methods
@@ -57,7 +58,8 @@ class TestAuthenticationMiddleware:
         assert len(auth_middleware.basic_auth_users) == 0
         assert len(auth_middleware.jwt_tokens) == 0
     
-    def test_api_key_creation_and_revocation(self, auth_middleware):
+    @pytest.mark.asyncio
+    async def test_api_key_creation_and_revocation(self, auth_middleware):
         """Test API key creation and revocation."""
         # Test API key creation
         api_key = auth_middleware.create_api_key(
@@ -85,7 +87,8 @@ class TestAuthenticationMiddleware:
         result = auth_middleware.revoke_api_key("non-existent-key")
         assert result is False
     
-    def test_basic_auth_user_management(self, auth_middleware):
+    @pytest.mark.asyncio
+    async def test_basic_auth_user_management(self, auth_middleware):
         """Test basic auth user creation, update, and deletion."""
         # Test user creation
         result = auth_middleware.create_basic_auth_user(
@@ -340,7 +343,8 @@ class TestAuthenticationMiddleware:
         assert result.success is False
         assert "Too many authentication attempts" in result.error
     
-    def test_permission_storage(self, auth_middleware):
+    @pytest.mark.asyncio
+    async def test_permission_storage(self, auth_middleware):
         """Test permission storage functionality."""
         # Test that roles are properly initialized
         assert "admin" in auth_middleware.roles
@@ -354,7 +358,8 @@ class TestAuthenticationMiddleware:
         assert Permission.ADMIN in admin_perms
         assert Permission.EXECUTE in admin_perms
     
-    def test_path_permissions_storage(self, auth_middleware):
+    @pytest.mark.asyncio
+    async def test_path_permissions_storage(self, auth_middleware):
         """Test path-based permission storage."""
         # Set path permissions
         auth_middleware.path_permissions["/admin/*"] = [Permission.ADMIN]
@@ -366,7 +371,8 @@ class TestAuthenticationMiddleware:
         assert Permission.ADMIN in auth_middleware.path_permissions["/admin/*"]
         assert Permission.READ in auth_middleware.path_permissions["/api/v1/*"]
     
-    def test_auth_result_properties(self):
+    @pytest.mark.asyncio
+    async def test_auth_result_properties(self):
         """Test AuthResult properties."""
         result = AuthResult(
             success=True,
@@ -383,7 +389,8 @@ class TestAuthenticationMiddleware:
         assert result.metadata == {"test": "data"}
         assert result.error is None
     
-    def test_auth_config_storage(self):
+    @pytest.mark.asyncio
+    async def test_auth_config_storage(self):
         """Test authentication configuration storage."""
         # Test valid config
         config = {
