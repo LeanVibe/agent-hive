@@ -42,6 +42,7 @@ class EnhancedDashboardServer:
         self.session_name = session_name
         self.base_dir = Path(base_dir)
         self.websocket_connections: List[WebSocket] = []
+        self.recent_metrics: List[Dict[str, Any]] = []
         
         # Create lifespan context manager
         @asynccontextmanager
@@ -175,6 +176,55 @@ class EnhancedDashboardServer:
                 return {"message": "Gemini review added successfully"}
             except Exception as e:
                 return {"error": str(e)}
+        
+        @self.app.post("/api/metrics")
+        async def receive_metrics(request: Request):
+            """Receive metrics from dashboard integration"""
+            try:
+                data = await request.json()
+                
+                # Validate required fields
+                required_fields = ['metric_id', 'type', 'value', 'status', 'timestamp']
+                if not all(field in data for field in required_fields):
+                    raise HTTPException(status_code=400, detail="Missing required fields")
+                
+                # Store metric data for dashboard display
+                metric_data = {
+                    'metric_id': data['metric_id'],
+                    'type': data['type'],
+                    'value': data['value'],
+                    'status': data['status'],
+                    'timestamp': data['timestamp'],
+                    'source': data.get('source', 'unknown')
+                }
+                
+                # Broadcast to connected WebSocket clients
+                await self._broadcast_metric_update(metric_data)
+                
+                logger.info(f"Received metric: {data['type']} = {data['value']} [{data['status']}]")
+                return {"message": "Metric received successfully", "metric_id": data['metric_id']}
+                
+            except Exception as e:
+                logger.error(f"Error receiving metric: {e}")
+                raise HTTPException(status_code=500, detail=str(e))
+        
+        @self.app.get("/api/metrics")
+        async def get_metrics():
+            """Get recent metrics for dashboard display"""
+            try:
+                # Return stored metrics (simplified for now)
+                return {"metrics": self.recent_metrics}
+            except Exception as e:
+                return {"metrics": [], "error": str(e)}
+        
+        @self.app.get("/api/health")
+        async def health_check():
+            """Health check endpoint for dashboard integration"""
+            return {
+                "status": "healthy",
+                "timestamp": datetime.now().isoformat(),
+                "version": "2.0.0"
+            }
         
         @self.app.websocket("/ws")
         async def websocket_endpoint(websocket: WebSocket):
@@ -400,6 +450,84 @@ class EnhancedDashboardServer:
                     font-family: inherit;
                 }
                 
+                /* Metrics Section */
+                .metrics-section {
+                    background: var(--card-bg);
+                    border-radius: var(--border-radius);
+                    box-shadow: var(--shadow);
+                    margin-bottom: 20px;
+                    max-height: 400px;
+                    overflow-y: auto;
+                }
+                
+                .metric-item {
+                    padding: 16px 20px;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    transition: background-color 0.2s ease;
+                }
+                
+                .metric-item:hover { background-color: rgba(0, 0, 0, 0.02); }
+                .metric-item:last-child { border-bottom: none; }
+                
+                .metric-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+                
+                .metric-type {
+                    font-weight: 600;
+                    color: var(--primary-color);
+                    text-transform: capitalize;
+                }
+                
+                .metric-details {
+                    font-size: 12px;
+                    color: #666;
+                    display: flex;
+                    gap: 12px;
+                }
+                
+                .metric-value {
+                    font-size: 20px;
+                    font-weight: 700;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    min-width: 80px;
+                    text-align: center;
+                }
+                
+                .metric-value.compliant {
+                    background: rgba(39, 174, 96, 0.1);
+                    color: var(--success-color);
+                    border: 1px solid rgba(39, 174, 96, 0.2);
+                }
+                
+                .metric-value.warning {
+                    background: rgba(243, 156, 18, 0.1);
+                    color: var(--warning-color);
+                    border: 1px solid rgba(243, 156, 18, 0.2);
+                }
+                
+                .metric-value.violation {
+                    background: rgba(231, 76, 60, 0.1);
+                    color: var(--danger-color);
+                    border: 1px solid rgba(231, 76, 60, 0.2);
+                }
+                
+                .metric-new {
+                    animation: metricPulse 2s ease-in-out;
+                }
+                
+                @keyframes metricPulse {
+                    0% { background-color: rgba(52, 152, 219, 0.2); }
+                    50% { background-color: rgba(52, 152, 219, 0.05); }
+                    100% { background-color: transparent; }
+                }
+                
                 /* Activity Section */
                 .activity-section {
                     background: var(--card-bg);
@@ -533,6 +661,15 @@ class EnhancedDashboardServer:
                 </div>
                 
                 <div class="section-header">
+                    <h2>📈 Real-time Metrics</h2>
+                    <button class="btn btn-primary" onclick="refreshMetrics()">Refresh</button>
+                </div>
+                
+                <div id="metrics-display" class="metrics-section">
+                    <!-- Metrics will be populated by JavaScript -->
+                </div>
+                
+                <div class="section-header">
                     <h2>📊 Git Activity</h2>
                     <button class="btn btn-primary" onclick="refreshActivity()">Refresh</button>
                 </div>
@@ -545,10 +682,13 @@ class EnhancedDashboardServer:
             <script>
                 // Global state
                 let currentPrompts = [];
+                let currentMetrics = [];
+                let websocket = null;
                 
                 // Initialize dashboard
                 document.addEventListener('DOMContentLoaded', function() {
                     loadAllData();
+                    initWebSocket();
                     
                     // Refresh data every 30 seconds
                     setInterval(loadAllData, 30000);
@@ -558,6 +698,7 @@ class EnhancedDashboardServer:
                     loadQuickStats();
                     loadGitHubPRs();
                     loadRecentPrompts();
+                    loadMetrics();
                     loadGitActivity();
                 }
                 
@@ -756,6 +897,122 @@ class EnhancedDashboardServer:
                     showNotification('Activity refreshed', 'success');
                 }
                 
+                function refreshMetrics() {
+                    loadMetrics();
+                    showNotification('Metrics refreshed', 'success');
+                }
+                
+                function initWebSocket() {
+                    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    const wsUrl = `${protocol}//${window.location.host}/ws`;
+                    
+                    websocket = new WebSocket(wsUrl);
+                    
+                    websocket.onopen = function() {
+                        console.log('WebSocket connected');
+                        showNotification('Real-time updates connected', 'success');
+                    };
+                    
+                    websocket.onmessage = function(event) {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'metric_update') {
+                            handleMetricUpdate(data.data);
+                        }
+                    };
+                    
+                    websocket.onclose = function() {
+                        console.log('WebSocket disconnected');
+                        showNotification('Real-time updates disconnected', 'warning');
+                        
+                        // Reconnect after 5 seconds
+                        setTimeout(initWebSocket, 5000);
+                    };
+                    
+                    websocket.onerror = function(error) {
+                        console.error('WebSocket error:', error);
+                    };
+                }
+                
+                function loadMetrics() {
+                    fetch('/api/metrics')
+                        .then(response => response.json())
+                        .then(data => {
+                            currentMetrics = data.metrics || [];
+                            updateMetricsDisplay(currentMetrics);
+                        })
+                        .catch(error => console.error('Error loading metrics:', error));
+                }
+                
+                function updateMetricsDisplay(metrics) {
+                    const metricsDiv = document.getElementById('metrics-display');
+                    if (metrics.length === 0) {
+                        metricsDiv.innerHTML = '<div class="metric-item">No metrics available yet.</div>';
+                        return;
+                    }
+                    
+                    // Sort metrics by timestamp (newest first)
+                    const sortedMetrics = metrics.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    metricsDiv.innerHTML = sortedMetrics.map(metric => {
+                        const timestamp = new Date(metric.timestamp).toLocaleString();
+                        const typeDisplay = metric.type.replace('_', ' ');
+                        
+                        return `
+                            <div class="metric-item" id="metric-${metric.metric_id}">
+                                <div class="metric-info">
+                                    <div class="metric-type">${typeDisplay}</div>
+                                    <div class="metric-details">
+                                        <span>📅 ${timestamp}</span>
+                                        <span>🔗 ${metric.source}</span>
+                                        <span>🆔 ${metric.metric_id}</span>
+                                    </div>
+                                </div>
+                                <div class="metric-value ${metric.status}">
+                                    ${formatMetricValue(metric.value, metric.type)}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                function handleMetricUpdate(metricData) {
+                    // Add to current metrics
+                    currentMetrics.unshift(metricData);
+                    
+                    // Keep only last 50 metrics
+                    if (currentMetrics.length > 50) {
+                        currentMetrics = currentMetrics.slice(0, 50);
+                    }
+                    
+                    // Update display
+                    updateMetricsDisplay(currentMetrics);
+                    
+                    // Highlight new metric
+                    setTimeout(() => {
+                        const metricElement = document.getElementById(`metric-${metricData.metric_id}`);
+                        if (metricElement) {
+                            metricElement.classList.add('metric-new');
+                        }
+                    }, 100);
+                    
+                    // Show notification
+                    const typeDisplay = metricData.type.replace('_', ' ');
+                    showNotification(`New ${typeDisplay}: ${formatMetricValue(metricData.value, metricData.type)}`, 'info');
+                }
+                
+                function formatMetricValue(value, type) {
+                    switch (type) {
+                        case 'xp_compliance':
+                            return `${value}%`;
+                        case 'pr_size':
+                            return `${value} lines`;
+                        case 'velocity':
+                            return `${value} pts`;
+                        default:
+                            return value;
+                    }
+                }
+                
                 function showReviewForm(promptId) {
                     document.getElementById(`review-form-${promptId}`).style.display = 'block';
                 }
@@ -904,6 +1161,32 @@ class EnhancedDashboardServer:
                 logger.error(f"Error broadcasting updates: {e}")
             
             await asyncio.sleep(30)  # Broadcast every 30 seconds
+    
+    async def _broadcast_metric_update(self, metric_data: Dict[str, Any]):
+        """Broadcast metric update to all WebSocket connections"""
+        # Store metric for future retrieval (keep last 50)
+        self.recent_metrics.append(metric_data)
+        if len(self.recent_metrics) > 50:
+            self.recent_metrics.pop(0)
+        
+        # Broadcast to WebSocket clients
+        if self.websocket_connections:
+            update_message = {
+                "type": "metric_update",
+                "data": metric_data,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            disconnected = []
+            for ws in self.websocket_connections:
+                try:
+                    await ws.send_text(json.dumps(update_message))
+                except Exception:
+                    disconnected.append(ws)
+            
+            # Remove disconnected connections
+            for ws in disconnected:
+                self.websocket_connections.remove(ws)
     
     async def _run_command(self, cmd: List[str], cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
         """Run a command asynchronously"""
