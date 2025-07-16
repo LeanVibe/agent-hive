@@ -2,6 +2,14 @@
 """
 Automated Accountability Framework for Agent Coordination
 Ensures mandatory completion deadlines, evidence tracking, and automated escalation.
+
+XP METHODOLOGY COMPLIANCE:
+- Small Releases: Tasks broken into 4-hour maximum chunks
+- Continuous Integration: Automated git/test validation
+- Test-Driven Development: Evidence requirements include test passing
+- Simple Design: Clean, modular accountability system
+- Collective Code Ownership: Automated reassignment on failures
+- Sustainable Pace: 4-hour maximum work cycles with checkpoints
 """
 
 import asyncio
@@ -266,10 +274,10 @@ class AccountabilityFramework:
                 continue
             
             try:
-                # Run validation command
+                # Run validation command safely without shell=True
+                command_parts = requirement.validation_command.split()
                 result = subprocess.run(
-                    requirement.validation_command,
-                    shell=True,
+                    command_parts,
                     capture_output=True,
                     text=True,
                     timeout=self.config["evidence_validation_timeout"]
