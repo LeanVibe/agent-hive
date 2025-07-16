@@ -1,0 +1,123 @@
+{
+  "test_summary": {
+    "total_tests": 18,
+    "passed_tests": 17,
+    "failed_tests": 1,
+    "success_rate": 0.9444444444444444,
+    "timestamp": "2025-07-16T13:12:16.235444"
+  },
+  "test_results": [
+    {
+      "test": "component_initialization",
+      "passed": true,
+      "message": "All components initialized successfully",
+      "timestamp": "2025-07-16T13:12:15.079076"
+    },
+    {
+      "test": "agent_discovery",
+      "passed": true,
+      "message": "Discovered 7 agents",
+      "timestamp": "2025-07-16T13:12:15.119434"
+    },
+    {
+      "test": "message_sending",
+      "passed": true,
+      "message": "Message sending to integration-specialist-Jul-16-1220: success",
+      "timestamp": "2025-07-16T13:12:15.349647"
+    },
+    {
+      "test": "statistics_collection",
+      "passed": true,
+      "message": "Statistics collection: {'tmux_messages': 1, 'message_bus_messages': 0, 'bridge_messages': 0, 'failed_messages': 0}",
+      "timestamp": "2025-07-16T13:12:15.349788"
+    },
+    {
+      "test": "agent_discovery_comprehensive",
+      "passed": true,
+      "message": "Discovered 7 agents, 6 migration ready",
+      "timestamp": "2025-07-16T13:12:15.390183"
+    },
+    {
+      "test": "agent_capabilities",
+      "passed": true,
+      "message": "Agent capabilities assessed",
+      "timestamp": "2025-07-16T13:12:15.390274"
+    },
+    {
+      "test": "pre_migration_validation",
+      "passed": true,
+      "message": "Pre-migration validation: Pre-migration validation passed",
+      "timestamp": "2025-07-16T13:12:15.446519"
+    },
+    {
+      "test": "resource_validation",
+      "passed": true,
+      "message": "Resource validation: System resources validation passed",
+      "timestamp": "2025-07-16T13:12:15.446808"
+    },
+    {
+      "test": "connectivity_validation",
+      "passed": true,
+      "message": "Connectivity validation: Agent connectivity validation passed",
+      "timestamp": "2025-07-16T13:12:15.959647"
+    },
+    {
+      "test": "migration_planning",
+      "passed": true,
+      "message": "Migration plan created: 6 agents, gradual",
+      "timestamp": "2025-07-16T13:12:15.998287"
+    },
+    {
+      "test": "plan_validation",
+      "passed": true,
+      "message": "Plan validation: Migration plan validation passed",
+      "timestamp": "2025-07-16T13:12:16.032942"
+    },
+    {
+      "test": "checkpoint_creation",
+      "passed": true,
+      "message": "Checkpoint creation: success",
+      "timestamp": "2025-07-16T13:12:16.075630"
+    },
+    {
+      "test": "checkpoint_listing",
+      "passed": true,
+      "message": "Checkpoint listing: 1 checkpoints",
+      "timestamp": "2025-07-16T13:12:16.075668"
+    },
+    {
+      "test": "checkpoint_validation",
+      "passed": true,
+      "message": "Checkpoint validation: {'valid': True, 'checkpoint_id': 'test_checkpoint', 'issues': [], 'warnings': []}",
+      "timestamp": "2025-07-16T13:12:16.075685"
+    },
+    {
+      "test": "rollback_status",
+      "passed": true,
+      "message": "Rollback status: 1 checkpoints",
+      "timestamp": "2025-07-16T13:12:16.075709"
+    },
+    {
+      "test": "e2e_migration_execution",
+      "passed": false,
+      "message": "Migration execution: failed",
+      "timestamp": "2025-07-16T13:12:16.197663"
+    },
+    {
+      "test": "migration_monitoring",
+      "passed": true,
+      "message": "Health monitoring: good",
+      "timestamp": "2025-07-16T13:12:16.235203"
+    },
+    {
+      "test": "migration_status",
+      "passed": true,
+      "message": "Migration status: preparation",
+      "timestamp": "2025-07-16T13:12:16.235391"
+    }
+  ],
+  "conclusions": [
+    "\u26a0\ufe0f Most migration tools are working, but some issues need attention",
+    "\u26a0\ufe0f Review failed tests before production migration"
+  ]
+}
