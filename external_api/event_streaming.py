@@ -274,6 +274,94 @@ class EventStreaming:
             return True
         return False
     
+    async def register_agent_endpoint(self, agent_id: str, endpoint: str) -> bool:
+        """
+        Register a message queue endpoint for an agent.
+        
+        Args:
+            agent_id: Unique agent identifier
+            endpoint: API endpoint for agent communication
+            
+        Returns:
+            True if registration successful
+        """
+        try:
+            # Store agent endpoint mapping
+            if not hasattr(self, 'agent_endpoints'):
+                self.agent_endpoints = {}
+            
+            self.agent_endpoints[agent_id] = endpoint
+            logger.info(f"Registered message queue endpoint for agent {agent_id}: {endpoint}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to register agent endpoint for {agent_id}: {e}")
+            return False
+    
+    async def unregister_agent_endpoint(self, agent_id: str) -> bool:
+        """
+        Unregister a message queue endpoint for an agent.
+        
+        Args:
+            agent_id: Agent identifier to unregister
+            
+        Returns:
+            True if unregistration successful
+        """
+        try:
+            if hasattr(self, 'agent_endpoints') and agent_id in self.agent_endpoints:
+                del self.agent_endpoints[agent_id]
+                logger.info(f"Unregistered message queue endpoint for agent {agent_id}")
+                return True
+            return False
+            
+        except Exception as e:
+            logger.error(f"Failed to unregister agent endpoint for {agent_id}: {e}")
+            return False
+    
+    async def send_agent_message(self, agent_id: str, message: Dict[str, Any]) -> bool:
+        """
+        Send a message to a specific agent via message queue.
+        
+        Args:
+            agent_id: Target agent identifier
+            message: Message data to send
+            
+        Returns:
+            True if message sent successfully
+        """
+        try:
+            if not hasattr(self, 'agent_endpoints') or agent_id not in self.agent_endpoints:
+                logger.error(f"No endpoint registered for agent {agent_id}")
+                return False
+            
+            # Create agent-specific event
+            event = StreamEvent(
+                event_id=str(uuid.uuid4()),
+                event_type="agent_message",
+                timestamp=datetime.now(),
+                source="migration_manager",
+                data={
+                    "agent_id": agent_id,
+                    "message": message,
+                    "endpoint": self.agent_endpoints[agent_id]
+                },
+                priority=EventPriority.HIGH
+            )
+            
+            # Publish the event
+            success = await self.publish_event("agent_message", event.data, EventPriority.HIGH)
+            if success:
+                logger.debug(f"Sent message to agent {agent_id}")
+            else:
+                logger.error(f"Failed to send message to agent {agent_id}")
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"Error sending message to agent {agent_id}: {e}")
+            return False
+    
     async def _flush_loop(self) -> None:
         """Main flush loop for periodic event delivery."""
         while self.stream_active:
