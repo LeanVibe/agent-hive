@@ -194,11 +194,12 @@ class EnhancedAgentSpawner:
     async def _start_tmux_session(self, agent_id: str, worktree_path: Path) -> bool:
         """Start tmux session with reliable Claude Code initialization"""
         try:
-            # Create tmux window
+            # Create tmux window with proper agent- prefix for communication compatibility
+            tmux_window_name = f"agent-{agent_id}"
             cmd = [
                 "tmux", "new-window", 
                 "-t", "agent-hive",
-                "-n", agent_id,
+                "-n", tmux_window_name,
                 "-c", str(worktree_path)
             ]
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
@@ -217,10 +218,13 @@ class EnhancedAgentSpawner:
     async def _initialize_claude_code(self, agent_id: str, task: str, priority: str) -> bool:
         """Initialize Claude Code with reliable instruction delivery"""
         try:
+            # Use proper agent- prefixed window name for all tmux commands
+            tmux_window_name = f"agent-{agent_id}"
+            
             # Start Claude Code with permission bypass
             cmd = [
                 "tmux", "send-keys", 
-                "-t", f"agent-hive:{agent_id}",
+                "-t", f"agent-hive:{tmux_window_name}",
                 "claude --dangerously-skip-permissions",
                 "Enter"
             ]
@@ -249,11 +253,14 @@ class EnhancedAgentSpawner:
     async def _reliable_instruction_delivery(self, agent_id: str, instruction: str) -> bool:
         """Deliver instructions with multiple retry mechanisms"""
         
+        # Use proper agent- prefixed window name for all tmux commands
+        tmux_window_name = f"agent-{agent_id}"
+        
         # Method 1: Direct tmux send-keys
         try:
             cmd = [
                 "tmux", "send-keys",
-                "-t", f"agent-hive:{agent_id}",
+                "-t", f"agent-hive:{tmux_window_name}",
                 instruction,
                 "Enter"
             ]
@@ -272,7 +279,7 @@ class EnhancedAgentSpawner:
                 # Send file read command
                 cmd = [
                     "tmux", "send-keys",
-                    "-t", f"agent-hive:{agent_id}",
+                    "-t", f"agent-hive:{tmux_window_name}",
                     f"cat INSTRUCTIONS.txt",
                     "Enter"
                 ]
@@ -404,8 +411,9 @@ class EnhancedAgentSpawner:
     async def _cleanup_failed_spawn(self, agent_id: str):
         """Cleanup resources if spawning fails"""
         try:
-            # Kill tmux window if it exists
-            cmd = ["tmux", "kill-window", "-t", f"agent-hive:{agent_id}"]
+            # Kill tmux window if it exists (with proper agent- prefix)
+            tmux_window_name = f"agent-{agent_id}"
+            cmd = ["tmux", "kill-window", "-t", f"agent-hive:{tmux_window_name}"]
             subprocess.run(cmd, capture_output=True, timeout=10)
             
             # Remove worktree if it exists
