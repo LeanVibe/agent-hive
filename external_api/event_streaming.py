@@ -329,12 +329,24 @@ class EventStreaming:
         Returns:
             Batch data
         """
+        # Convert events to dicts and serialize datetime objects and enums
+        serialized_events = []
+        for event in events:
+            event_dict = asdict(event)
+            # Convert datetime to ISO string
+            if isinstance(event_dict.get('timestamp'), datetime):
+                event_dict['timestamp'] = event_dict['timestamp'].isoformat()
+            # Convert enum to value
+            if hasattr(event_dict.get('priority'), 'value'):
+                event_dict['priority'] = event_dict['priority'].value
+            serialized_events.append(event_dict)
+        
         batch_data = {
             "batch_id": str(uuid.uuid4()),
             "stream_name": self.config.stream_name,
             "timestamp": datetime.now().isoformat(),
             "event_count": len(events),
-            "events": [asdict(event) for event in events]
+            "events": serialized_events
         }
         
         # Apply compression if enabled
@@ -371,10 +383,11 @@ class EventStreaming:
                 )
             
             return {
+                **batch_data,  # Preserve original metadata
                 "compressed": True,
                 "original_size": original_size,
                 "compressed_size": compressed_size,
-                "data": compressed_data.hex()  # Store as hex string
+                "compressed_data": compressed_data.hex()  # Store as hex string
             }
             
         except Exception as e:

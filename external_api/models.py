@@ -60,6 +60,7 @@ class ApiGatewayConfig:
     auth_required: bool = False
     api_key_header: str = "X-API-Key"
     request_timeout: int = 30
+    test_mode: bool = False
     
     def __post_init__(self):
         """Validate configuration parameters."""
@@ -125,7 +126,7 @@ class ApiRequest:
     
     def __post_init__(self):
         """Validate request data."""
-        if self.method not in ["GET", "POST", "PUT", "DELETE", "PATCH"]:
+        if self.method not in ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]:
             raise ValueError(f"Invalid HTTP method: {self.method}")
         if not self.request_id:
             raise ValueError("Request ID cannot be empty")

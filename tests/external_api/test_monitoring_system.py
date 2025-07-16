@@ -439,14 +439,14 @@ class TestMonitoringSystem:
     
     async def test_metrics_cleanup(self, monitoring_system):
         """Test metrics cleanup functionality."""
-        # Set very short retention
-        monitoring_system.retention_hours = 0.001  # About 3.6 seconds
+        # Set very short retention (much smaller for testing)
+        monitoring_system.retention_hours = 0.00001  # About 0.036 seconds
         
         # Record old metric
         monitoring_system.record_metric("test.metric", 42.0)
         
-        # Wait for cleanup
-        await asyncio.sleep(0.1)
+        # Wait for metric to become old enough for cleanup
+        await asyncio.sleep(0.1)  # This is much longer than 0.036 seconds
         
         # Manually trigger cleanup
         cutoff_time = datetime.now() - timedelta(hours=monitoring_system.retention_hours)

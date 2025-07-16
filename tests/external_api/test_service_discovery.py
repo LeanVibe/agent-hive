@@ -25,7 +25,8 @@ class TestServiceDiscovery:
         """Create ServiceDiscovery instance."""
         config = {
             "health_check_interval": 1,
-            "cleanup_interval": 2
+            "cleanup_interval": 2,
+            "test_mode": True
         }
         return ServiceDiscovery(config)
     
