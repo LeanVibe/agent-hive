@@ -255,6 +255,7 @@ class TestServiceDiscoveryAPI:
         assert response.status_code == 404
         assert "No healthy instances found" in response.json()["detail"]
     
+    @pytest.mark.asyncio
     async def test_create_service_discovery_api(self):
         """Test creating ServiceDiscoveryAPI via convenience function."""
         api = await create_service_discovery_api()
@@ -263,6 +264,7 @@ class TestServiceDiscoveryAPI:
         assert api.host == "0.0.0.0"
         assert api.port == 8000
     
+    @pytest.mark.asyncio
     async def test_create_service_discovery_api_custom_config(self):
         """Test creating ServiceDiscoveryAPI with custom configuration."""
         config = {"health_check_interval": 10}
@@ -276,6 +278,7 @@ class TestServiceDiscoveryAPI:
         assert api.host == "127.0.0.1"
         assert api.port == 9000
     
+    @pytest.mark.asyncio
     async def test_api_server_lifecycle(self, service_discovery_api):
         """Test API server start/stop lifecycle."""
         # Note: This test is simplified since we can't easily test the actual server
