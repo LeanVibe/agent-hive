@@ -34,3 +34,26 @@
 2025-07-17 00:48:35 [WARNING] __main__: ⏰ DEADLINE WARNING: Task test-task-123, Agent test-agent, Time: 30 minutes
 2025-07-17 00:48:35 [WARNING] __main__: ⚠️ Could not reach agent test-agent: 
 2025-07-17 00:48:36 [INFO] __main__: ✅ PM agent notified: Deadline approaching for task test-task-123
+Exception in thread Thread-1:
+Traceback (most recent call last):
+  File "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/threading.py", line 1043, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages/watchdog/observers/api.py", line 213, in run
+    self.dispatch_events(self.event_queue)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages/watchdog/observers/api.py", line 391, in dispatch_events
+    handler.dispatch(event)
+    ~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/site-packages/watchdog/events.py", line 217, in dispatch
+    getattr(self, f"on_{event.event_type}")(event)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/pm-agent-new/new-worktrees/performance-Jul-16-1339/scripts/realtime_coordination_monitor.py", line 32, in on_modified
+    asyncio.create_task(self.monitor.process_new_events())
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/asyncio/tasks.py", line 407, in create_task
+    loop = events.get_running_loop()
+RuntimeError: no running event loop
+/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/threading.py:1045: RuntimeWarning: coroutine 'RealTimeCoordinationMonitor.process_new_events' was never awaited
+  self._invoke_excepthook(self)
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
