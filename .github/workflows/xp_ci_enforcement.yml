@@ -200,7 +200,7 @@ jobs:
     
     - name: Upload Coverage Reports
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-reports
         path: |
@@ -212,7 +212,7 @@ jobs:
     
     - name: Upload XP Methodology Report
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: xp-methodology-report
         path: xp_methodology_report.md
