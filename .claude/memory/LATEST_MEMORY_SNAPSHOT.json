@@ -1,0 +1,40 @@
+{
+  "consolidation_level": "critical",
+  "timestamp": "2025-07-16T12:31:08.712492",
+  "state": {
+    "timestamp": "2025-07-16T12:31:08.712492",
+    "agent_status": {
+      "raw_output": "\ud83e\udd16 AGENT STATUS REPORT\n==================================================\nTimestamp: 2025-07-16 12:31:08\n\n\u26a0\ufe0f TMUX_ONLY (4 agents):\n  frontend-Jul-16-1222:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n  integration-specialist-Jul-16-1220:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n  pm-agent-new:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n  service-mesh-Jul-16-1221:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n"
+    },
+    "project_status": {
+      "uncommitted_changes": "M CLAUDE.md",
+      "recent_commits": "7154add Merge remote PR integrations with local workflow improvements\n0be97ad feat: Frontend Dashboard Integration Repair - Real /api/metrics endpoints and WebSocket broadcasting (#44)\n1b3973c feat: service-mesh - Production ready implementation (#42)\n21e9f77 feat: Complete workflow infrastructure - resolve PM agent access constraints\n712205e feat: Add custom Claude commands /sleep and /wake for manual memory management\nc1b67ce feat: Complete Gemini-recommended reliability improvements\n87db249 fix: Agent communication system - eliminate manual Enter requirement\n403c47f feat: Enhanced Agent Coordination System - solve idle agent problem\n5145f9b feat: Critical workflow improvements - evidence-based validation and complete Git workflow\nb937c4f feat: Add Monitoring System component (#38)",
+      "open_prs": [
+        {
+          "headRefName": "feature/integration-merge-workflow-improvements",
+          "number": 46,
+          "title": "feat: Integration workflow improvements and branch sync"
+        },
+        {
+          "headRefName": "new-work/integration-specialist-Jul-16-0207",
+          "number": 43,
+          "title": "feat: integration-specialist - Production ready implementation"
+        }
+      ]
+    },
+    "active_work": {
+      "worktrees": [
+        "new-worktrees/integration-specialist-Jul-16-0207",
+        "new-worktrees/service-mesh-Jul-16-0207",
+        "new-worktrees/frontend-Jul-16-0208"
+      ]
+    },
+    "critical_insights": []
+  },
+  "wake_instructions": [
+    "Read .claude/memory/ESSENTIAL_WORKFLOW_KNOWLEDGE.md immediately",
+    "Check agent status with scripts/check_agent_status.py",
+    "Verify current work with git status and PR status",
+    "Resume coordination using proper communication scripts"
+  ]
+}

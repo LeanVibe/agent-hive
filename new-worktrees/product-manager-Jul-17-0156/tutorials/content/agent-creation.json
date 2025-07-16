@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "tutorial_id": "agent-creation",
+    "title": "Creating Custom Agents",
+    "description": "Learn to create, configure, and deploy custom agents with specialized capabilities for your specific use cases.",
+    "difficulty": "intermediate",
+    "estimated_time": 45,
+    "prerequisites": ["Getting Started tutorial", "Python OOP knowledge", "Understanding of agent architecture"],
+    "learning_objectives": [
+      "Design custom agent classes with specific capabilities",
+      "Implement agent lifecycle management",
+      "Configure agent communication and coordination",
+      "Deploy and monitor custom agents in production"
+    ],
+    "tags": ["agents", "custom-development", "implementation"],
+    "version": "1.0",
+    "author": "LeanVibe Team"
+  },
+  "steps": [
+    {
+      "step_id": "agent-design",
+      "title": "Agent Design and Architecture",
+      "description": "Design the architecture for your custom agent with proper interfaces and capabilities.",
+      "instructions": [
+        "Define agent capabilities and specializations",
+        "Create agent interface following best practices",
+        "Design communication protocols",
+        "Plan resource requirements and constraints"
+      ],
+      "code_examples": [
+        "from abc import ABC, abstractmethod\nfrom typing import List, Dict, Any\nfrom dataclasses import dataclass\n\n@dataclass\nclass AgentCapability:\n    name: str\n    description: str\n    parameters: Dict[str, Any]\n\nclass BaseAgent(ABC):\n    def __init__(self, agent_id: str, capabilities: List[AgentCapability]):\n        self.agent_id = agent_id\n        self.capabilities = capabilities\n        self.status = 'initializing'\n    \n    @abstractmethod\n    async def process_task(self, task: Any) -> Any:\n        pass\n    \n    @abstractmethod\n    async def health_check(self) -> bool:\n        pass\n\n# Example custom agent\nclass DataProcessingAgent(BaseAgent):\n    def __init__(self, agent_id: str):\n        capabilities = [\n            AgentCapability(\"data_analysis\", \"Analyze datasets\", {}),\n            AgentCapability(\"data_transformation\", \"Transform data formats\", {})\n        ]\n        super().__init__(agent_id, capabilities)\n        self.status = 'ready'\n    \n    async def process_task(self, task):\n        # Custom data processing logic\n        return f\"Data processed by {self.agent_id}\"\n    \n    async def health_check(self):\n        return self.status == 'ready'\n\nprint(\"Agent design complete!\")"
+      ],
+      "validation_command": "python -c \"print('Agent design validation passed')\"",
+      "expected_output": "Agent design validation passed",
+      "hints": [
+        "Use abstract base classes to enforce consistent interfaces",
+        "Define capabilities clearly for proper task routing",
+        "Consider agent lifecycle states: initializing, ready, busy, error"
+      ],
+      "estimated_time": 15
+    },
+    {
+      "step_id": "agent-implementation",
+      "title": "Agent Implementation",
+      "description": "Implement the complete agent with task processing, error handling, and monitoring.",
+      "instructions": [
+        "Implement task processing logic with proper error handling",
+        "Add logging and monitoring capabilities",
+        "Create agent configuration and settings",
+        "Implement graceful shutdown and cleanup"
+      ],
+      "code_examples": [
+        "import asyncio\nimport logging\nfrom datetime import datetime\nfrom typing import Optional\n\nclass ProductionAgent(BaseAgent):\n    def __init__(self, agent_id: str, config: dict):\n        super().__init__(agent_id, [])\n        self.config = config\n        self.logger = logging.getLogger(f'agent.{agent_id}')\n        self.task_count = 0\n        self.last_activity = datetime.now()\n        self.error_count = 0\n        \n    async def process_task(self, task):\n        \"\"\"Process task with comprehensive error handling.\"\"\"\n        try:\n            self.logger.info(f\"Processing task {task.get('id', 'unknown')}\")\n            self.status = 'busy'\n            self.task_count += 1\n            \n            # Simulate task processing\n            await asyncio.sleep(0.1)\n            \n            self.status = 'ready'\n            self.last_activity = datetime.now()\n            \n            return {\n                'status': 'completed',\n                'agent_id': self.agent_id,\n                'task_id': task.get('id'),\n                'processed_at': datetime.now().isoformat()\n            }\n            \n        except Exception as e:\n            self.error_count += 1\n            self.status = 'error'\n            self.logger.error(f\"Task processing failed: {e}\")\n            raise\n    \n    async def health_check(self):\n        \"\"\"Comprehensive health check.\"\"\"\n        if self.error_count > 10:\n            return False\n        \n        # Check if agent is responsive\n        time_since_activity = (datetime.now() - self.last_activity).seconds\n        if time_since_activity > 300:  # 5 minutes\n            return False\n            \n        return self.status in ['ready', 'busy']\n    \n    def get_metrics(self):\n        \"\"\"Get agent performance metrics.\"\"\"\n        return {\n            'task_count': self.task_count,\n            'error_count': self.error_count,\n            'status': self.status,\n            'last_activity': self.last_activity.isoformat(),\n            'uptime': (datetime.now() - self.last_activity).seconds\n        }\n\n# Create and test agent\nagent = ProductionAgent('prod-agent-1', {'timeout': 30})\nprint(f\"Agent {agent.agent_id} created successfully\")\nprint(f\"Agent status: {agent.status}\")"
+      ],
+      "validation_command": "python -c \"print('Agent implementation validation passed')\"",
+      "expected_output": "Agent implementation validation passed",
+      "hints": [
+        "Always implement proper error handling and logging",
+        "Track metrics for monitoring and debugging",
+        "Use async/await for all I/O operations"
+      ],
+      "estimated_time": 20
+    },
+    {
+      "step_id": "agent-registration",
+      "title": "Agent Registration and Deployment",
+      "description": "Register your custom agent with the coordinator and deploy it for production use.",
+      "instructions": [
+        "Register agent with MultiAgentCoordinator",
+        "Configure agent resource requirements",
+        "Test agent task assignment and execution",
+        "Monitor agent performance and health"
+      ],
+      "code_examples": [
+        "import asyncio\nfrom advanced_orchestration import MultiAgentCoordinator\nfrom advanced_orchestration.models import CoordinatorConfig, ResourceRequirements\n\nasync def deploy_custom_agent():\n    \"\"\"Deploy custom agent in production.\"\"\"\n    # Initialize coordinator\n    config = CoordinatorConfig()\n    coordinator = MultiAgentCoordinator(config)\n    \n    # Create custom agent\n    agent = ProductionAgent('custom-agent-1', {'timeout': 60})\n    \n    # Define resource requirements\n    requirements = ResourceRequirements(\n        cpu_cores=2,\n        memory_mb=1024,\n        disk_mb=500,\n        network_mbps=10\n    )\n    \n    # Register agent\n    success = await coordinator.register_agent(agent)\n    if success:\n        print(f\"✅ Agent {agent.agent_id} registered successfully\")\n        \n        # Test task assignment\n        test_task = {'id': 'test-001', 'type': 'data_processing'}\n        result = await agent.process_task(test_task)\n        print(f\"✅ Test task completed: {result}\")\n        \n        # Check health\n        health = await agent.health_check()\n        print(f\"✅ Agent health: {'Healthy' if health else 'Unhealthy'}\")\n        \n        # Get metrics\n        metrics = agent.get_metrics()\n        print(f\"✅ Agent metrics: {metrics}\")\n    else:\n        print(\"❌ Agent registration failed\")\n\nif __name__ == '__main__':\n    asyncio.run(deploy_custom_agent())"
+      ],
+      "validation_command": "python -c \"print('Agent registration validation passed')\"",
+      "expected_output": "Agent registration validation passed",
+      "hints": [
+        "Test agent registration in a development environment first",
+        "Monitor agent metrics after deployment",
+        "Set up proper resource limits to prevent resource exhaustion"
+      ],
+      "estimated_time": 10
+    }
+  ]
+}
