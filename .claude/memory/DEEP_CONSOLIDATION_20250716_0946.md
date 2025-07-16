@@ -1,0 +1,32 @@
+{
+  "consolidation_type": "deep",
+  "timestamp": "2025-07-16T09:46:58.368575",
+  "context_trigger": "High context usage detected",
+  "agent_status": {
+    "raw_output": "\ud83e\udd16 AGENT STATUS REPORT\n==================================================\nTimestamp: 2025-07-16 09:46:58\n\n\u2705 ACTIVE (4 agents):\n  frontend-Jul-16-0208:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/frontend-Jul-16-0208\n    Last activity: 2025-07-16 09:14:14 +0300\n\n  integration-specialist-Jul-16-0207:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/integration-specialist-Jul-16-0207\n    Last activity: 2025-07-16 09:16:22 +0300\n\n  pm-agent:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: worktrees/pm-agent\n    Last activity: 2025-07-16 01:04:16 +0300\n\n  service-mesh-Jul-16-0207:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/service-mesh-Jul-16-0207\n    Last activity: 2025-07-16 09:16:04 +0300\n\n\u26a0\ufe0f TMUX_ONLY (1 agents):\n  monitoring-agent:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n"
+  },
+  "project_status": {
+    "uncommitted_changes": "M .claude/logs/errors.log\n M .claude/logs/leanvibe.log\n M new-worktrees/frontend-Jul-16-0208\n M new-worktrees/integration-specialist-Jul-16-0207\n M new-worktrees/service-mesh-Jul-16-0207\n M scripts/pr_integration_manager.py\n M uv.lock\n?? .claude/hooks/context_monitor.py\n?? .claude/memory/\n?? MEMORY_MANAGEMENT_SYSTEM_DESIGN.md\n?? quality_gate_report.json",
+    "recent_commits": "21e9f77 feat: Complete workflow infrastructure - resolve PM agent access constraints\n712205e feat: Add custom Claude commands /sleep and /wake for manual memory management\nc1b67ce feat: Complete Gemini-recommended reliability improvements\n87db249 fix: Agent communication system - eliminate manual Enter requirement\n403c47f feat: Enhanced Agent Coordination System - solve idle agent problem\n5145f9b feat: Critical workflow improvements - evidence-based validation and complete Git workflow\n3491687 feat: Add API Gateway component (#35)\n5e2850b feat: Add Service Discovery component (#36)\n233465e feat: Add authentication middleware component (#31)\n1ede091 feat: Complete Phase 2 intelligence framework with modern workflows (#30)",
+    "open_prs": [
+      {
+        "headRefName": "new-work/integration-specialist-Jul-16-0207",
+        "number": 43,
+        "title": "feat: integration-specialist - Production ready implementation"
+      }
+    ]
+  },
+  "active_work": {
+    "worktrees": [
+      "new-worktrees/integration-specialist-Jul-16-0207",
+      "new-worktrees/service-mesh-Jul-16-0207",
+      "new-worktrees/frontend-Jul-16-0208"
+    ]
+  },
+  "critical_reminders": [
+    "Use scripts/fixed_agent_communication.py for agent messaging",
+    "Always verify git commits and pushes before claiming completion",
+    "Evidence-based validation required for all claims",
+    "Quality gates mandatory before integration"
+  ]
+}
