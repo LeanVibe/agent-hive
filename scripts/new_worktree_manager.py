@@ -37,7 +37,7 @@ class NewWorktreeManager:
         """Create a new worktree for an agent with strict quality gates"""
         try:
             # Create unique branch name
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now().strftime("%b-%d-%H%M")
             branch_name = f"new-work/{agent_name}-{timestamp}"
             worktree_path = self.worktrees_dir / f"{agent_name}-{timestamp}"
             
