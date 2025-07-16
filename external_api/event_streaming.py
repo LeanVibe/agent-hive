@@ -334,7 +334,7 @@ class EventStreaming:
             "stream_name": self.config.stream_name,
             "timestamp": datetime.now().isoformat(),
             "event_count": len(events),
-            "events": [asdict(event) for event in events]
+            "events": [self._serialize_event(event) for event in events]
         }
         
         # Apply compression if enabled
@@ -342,6 +342,25 @@ class EventStreaming:
             batch_data = await self._compress_batch(batch_data)
         
         return batch_data
+    
+    def _serialize_event(self, event: StreamEvent) -> Dict[str, Any]:
+        """
+        Serialize a StreamEvent to a JSON-serializable dictionary.
+        
+        Args:
+            event: StreamEvent to serialize
+            
+        Returns:
+            JSON-serializable dictionary
+        """
+        event_dict = asdict(event)
+        # Convert datetime to ISO format string
+        if isinstance(event_dict.get('timestamp'), datetime):
+            event_dict['timestamp'] = event_dict['timestamp'].isoformat()
+        # Convert enum to string value
+        if 'priority' in event_dict and hasattr(event_dict['priority'], 'value'):
+            event_dict['priority'] = event_dict['priority'].value
+        return event_dict
     
     async def _compress_batch(self, batch_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -371,10 +390,11 @@ class EventStreaming:
                 )
             
             return {
+                **batch_data,  # Preserve original batch metadata
                 "compressed": True,
                 "original_size": original_size,
                 "compressed_size": compressed_size,
-                "data": compressed_data.hex()  # Store as hex string
+                "compressed_data": compressed_data.hex()  # Store as hex string
             }
             
         except Exception as e:

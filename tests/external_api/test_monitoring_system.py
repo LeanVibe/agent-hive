@@ -529,15 +529,25 @@ class TestMonitoringSystem:
         assert len(monitoring_system.metrics["test3.metric"]) == 20
     
     @pytest.mark.asyncio
-
-    
     async def test_metrics_cleanup(self, monitoring_system):
         """Test metrics cleanup functionality."""
         # Set very short retention
         monitoring_system.retention_hours = 0.001  # About 3.6 seconds
         
-        # Record old metric
-        monitoring_system.record_metric("test.metric", 42.0)
+        # Record old metric by manually creating it with old timestamp
+        old_timestamp = datetime.now() - timedelta(hours=0.002)  # Older than retention
+        from external_api.monitoring_system import MetricData, MetricType
+        
+        old_metric = MetricData(
+            name="test.metric",
+            value=42.0,
+            metric_type=MetricType.GAUGE,
+            tags={},
+            timestamp=old_timestamp
+        )
+        
+        # Add the old metric directly
+        monitoring_system.metrics["test.metric"] = [old_metric]
         
         # Wait for cleanup
         await asyncio.sleep(0.1)
