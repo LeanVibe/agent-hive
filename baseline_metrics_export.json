@@ -1,0 +1,207 @@
+{
+  "export_timestamp": "2025-07-16T13:41:56.208527",
+  "time_period_hours": 24,
+  "metrics_count": 20,
+  "metrics": [
+    {
+      "id": 20,
+      "metric_name": "process_count",
+      "value": 1053.0,
+      "unit": "count",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 19,
+      "metric_name": "network_bytes_recv",
+      "value": 1839026176.0,
+      "unit": "bytes",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 18,
+      "metric_name": "network_bytes_sent",
+      "value": 4312944640.0,
+      "unit": "bytes",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 17,
+      "metric_name": "load_average_15min",
+      "value": 7.5908203125,
+      "unit": "load",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 16,
+      "metric_name": "load_average_5min",
+      "value": 7.69140625,
+      "unit": "load",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 15,
+      "metric_name": "load_average_1min",
+      "value": 6.02880859375,
+      "unit": "load",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 14,
+      "metric_name": "disk_usage_percent",
+      "value": 15.5,
+      "unit": "%",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 13,
+      "metric_name": "cpu_usage_percent",
+      "value": 22.7,
+      "unit": "%",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 12,
+      "metric_name": "memory_usage_percent",
+      "value": 65.1,
+      "unit": "%",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 11,
+      "metric_name": "memory_usage_mb",
+      "value": 21880.0,
+      "unit": "MB",
+      "timestamp": "2025-07-16T13:41:52.219196",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 10,
+      "metric_name": "process_count",
+      "value": 1053.0,
+      "unit": "count",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 9,
+      "metric_name": "network_bytes_recv",
+      "value": 1835805696.0,
+      "unit": "bytes",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 8,
+      "metric_name": "network_bytes_sent",
+      "value": 4298998784.0,
+      "unit": "bytes",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 7,
+      "metric_name": "load_average_15min",
+      "value": 7.8017578125,
+      "unit": "load",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 6,
+      "metric_name": "load_average_5min",
+      "value": 8.35302734375,
+      "unit": "load",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 5,
+      "metric_name": "load_average_1min",
+      "value": 8.40185546875,
+      "unit": "load",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 4,
+      "metric_name": "disk_usage_percent",
+      "value": 15.5,
+      "unit": "%",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 3,
+      "metric_name": "cpu_usage_percent",
+      "value": 25.5,
+      "unit": "%",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 2,
+      "metric_name": "memory_usage_percent",
+      "value": 65.3,
+      "unit": "%",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    },
+    {
+      "id": 1,
+      "metric_name": "memory_usage_mb",
+      "value": 21949.140625,
+      "unit": "MB",
+      "timestamp": "2025-07-16T13:40:51.204088",
+      "agent_id": null,
+      "session_id": null,
+      "metadata": null
+    }
+  ]
+}
