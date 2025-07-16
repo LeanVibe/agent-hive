@@ -1,0 +1,35 @@
+{
+  "consolidation_type": "deep",
+  "timestamp": "2025-07-16T13:19:08.166022",
+  "context_trigger": "High context usage detected",
+  "agent_status": {
+    "raw_output": "\ud83e\udd16 AGENT STATUS REPORT\n==================================================\nTimestamp: 2025-07-16 13:19:08\n\n\u2705 ACTIVE (7 agents):\n  frontend-Jul-16-1222:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/frontend-Jul-16-1222\n    Last activity: 2025-07-16 13:01:39 +0300\n\n  infrastructure-Jul-16-1300:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/infrastructure-Jul-16-1300\n    Last activity: 2025-07-16 13:14:19 +0300\n\n  integration-specialist-Jul-16-1220:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/integration-specialist-Jul-16-1220\n    Last activity: 2025-07-16 12:48:09 +0300\n\n  integration-specialist-Jul-16-1247:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/integration-specialist-Jul-16-1247\n    Last activity: 2025-07-16 13:15:23 +0300\n\n  performance-Jul-16-1301:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/performance-Jul-16-1301\n    Last activity: 2025-07-16 13:10:59 +0300\n\n  pm-agent-new:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: worktrees/pm-agent-new\n    Last activity: 2025-07-16 09:50:54 +0300\n\n  service-mesh-Jul-16-1221:\n    Tmux: \ud83d\udfe2 | Worktree: \ud83d\udcc1\n    Path: new-worktrees/service-mesh-Jul-16-1221\n    Last activity: 2025-07-16 13:18:02 +0300\n\n"
+  },
+  "project_status": {
+    "uncommitted_changes": "M docs/PLAN.md\n?? scripts/foundation_epic_monitor.py",
+    "recent_commits": "0eb0538 feat: Initiate Foundation Epic Phase 1 - Real Infrastructure Implementation\n6f0267b feat: Implement intelligent agent notification system with automation specialist\n6d6b58c fix: Clean up Python cache conflicts and prepare for final push\nc4e9690 feat: Complete Week 1 Sprint cleanup and documentation archival\n293cc5c Resolve merge conflicts in API_REFERENCE.md - keep HEAD version\n7154add Merge remote PR integrations with local workflow improvements\n0be97ad feat: Frontend Dashboard Integration Repair - Real /api/metrics endpoints and WebSocket broadcasting (#44)\n1b3973c feat: service-mesh - Production ready implementation (#42)\n21e9f77 feat: Complete workflow infrastructure - resolve PM agent access constraints\n712205e feat: Add custom Claude commands /sleep and /wake for manual memory management",
+    "open_prs": [
+      {
+        "headRefName": "new-work/integration-specialist-Jul-16-0207",
+        "number": 43,
+        "title": "feat: integration-specialist - Production ready implementation"
+      }
+    ]
+  },
+  "active_work": {
+    "worktrees": [
+      "new-worktrees/performance-Jul-16-1301",
+      "new-worktrees/frontend-Jul-16-1222",
+      "new-worktrees/integration-specialist-Jul-16-1247",
+      "new-worktrees/service-mesh-Jul-16-1221",
+      "new-worktrees/infrastructure-Jul-16-1300",
+      "new-worktrees/integration-specialist-Jul-16-1220"
+    ]
+  },
+  "critical_reminders": [
+    "Use scripts/fixed_agent_communication.py for agent messaging",
+    "Always verify git commits and pushes before claiming completion",
+    "Evidence-based validation required for all claims",
+    "Quality gates mandatory before integration"
+  ]
+}
