@@ -25,8 +25,9 @@ fastapi>=0.104.0
 uvicorn>=0.24.0
 pydantic>=2.0.0
 
-# HTTP and API clients
-aiohttp>=3.8.0
+# Message Queue System Dependencies
+redis>=4.5.0
+websockets>=11.0.0
 
 # Configuration and utilities
 python-dotenv>=1.0.0
