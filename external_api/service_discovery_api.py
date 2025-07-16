@@ -11,6 +11,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 
 from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import uvicorn
@@ -94,6 +95,9 @@ class ServiceDiscoveryAPI:
         
         # Setup routes
         self._setup_routes()
+        
+        # Setup CORS middleware (after routes to ensure proper handling)
+        self._setup_cors_middleware()
         
         logger.info(f"ServiceDiscoveryAPI initialized on {host}:{port}")
     
@@ -388,6 +392,19 @@ class ServiceDiscoveryAPI:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Failed to get healthy instance: {str(e)}"
                 )
+    
+    def _setup_cors_middleware(self) -> None:
+        """Setup CORS middleware for FastAPI application."""
+        # Add CORS middleware with comprehensive OPTIONS support
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],  # Allow all origins for development/testing
+            allow_credentials=True,
+            allow_methods=["*"],  # Allow all HTTP methods including OPTIONS
+            allow_headers=["*"],  # Allow all headers
+            expose_headers=["*"],  # Expose all headers
+        )
+        logger.info("CORS middleware configured with full OPTIONS support")
     
     async def start_server(self) -> None:
         """Start the API server."""
