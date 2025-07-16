@@ -14,11 +14,17 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List, Callable
 from dataclasses import asdict
 
+import uvicorn
+from fastapi import FastAPI, Request, Response, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+import aiohttp
+
 from .models import (
     ApiGatewayConfig,
     ApiRequest,
     ApiResponse
 )
+from .service_discovery import ServiceDiscovery
 
 
 logger = logging.getLogger(__name__)
@@ -47,6 +53,32 @@ class ApiGateway:
         self.server_started = False
         self._request_count = 0
         
+        # Initialize FastAPI app
+        self.app = FastAPI(
+            title="LeanVibe Agent Hive API Gateway",
+            description="Unified API for agent hive orchestration",
+            version="1.0.0"
+        )
+        
+        # Service discovery integration
+        self.service_discovery = ServiceDiscovery()
+        
+        # Configure CORS if enabled
+        if self.config.enable_cors:
+            self.app.add_middleware(
+                CORSMiddleware,
+                allow_origins=self.config.cors_origins,
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+            )
+        
+        # Setup catch-all route for dynamic routing
+        self.app.add_api_route("/{path:path}", self._handle_fastapi_request, methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+        
+        # Server instance for stopping
+        self.server = None
+        
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
     
     async def start_server(self) -> None:
@@ -57,7 +89,24 @@ class ApiGateway:
             
         try:
             logger.info(f"Starting API gateway on {self.config.host}:{self.config.port}")
-            await asyncio.sleep(0.1)  # Simulate startup time
+            
+            # Create uvicorn config
+            config = uvicorn.Config(
+                app=self.app,
+                host=self.config.host,
+                port=self.config.port,
+                log_level="info",
+                access_log=True
+            )
+            
+            # Create and start server
+            self.server = uvicorn.Server(config)
+            
+            # Start server in background task
+            self._server_task = asyncio.create_task(self.server.serve())
+            
+            # Wait a bit for server to start
+            await asyncio.sleep(0.5)
             
             self.server_started = True
             logger.info("API gateway started successfully")
@@ -74,6 +123,19 @@ class ApiGateway:
             
         try:
             logger.info("Stopping API gateway...")
+            
+            if self.server:
+                # Stop the uvicorn server
+                self.server.should_exit = True
+                
+                # Cancel the server task
+                if hasattr(self, '_server_task'):
+                    self._server_task.cancel()
+                    try:
+                        await self._server_task
+                    except asyncio.CancelledError:
+                        pass
+            
             self.server_started = False
             logger.info("API gateway stopped")
             
@@ -147,6 +209,54 @@ class ApiGateway:
         }
         logger.info(f"Registered API key with metadata: {list(metadata.keys())}")
     
+    async def _handle_fastapi_request(self, request: Request) -> Response:
+        """
+        FastAPI route handler that converts to our internal ApiRequest format.
+        
+        Args:
+            request: FastAPI Request object
+            
+        Returns:
+            FastAPI Response object
+        """
+        # Convert FastAPI request to our ApiRequest format
+        path = request.url.path
+        method = request.method
+        headers = dict(request.headers)
+        query_params = dict(request.query_params)
+        
+        # Get body for non-GET requests
+        body = None
+        if method != "GET":
+            try:
+                body = await request.json()
+            except:
+                body_bytes = await request.body()
+                body = body_bytes.decode() if body_bytes else None
+        
+        # Create our internal request object
+        api_request = ApiRequest(
+            method=method,
+            path=path,
+            headers=headers,
+            query_params=query_params,
+            body=body,
+            timestamp=datetime.now(),
+            request_id=f"req-{uuid.uuid4().hex[:8]}",
+            client_ip=request.client.host if request.client else "unknown"
+        )
+        
+        # Process request using our existing logic
+        api_response = await self.handle_request(api_request)
+        
+        # Convert our ApiResponse to FastAPI Response
+        return Response(
+            content=json.dumps(api_response.body) if api_response.body is not None else "",
+            status_code=api_response.status_code,
+            headers=api_response.headers,
+            media_type="application/json"
+        )
+    
     async def handle_request(self, request: ApiRequest) -> ApiResponse:
         """
         Handle incoming API request.
@@ -185,7 +295,13 @@ class ApiGateway:
             if self.config.enable_cors and request.method == "OPTIONS":
                 return self._create_cors_response(request.request_id, start_time)
             
-            # Route matching
+            # Check for service routing first (e.g., /api/v1/services/{service_name}/...)
+            service_name = self._extract_service_name(request.path)
+            if service_name:
+                # Proxy to discovered service
+                return await self.proxy_to_service(request, service_name)
+            
+            # Route matching for local handlers
             handler = self._find_handler(request.path, request.method)
             if not handler:
                 return self._create_error_response(
@@ -244,6 +360,97 @@ class ApiGateway:
                 request.request_id,
                 500,
                 "Internal server error",
+                start_time
+            )
+    
+    async def proxy_to_service(self, request: ApiRequest, service_name: str) -> ApiResponse:
+        """
+        Proxy request to a discovered service instance.
+        
+        Args:
+            request: The API request to proxy
+            service_name: Name of the service to proxy to
+            
+        Returns:
+            API response from the service
+        """
+        start_time = time.time()
+        
+        try:
+            # Find a healthy service instance
+            service_instance = await self.service_discovery.get_healthy_instance(service_name)
+            
+            if not service_instance:
+                logger.warning(f"No healthy instances found for service: {service_name}")
+                return self._create_error_response(
+                    request.request_id,
+                    503,
+                    f"Service {service_name} unavailable",
+                    start_time
+                )
+            
+            # Build target URL
+            target_url = f"http://{service_instance.host}:{service_instance.port}{request.path}"
+            
+            # Prepare request data
+            request_data = {
+                "method": request.method,
+                "url": target_url,
+                "params": request.query_params,
+                "headers": request.headers,
+                "timeout": aiohttp.ClientTimeout(total=self.config.request_timeout)
+            }
+            
+            # Add body for non-GET requests
+            if request.method != "GET" and request.body is not None:
+                if isinstance(request.body, dict):
+                    request_data["json"] = request.body
+                else:
+                    request_data["data"] = request.body
+            
+            # Make the proxied request
+            async with aiohttp.ClientSession() as session:
+                async with session.request(**request_data) as response:
+                    # Read response body
+                    response_body = await response.text()
+                    
+                    # Try to parse as JSON, fallback to text
+                    try:
+                        response_json = json.loads(response_body) if response_body else None
+                    except json.JSONDecodeError:
+                        response_json = {"content": response_body}
+                    
+                    # Create response headers
+                    response_headers = dict(response.headers)
+                    response_headers.update(self._get_response_headers())
+                    
+                    processing_time = (time.time() - start_time) * 1000
+                    logger.info(f"Proxied request {request.request_id} to {service_name} in {processing_time:.2f}ms")
+                    
+                    return ApiResponse(
+                        status_code=response.status,
+                        headers=response_headers,
+                        body=response_json,
+                        timestamp=datetime.now(),
+                        processing_time=processing_time,
+                        request_id=request.request_id
+                    )
+                    
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout proxying request {request.request_id} to {service_name}")
+            return self._create_error_response(
+                request.request_id,
+                504,
+                f"Service {service_name} timeout",
+                start_time
+            )
+            
+        except Exception as e:
+            logger.error(f"Error proxying request {request.request_id} to {service_name}: {e}")
+            return self._create_error_response(
+                request.request_id,
+                502,
+                f"Bad gateway to {service_name}",
                 start_time
             )
     
@@ -341,6 +548,34 @@ class ApiGateway:
             path = path[len(self.config.api_prefix):]
         
         return self.routes.get(path, {}).get(method.upper())
+    
+    def _extract_service_name(self, path: str) -> Optional[str]:
+        """
+        Extract service name from request path for service discovery routing.
+        
+        Expected patterns:
+        - /api/v1/services/{service_name}/...
+        - /services/{service_name}/...
+        
+        Args:
+            path: Request path
+            
+        Returns:
+            Service name if found, None otherwise
+        """
+        # Remove API prefix if present
+        if path.startswith(self.config.api_prefix):
+            path = path[len(self.config.api_prefix):]
+        
+        # Check for service routing patterns
+        if path.startswith("/services/"):
+            parts = path.split("/")
+            if len(parts) >= 3:  # ["", "services", "service_name", ...]
+                service_name = parts[2]
+                if service_name:  # Ensure not empty
+                    return service_name
+        
+        return None
     
     def _get_response_headers(self) -> Dict[str, str]:
         """Get response headers including CORS if enabled."""
