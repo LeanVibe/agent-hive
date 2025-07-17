@@ -1,7 +1,0 @@
-{"type": "COORDINATION_CRISIS", "task_id": "reassign-task", "agent_id": "unresponsive-agent", "description": "Reassign test", "overdue_hours": 9.99525e-05, "escalation_level": "red", "timestamp": "2025-07-16T19:03:54.363748"}
-{"type": "COORDINATION_CRISIS", "task_id": "reassign-task", "agent_id": "unresponsive-agent", "description": "Reassign test", "overdue_hours": 9.990416666666667e-05, "escalation_level": "red", "timestamp": "2025-07-16T19:46:58.806713"}
-{"type": "COORDINATION_CRISIS", "task_id": "reassign-task", "agent_id": "unresponsive-agent", "description": "Reassign test", "overdue_hours": 9.986277777777777e-05, "escalation_level": "red", "timestamp": "2025-07-16T19:47:20.571039"}
-{"type": "COORDINATION_CRISIS", "task_id": "reassign-task", "agent_id": "unresponsive-agent", "description": "Reassign test", "overdue_hours": 9.99425e-05, "escalation_level": "red", "timestamp": "2025-07-16T20:52:42.553843"}
-{"type": "COORDINATION_CRISIS", "task_id": "reassign-task", "agent_id": "unresponsive-agent", "description": "Reassign test", "overdue_hours": 9.99338888888889e-05, "escalation_level": "red", "timestamp": "2025-07-17T00:38:38.973768"}
-{"type": "DEADLINE_WARNING", "task_id": "test-task-123", "agent_id": "test-agent", "timestamp": "2025-07-16T21:44:26.3NZ", "time_remaining": "30 minutes"}
-{"type": "COORDINATION_CRISIS", "task_id": "reassign-task", "agent_id": "unresponsive-agent", "description": "Reassign test", "overdue_hours": 9.994749999999999e-05, "escalation_level": "red", "timestamp": "2025-07-17T00:49:19.121504"}
