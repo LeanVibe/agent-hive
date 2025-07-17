@@ -23,7 +23,7 @@ import enum
 # Import Security Agent's base models
 import sys
 sys.path.append('../security-Jul-17-0944')
-from external_api.database_models import Base, User as SecurityUser, Role as SecurityRole, PermissionModel
+from external_api.database_models import Base, User as SecurityUser, Role as SecurityRole, PermissionModel, AuditLog
 
 # Import our RBAC enums
 from .rbac_framework import ResourceType, ActionType, PermissionScope
@@ -113,10 +113,10 @@ class EnhancedRole(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    metadata = Column(JSON, nullable=True)
+    enhanced_metadata = Column(JSON, nullable=True)
     
     # Relationships
-    users = relationship("SecurityUser", secondary="user_roles", back_populates="roles")
+    users = relationship("User", secondary="user_roles", back_populates="roles")
     permissions = relationship("EnhancedPermission", secondary=enhanced_role_permissions, back_populates="roles")
     
     # Hierarchy relationships
@@ -190,7 +190,7 @@ class EnhancedRole(Base):
             'hierarchy_path': self.hierarchy_path,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.metadata or {}
+            'metadata': self.enhanced_metadata or {}
         }
 
 
@@ -222,11 +222,11 @@ class EnhancedPermission(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    metadata = Column(JSON, nullable=True)
+    enhanced_metadata = Column(JSON, nullable=True)
     
     # Relationships
     roles = relationship("EnhancedRole", secondary=enhanced_role_permissions, back_populates="permissions")
-    users = relationship("SecurityUser", secondary=user_direct_permissions, back_populates="direct_permissions")
+    users = relationship("User", secondary=user_direct_permissions, back_populates="direct_permissions")
     
     # Indexes
     __table_args__ = (
@@ -292,7 +292,7 @@ class EnhancedPermission(Base):
             'expires_at': self.expires_at.isoformat() if self.expires_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.metadata or {}
+            'metadata': self.enhanced_metadata or {}
         }
     
     @classmethod
@@ -324,7 +324,7 @@ class PermissionCache(Base):
     hit_count = Column(Integer, default=0)
     
     # Relationships
-    user = relationship("SecurityUser")
+    user = relationship("User")
     
     # Indexes
     __table_args__ = (
@@ -341,67 +341,10 @@ class PermissionCache(Base):
         return datetime.utcnow() > self.expires_at
 
 
-class AuditLog(Base):
-    """Audit log for authorization decisions."""
-    
-    __tablename__ = 'audit_logs'
-    
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
-    
-    # Request details
-    resource_type = Column(SQLEnum(ResourceTypeEnum), nullable=False)
-    action = Column(SQLEnum(ActionTypeEnum), nullable=False)
-    resource_id = Column(String(100), nullable=True)
-    
-    # Authorization result
-    authorized = Column(Boolean, nullable=False)
-    reason = Column(Text, nullable=True)
-    permissions_used = Column(JSON, nullable=True)
-    
-    # Context information
-    client_ip = Column(String(45), nullable=True)
-    user_agent = Column(Text, nullable=True)
-    request_context = Column(JSON, nullable=True)
-    
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
-    # Relationships
-    user = relationship("SecurityUser")
-    
-    # Indexes
-    __table_args__ = (
-        Index('idx_audit_logs_user_id', 'user_id'),
-        Index('idx_audit_logs_resource_type', 'resource_type'),
-        Index('idx_audit_logs_action', 'action'),
-        Index('idx_audit_logs_authorized', 'authorized'),
-        Index('idx_audit_logs_created_at', 'created_at'),
-        Index('idx_audit_logs_composite', 'user_id', 'resource_type', 'action', 'created_at'),
-    )
-    
-    def __repr__(self):
-        return f"<AuditLog(id={self.id}, user_id={self.user_id}, authorized={self.authorized})>"
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary."""
-        return {
-            'id': str(self.id),
-            'user_id': str(self.user_id),
-            'resource_type': self.resource_type.value,
-            'action': self.action.value,
-            'resource_id': self.resource_id,
-            'authorized': self.authorized,
-            'reason': self.reason,
-            'permissions_used': self.permissions_used or [],
-            'client_ip': self.client_ip,
-            'user_agent': self.user_agent,
-            'request_context': self.request_context or {},
-            'created_at': self.created_at.isoformat() if self.created_at else None
-        }
+# AuditLog is imported from database_models.py to avoid duplication
 
 
-# Extend the SecurityUser model with additional relationships
+# Extend the User model with additional relationships
 SecurityUser.direct_permissions = relationship(
     "EnhancedPermission", 
     secondary=user_direct_permissions, 

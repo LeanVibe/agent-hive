@@ -34,3 +34,6 @@ psutil>=5.9.0
 
 # Message Bus (Redis backend)
 redis[asyncio]>=5.0.0
+
+# Database drivers
+asyncpg>=0.28.0
