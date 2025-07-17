@@ -43,22 +43,22 @@ class TestPredictiveAnalytics:
     def test_init_creates_database_schema(self, temp_db, config):
         """Test that initialization creates proper database schema."""
         analytics = PredictiveAnalytics(config=config, db_path=temp_db)
-        
+
         # Verify database file exists
         assert Path(temp_db).exists()
-        
+
         # Verify schema
         with sqlite3.connect(temp_db) as conn:
             cursor = conn.cursor()
-            
+
             # Check system_metrics table
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='system_metrics'")
             assert cursor.fetchone() is not None
-            
+
             # Check predictions table
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='predictions'")
             assert cursor.fetchone() is not None
-            
+
             # Check resource_forecasts table
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='resource_forecasts'")
             assert cursor.fetchone() is not None
@@ -78,15 +78,15 @@ class TestPredictiveAnalytics:
             throughput=10.5,
             metadata={'source': 'test'}
         )
-        
+
         assert metric_id.startswith('metrics_')
-        
+
         # Verify metric was recorded
         with sqlite3.connect(analytics.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM system_metrics WHERE metric_id = ?", (metric_id,))
             result = cursor.fetchone()
-            
+
             assert result is not None
             assert result[2] == 0.7  # cpu_usage
             assert result[3] == 0.6  # memory_usage
@@ -99,9 +99,9 @@ class TestPredictiveAnalytics:
             'queue_size': 5,
             'task_complexity': 2.0
         }
-        
+
         result = analytics.predict_performance(features)
-        
+
         assert isinstance(result, AnalyticsResult)
         assert result.prediction_type == 'performance'
         assert 0.0 <= result.predicted_value <= 1.0
@@ -126,7 +126,7 @@ class TestPredictiveAnalytics:
             features={'active_agents': 3, 'task_complexity': 2.0},
             prediction_horizon=60
         )
-        
+
         assert isinstance(prediction, ResourcePrediction)
         assert prediction.resource_type == "cpu_usage"
         assert prediction.current_usage == 0.6
@@ -156,22 +156,22 @@ class TestPredictiveAnalytics:
                 response_time=1.0 + (i % 5) * 0.2,
                 throughput=8.0 + i * 0.5
             )
-        
+
         result = analytics.train_models()
-        
+
         assert 'model_version' in result
         assert 'training_data_size' in result
         assert result['training_data_size'] >= 10
-        
+
         # Check that at least some models were trained successfully
-        successful_models = [k for k, v in result.items() 
+        successful_models = [k for k, v in result.items()
                            if isinstance(v, dict) and 'error' not in v]
         assert len(successful_models) > 0
 
     def test_calculate_performance_score(self, analytics):
         """Test performance score calculation."""
         import pandas as pd
-        
+
         # Create test dataframe
         test_data = pd.DataFrame([
             {
@@ -187,9 +187,9 @@ class TestPredictiveAnalytics:
                 'throughput': 5.0
             }
         ])
-        
+
         scores = analytics._calculate_performance_score(test_data)
-        
+
         assert len(scores) == 2
         assert 0.0 <= scores[0] <= 1.0
         assert 0.0 <= scores[1] <= 1.0
@@ -204,9 +204,9 @@ class TestPredictiveAnalytics:
             'hour': 14,
             'day_of_week': 2
         }
-        
+
         vector = analytics._prepare_feature_vector(features, 'performance')
-        
+
         assert isinstance(vector, type(vector))  # numpy array
         assert len(vector) >= 4  # Should have at least base features
 
@@ -216,7 +216,7 @@ class TestPredictiveAnalytics:
         interval = analytics._calculate_confidence_interval(
             prediction, 'performance', {'active_agents': 3}
         )
-        
+
         assert len(interval) == 2
         assert interval[0] <= prediction <= interval[1]
         assert 0.0 <= interval[0] <= 1.0
@@ -227,11 +227,11 @@ class TestPredictiveAnalytics:
         # Test increasing trend
         trend = analytics._determine_trend(0.5, 0.7)
         assert trend == 'increasing'
-        
+
         # Test decreasing trend
         trend = analytics._determine_trend(0.7, 0.5)
         assert trend == 'decreasing'
-        
+
         # Test stable trend
         trend = analytics._determine_trend(0.6, 0.62)
         assert trend == 'stable'
@@ -244,7 +244,7 @@ class TestPredictiveAnalytics:
         )
         assert rec is not None
         assert 'scale up' in rec.lower()
-        
+
         # Test normal usage
         rec = analytics._generate_resource_recommendation(
             'memory_usage', 0.5, 0.55, 'stable'
@@ -265,15 +265,15 @@ class TestPredictiveAnalytics:
             active_agents=3, queue_size=5, task_completion_rate=0.9,
             error_rate=0.05, response_time=1.2, throughput=10.5
         )
-        
+
         summary = analytics.get_analytics_summary()
-        
+
         assert 'model_status' in summary
         assert 'model_version' in summary
         assert 'data_availability' in summary
         assert 'recent_activity_24h' in summary
         assert 'config' in summary
-        
+
         # Check data availability
         assert summary['data_availability']['total_metrics'] > 0
 
@@ -282,7 +282,7 @@ class TestPredictiveAnalytics:
         # Create old and recent data
         old_time = datetime.now() - timedelta(days=35)
         recent_time = datetime.now() - timedelta(days=5)
-        
+
         with sqlite3.connect(analytics.db_path) as conn:
             # Insert old metric
             conn.execute("""
@@ -290,21 +290,21 @@ class TestPredictiveAnalytics:
             """, (
                 "old_metric", old_time, 0.5, 0.4, 0.3, 0.2, 2, 3, 0.8, 0.1, 1.0, 5.0, "{}"
             ))
-            
+
             # Insert recent metric
             conn.execute("""
                 INSERT INTO system_metrics VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 "recent_metric", recent_time, 0.6, 0.5, 0.4, 0.3, 3, 4, 0.9, 0.05, 1.2, 8.0, "{}"
             ))
-            
+
             conn.commit()
-        
+
         deleted_count = analytics.cleanup_old_data(days_to_keep=30)
-        
+
         # Should have deleted old data
         assert deleted_count >= 1
-        
+
         # Verify recent data still exists
         with sqlite3.connect(analytics.db_path) as conn:
             cursor = conn.execute("SELECT COUNT(*) FROM system_metrics WHERE metric_id = 'recent_metric'")
@@ -321,9 +321,9 @@ class TestPredictiveAnalytics:
             features_used=['agents', 'queue_size'],
             model_version='1.0.0'
         )
-        
+
         result_dict = result.to_dict()
-        
+
         assert isinstance(result_dict, dict)
         assert result_dict['prediction_type'] == 'performance'
         assert result_dict['predicted_value'] == 0.85
@@ -340,9 +340,9 @@ class TestPredictiveAnalytics:
             trend_direction='increasing',
             recommended_action='Monitor closely'
         )
-        
+
         pred_dict = prediction.to_dict()
-        
+
         assert isinstance(pred_dict, dict)
         assert pred_dict['resource_type'] == 'cpu_usage'
         assert pred_dict['current_usage'] == 0.6
@@ -353,7 +353,7 @@ class TestPredictiveAnalytics:
         """Test thread safety of metrics recording."""
         import threading
         import time
-        
+
         def record_metrics(thread_id):
             for i in range(3):
                 analytics.record_system_metrics(
@@ -369,17 +369,17 @@ class TestPredictiveAnalytics:
                     throughput=5.0 + thread_id
                 )
                 time.sleep(0.01)
-        
+
         # Run multiple threads
         threads = []
         for t in range(3):
             thread = threading.Thread(target=record_metrics, args=(t,))
             threads.append(thread)
             thread.start()
-        
+
         for thread in threads:
             thread.join()
-        
+
         # Verify all metrics were recorded
         with sqlite3.connect(analytics.db_path) as conn:
             cursor = conn.execute("SELECT COUNT(*) FROM system_metrics")
@@ -394,7 +394,7 @@ class TestPredictiveAnalytics:
             active_agents=3, queue_size=5, task_completion_rate=0.9,
             error_rate=0.05, response_time=1.2, throughput=10.5
         )
-        
+
         # Verify debug logging was called
         mock_logger.debug.assert_called()
 
@@ -402,7 +402,7 @@ class TestPredictiveAnalytics:
         """Test error handling with invalid configuration."""
         with pytest.raises(ValueError):
             MLConfig(forecasting_horizon=-10)  # Should trigger validation
-        
+
         with pytest.raises(ValueError):
             MLConfig(accuracy_threshold=1.5)  # Should trigger validation
 
@@ -410,10 +410,10 @@ class TestPredictiveAnalytics:
         """Test model metadata and version tracking."""
         # Test that model version is properly set
         assert analytics.model_version == "1.0.0"
-        
+
         # Test that model metrics are initialized
         assert isinstance(analytics.model_metrics, dict)
-        
+
         # Test that scalers are initialized for each model
         expected_models = ['performance', 'cpu_usage', 'memory_usage', 'network_usage', 'task_completion_time']
         for model_name in expected_models:

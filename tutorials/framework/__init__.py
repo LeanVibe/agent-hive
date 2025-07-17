@@ -14,7 +14,7 @@ from .validation import StepValidator, ValidationResult, TutorialValidator, Tuto
 __version__ = "1.0.0"
 __all__ = [
     "TutorialManager",
-    "Tutorial", 
+    "Tutorial",
     "TutorialStep",
     "TutorialMetadata",
     "StepValidator",

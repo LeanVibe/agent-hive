@@ -39,7 +39,7 @@ class TestResult:
     message: Optional[str] = None
     traceback: Optional[str] = None
     tags: List[str] = None
-    
+
     def __post_init__(self):
         if self.tags is None:
             self.tags = []
@@ -74,13 +74,13 @@ class TestReport:
 
 class TestReportGenerator:
     """Automated test report generator."""
-    
+
     def __init__(self, output_dir: str = "test_reports"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         self.db_path = self.output_dir / "test_history.db"
         self._init_database()
-    
+
     def _init_database(self):
         """Initialize test history database."""
         conn = sqlite3.connect(str(self.db_path))
@@ -99,7 +99,7 @@ class TestReportGenerator:
                 security_score REAL
             )
         """)
-        
+
         conn.execute("""
             CREATE TABLE IF NOT EXISTS test_results (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,49 +113,49 @@ class TestReportGenerator:
                 FOREIGN KEY (run_id) REFERENCES test_runs (id)
             )
         """)
-        
+
         conn.commit()
         conn.close()
-    
+
     def run_tests_and_generate_report(self, test_patterns: List[str] = None) -> TestReport:
         """Run tests and generate comprehensive report."""
         if test_patterns is None:
             test_patterns = ["tests/"]
-        
+
         print("🧪 Running comprehensive test suite...")
-        
+
         # Run unit tests
         unit_results = self._run_pytest_tests(test_patterns, "unit")
-        
+
         # Run integration tests
         integration_results = self._run_pytest_tests(["tests/integration/"], "integration")
-        
+
         # Run performance tests
         performance_results = self._run_pytest_tests(["tests/performance/"], "performance")
-        
+
         # Run security tests
         security_results = self._run_pytest_tests(["tests/security/"], "security")
-        
+
         # Run mutation tests
         mutation_results = self._run_pytest_tests(["tests/mutation/"], "mutation")
-        
+
         # Generate coverage report
         coverage_report = self._generate_coverage_report()
-        
+
         # Generate performance metrics
         performance_metrics = self._generate_performance_metrics()
-        
+
         # Generate security scan
         security_scan = self._generate_security_scan()
-        
+
         # Generate mutation testing report
         mutation_testing = self._generate_mutation_report()
-        
+
         # Compile complete report
         report = TestReport(
             timestamp=datetime.now(),
             environment=self._get_environment_info(),
-            suites=[unit_results, integration_results, performance_results, 
+            suites=[unit_results, integration_results, performance_results,
                    security_results, mutation_results],
             overall_stats=self._calculate_overall_stats([
                 unit_results, integration_results, performance_results,
@@ -166,12 +166,12 @@ class TestReportGenerator:
             security_scan=security_scan,
             mutation_testing=mutation_testing
         )
-        
+
         # Save to database
         self._save_to_database(report)
-        
+
         return report
-    
+
     def _run_pytest_tests(self, patterns: List[str], suite_name: str) -> TestSuite:
         """Run pytest tests and parse results."""
         cmd = [
@@ -181,24 +181,24 @@ class TestReportGenerator:
             f"--json-report-file={self.output_dir}/{suite_name}_results.json",
             "-v"
         ] + patterns
-        
+
         start_time = time.time()
-        
+
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             duration = time.time() - start_time
-            
+
             # Parse JSON results
             json_file = self.output_dir / f"{suite_name}_results.json"
             if json_file.exists():
                 with open(json_file, 'r') as f:
                     pytest_results = json.load(f)
-                
+
                 return self._parse_pytest_results(pytest_results, suite_name, duration)
             else:
                 # Fallback parsing from stdout
                 return self._parse_pytest_stdout(result.stdout, suite_name, duration)
-                
+
         except subprocess.TimeoutExpired:
             return TestSuite(
                 suite_name=suite_name,
@@ -235,11 +235,11 @@ class TestReportGenerator:
                     message=str(e)
                 )]
             )
-    
+
     def _parse_pytest_results(self, results: Dict[str, Any], suite_name: str, duration: float) -> TestSuite:
         """Parse pytest JSON results."""
         tests = []
-        
+
         for test in results.get('tests', []):
             test_result = TestResult(
                 test_id=test.get('nodeid', ''),
@@ -251,9 +251,9 @@ class TestReportGenerator:
                 tags=[]
             )
             tests.append(test_result)
-        
+
         summary = results.get('summary', {})
-        
+
         return TestSuite(
             suite_name=suite_name,
             total_tests=summary.get('total', 0),
@@ -264,14 +264,14 @@ class TestReportGenerator:
             duration=duration,
             tests=tests
         )
-    
+
     def _parse_pytest_stdout(self, stdout: str, suite_name: str, duration: float) -> TestSuite:
         """Parse pytest stdout as fallback."""
         lines = stdout.split('\n')
-        
+
         passed = failed = skipped = errors = 0
         tests = []
-        
+
         for line in lines:
             if " PASSED " in line:
                 passed += 1
@@ -295,9 +295,9 @@ class TestReportGenerator:
                 ))
             elif " SKIPPED " in line:
                 skipped += 1
-        
+
         total = passed + failed + skipped + errors
-        
+
         return TestSuite(
             suite_name=suite_name,
             total_tests=total,
@@ -308,7 +308,7 @@ class TestReportGenerator:
             duration=duration,
             tests=tests
         )
-    
+
     def _generate_coverage_report(self) -> Dict[str, Any]:
         """Generate coverage report."""
         try:
@@ -319,20 +319,20 @@ class TestReportGenerator:
                 "--cov-report=html:htmlcov",
                 "tests/"
             ]
-            
+
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-            
+
             # Parse coverage.json if it exists
             if Path("coverage.json").exists():
                 with open("coverage.json", 'r') as f:
                     coverage_data = json.load(f)
                 return coverage_data
-            
+
             return {"error": "Coverage report not generated"}
-            
+
         except Exception as e:
             return {"error": f"Coverage generation failed: {str(e)}"}
-    
+
     def _generate_performance_metrics(self) -> Dict[str, Any]:
         """Generate performance metrics."""
         return {
@@ -351,7 +351,7 @@ class TestReportGenerator:
                 "task_queue_operations": 0.02
             }
         }
-    
+
     def _generate_security_scan(self) -> Dict[str, Any]:
         """Generate security scan report."""
         return {
@@ -370,7 +370,7 @@ class TestReportGenerator:
             },
             "security_score": 95.0
         }
-    
+
     def _generate_mutation_report(self) -> Dict[str, Any]:
         """Generate mutation testing report."""
         return {
@@ -380,11 +380,11 @@ class TestReportGenerator:
             "mutation_score": 90.0,
             "test_quality": "Good"
         }
-    
+
     def _get_environment_info(self) -> Dict[str, Any]:
         """Get environment information."""
         import platform
-        
+
         return {
             "python_version": platform.python_version(),
             "platform": platform.platform(),
@@ -393,16 +393,16 @@ class TestReportGenerator:
             "pytest_version": self._get_pytest_version(),
             "working_directory": str(Path.cwd())
         }
-    
+
     def _get_pytest_version(self) -> str:
         """Get pytest version."""
         try:
-            result = subprocess.run([sys.executable, "-m", "pytest", "--version"], 
+            result = subprocess.run([sys.executable, "-m", "pytest", "--version"],
                                   capture_output=True, text=True)
             return result.stdout.split()[1] if result.stdout else "unknown"
         except:
             return "unknown"
-    
+
     def _calculate_overall_stats(self, suites: List[TestSuite]) -> Dict[str, Any]:
         """Calculate overall statistics."""
         total_tests = sum(suite.total_tests for suite in suites)
@@ -411,9 +411,9 @@ class TestReportGenerator:
         total_skipped = sum(suite.skipped for suite in suites)
         total_errors = sum(suite.errors for suite in suites)
         total_duration = sum(suite.duration for suite in suites)
-        
+
         success_rate = (total_passed / total_tests * 100) if total_tests > 0 else 0
-        
+
         return {
             "total_tests": total_tests,
             "passed": total_passed,
@@ -424,14 +424,14 @@ class TestReportGenerator:
             "success_rate": success_rate,
             "status": "PASSED" if total_failed == 0 and total_errors == 0 else "FAILED"
         }
-    
+
     def _save_to_database(self, report: TestReport):
         """Save test results to database."""
         conn = sqlite3.connect(str(self.db_path))
-        
+
         # Insert test run
         cursor = conn.execute("""
-            INSERT INTO test_runs (timestamp, total_tests, passed, failed, skipped, errors, 
+            INSERT INTO test_runs (timestamp, total_tests, passed, failed, skipped, errors,
                                  duration, coverage, mutation_score, security_score)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
@@ -446,9 +446,9 @@ class TestReportGenerator:
             report.mutation_testing.get("mutation_score", 0) if report.mutation_testing else 0,
             report.security_scan.get("security_score", 0) if report.security_scan else 0
         ))
-        
+
         run_id = cursor.lastrowid
-        
+
         # Insert individual test results
         for suite in report.suites:
             for test in suite.tests:
@@ -464,10 +464,10 @@ class TestReportGenerator:
                     test.duration,
                     test.message
                 ))
-        
+
         conn.commit()
         conn.close()
-    
+
     def generate_html_report(self, report: TestReport) -> str:
         """Generate HTML report."""
         html_content = f"""
@@ -495,7 +495,7 @@ class TestReportGenerator:
         <p>Generated: {report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}</p>
         <p>Status: <span class="{'passed' if report.overall_stats['status'] == 'PASSED' else 'failed'}">{report.overall_stats['status']}</span></p>
     </div>
-    
+
     <div class="stats">
         <div class="stat">
             <h3>Total Tests</h3>
@@ -522,23 +522,23 @@ class TestReportGenerator:
             <p>{report.overall_stats['success_rate']:.1f}%</p>
         </div>
     </div>
-    
+
     <div id="coverage-chart" class="chart"></div>
     <div id="performance-chart" class="chart"></div>
-    
+
     <h2>Test Suites</h2>
 """
-        
+
         # Add suite details
         for suite in report.suites:
             html_content += f"""
     <div class="suite">
         <h3>{suite.suite_name}</h3>
         <p>Tests: {suite.total_tests} | Passed: {suite.passed} | Failed: {suite.failed} | Duration: {suite.duration:.2f}s</p>
-        
+
         <div class="tests">
 """
-            
+
             for test in suite.tests[:10]:  # Show first 10 tests
                 status_class = test.status.lower()
                 html_content += f"""
@@ -546,12 +546,12 @@ class TestReportGenerator:
                 <span class="{status_class}">{test.status}</span> - {test.test_name} ({test.duration:.3f}s)
             </div>
 """
-            
+
             html_content += """
         </div>
     </div>
 """
-        
+
         # Add JavaScript for charts
         html_content += """
     <script>
@@ -562,15 +562,15 @@ class TestReportGenerator:
             type: 'bar',
             marker: {color: ['green', 'red']}
         }];
-        
+
         var coverageLayout = {
             title: 'Code Coverage',
             xaxis: {title: 'Coverage Type'},
             yaxis: {title: 'Percentage'}
         };
-        
+
         Plotly.newPlot('coverage-chart', coverageData, coverageLayout);
-        
+
         // Performance chart
         var performanceData = [{
             x: ['Unit', 'Integration', 'Performance', 'Security'],
@@ -578,26 +578,26 @@ class TestReportGenerator:
             type: 'bar',
             marker: {color: 'blue'}
         }];
-        
+
         var performanceLayout = {
             title: 'Test Suite Performance',
             xaxis: {title: 'Test Suite'},
             yaxis: {title: 'Duration (seconds)'}
         };
-        
+
         Plotly.newPlot('performance-chart', performanceData, performanceLayout);
     </script>
 </body>
 </html>
 """
-        
+
         # Save HTML report
         html_file = self.output_dir / f"test_report_{report.timestamp.strftime('%Y%m%d_%H%M%S')}.html"
         with open(html_file, 'w') as f:
             f.write(html_content)
-        
+
         return str(html_file)
-    
+
     def generate_json_report(self, report: TestReport) -> str:
         """Generate JSON report for CI/CD integration."""
         json_data = {
@@ -610,27 +610,27 @@ class TestReportGenerator:
             "security": report.security_scan,
             "mutation_testing": report.mutation_testing
         }
-        
+
         # Save JSON report
         json_file = self.output_dir / f"test_report_{report.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
         with open(json_file, 'w') as f:
             json.dump(json_data, f, indent=2, default=str)
-        
+
         return str(json_file)
-    
+
     def get_historical_trends(self, days: int = 30) -> Dict[str, Any]:
         """Get historical test trends."""
         conn = sqlite3.connect(str(self.db_path))
         conn.row_factory = sqlite3.Row
-        
+
         cutoff_date = datetime.now() - timedelta(days=days)
-        
+
         rows = conn.execute("""
-            SELECT * FROM test_runs 
-            WHERE timestamp >= ? 
+            SELECT * FROM test_runs
+            WHERE timestamp >= ?
             ORDER BY timestamp DESC
         """, (cutoff_date,)).fetchall()
-        
+
         trends = {
             "dates": [],
             "success_rates": [],
@@ -639,7 +639,7 @@ class TestReportGenerator:
             "security_scores": [],
             "average_duration": []
         }
-        
+
         for row in rows:
             trends["dates"].append(row["timestamp"])
             success_rate = (row["passed"] / row["total_tests"] * 100) if row["total_tests"] > 0 else 0
@@ -648,7 +648,7 @@ class TestReportGenerator:
             trends["mutation_scores"].append(row["mutation_score"])
             trends["security_scores"].append(row["security_score"])
             trends["average_duration"].append(row["duration"])
-        
+
         conn.close()
         return trends
 
@@ -656,7 +656,7 @@ class TestReportGenerator:
 @pytest.mark.reporting
 class TestReportGenerator:
     """Tests for test report generator."""
-    
+
     def test_test_result_creation(self):
         """Test TestResult creation."""
         result = TestResult(
@@ -667,20 +667,20 @@ class TestReportGenerator:
             duration=0.5,
             message="Test passed successfully"
         )
-        
+
         assert result.test_id == "test_001"
         assert result.test_name == "test_example"
         assert result.status == "PASSED"
         assert result.duration == 0.5
         assert result.tags == []
-    
+
     def test_test_suite_creation(self):
         """Test TestSuite creation."""
         tests = [
             TestResult("test_001", "test_example", "module", "PASSED", 0.5),
             TestResult("test_002", "test_example2", "module", "FAILED", 0.3)
         ]
-        
+
         suite = TestSuite(
             suite_name="unit_tests",
             total_tests=2,
@@ -691,54 +691,54 @@ class TestReportGenerator:
             duration=0.8,
             tests=tests
         )
-        
+
         assert suite.suite_name == "unit_tests"
         assert suite.total_tests == 2
         assert suite.passed == 1
         assert suite.failed == 1
         assert len(suite.tests) == 2
-    
+
     def test_report_generator_initialization(self):
         """Test ReportGenerator initialization."""
         with tempfile.TemporaryDirectory() as temp_dir:
             generator = TestReportGenerator(temp_dir)
-            
+
             assert generator.output_dir.exists()
             assert generator.db_path.exists()
-    
+
     def test_environment_info_collection(self):
         """Test environment information collection."""
         with tempfile.TemporaryDirectory() as temp_dir:
             generator = TestReportGenerator(temp_dir)
             env_info = generator._get_environment_info()
-            
+
             assert "python_version" in env_info
             assert "platform" in env_info
             assert "timestamp" in env_info
             assert "pytest_version" in env_info
-    
+
     def test_overall_stats_calculation(self):
         """Test overall statistics calculation."""
         suites = [
             TestSuite("unit", 10, 8, 2, 0, 0, 1.0, []),
             TestSuite("integration", 5, 4, 1, 0, 0, 2.0, [])
         ]
-        
+
         with tempfile.TemporaryDirectory() as temp_dir:
             generator = TestReportGenerator(temp_dir)
             stats = generator._calculate_overall_stats(suites)
-            
+
             assert stats["total_tests"] == 15
             assert stats["passed"] == 12
             assert stats["failed"] == 3
             assert stats["duration"] == 3.0
             assert stats["success_rate"] == 80.0
-    
+
     def test_html_report_generation(self):
         """Test HTML report generation."""
         with tempfile.TemporaryDirectory() as temp_dir:
             generator = TestReportGenerator(temp_dir)
-            
+
             # Create mock report
             report = TestReport(
                 timestamp=datetime.now(),
@@ -750,22 +750,22 @@ class TestReportGenerator:
                 ],
                 overall_stats={"total_tests": 5, "passed": 4, "failed": 1, "status": "FAILED"}
             )
-            
+
             html_file = generator.generate_html_report(report)
-            
+
             assert Path(html_file).exists()
-            
+
             with open(html_file, 'r') as f:
                 content = f.read()
                 assert "LeanVibe Quality Agent Test Report" in content
                 assert "Total Tests" in content
                 assert "test_example" in content
-    
+
     def test_json_report_generation(self):
         """Test JSON report generation."""
         with tempfile.TemporaryDirectory() as temp_dir:
             generator = TestReportGenerator(temp_dir)
-            
+
             # Create mock report
             report = TestReport(
                 timestamp=datetime.now(),
@@ -777,23 +777,23 @@ class TestReportGenerator:
                 ],
                 overall_stats={"total_tests": 5, "passed": 4, "failed": 1, "status": "FAILED"}
             )
-            
+
             json_file = generator.generate_json_report(report)
-            
+
             assert Path(json_file).exists()
-            
+
             with open(json_file, 'r') as f:
                 data = json.load(f)
                 assert "timestamp" in data
                 assert "overall_stats" in data
                 assert "suites" in data
                 assert data["overall_stats"]["total_tests"] == 5
-    
+
     def test_database_operations(self):
         """Test database operations."""
         with tempfile.TemporaryDirectory() as temp_dir:
             generator = TestReportGenerator(temp_dir)
-            
+
             # Create mock report
             report = TestReport(
                 timestamp=datetime.now(),
@@ -805,25 +805,25 @@ class TestReportGenerator:
                 ],
                 overall_stats={"total_tests": 5, "passed": 4, "failed": 1, "duration": 1.0, "status": "FAILED"}
             )
-            
+
             # Save to database
             generator._save_to_database(report)
-            
+
             # Verify data was saved
             conn = sqlite3.connect(str(generator.db_path))
             cursor = conn.execute("SELECT COUNT(*) FROM test_runs")
             assert cursor.fetchone()[0] == 1
-            
+
             cursor = conn.execute("SELECT COUNT(*) FROM test_results")
             assert cursor.fetchone()[0] == 1
-            
+
             conn.close()
-    
+
     def test_historical_trends(self):
         """Test historical trends analysis."""
         with tempfile.TemporaryDirectory() as temp_dir:
             generator = TestReportGenerator(temp_dir)
-            
+
             # Create mock historical data
             conn = sqlite3.connect(str(generator.db_path))
             for i in range(5):
@@ -836,9 +836,9 @@ class TestReportGenerator:
                 ))
             conn.commit()
             conn.close()
-            
+
             trends = generator.get_historical_trends(30)
-            
+
             assert len(trends["dates"]) == 5
             assert len(trends["success_rates"]) == 5
             assert len(trends["coverage_percentages"]) == 5
