@@ -19,14 +19,14 @@ logger = logging.getLogger(__name__)
 class AgentCommunicator:
     """
     Simple interface for agent-to-agent communication via message bus.
-    
+
     Drop-in replacement for tmux-based scripts/agent_communicate.py
     """
-    
+
     def __init__(self, agent_name: str, message_bus: Optional[MessageBus] = None):
         """
         Initialize agent communicator.
-        
+
         Args:
             agent_name: Name of this agent
             message_bus: Message bus instance (creates new if None)
@@ -35,30 +35,30 @@ class AgentCommunicator:
         self.message_bus = message_bus or MessageBus()
         self.message_handler: Optional[Callable] = None
         self.running = False
-        
+
         logger.info(f"AgentCommunicator initialized for agent: {agent_name}")
-    
+
     async def start(self) -> None:
         """Start the communicator and subscribe to messages."""
         if self.running:
             return
-        
+
         await self.message_bus.start()
         await self.message_bus.subscribe_to_agent(self.agent_name, self._handle_incoming_message)
         self.running = True
-        
+
         logger.info(f"Agent {self.agent_name} communicator started")
-    
+
     async def stop(self) -> None:
         """Stop the communicator."""
         if not self.running:
             return
-        
+
         await self.message_bus.unsubscribe_from_agent(self.agent_name)
         self.running = False
-        
+
         logger.info(f"Agent {self.agent_name} communicator stopped")
-    
+
     @asynccontextmanager
     async def lifespan(self):
         """Context manager for communicator lifecycle."""
@@ -67,16 +67,16 @@ class AgentCommunicator:
             yield self
         finally:
             await self.stop()
-    
+
     def set_message_handler(self, handler: Callable[[AgentMessage], None]) -> None:
         """
         Set handler function for incoming messages.
-        
+
         Args:
             handler: Async function to handle incoming messages
         """
         self.message_handler = handler
-    
+
     async def send_message_to_agent(
         self,
         target_agent: str,
@@ -87,14 +87,14 @@ class AgentCommunicator:
     ) -> bool:
         """
         Send a message to another agent.
-        
+
         Args:
             target_agent: Name of target agent
             message: Message content
             message_type: Type of message
             priority: Message priority
             context: Additional context data
-            
+
         Returns:
             bool: True if message was sent successfully
         """
@@ -109,20 +109,20 @@ class AgentCommunicator:
                 },
                 priority=priority
             )
-            
+
             success = await self.message_bus.publish_message(agent_message)
-            
+
             if success:
                 logger.info(f"Sent message to {target_agent}: {message[:50]}...")
             else:
                 logger.error(f"Failed to send message to {target_agent}")
-            
+
             return success
-            
+
         except Exception as e:
             logger.error(f"Error sending message to {target_agent}: {e}")
             return False
-    
+
     async def send_task_assignment(
         self,
         target_agent: str,
@@ -133,14 +133,14 @@ class AgentCommunicator:
     ) -> bool:
         """
         Send a task assignment to another agent.
-        
+
         Args:
             target_agent: Name of target agent
             task_description: Description of task to be performed
             priority: Task priority
             deadline: Optional deadline for task
             context: Additional context data
-            
+
         Returns:
             bool: True if task assignment was sent successfully
         """
@@ -153,20 +153,20 @@ class AgentCommunicator:
                 deadline=deadline,
                 context=context
             )
-            
+
             success = await self.message_bus.publish_message(task_message)
-            
+
             if success:
                 logger.info(f"Assigned task to {target_agent}: {task_description[:50]}...")
             else:
                 logger.error(f"Failed to assign task to {target_agent}")
-            
+
             return success
-            
+
         except Exception as e:
             logger.error(f"Error assigning task to {target_agent}: {e}")
             return False
-    
+
     async def broadcast_message(
         self,
         message: str,
@@ -176,13 +176,13 @@ class AgentCommunicator:
     ) -> Dict[str, bool]:
         """
         Broadcast a message to multiple agents.
-        
+
         Args:
             message: Message to broadcast
             agents: List of agent names (broadcasts to all if None)
             message_type: Type of message
             priority: Message priority
-            
+
         Returns:
             Dict mapping agent names to success status
         """
@@ -190,15 +190,15 @@ class AgentCommunicator:
             # Default agent list (could be configurable)
             agents = [
                 "pm-agent",
-                "frontend-agent", 
+                "frontend-agent",
                 "documentation-agent",
                 "quality-agent",
                 "integration-agent",
                 "orchestration-agent"
             ]
-        
+
         results = {}
-        
+
         for agent in agents:
             if agent != self.agent_name:  # Don't send to self
                 success = await self.send_message_to_agent(
@@ -208,12 +208,12 @@ class AgentCommunicator:
                     priority=priority
                 )
                 results[agent] = success
-        
+
         successful_count = sum(results.values())
         logger.info(f"Broadcast message sent to {successful_count}/{len(results)} agents")
-        
+
         return results
-    
+
     async def reply_to_message(
         self,
         original_message: AgentMessage,
@@ -222,12 +222,12 @@ class AgentCommunicator:
     ) -> bool:
         """
         Send a reply to a received message.
-        
+
         Args:
             original_message: Original message to reply to
             reply_content: Content of reply
             context: Additional context data
-            
+
         Returns:
             bool: True if reply was sent successfully
         """
@@ -238,20 +238,20 @@ class AgentCommunicator:
                     "context": context or {}
                 }
             )
-            
+
             success = await self.message_bus.publish_message(reply_message)
-            
+
             if success:
                 logger.info(f"Sent reply to {original_message.from_agent}")
             else:
                 logger.error(f"Failed to send reply to {original_message.from_agent}")
-            
+
             return success
-            
+
         except Exception as e:
             logger.error(f"Error sending reply: {e}")
             return False
-    
+
     async def get_pending_messages_count(self) -> int:
         """Get number of pending messages for this agent."""
         try:
@@ -259,12 +259,12 @@ class AgentCommunicator:
         except Exception as e:
             logger.error(f"Error getting pending message count: {e}")
             return 0
-    
+
     async def _handle_incoming_message(self, message: AgentMessage) -> None:
         """Internal handler for incoming messages."""
         try:
             logger.info(f"Received message from {message.from_agent}: {message.message_type.value}")
-            
+
             # Call user-defined handler if set
             if self.message_handler:
                 await self.message_handler(message)
@@ -272,7 +272,7 @@ class AgentCommunicator:
                 # Default handling - just log
                 content = message.body.get('content', 'No content')
                 logger.info(f"Message content: {content}")
-            
+
         except Exception as e:
             logger.error(f"Error handling incoming message {message.message_id}: {e}")
 
@@ -282,28 +282,28 @@ class AgentCommunicator:
 async def send_to_agent(target_agent: str, message: str, from_agent: str = "unknown") -> bool:
     """
     Drop-in replacement for tmux-based send_to_agent function.
-    
+
     Args:
         target_agent: Name of target agent
         message: Message to send
         from_agent: Name of sending agent
-        
+
     Returns:
         bool: True if message was sent successfully
     """
     config = MessageBusConfig()
-    
+
     async with MessageBus(config).lifespan() as bus:
         communicator = AgentCommunicator(from_agent, bus)
         await communicator.start()
-        
+
         success = await communicator.send_message_to_agent(
             target_agent=target_agent,
             message=message,
             message_type=MessageType.INFORMATION_SHARE,
             priority=MessagePriority.MEDIUM
         )
-        
+
         await communicator.stop()
         return success
 
@@ -311,11 +311,11 @@ async def send_to_agent(target_agent: str, message: str, from_agent: str = "unkn
 class SimpleAgentCommunicator:
     """
     Simplified interface for basic agent communication.
-    
+
     Provides static methods for one-off message sending without managing
     persistent connections. Good for scripts and simple interactions.
     """
-    
+
     @staticmethod
     async def send_message(
         from_agent: str,
@@ -324,7 +324,7 @@ class SimpleAgentCommunicator:
         priority: str = "medium"
     ) -> bool:
         """Send a simple message between agents."""
-        
+
         priority_map = {
             "low": MessagePriority.LOW,
             "medium": MessagePriority.MEDIUM,
@@ -332,11 +332,11 @@ class SimpleAgentCommunicator:
             "urgent": MessagePriority.URGENT,
             "emergency": MessagePriority.EMERGENCY
         }
-        
+
         msg_priority = priority_map.get(priority.lower(), MessagePriority.MEDIUM)
-        
+
         return await send_to_agent(to_agent, message, from_agent)
-    
+
     @staticmethod
     async def send_task(
         from_agent: str,
@@ -345,18 +345,18 @@ class SimpleAgentCommunicator:
         deadline: Optional[str] = None
     ) -> bool:
         """Send a task assignment between agents."""
-        
+
         config = MessageBusConfig()
-        
+
         async with MessageBus(config).lifespan() as bus:
             communicator = AgentCommunicator(from_agent, bus)
             await communicator.start()
-            
+
             success = await communicator.send_task_assignment(
                 target_agent=to_agent,
                 task_description=task_description,
                 deadline=deadline
             )
-            
+
             await communicator.stop()
             return success

@@ -29,7 +29,7 @@ class PromptLog:
     gemini_feedback: Optional[str] = None
     pm_review: Optional[str] = None
     suggested_improvement: Optional[str] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization"""
         return {
@@ -47,12 +47,12 @@ class PromptLog:
 
 class PromptLogger:
     """Simple SQLite-based prompt logger"""
-    
+
     def __init__(self, db_path: str = "dashboard/prompts.db"):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(exist_ok=True)
         self._init_db()
-    
+
     def _init_db(self):
         """Initialize the database"""
         with sqlite3.connect(self.db_path) as conn:
@@ -70,19 +70,19 @@ class PromptLogger:
                     suggested_improvement TEXT
                 )
             """)
-            
+
             conn.execute("""
-                CREATE INDEX IF NOT EXISTS idx_agent_timestamp 
+                CREATE INDEX IF NOT EXISTS idx_agent_timestamp
                 ON prompt_logs (agent_name, timestamp)
             """)
-    
-    def log_prompt(self, agent_name: str, prompt_text: str, 
-                   response_text: str = "", success: bool = True, 
+
+    def log_prompt(self, agent_name: str, prompt_text: str,
+                   response_text: str = "", success: bool = True,
                    error_message: Optional[str] = None) -> int:
         """Log a prompt interaction"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute("""
-                INSERT INTO prompt_logs 
+                INSERT INTO prompt_logs
                 (timestamp, agent_name, prompt_text, response_text, success, error_message)
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (
@@ -94,80 +94,80 @@ class PromptLogger:
                 error_message
             ))
             return cursor.lastrowid
-    
+
     def add_gemini_feedback(self, log_id: int, feedback: str):
         """Add Gemini review feedback to a prompt log"""
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
-                UPDATE prompt_logs 
-                SET gemini_feedback = ? 
+                UPDATE prompt_logs
+                SET gemini_feedback = ?
                 WHERE id = ?
             """, (feedback, log_id))
-    
+
     def add_pm_review(self, log_id: int, review: str, suggested_improvement: str):
         """Add PM review and improvement suggestion"""
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
-                UPDATE prompt_logs 
+                UPDATE prompt_logs
                 SET pm_review = ?, suggested_improvement = ?
                 WHERE id = ?
             """, (review, suggested_improvement, log_id))
-    
+
     def get_recent_prompts(self, limit: int = 50) -> List[PromptLog]:
         """Get recent prompts for dashboard"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute("""
-                SELECT * FROM prompt_logs 
-                ORDER BY timestamp DESC 
+                SELECT * FROM prompt_logs
+                ORDER BY timestamp DESC
                 LIMIT ?
             """, (limit,))
-            
+
             rows = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
-            
+
             return [self._row_to_prompt_log(dict(zip(columns, row))) for row in rows]
-    
+
     def get_prompts_for_agent(self, agent_name: str, limit: int = 20) -> List[PromptLog]:
         """Get prompts for specific agent"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute("""
-                SELECT * FROM prompt_logs 
+                SELECT * FROM prompt_logs
                 WHERE agent_name = ?
-                ORDER BY timestamp DESC 
+                ORDER BY timestamp DESC
                 LIMIT ?
             """, (agent_name, limit))
-            
+
             rows = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
-            
+
             return [self._row_to_prompt_log(dict(zip(columns, row))) for row in rows]
-    
+
     def get_prompts_needing_review(self) -> List[PromptLog]:
         """Get prompts that need PM review"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute("""
-                SELECT * FROM prompt_logs 
+                SELECT * FROM prompt_logs
                 WHERE pm_review IS NULL
                 ORDER BY timestamp DESC
             """)
-            
+
             rows = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
-            
+
             return [self._row_to_prompt_log(dict(zip(columns, row))) for row in rows]
-    
+
     def get_prompt_stats(self) -> Dict[str, Any]:
         """Get prompt statistics for dashboard"""
         with sqlite3.connect(self.db_path) as conn:
             # Total prompts
             total_prompts = conn.execute("SELECT COUNT(*) FROM prompt_logs").fetchone()[0]
-            
+
             # Success rate
             success_rate = conn.execute("""
-                SELECT AVG(CASE WHEN success THEN 1.0 ELSE 0.0 END) 
+                SELECT AVG(CASE WHEN success THEN 1.0 ELSE 0.0 END)
                 FROM prompt_logs
             """).fetchone()[0] or 0.0
-            
+
             # Prompts by agent
             agent_stats = conn.execute("""
                 SELECT agent_name, COUNT(*) as count
@@ -175,20 +175,20 @@ class PromptLogger:
                 GROUP BY agent_name
                 ORDER BY count DESC
             """).fetchall()
-            
+
             # Prompts needing review
             needs_review = conn.execute("""
-                SELECT COUNT(*) FROM prompt_logs 
+                SELECT COUNT(*) FROM prompt_logs
                 WHERE pm_review IS NULL
             """).fetchone()[0]
-            
+
             return {
                 'total_prompts': total_prompts,
                 'success_rate': success_rate,
                 'agent_stats': dict(agent_stats),
                 'needs_review': needs_review
             }
-    
+
     def _row_to_prompt_log(self, row: Dict[str, Any]) -> PromptLog:
         """Convert database row to PromptLog object"""
         return PromptLog(

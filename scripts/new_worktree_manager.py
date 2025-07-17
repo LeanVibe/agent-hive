@@ -16,12 +16,12 @@ from datetime import datetime
 
 class NewWorktreeManager:
     """Manages new worktree creation with strict quality gates"""
-    
+
     def __init__(self, base_dir: str = "."):
         self.base_dir = Path(base_dir)
         self.worktrees_dir = self.base_dir / "new-worktrees"
         self.worktrees_dir.mkdir(exist_ok=True)
-        
+
         # Strict quality gates for new work
         self.quality_gates = {
             "max_pr_size": 500,  # Reduced from 1000
@@ -32,7 +32,7 @@ class NewWorktreeManager:
             "max_complexity": 15,  # Cyclomatic complexity
             "min_coverage": 85,    # Test coverage percentage
         }
-    
+
     def create_new_worktree(self, agent_name: str, task_description: str) -> Dict[str, any]:
         """Create a new worktree for an agent with strict quality gates"""
         try:
@@ -40,27 +40,27 @@ class NewWorktreeManager:
             timestamp = datetime.now().strftime("%b-%d-%H%M")
             branch_name = f"new-work/{agent_name}-{timestamp}"
             worktree_path = self.worktrees_dir / f"{agent_name}-{timestamp}"
-            
+
             print(f"🚀 Creating new worktree for {agent_name}")
             print(f"📁 Path: {worktree_path}")
             print(f"🌿 Branch: {branch_name}")
-            
+
             # Create worktree with new branch
             subprocess.run([
                 "git", "worktree", "add", "-b", branch_name, str(worktree_path), "main"
             ], check=True)
-            
+
             # Setup quality gates in worktree
             self._setup_quality_gates(worktree_path, agent_name, task_description)
-            
+
             # Create agent-specific CLAUDE.md
             self._create_agent_claude_file(worktree_path, agent_name, task_description)
-            
+
             # Setup pre-commit hooks
             self._setup_pre_commit_hooks(worktree_path)
-            
+
             print(f"✅ New worktree created successfully!")
-            
+
             return {
                 "success": True,
                 "worktree_path": str(worktree_path),
@@ -69,14 +69,14 @@ class NewWorktreeManager:
                 "task_description": task_description,
                 "quality_gates": self.quality_gates
             }
-            
+
         except subprocess.CalledProcessError as e:
             print(f"❌ Git command failed: {e}")
             return {"success": False, "error": str(e)}
         except Exception as e:
             print(f"❌ Error creating worktree: {e}")
             return {"success": False, "error": str(e)}
-    
+
     def _setup_quality_gates(self, worktree_path: Path, agent_name: str, task_description: str):
         """Setup quality gates configuration in worktree"""
         quality_config = {
@@ -96,13 +96,13 @@ class NewWorktreeManager:
                 "type_checking_required": True
             }
         }
-        
+
         quality_file = worktree_path / ".quality-gates.json"
         with open(quality_file, 'w') as f:
             json.dump(quality_config, f, indent=2)
-        
+
         print(f"✅ Quality gates configured: {quality_file}")
-    
+
     def _create_agent_claude_file(self, worktree_path: Path, agent_name: str, task_description: str):
         """Create agent-specific CLAUDE.md file"""
         claude_content = f"""# {agent_name.title()} Agent - New Work Environment
@@ -153,19 +153,19 @@ class NewWorktreeManager:
 
 Remember: Quality over speed. Better to deliver fewer, high-quality features than many poorly implemented ones.
 """
-        
+
         claude_file = worktree_path / "CLAUDE.md"
         with open(claude_file, 'w') as f:
             f.write(claude_content)
-        
+
         print(f"✅ Agent CLAUDE.md created: {claude_file}")
-    
+
     def _setup_pre_commit_hooks(self, worktree_path: Path):
         """Setup pre-commit hooks for quality enforcement"""
         try:
             # In worktrees, git hooks are in .git file, not .git directory
             git_dir = worktree_path / ".git"
-            
+
             # Check if .git is a file (worktree) or directory (main repo)
             if git_dir.is_file():
                 # Read .git file to find actual git directory
@@ -180,9 +180,9 @@ Remember: Quality over speed. Better to deliver fewer, high-quality features tha
             else:
                 # Regular git directory
                 hooks_dir = git_dir / "hooks"
-            
+
             hooks_dir.mkdir(exist_ok=True)
-            
+
             pre_commit_hook = hooks_dir / "pre-commit"
             hook_content = """#!/bin/bash
 # Strict quality gates pre-commit hook
@@ -198,26 +198,26 @@ fi
 
 echo "✅ Quality gates passed. Proceeding with commit."
 """
-            
+
             with open(pre_commit_hook, 'w') as f:
                 f.write(hook_content)
-            
+
             # Make hook executable
             os.chmod(pre_commit_hook, 0o755)
-            
+
             print(f"✅ Pre-commit hooks installed: {pre_commit_hook}")
-            
+
         except Exception as e:
             print(f"⚠️ Could not install pre-commit hooks: {e}")
             # Don't fail the entire worktree creation for hook setup issues
-    
+
     def list_new_worktrees(self) -> List[Dict[str, any]]:
         """List all new worktrees with their status"""
         worktrees = []
-        
+
         if not self.worktrees_dir.exists():
             return worktrees
-        
+
         for worktree_dir in self.worktrees_dir.iterdir():
             if worktree_dir.is_dir():
                 quality_file = worktree_dir / ".quality-gates.json"
@@ -225,15 +225,15 @@ echo "✅ Quality gates passed. Proceeding with commit."
                     try:
                         with open(quality_file, 'r') as f:
                             config = json.load(f)
-                        
+
                         # Get git status
                         try:
                             result = subprocess.run([
                                 "git", "status", "--porcelain"
                             ], cwd=worktree_dir, capture_output=True, text=True)
-                            
+
                             has_changes = bool(result.stdout.strip())
-                            
+
                             worktrees.append({
                                 "path": str(worktree_dir),
                                 "agent_name": config["agent_name"],
@@ -242,40 +242,40 @@ echo "✅ Quality gates passed. Proceeding with commit."
                                 "has_changes": has_changes,
                                 "quality_gates": config["quality_gates"]
                             })
-                            
+
                         except subprocess.CalledProcessError:
                             # Skip if git command fails
                             pass
-                            
+
                     except (json.JSONDecodeError, KeyError):
                         # Skip invalid quality config files
                         pass
-        
+
         return worktrees
-    
+
     def run_quality_gates(self, worktree_path: Path) -> Dict[str, any]:
         """Run quality gates for a specific worktree"""
         try:
             quality_file = worktree_path / ".quality-gates.json"
             if not quality_file.exists():
                 return {"success": False, "error": "No quality gates configuration found"}
-            
+
             with open(quality_file, 'r') as f:
                 config = json.load(f)
-            
+
             results = {
                 "success": True,
                 "checks": {},
                 "warnings": [],
                 "errors": []
             }
-            
+
             # Check PR size (count modified lines)
             try:
                 result = subprocess.run([
                     "git", "diff", "--stat", "main"
                 ], cwd=worktree_path, capture_output=True, text=True)
-                
+
                 if result.stdout:
                     lines = result.stdout.strip().split('\n')
                     if lines:
@@ -288,7 +288,7 @@ echo "✅ Quality gates passed. Proceeding with commit."
                             for part in parts:
                                 if part.isdigit():
                                     changes += int(part)
-                            
+
                             max_size = config["quality_gates"]["max_pr_size"]
                             if changes > max_size:
                                 results["errors"].append(f"PR size {changes} exceeds limit {max_size}")
@@ -301,18 +301,18 @@ echo "✅ Quality gates passed. Proceeding with commit."
                         results["checks"]["pr_size"] = "✅ No changes detected"
                 else:
                     results["checks"]["pr_size"] = "✅ No changes detected"
-                    
+
             except subprocess.CalledProcessError as e:
                 results["warnings"].append(f"Could not check PR size: {e}")
-            
+
             # Add more quality checks here (tests, docs, security, etc.)
             results["checks"]["tests"] = "⚠️ Test coverage check not implemented"
             results["checks"]["docs"] = "⚠️ Documentation check not implemented"
             results["checks"]["security"] = "⚠️ Security review not implemented"
             results["checks"]["linting"] = "⚠️ Linting check not implemented"
-            
+
             return results
-            
+
         except Exception as e:
             return {"success": False, "error": str(e)}
 
@@ -324,20 +324,20 @@ def main():
         print("  python new_worktree_manager.py list")
         print("  python new_worktree_manager.py quality-check <worktree-path>")
         return
-    
+
     manager = NewWorktreeManager()
     command = sys.argv[1]
-    
+
     if command == "create":
         if len(sys.argv) < 4:
             print("Usage: python new_worktree_manager.py create <agent-name> <task-description>")
             return
-        
+
         agent_name = sys.argv[2]
         task_description = " ".join(sys.argv[3:])
-        
+
         result = manager.create_new_worktree(agent_name, task_description)
-        
+
         if result["success"]:
             print(f"🎉 New worktree created successfully!")
             print(f"📁 Path: {result['worktree_path']}")
@@ -345,10 +345,10 @@ def main():
             print(f"🔒 Quality gates: {result['quality_gates']['max_pr_size']} line limit")
         else:
             print(f"❌ Failed to create worktree: {result['error']}")
-    
+
     elif command == "list":
         worktrees = manager.list_new_worktrees()
-        
+
         if not worktrees:
             print("📝 No new worktrees found")
         else:
@@ -358,27 +358,27 @@ def main():
                 print(f"  - {wt['agent_name']}: {wt['task_description']} ({status})")
                 print(f"    Path: {wt['path']}")
                 print(f"    Created: {wt['created_at']}")
-    
+
     elif command == "quality-check":
         if len(sys.argv) < 3:
             print("Usage: python new_worktree_manager.py quality-check <worktree-path>")
             return
-        
+
         worktree_path = Path(sys.argv[2])
         result = manager.run_quality_gates(worktree_path)
-        
+
         if result["success"]:
             print("✅ Quality gates check completed")
             for check, status in result["checks"].items():
                 print(f"  {check}: {status}")
         else:
             print(f"❌ Quality gates failed: {result['error']}")
-        
+
         if result.get("warnings"):
             print("⚠️ Warnings:")
             for warning in result["warnings"]:
                 print(f"  - {warning}")
-        
+
         if result.get("errors"):
             print("❌ Errors:")
             for error in result["errors"]:

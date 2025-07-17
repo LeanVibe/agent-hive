@@ -36,28 +36,28 @@ logger = logging.getLogger(__name__)
 
 class QualityMetricsMonitor:
     """Advanced quality metrics monitoring and alerting system."""
-    
+
     def __init__(self, config_path: Optional[str] = None):
         """Initialize the quality metrics monitor."""
         self.config = self._load_config(config_path)
         self.db_path = Path("quality_metrics.db")
         self.reports_dir = Path("quality_reports")
         self.reports_dir.mkdir(exist_ok=True)
-        
+
         # Initialize database
         self._init_database()
-        
+
         # Quality thresholds
         self.coverage_threshold = self.config.get("coverage_threshold", 85.0)
         self.performance_threshold = self.config.get("performance_threshold_ms", 2000)
         self.regression_threshold = self.config.get("regression_threshold_percent", 20)
-        
+
         # Monitoring configuration
         self.monitoring_interval = self.config.get("monitoring_interval_minutes", 30)
         self.trend_analysis_days = self.config.get("trend_analysis_days", 7)
-        
+
         logger.info("Quality Metrics Monitor initialized with advanced analytics")
-    
+
     def _load_config(self, config_path: Optional[str]) -> Dict:
         """Load configuration from file or use defaults."""
         default_config = {
@@ -71,7 +71,7 @@ class QualityMetricsMonitor:
             "enable_coverage_monitoring": True,
             "enable_quality_gates": True
         }
-        
+
         if config_path and Path(config_path).exists():
             try:
                 with open(config_path, 'r') as f:
@@ -79,13 +79,13 @@ class QualityMetricsMonitor:
                 default_config.update(user_config)
             except Exception as e:
                 logger.warning(f"Failed to load config from {config_path}: {e}")
-        
+
         return default_config
-    
+
     def _init_database(self):
         """Initialize SQLite database for quality metrics."""
         conn = sqlite3.connect(str(self.db_path))
-        
+
         # Test execution metrics table
         conn.execute("""
             CREATE TABLE IF NOT EXISTS test_executions (
@@ -101,7 +101,7 @@ class QualityMetricsMonitor:
                 commit_hash TEXT
             )
         """)
-        
+
         # Performance metrics table
         conn.execute("""
             CREATE TABLE IF NOT EXISTS performance_metrics (
@@ -115,7 +115,7 @@ class QualityMetricsMonitor:
                 cpu_usage_percent REAL
             )
         """)
-        
+
         # Quality alerts table
         conn.execute("""
             CREATE TABLE IF NOT EXISTS quality_alerts (
@@ -128,7 +128,7 @@ class QualityMetricsMonitor:
                 resolved BOOLEAN DEFAULT FALSE
             )
         """)
-        
+
         # Quality trends table
         conn.execute("""
             CREATE TABLE IF NOT EXISTS quality_trends (
@@ -141,16 +141,16 @@ class QualityMetricsMonitor:
                 quality_score REAL
             )
         """)
-        
+
         conn.commit()
         conn.close()
-        
+
         logger.info("Quality metrics database initialized")
-    
+
     def run_comprehensive_quality_analysis(self) -> Dict:
         """Run complete quality analysis and monitoring."""
         logger.info("🔍 Starting comprehensive quality analysis")
-        
+
         analysis_results = {
             "timestamp": datetime.now().isoformat(),
             "test_execution": self._analyze_test_execution(),
@@ -160,33 +160,33 @@ class QualityMetricsMonitor:
             "regression_detection": self._detect_performance_regressions(),
             "quality_gates": self._evaluate_quality_gates()
         }
-        
+
         # Calculate overall quality score
         analysis_results["overall_quality_score"] = self._calculate_quality_score(analysis_results)
         analysis_results["quality_grade"] = self._determine_quality_grade(analysis_results["overall_quality_score"])
-        
+
         # Store results in database
         self._store_analysis_results(analysis_results)
-        
+
         # Check for alerts
         alerts = self._check_quality_alerts(analysis_results)
         analysis_results["alerts"] = alerts
-        
+
         # Generate recommendations
         analysis_results["recommendations"] = self._generate_recommendations(analysis_results)
-        
+
         # Save detailed report
         report_file = self.reports_dir / f"quality_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_file, 'w') as f:
             json.dump(analysis_results, f, indent=2)
-        
+
         logger.info(f"✅ Quality analysis complete. Report saved: {report_file}")
         return analysis_results
-    
+
     def _analyze_test_execution(self) -> Dict:
         """Analyze current test execution metrics."""
         logger.info("Analyzing test execution metrics...")
-        
+
         try:
             # Run pytest with coverage and timing
             cmd = [
@@ -199,19 +199,19 @@ class QualityMetricsMonitor:
                 'tests/',
                 '-v'
             ]
-            
+
             start_time = time.time()
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             execution_time = (time.time() - start_time) * 1000  # Convert to milliseconds
-            
+
             # Parse test results
             test_metrics = {"execution_time_ms": execution_time}
-            
+
             if Path("test_results.json").exists():
                 try:
                     with open("test_results.json", 'r') as f:
                         test_data = json.load(f)
-                    
+
                     summary = test_data.get("summary", {})
                     test_metrics.update({
                         "total_tests": summary.get("total", 0),
@@ -223,46 +223,46 @@ class QualityMetricsMonitor:
                     })
                 except Exception as e:
                     logger.error(f"Failed to parse test results: {e}")
-            
+
             # Parse coverage results
             if Path("coverage.json").exists():
                 try:
                     with open("coverage.json", 'r') as f:
                         coverage_data = json.load(f)
-                    
+
                     test_metrics["coverage_percentage"] = coverage_data.get("totals", {}).get("percent_covered", 0)
                 except Exception as e:
                     logger.error(f"Failed to parse coverage results: {e}")
-            
+
             return test_metrics
-            
+
         except subprocess.TimeoutExpired:
             logger.error("Test execution timed out")
             return {"status": "timeout", "execution_time_ms": 300000}
         except Exception as e:
             logger.error(f"Test execution failed: {e}")
             return {"status": "error", "error": str(e)}
-    
+
     def _analyze_performance_metrics(self) -> Dict:
         """Analyze test performance metrics."""
         logger.info("Analyzing performance metrics...")
-        
+
         performance_data = {
             "test_suite_performance": [],
             "slow_tests": [],
             "memory_usage": self._get_memory_usage(),
             "cpu_usage": self._get_cpu_usage()
         }
-        
+
         # Analyze individual test performance
         if Path("test_results.json").exists():
             try:
                 with open("test_results.json", 'r') as f:
                     test_data = json.load(f)
-                
+
                 tests = test_data.get("tests", [])
                 durations = [test.get("duration", 0) for test in tests if test.get("duration")]
-                
+
                 if durations:
                     performance_data.update({
                         "avg_test_duration": statistics.mean(durations),
@@ -271,7 +271,7 @@ class QualityMetricsMonitor:
                         "median_test_duration": statistics.median(durations),
                         "total_test_duration": sum(durations)
                     })
-                    
+
                     # Identify slow tests (top 10% by duration)
                     slow_threshold = statistics.quantile(durations, 0.9) if len(durations) > 10 else max(durations)
                     slow_tests = [
@@ -280,27 +280,27 @@ class QualityMetricsMonitor:
                             "duration": test.get("duration", 0),
                             "status": test.get("outcome", "")
                         }
-                        for test in tests 
+                        for test in tests
                         if test.get("duration", 0) >= slow_threshold
                     ]
                     performance_data["slow_tests"] = sorted(slow_tests, key=lambda x: x["duration"], reverse=True)[:10]
-                
+
             except Exception as e:
                 logger.error(f"Failed to analyze performance metrics: {e}")
-        
+
         return performance_data
-    
+
     def _analyze_coverage_metrics(self) -> Dict:
         """Analyze code coverage metrics."""
         logger.info("Analyzing coverage metrics...")
-        
+
         coverage_data = {}
-        
+
         if Path("coverage.json").exists():
             try:
                 with open("coverage.json", 'r') as f:
                     coverage_json = json.load(f)
-                
+
                 totals = coverage_json.get("totals", {})
                 coverage_data.update({
                     "overall_coverage": totals.get("percent_covered", 0),
@@ -311,11 +311,11 @@ class QualityMetricsMonitor:
                     "branches_missing": totals.get("missing_branches", 0),
                     "total_branches": totals.get("num_branches", 0)
                 })
-                
+
                 # Analyze per-file coverage
                 files = coverage_json.get("files", {})
                 file_coverage = []
-                
+
                 for file_path, file_data in files.items():
                     summary = file_data.get("summary", {})
                     file_coverage.append({
@@ -324,40 +324,40 @@ class QualityMetricsMonitor:
                         "lines_covered": summary.get("covered_lines", 0),
                         "lines_missing": summary.get("missing_lines", 0)
                     })
-                
+
                 # Sort by lowest coverage first
                 coverage_data["low_coverage_files"] = sorted(
                     [f for f in file_coverage if f["coverage"] < self.coverage_threshold],
                     key=lambda x: x["coverage"]
                 )[:10]
-                
+
                 # Files with good coverage
                 coverage_data["high_coverage_files"] = [
                     f for f in file_coverage if f["coverage"] >= 95
                 ]
-                
+
             except Exception as e:
                 logger.error(f"Failed to analyze coverage metrics: {e}")
-        
+
         return coverage_data
-    
+
     def _analyze_quality_trends(self) -> Dict:
         """Analyze quality trends over time."""
         logger.info("Analyzing quality trends...")
-        
+
         conn = sqlite3.connect(str(self.db_path))
         conn.row_factory = sqlite3.Row
-        
+
         # Get trends for the last N days
         cutoff_date = datetime.now() - timedelta(days=self.trend_analysis_days)
-        
+
         trends_query = """
             SELECT date, avg_coverage, avg_execution_time, total_tests, success_rate, quality_score
             FROM quality_trends
             WHERE date >= ?
             ORDER BY date DESC
         """
-        
+
         trends = []
         try:
             cursor = conn.execute(trends_query, (cutoff_date.date(),))
@@ -366,15 +366,15 @@ class QualityMetricsMonitor:
             logger.error(f"Failed to analyze trends: {e}")
         finally:
             conn.close()
-        
+
         if not trends:
             return {"status": "no_data", "trends": []}
-        
+
         # Calculate trend analysis
         coverages = [t["avg_coverage"] for t in trends if t["avg_coverage"]]
         execution_times = [t["avg_execution_time"] for t in trends if t["avg_execution_time"]]
         success_rates = [t["success_rate"] for t in trends if t["success_rate"]]
-        
+
         trend_analysis = {
             "total_data_points": len(trends),
             "date_range": {
@@ -382,7 +382,7 @@ class QualityMetricsMonitor:
                 "end": trends[0]["date"] if trends else None
             }
         }
-        
+
         if coverages:
             trend_analysis["coverage_trend"] = {
                 "current": coverages[0],
@@ -390,7 +390,7 @@ class QualityMetricsMonitor:
                 "trend": "improving" if len(coverages) > 1 and coverages[0] > coverages[-1] else "declining" if len(coverages) > 1 else "stable",
                 "change_percent": ((coverages[0] - coverages[-1]) / coverages[-1] * 100) if len(coverages) > 1 and coverages[-1] > 0 else 0
             }
-        
+
         if execution_times:
             trend_analysis["performance_trend"] = {
                 "current_ms": execution_times[0],
@@ -398,7 +398,7 @@ class QualityMetricsMonitor:
                 "trend": "improving" if len(execution_times) > 1 and execution_times[0] < execution_times[-1] else "declining" if len(execution_times) > 1 else "stable",
                 "change_percent": ((execution_times[0] - execution_times[-1]) / execution_times[-1] * 100) if len(execution_times) > 1 and execution_times[-1] > 0 else 0
             }
-        
+
         if success_rates:
             trend_analysis["success_rate_trend"] = {
                 "current": success_rates[0],
@@ -406,20 +406,20 @@ class QualityMetricsMonitor:
                 "trend": "improving" if len(success_rates) > 1 and success_rates[0] > success_rates[-1] else "declining" if len(success_rates) > 1 else "stable",
                 "change_percent": ((success_rates[0] - success_rates[-1]) / success_rates[-1] * 100) if len(success_rates) > 1 and success_rates[-1] > 0 else 0
             }
-        
+
         trend_analysis["historical_data"] = trends[:30]  # Last 30 data points
-        
+
         return trend_analysis
-    
+
     def _detect_performance_regressions(self) -> Dict:
         """Detect performance regressions."""
         logger.info("Detecting performance regressions...")
-        
+
         conn = sqlite3.connect(str(self.db_path))
         conn.row_factory = sqlite3.Row
-        
+
         regressions = []
-        
+
         try:
             # Get recent performance data
             recent_query = """
@@ -429,21 +429,21 @@ class QualityMetricsMonitor:
                 ORDER BY timestamp DESC
                 LIMIT 10
             """
-            
+
             cutoff_time = datetime.now() - timedelta(hours=24)
             cursor = conn.execute(recent_query, (cutoff_time,))
             recent_data = [dict(row) for row in cursor.fetchall()]
-            
+
             if len(recent_data) >= 5:
                 recent_times = [d["avg_execution_time_ms"] for d in recent_data[:5]]
                 baseline_times = [d["avg_execution_time_ms"] for d in recent_data[5:]]
-                
+
                 recent_avg = statistics.mean(recent_times)
                 baseline_avg = statistics.mean(baseline_times) if baseline_times else recent_avg
-                
+
                 if baseline_avg > 0:
                     regression_percent = ((recent_avg - baseline_avg) / baseline_avg) * 100
-                    
+
                     if regression_percent > self.regression_threshold:
                         regressions.append({
                             "type": "performance_regression",
@@ -453,26 +453,26 @@ class QualityMetricsMonitor:
                             "baseline_avg_ms": baseline_avg,
                             "description": f"Performance regression detected: {regression_percent:.1f}% slower than baseline"
                         })
-        
+
         except Exception as e:
             logger.error(f"Failed to detect regressions: {e}")
         finally:
             conn.close()
-        
+
         return {
             "regressions_detected": len(regressions),
             "regressions": regressions
         }
-    
+
     def _evaluate_quality_gates(self) -> Dict:
         """Evaluate quality gates against current metrics."""
         logger.info("Evaluating quality gates...")
-        
+
         # Get current metrics
         current_execution = self._analyze_test_execution()
         current_coverage = self._analyze_coverage_metrics()
         current_performance = self._analyze_performance_metrics()
-        
+
         gates = {
             "coverage_gate": {
                 "threshold": self.coverage_threshold,
@@ -499,10 +499,10 @@ class QualityMetricsMonitor:
                 "description": "No failed tests allowed"
             }
         }
-        
+
         gates_passed = sum(1 for gate in gates.values() if gate["passed"])
         total_gates = len(gates)
-        
+
         return {
             "gates_passed": gates_passed,
             "total_gates": total_gates,
@@ -510,30 +510,30 @@ class QualityMetricsMonitor:
             "pass_rate": (gates_passed / total_gates) * 100,
             "gates": gates
         }
-    
+
     def _calculate_quality_score(self, analysis_results: Dict) -> float:
         """Calculate overall quality score (0-100)."""
         score = 100.0
-        
+
         # Coverage score (30% weight)
         coverage = analysis_results.get("coverage_analysis", {}).get("overall_coverage", 0)
         coverage_score = min(coverage, 100) * 0.3
-        
+
         # Performance score (25% weight)
         execution_time = analysis_results.get("test_execution", {}).get("execution_time_ms", 0)
         performance_score = max(0, 100 - (execution_time / self.performance_threshold * 100)) * 0.25
-        
+
         # Success rate score (25% weight)
         success_rate = analysis_results.get("test_execution", {}).get("success_rate", 0)
         success_score = success_rate * 0.25
-        
+
         # Quality gates score (20% weight)
         gates_passed = analysis_results.get("quality_gates", {}).get("pass_rate", 0)
         gates_score = gates_passed * 0.2
-        
+
         final_score = coverage_score + performance_score + success_score + gates_score
         return max(0.0, min(100.0, final_score))
-    
+
     def _determine_quality_grade(self, score: float) -> str:
         """Determine quality grade based on score."""
         if score >= 95:
@@ -552,7 +552,7 @@ class QualityMetricsMonitor:
             return "D"
         else:
             return "F"
-    
+
     def _get_memory_usage(self) -> float:
         """Get current memory usage in MB."""
         try:
@@ -561,7 +561,7 @@ class QualityMetricsMonitor:
             return process.memory_info().rss / 1024 / 1024  # Convert to MB
         except:
             return 0.0
-    
+
     def _get_cpu_usage(self) -> float:
         """Get current CPU usage percentage."""
         try:
@@ -569,18 +569,18 @@ class QualityMetricsMonitor:
             return psutil.cpu_percent(interval=1)
         except:
             return 0.0
-    
+
     def _store_analysis_results(self, results: Dict):
         """Store analysis results in database."""
         conn = sqlite3.connect(str(self.db_path))
-        
+
         try:
             # Store test execution metrics
             test_data = results.get("test_execution", {})
             if test_data:
                 conn.execute("""
-                    INSERT INTO test_executions 
-                    (timestamp, total_tests, passed_tests, failed_tests, skipped_tests, 
+                    INSERT INTO test_executions
+                    (timestamp, total_tests, passed_tests, failed_tests, skipped_tests,
                      execution_time_ms, coverage_percentage, branch, commit_hash)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
@@ -594,7 +594,7 @@ class QualityMetricsMonitor:
                     self._get_current_branch(),
                     self._get_current_commit()
                 ))
-            
+
             # Store performance metrics
             perf_data = results.get("performance_metrics", {})
             if perf_data:
@@ -612,7 +612,7 @@ class QualityMetricsMonitor:
                     perf_data.get("memory_usage", 0),
                     perf_data.get("cpu_usage", 0)
                 ))
-            
+
             # Store daily quality trends
             today = datetime.now().date()
             conn.execute("""
@@ -627,18 +627,18 @@ class QualityMetricsMonitor:
                 test_data.get("success_rate", 0),
                 results.get("overall_quality_score", 0)
             ))
-            
+
             conn.commit()
-            
+
         except Exception as e:
             logger.error(f"Failed to store analysis results: {e}")
         finally:
             conn.close()
-    
+
     def _check_quality_alerts(self, results: Dict) -> List[Dict]:
         """Check for quality alerts and store them."""
         alerts = []
-        
+
         # Coverage alerts
         coverage = results.get("coverage_analysis", {}).get("overall_coverage", 0)
         if coverage < self.coverage_threshold:
@@ -649,7 +649,7 @@ class QualityMetricsMonitor:
                 "current_value": coverage,
                 "threshold": self.coverage_threshold
             })
-        
+
         # Performance alerts
         execution_time = results.get("test_execution", {}).get("execution_time_ms", 0)
         if execution_time > self.performance_threshold:
@@ -660,7 +660,7 @@ class QualityMetricsMonitor:
                 "current_value": execution_time,
                 "threshold": self.performance_threshold
             })
-        
+
         # Failed tests alerts
         failed_tests = results.get("test_execution", {}).get("failed_tests", 0)
         if failed_tests > 0:
@@ -671,7 +671,7 @@ class QualityMetricsMonitor:
                 "current_value": failed_tests,
                 "threshold": 0
             })
-        
+
         # Quality score alerts
         quality_score = results.get("overall_quality_score", 100)
         if quality_score < 80:
@@ -682,17 +682,17 @@ class QualityMetricsMonitor:
                 "current_value": quality_score,
                 "threshold": 80
             })
-        
+
         # Store alerts in database
         if alerts:
             self._store_alerts(alerts)
-        
+
         return alerts
-    
+
     def _store_alerts(self, alerts: List[Dict]):
         """Store quality alerts in database."""
         conn = sqlite3.connect(str(self.db_path))
-        
+
         try:
             for alert in alerts:
                 conn.execute("""
@@ -706,19 +706,19 @@ class QualityMetricsMonitor:
                     alert["message"],
                     json.dumps(alert)
                 ))
-            
+
             conn.commit()
             logger.info(f"Stored {len(alerts)} quality alerts")
-            
+
         except Exception as e:
             logger.error(f"Failed to store alerts: {e}")
         finally:
             conn.close()
-    
+
     def _generate_recommendations(self, results: Dict) -> List[Dict]:
         """Generate improvement recommendations based on analysis."""
         recommendations = []
-        
+
         # Coverage recommendations
         coverage = results.get("coverage_analysis", {}).get("overall_coverage", 0)
         if coverage < self.coverage_threshold:
@@ -735,7 +735,7 @@ class QualityMetricsMonitor:
                     "Review and remove dead code if applicable"
                 ]
             })
-        
+
         # Performance recommendations
         slow_tests = results.get("performance_metrics", {}).get("slow_tests", [])
         if slow_tests:
@@ -751,7 +751,7 @@ class QualityMetricsMonitor:
                     f"Focus on: {', '.join([t['test_name'].split('::')[-1] for t in slow_tests[:3]])}"
                 ]
             })
-        
+
         # Quality gate recommendations
         quality_gates = results.get("quality_gates", {})
         if not quality_gates.get("overall_passed", True):
@@ -768,7 +768,7 @@ class QualityMetricsMonitor:
                     "Monitor quality gates in CI/CD pipeline"
                 ]
             })
-        
+
         # Trend-based recommendations
         trends = results.get("quality_trends", {})
         coverage_trend = trends.get("coverage_trend", {})
@@ -785,33 +785,33 @@ class QualityMetricsMonitor:
                     "Set up coverage monitoring alerts"
                 ]
             })
-        
+
         return recommendations
-    
+
     def _get_current_branch(self) -> str:
         """Get current git branch."""
         try:
-            result = subprocess.run(['git', 'branch', '--show-current'], 
+            result = subprocess.run(['git', 'branch', '--show-current'],
                                   capture_output=True, text=True, timeout=5)
             return result.stdout.strip() if result.returncode == 0 else "unknown"
         except:
             return "unknown"
-    
+
     def _get_current_commit(self) -> str:
         """Get current git commit hash."""
         try:
-            result = subprocess.run(['git', 'rev-parse', 'HEAD'], 
+            result = subprocess.run(['git', 'rev-parse', 'HEAD'],
                                   capture_output=True, text=True, timeout=5)
             return result.stdout.strip()[:8] if result.returncode == 0 else "unknown"
         except:
             return "unknown"
-    
+
     def generate_quality_dashboard(self, results: Dict) -> str:
         """Generate HTML quality dashboard."""
         timestamp = results.get("timestamp", datetime.now().isoformat())
         quality_score = results.get("overall_quality_score", 0)
         quality_grade = results.get("quality_grade", "F")
-        
+
         dashboard_html = f"""
 <!DOCTYPE html>
 <html>
@@ -847,7 +847,7 @@ class QualityMetricsMonitor:
             <p>Generated: {timestamp}</p>
             <p>Overall Quality Score: {quality_score:.1f}/100 (Grade: {quality_grade})</p>
         </div>
-        
+
         <div class="metrics-grid">
             <div class="metric-card quality-score">
                 <div class="score-circle grade-{quality_grade.lower().replace('+', '').replace('-', '')}">
@@ -856,7 +856,7 @@ class QualityMetricsMonitor:
                 <div class="metric-label">Quality Grade</div>
             </div>
 """
-        
+
         # Add test execution metrics
         test_data = results.get("test_execution", {})
         dashboard_html += f"""
@@ -864,18 +864,18 @@ class QualityMetricsMonitor:
                 <div class="metric-value">{test_data.get('total_tests', 0)}</div>
                 <div class="metric-label">Total Tests</div>
             </div>
-            
+
             <div class="metric-card">
                 <div class="metric-value" style="color: green;">{test_data.get('passed_tests', 0)}</div>
                 <div class="metric-label">Passed Tests</div>
             </div>
-            
+
             <div class="metric-card">
                 <div class="metric-value" style="color: red;">{test_data.get('failed_tests', 0)}</div>
                 <div class="metric-label">Failed Tests</div>
             </div>
 """
-        
+
         # Add coverage metrics
         coverage_data = results.get("coverage_analysis", {})
         dashboard_html += f"""
@@ -883,21 +883,21 @@ class QualityMetricsMonitor:
                 <div class="metric-value">{coverage_data.get('overall_coverage', 0):.1f}%</div>
                 <div class="metric-label">Code Coverage</div>
             </div>
-            
+
             <div class="metric-card">
                 <div class="metric-value">{test_data.get('execution_time_ms', 0):.0f}ms</div>
                 <div class="metric-label">Execution Time</div>
             </div>
         """
-        
+
         dashboard_html += """
         </div>
-        
+
         <!-- Alerts Section -->
         <div class="recommendations">
             <h2>🚨 Quality Alerts</h2>
 """
-        
+
         alerts = results.get("alerts", [])
         if alerts:
             for alert in alerts:
@@ -909,12 +909,12 @@ class QualityMetricsMonitor:
 """
         else:
             dashboard_html += "<p>✅ No quality alerts detected</p>"
-        
+
         # Add recommendations
         dashboard_html += """
             <h2>💡 Recommendations</h2>
 """
-        
+
         recommendations = results.get("recommendations", [])
         if recommendations:
             for rec in recommendations:
@@ -926,35 +926,35 @@ class QualityMetricsMonitor:
 """
                 for action in rec['actions']:
                     dashboard_html += f"<li>{action}</li>"
-                
+
                 dashboard_html += """
                 </ul>
             </div>
 """
         else:
             dashboard_html += "<p>✅ No specific recommendations at this time</p>"
-        
+
         dashboard_html += """
         </div>
     </div>
 </body>
 </html>
 """
-        
+
         # Save dashboard
         dashboard_file = self.reports_dir / f"quality_dashboard_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
         with open(dashboard_file, 'w') as f:
             f.write(dashboard_html)
-        
+
         logger.info(f"Quality dashboard generated: {dashboard_file}")
         return str(dashboard_file)
-    
+
     def generate_quality_report(self, results: Dict) -> str:
         """Generate comprehensive quality report."""
         timestamp = results.get("timestamp", datetime.now().isoformat())
         quality_score = results.get("overall_quality_score", 0)
         quality_grade = results.get("quality_grade", "F")
-        
+
         report = f"""
 # 🔍 LeanVibe Quality Monitoring Report
 
@@ -965,7 +965,7 @@ class QualityMetricsMonitor:
 ## 📊 Executive Summary
 
 """
-        
+
         # Test execution summary
         test_data = results.get("test_execution", {})
         report += f"""
@@ -978,7 +978,7 @@ class QualityMetricsMonitor:
 - **Execution Time**: {test_data.get('execution_time_ms', 0):.0f}ms
 
 """
-        
+
         # Coverage analysis
         coverage_data = results.get("coverage_analysis", {})
         report += f"""
@@ -989,7 +989,7 @@ class QualityMetricsMonitor:
 - **Total Lines**: {coverage_data.get('total_lines', 0)}
 
 """
-        
+
         # Performance metrics
         perf_data = results.get("performance_metrics", {})
         report += f"""
@@ -1000,7 +1000,7 @@ class QualityMetricsMonitor:
 - **Memory Usage**: {perf_data.get('memory_usage', 0):.1f}MB
 
 """
-        
+
         # Quality gates
         gates_data = results.get("quality_gates", {})
         report += f"""
@@ -1010,7 +1010,7 @@ class QualityMetricsMonitor:
 - **Pass Rate**: {gates_data.get('pass_rate', 0):.1f}%
 
 """
-        
+
         # Alerts
         alerts = results.get("alerts", [])
         if alerts:
@@ -1020,9 +1020,9 @@ class QualityMetricsMonitor:
                 report += f"- {severity_emoji} **{alert['type'].replace('_', ' ').title()}**: {alert['message']}\n"
         else:
             report += "### ✅ No Quality Alerts\n\nAll quality metrics are within acceptable thresholds.\n"
-        
+
         report += "\n"
-        
+
         # Recommendations
         recommendations = results.get("recommendations", [])
         if recommendations:
@@ -1034,36 +1034,36 @@ class QualityMetricsMonitor:
                 for action in rec['actions']:
                     report += f"   - {action}\n"
                 report += "\n"
-        
+
         return report
 
 
 def main():
     """Main function for quality metrics monitoring."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="LeanVibe Quality Metrics Monitoring")
     parser.add_argument("--config", help="Configuration file path")
     parser.add_argument("--analyze", action="store_true", help="Run quality analysis")
     parser.add_argument("--dashboard", action="store_true", help="Generate HTML dashboard")
     parser.add_argument("--monitor", action="store_true", help="Start continuous monitoring")
-    
+
     args = parser.parse_args()
-    
+
     monitor = QualityMetricsMonitor(args.config)
-    
+
     if args.analyze:
         logger.info("🔍 Running quality analysis")
         results = monitor.run_comprehensive_quality_analysis()
-        
+
         # Generate and display report
         report = monitor.generate_quality_report(results)
         print(report)
-        
+
         if args.dashboard:
             dashboard_file = monitor.generate_quality_dashboard(results)
             logger.info(f"📊 Dashboard generated: {dashboard_file}")
-        
+
     else:
         logger.info("🔍 Running default quality analysis")
         results = monitor.run_comprehensive_quality_analysis()
