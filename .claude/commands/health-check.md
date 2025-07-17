@@ -1,3 +1,8 @@
+# DEPRECATED: Use `/monitor --health` or `/monitor --quick` instead
+
+This protocol is now consolidated under `monitor.md`.
+See `monitor.md` for all monitoring, health, debugging, and optimization workflows.
+
 ---
 category: monitoring
 description: Check system health
@@ -11,3 +16,4 @@ description: Check system health
 4. Report: Healthy if no issues.
 
 $ARGUMENTS
+

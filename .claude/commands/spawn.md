@@ -10,7 +10,20 @@ description: Spawn specialized agent with reliable initialization
 /spawn --agent integration-specialist --priority 1.1 --task "api-gateway-repair" --timeline "3-days"
 /spawn --agent service-mesh --priority 1.2 --task "service-discovery-integration" --timeline "2-days"  
 /spawn --agent frontend --priority 1.3 --task "dashboard-integration-repair" --timeline "2-days"
+/spawn --agent developer --persona reviewer --lang python --strict
+/spawn --agent optimizer --persona optimizer --focus frontend
 ```
+
+### Persona Options (from deprecated persona.md)
+- `--persona [role]` - Switch to a specific persona (orchestrator, developer, reviewer, optimizer, debugger)
+- `--lang [language]` - Specify language focus (e.g., python)
+- `--strict` - Enable strict mode (for reviewers)
+- `--focus [area]` - Focus optimization or development on a specific area
+- `--auto` - Automatically select best persona for current task
+- `--combine persona1,persona2` - Combine multiple personas
+- `--reset` - Return to default persona
+
+Personas are now managed as part of the agent spawning process.
 
 ## Automated Process
 1. **Worktree Creation**: Create isolated Git worktree with quality gates

@@ -1,3 +1,8 @@
+# DEPRECATED: Use `/monitor --optimize` instead
+
+This protocol is now consolidated under `monitor.md`.
+See `monitor.md` for all monitoring, debugging, and optimization workflows.
+
 ---
 category: operations
 description: Optimize performance
@@ -11,3 +16,4 @@ description: Optimize performance
 4. If >threshold, auto-apply.
 
 $ARGUMENTS
+

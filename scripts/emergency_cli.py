@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+CANONICAL: This is the canonical script for emergency CLI actions. Use this for all emergency and crisis workflows.
+
 Emergency Completion CLI Wrapper
 =================================
 
@@ -15,6 +17,7 @@ import sys
 import subprocess
 from pathlib import Path
 
+
 def main():
     """Quick emergency completion wrapper."""
     if len(sys.argv) < 2:
@@ -22,7 +25,9 @@ def main():
         print("=" * 40)
         print("Quick commands:")
         print("  emergency-complete <task>     - Emergency complete with defaults")
-        print("  emergency-force <task>        - Force complete with emergency settings")
+        print(
+            "  emergency-force <task>        - Force complete with emergency settings"
+        )
         print("  emergency-milestone <task>    - Milestone completion")
         print("")
         print("Full usage:")
@@ -35,20 +40,27 @@ def main():
     # Preset commands for common emergency scenarios
     emergency_commands = {
         "emergency-complete": [
-            "python", "scripts/emergency_complete.py",
-            "--template-type", "emergency",
-            "--force"
+            "python",
+            "scripts/emergency_complete.py",
+            "--template-type",
+            "emergency",
+            "--force",
         ],
         "emergency-force": [
-            "python", "scripts/emergency_complete.py",
-            "--template-type", "emergency",
-            "--force", "--emergency"
+            "python",
+            "scripts/emergency_complete.py",
+            "--template-type",
+            "emergency",
+            "--force",
+            "--emergency",
         ],
         "emergency-milestone": [
-            "python", "scripts/emergency_complete.py",
-            "--template-type", "milestone",
-            "--force"
-        ]
+            "python",
+            "scripts/emergency_complete.py",
+            "--template-type",
+            "milestone",
+            "--force",
+        ],
     }
 
     if command in emergency_commands:
@@ -64,6 +76,7 @@ def main():
         cmd = ["python", "scripts/emergency_complete.py"] + sys.argv[1:]
         result = subprocess.run(cmd)
         sys.exit(result.returncode)
+
 
 if __name__ == "__main__":
     main()

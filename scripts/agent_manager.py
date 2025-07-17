@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+CANONICAL: This is the canonical script for agent lifecycle management (spawn, monitor, manage, resume) in the LeanVibe Agent Hive. Use this for all agent lifecycle operations.
+
 Agent Manager for LeanVibe Agent Hive
 
 Manages agent lifecycle using tmux sessions and windows.
@@ -43,7 +45,7 @@ class TmuxAgentManager:
                             "claude_file": claude_file,
                             "window_name": f"agent-{agent_name}",
                             "last_activity": self._get_last_activity(worktree_dir),
-                            "status": "unknown"
+                            "status": "unknown",
                         }
 
         # Then, discover agents from git worktree list (for agents outside worktrees/)
@@ -52,7 +54,7 @@ class TmuxAgentManager:
                 ["git", "worktree", "list", "--porcelain"],
                 capture_output=True,
                 text=True,
-                cwd=self.base_dir
+                cwd=self.base_dir,
             )
 
             if result.returncode == 0:
@@ -62,15 +64,19 @@ class TmuxAgentManager:
                         current_worktree = Path(line.split(" ", 1)[1])
                     elif line.startswith("branch ") and current_worktree:
                         # Check if this is an agent worktree (not main repo)
-                        if (current_worktree != self.base_dir and
-                            current_worktree.name not in agents and
-                            current_worktree.name != "agent-hive"):
+                        if (
+                            current_worktree != self.base_dir
+                            and current_worktree.name not in agents
+                            and current_worktree.name != "agent-hive"
+                        ):
                             claude_file = current_worktree / "CLAUDE.md"
                             if claude_file.exists():
                                 # Extract agent name from path
                                 agent_name = current_worktree.name
                                 if agent_name.endswith("-worktree"):
-                                    agent_name = agent_name[:-9]  # Remove "-worktree" suffix
+                                    agent_name = agent_name[
+                                        :-9
+                                    ]  # Remove "-worktree" suffix
 
                                 # Skip if this agent looks like a generic orchestrator
                                 if self._is_agent_specific_claude(claude_file):
@@ -79,8 +85,10 @@ class TmuxAgentManager:
                                         "path": current_worktree,
                                         "claude_file": claude_file,
                                         "window_name": f"agent-{agent_name}",
-                                        "last_activity": self._get_last_activity(current_worktree),
-                                        "status": "unknown"
+                                        "last_activity": self._get_last_activity(
+                                            current_worktree
+                                        ),
+                                        "status": "unknown",
                                     }
         except Exception as e:
             print(f"Warning: Could not discover git worktrees: {e}")
@@ -95,7 +103,15 @@ class TmuxAgentManager:
             if "LeanVibe Orchestrator" in content and "Role: Orchestrator" in content:
                 return False
             # Must contain agent-specific content
-            if any(term in content.lower() for term in ["agent identity", "agent instructions", "specialization", "mission statement"]):
+            if any(
+                term in content.lower()
+                for term in [
+                    "agent identity",
+                    "agent instructions",
+                    "specialization",
+                    "mission statement",
+                ]
+            ):
                 return True
             return False
         except Exception:
@@ -108,7 +124,7 @@ class TmuxAgentManager:
                 ["git", "log", "-1", "--format=%ct"],
                 cwd=worktree_dir,
                 capture_output=True,
-                text=True
+                text=True,
             )
             if result.returncode == 0 and result.stdout.strip():
                 timestamp = int(result.stdout.strip())
@@ -128,16 +144,24 @@ class TmuxAgentManager:
 
     def _window_exists(self, window_name: str) -> bool:
         """Check if tmux window exists in session."""
-        result = self._tmux_command(["list-windows", "-t", self.session_name, "-F", "#{window_name}"])
+        result = self._tmux_command(
+            ["list-windows", "-t", self.session_name, "-F", "#{window_name}"]
+        )
         if result.returncode == 0:
             return window_name in result.stdout.splitlines()
         return False
 
     def _get_window_status(self, window_name: str) -> Optional[str]:
         """Get status of a specific tmux window."""
-        result = self._tmux_command([
-            "list-windows", "-t", self.session_name, "-F", "#{window_name}:#{window_active}:#{window_flags}"
-        ])
+        result = self._tmux_command(
+            [
+                "list-windows",
+                "-t",
+                self.session_name,
+                "-F",
+                "#{window_name}:#{window_active}:#{window_flags}",
+            ]
+        )
         if result.returncode == 0:
             for line in result.stdout.splitlines():
                 if line.startswith(window_name + ":"):
@@ -152,16 +176,11 @@ class TmuxAgentManager:
         """Get appropriate starting prompt for agent."""
         prompts = {
             "documentation-agent": "Hello! I'm the Documentation Agent. I'm ready to work on creating comprehensive documentation for agent-hive. Let me start by reading the existing documentation structure and begin with D.1.1: Documentation Audit & Reorganization as outlined in my CLAUDE.md instructions.",
-
             "intelligence-agent": "Hello! I'm the Intelligence Agent. I'm ready to implement advanced AI capabilities for agent-hive. Let me start by analyzing the current system architecture and begin implementing the intelligence framework as outlined in my instructions.",
-
             "orchestration-agent": "Hello! I'm the Orchestration Agent. I'm ready to coordinate multi-agent workflows and optimize system orchestration. Let me start by analyzing the current agent coordination patterns and begin implementing enhanced orchestration capabilities.",
-
             "pm-agent": "Hello! I'm the PM/XP Methodology Enforcer Agent. I'm ready to enforce XP practices and manage GitHub workflows for agent-hive. Let me start by reading the current XP methodology implementation and GitHub processes, then begin with PM.1.1: Sprint Coordination as outlined in my CLAUDE.md instructions.",
-
             "integration-agent": "Hello! I'm the Integration Agent. I'm ready to work on system integration and external API connections for agent-hive. Let me start by reading the current system architecture and external integrations, then begin with I.1.1: API Gateway Implementation as outlined in my CLAUDE.md instructions.",
-
-            "quality-agent": "Hello! I'm the Quality Agent. I'm ready to implement comprehensive testing and quality assurance for agent-hive. Let me start by reading the current test infrastructure and quality processes, then begin with Q.1.1: Comprehensive Test Suite as outlined in my CLAUDE.md instructions."
+            "quality-agent": "Hello! I'm the Quality Agent. I'm ready to implement comprehensive testing and quality assurance for agent-hive. Let me start by reading the current test infrastructure and quality processes, then begin with Q.1.1: Comprehensive Test Suite as outlined in my CLAUDE.md instructions.",
         }
 
         return prompts.get(agent_name)
@@ -180,7 +199,9 @@ class TmuxAgentManager:
             print(f"❌ Failed to create session: {result.stderr}")
             return False
 
-    def spawn_agent(self, agent_name: str, with_prompt: bool = True, force_recreate: bool = False) -> bool:
+    def spawn_agent(
+        self, agent_name: str, with_prompt: bool = True, force_recreate: bool = False
+    ) -> bool:
         """Spawn an agent in a new tmux window."""
         if agent_name not in self.agents:
             print(f"❌ Agent '{agent_name}' not found")
@@ -197,13 +218,17 @@ class TmuxAgentManager:
         if self._window_exists(window_name):
             if force_recreate:
                 print(f"🔄 Force recreating window '{window_name}'")
-                self._tmux_command(["kill-window", "-t", f"{self.session_name}:{window_name}"])
+                self._tmux_command(
+                    ["kill-window", "-t", f"{self.session_name}:{window_name}"]
+                )
             else:
                 print(f"⚠️  Window '{window_name}' already exists")
                 try:
                     choice = input("Kill existing window and recreate? (y/N): ")
-                    if choice.lower() == 'y':
-                        self._tmux_command(["kill-window", "-t", f"{self.session_name}:{window_name}"])
+                    if choice.lower() == "y":
+                        self._tmux_command(
+                            ["kill-window", "-t", f"{self.session_name}:{window_name}"]
+                        )
                     else:
                         print("Aborted")
                         return False
@@ -212,9 +237,17 @@ class TmuxAgentManager:
                     return False
 
         # Create new window
-        result = self._tmux_command([
-            "new-window", "-t", self.session_name, "-n", window_name, "-c", str(agent["path"])
-        ])
+        result = self._tmux_command(
+            [
+                "new-window",
+                "-t",
+                self.session_name,
+                "-n",
+                window_name,
+                "-c",
+                str(agent["path"]),
+            ]
+        )
 
         if result.returncode != 0:
             print(f"❌ Failed to create window: {result.stderr}")
@@ -222,9 +255,15 @@ class TmuxAgentManager:
 
         # Send command to start Claude with proper permissions
         claude_cmd = "claude --dangerously-skip-permissions"
-        self._tmux_command([
-            "send-keys", "-t", f"{self.session_name}:{window_name}", claude_cmd, "Enter"
-        ])
+        self._tmux_command(
+            [
+                "send-keys",
+                "-t",
+                f"{self.session_name}:{window_name}",
+                claude_cmd,
+                "Enter",
+            ]
+        )
 
         # Send starting prompt if requested
         if with_prompt:
@@ -235,7 +274,10 @@ class TmuxAgentManager:
                 try:
                     sys.path.append(str(self.base_dir))
                     from dashboard.prompt_logger import prompt_logger
-                    prompt_logger.log_prompt(agent_name, starting_prompt, "Starting prompt sent", True)
+
+                    prompt_logger.log_prompt(
+                        agent_name, starting_prompt, "Starting prompt sent", True
+                    )
                 except ImportError:
                     pass  # Continue without logging if dashboard not available
 
@@ -244,22 +286,22 @@ class TmuxAgentManager:
                 self._tmux_command(["set-buffer", starting_prompt])
 
                 # Clear any existing input
-                self._tmux_command([
-                    "send-keys", "-t", f"{self.session_name}:{window_name}", "C-c"
-                ])
+                self._tmux_command(
+                    ["send-keys", "-t", f"{self.session_name}:{window_name}", "C-c"]
+                )
 
                 time.sleep(0.3)  # Brief pause
 
                 # Paste buffer content
-                self._tmux_command([
-                    "paste-buffer", "-t", f"{self.session_name}:{window_name}"
-                ])
+                self._tmux_command(
+                    ["paste-buffer", "-t", f"{self.session_name}:{window_name}"]
+                )
 
                 # Send Enter to submit
                 time.sleep(0.2)
-                self._tmux_command([
-                    "send-keys", "-t", f"{self.session_name}:{window_name}", "Enter"
-                ])
+                self._tmux_command(
+                    ["send-keys", "-t", f"{self.session_name}:{window_name}", "Enter"]
+                )
 
         print(f"✅ Spawned agent '{agent_name}' in window '{window_name}'")
         print(f"📁 Working directory: {agent['path']}")
@@ -269,7 +311,9 @@ class TmuxAgentManager:
 
         return True
 
-    def spawn_all_agents(self, with_prompt: bool = True, force_recreate: bool = False) -> Dict[str, bool]:
+    def spawn_all_agents(
+        self, with_prompt: bool = True, force_recreate: bool = False
+    ) -> Dict[str, bool]:
         """Spawn all discovered agents."""
         results = {}
 
@@ -277,7 +321,9 @@ class TmuxAgentManager:
 
         for agent_name in self.agents:
             print(f"\n🔄 Spawning {agent_name}...")
-            results[agent_name] = self.spawn_agent(agent_name, with_prompt, force_recreate)
+            results[agent_name] = self.spawn_agent(
+                agent_name, with_prompt, force_recreate
+            )
 
         return results
 
@@ -296,7 +342,7 @@ class TmuxAgentManager:
                 "window_name": window_name,
                 "exists": self._window_exists(window_name),
                 "status": window_status,
-                "path": str(agent["path"])
+                "path": str(agent["path"]),
             }
 
         return status
@@ -321,7 +367,9 @@ class TmuxAgentManager:
 
         for agent_name, info in status.items():
             if info["exists"]:
-                status_parts = info["status"].split(":") if info["status"] else ["unknown"]
+                status_parts = (
+                    info["status"].split(":") if info["status"] else ["unknown"]
+                )
                 is_active = status_parts[0] == "active"
 
                 if is_active:
@@ -360,8 +408,13 @@ class TmuxAgentManager:
 
         # Use subprocess.run safely instead of os.system
         try:
-            subprocess.run(["tmux", "select-window", "-t", f"{self.session_name}:{window_name}"], check=True)
-            subprocess.run(["tmux", "attach-session", "-t", self.session_name], check=True)
+            subprocess.run(
+                ["tmux", "select-window", "-t", f"{self.session_name}:{window_name}"],
+                check=True,
+            )
+            subprocess.run(
+                ["tmux", "attach-session", "-t", self.session_name], check=True
+            )
         except subprocess.CalledProcessError as e:
             print(f"❌ Failed to attach to agent: {e}")
 
@@ -377,7 +430,9 @@ class TmuxAgentManager:
             print(f"⚠️  Window '{window_name}' does not exist")
             return True
 
-        result = self._tmux_command(["kill-window", "-t", f"{self.session_name}:{window_name}"])
+        result = self._tmux_command(
+            ["kill-window", "-t", f"{self.session_name}:{window_name}"]
+        )
 
         if result.returncode == 0:
             print(f"✅ Killed agent '{agent_name}' window")
@@ -411,7 +466,7 @@ class TmuxAgentManager:
             "session_name": self.session_name,
             "session_exists": self._session_exists(),
             "timestamp": datetime.now().isoformat(),
-            "agents": {}
+            "agents": {},
         }
 
         if overview["session_exists"]:
@@ -425,7 +480,9 @@ class TmuxAgentManager:
         script_content = "#!/bin/bash\n"
         script_content += "# LeanVibe Agent Hive - Attach to Agent Windows\n"
         script_content += f"# Session: {self.session_name}\n"
-        script_content += f"# Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        script_content += (
+            f"# Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        )
 
         script_content += "echo 'Available agents:'\n"
 
@@ -434,8 +491,12 @@ class TmuxAgentManager:
             script_content += f"echo '{i}. {agent_name} ({window_name})'\n"
 
         script_content += "\necho 'Commands:'\n"
-        script_content += f"echo 'tmux attach-session -t {self.session_name}  # Attach to session'\n"
-        script_content += f"echo 'tmux list-windows -t {self.session_name}    # List windows'\n"
+        script_content += (
+            f"echo 'tmux attach-session -t {self.session_name}  # Attach to session'\n"
+        )
+        script_content += (
+            f"echo 'tmux list-windows -t {self.session_name}    # List windows'\n"
+        )
 
         for agent_name in self.agents:
             window_name = self.agents[agent_name]["window_name"]
@@ -458,11 +519,25 @@ def main():
     parser.add_argument("--restart", metavar="AGENT", help="Restart specific agent")
     parser.add_argument("--attach", metavar="AGENT", help="Attach to specific agent")
     parser.add_argument("--status", action="store_true", help="Show agent status")
-    parser.add_argument("--create-session", action="store_true", help="Create tmux session")
-    parser.add_argument("--attach-script", action="store_true", help="Create attach script")
-    parser.add_argument("--no-prompt", action="store_true", help="Don't send starting prompt when spawning")
-    parser.add_argument("--force", action="store_true", help="Force recreate existing windows without prompting")
-    parser.add_argument("--json", action="store_true", help="Output status in JSON format")
+    parser.add_argument(
+        "--create-session", action="store_true", help="Create tmux session"
+    )
+    parser.add_argument(
+        "--attach-script", action="store_true", help="Create attach script"
+    )
+    parser.add_argument(
+        "--no-prompt",
+        action="store_true",
+        help="Don't send starting prompt when spawning",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force recreate existing windows without prompting",
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="Output status in JSON format"
+    )
 
     args = parser.parse_args()
 
@@ -473,12 +548,18 @@ def main():
         manager.create_session()
 
     elif args.spawn:
-        manager.spawn_agent(args.spawn, with_prompt=with_prompt, force_recreate=args.force)
+        manager.spawn_agent(
+            args.spawn, with_prompt=with_prompt, force_recreate=args.force
+        )
 
     elif args.spawn_all:
-        results = manager.spawn_all_agents(with_prompt=with_prompt, force_recreate=args.force)
+        results = manager.spawn_all_agents(
+            with_prompt=with_prompt, force_recreate=args.force
+        )
         success_count = sum(1 for success in results.values() if success)
-        print(f"\n📊 Results: {success_count}/{len(results)} agents spawned successfully")
+        print(
+            f"\n📊 Results: {success_count}/{len(results)} agents spawned successfully"
+        )
 
     elif args.kill:
         manager.kill_agent(args.kill)
@@ -486,7 +567,9 @@ def main():
     elif args.kill_all:
         results = manager.kill_all_agents()
         success_count = sum(1 for success in results.values() if success)
-        print(f"\n📊 Results: {success_count}/{len(results)} agents killed successfully")
+        print(
+            f"\n📊 Results: {success_count}/{len(results)} agents killed successfully"
+        )
 
     elif args.restart:
         manager.restart_agent(args.restart, with_prompt=with_prompt)

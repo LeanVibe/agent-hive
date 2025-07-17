@@ -1,5 +1,7 @@
 # /wake - Memory Restoration Command
 
+**Canonical system:** Automatic/manual memory system (see scripts/memory_*, .claude/memory/)
+
 Restores essential knowledge and project state from persistent memory after context reset or session restart.
 
 ## Usage
