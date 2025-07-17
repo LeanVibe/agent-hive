@@ -110,14 +110,14 @@ class ImprovementResult:
 
 class LearningEngine:
     """Machine learning engine for coordination pattern analysis."""
-    
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.pattern_history: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
         self.learning_models: Dict[str, Any] = {}
         self.prediction_accuracy: Dict[str, float] = {}
         self.feature_importance: Dict[str, Dict[str, float]] = {}
-        
+
     def analyze_coordination_patterns(self, coordination_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Analyze coordination patterns to identify improvement opportunities."""
         patterns = {
@@ -127,13 +127,13 @@ class LearningEngine:
             "workflow_patterns": self._analyze_workflow_patterns(coordination_data),
             "performance_correlations": self._identify_performance_correlations(coordination_data)
         }
-        
+
         return patterns
-    
+
     def _identify_bottlenecks(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Identify coordination bottlenecks."""
         bottlenecks = []
-        
+
         # Analyze task completion times
         task_times = defaultdict(list)
         for entry in data:
@@ -141,7 +141,7 @@ class LearningEngine:
                 task_id = entry.get("task_id")
                 completion_time = entry["task_completion_time"]
                 task_times[task_id].append(completion_time)
-        
+
         # Identify consistently slow tasks
         for task_id, times in task_times.items():
             if len(times) >= 3:
@@ -153,9 +153,9 @@ class LearningEngine:
                         "average_time": avg_time,
                         "occurrences": len(times)
                     })
-        
+
         return bottlenecks
-    
+
     def _analyze_efficiency_patterns(self, data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Analyze coordination efficiency patterns."""
         efficiency_data = {
@@ -163,13 +163,13 @@ class LearningEngine:
             "agent_combinations": self._analyze_agent_combinations(data),
             "workflow_types": self._analyze_workflow_efficiency(data)
         }
-        
+
         return efficiency_data
-    
+
     def _analyze_agent_interactions(self, data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Analyze agent interaction patterns."""
         interactions = defaultdict(lambda: defaultdict(int))
-        
+
         for entry in data:
             if "agent_interactions" in entry:
                 for interaction in entry["agent_interactions"]:
@@ -177,9 +177,9 @@ class LearningEngine:
                     target = interaction.get("target_agent")
                     if source and target:
                         interactions[source][target] += 1
-        
+
         return dict(interactions)
-    
+
     def _analyze_workflow_patterns(self, data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Analyze workflow execution patterns."""
         workflow_patterns = {
@@ -187,99 +187,99 @@ class LearningEngine:
             "completion_times": self._analyze_workflow_completion_times(data),
             "failure_patterns": self._analyze_failure_patterns(data)
         }
-        
+
         return workflow_patterns
-    
+
     def _identify_performance_correlations(self, data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Identify performance correlations."""
         correlations = {}
-        
+
         # Analyze correlation between agent load and performance
         agent_load_performance = self._correlate_agent_load_performance(data)
         correlations["agent_load_performance"] = agent_load_performance
-        
+
         # Analyze correlation between workflow complexity and completion time
         complexity_time_correlation = self._correlate_complexity_time(data)
         correlations["complexity_time"] = complexity_time_correlation
-        
+
         return correlations
-    
+
     def _identify_peak_efficiency_hours(self, data: List[Dict[str, Any]]) -> List[int]:
         """Identify peak efficiency hours."""
         hourly_efficiency = defaultdict(list)
-        
+
         for entry in data:
             if "timestamp" in entry and "efficiency_score" in entry:
                 hour = datetime.fromisoformat(entry["timestamp"]).hour
                 hourly_efficiency[hour].append(entry["efficiency_score"])
-        
+
         # Calculate average efficiency per hour
         avg_efficiency = {}
         for hour, scores in hourly_efficiency.items():
             avg_efficiency[hour] = statistics.mean(scores)
-        
+
         # Return top 3 peak hours
         peak_hours = sorted(avg_efficiency.items(), key=lambda x: x[1], reverse=True)[:3]
         return [hour for hour, _ in peak_hours]
-    
+
     def _analyze_agent_combinations(self, data: List[Dict[str, Any]]) -> Dict[str, float]:
         """Analyze agent combination effectiveness."""
         combinations = defaultdict(list)
-        
+
         for entry in data:
             if "active_agents" in entry and "efficiency_score" in entry:
                 agent_combo = tuple(sorted(entry["active_agents"]))
                 combinations[agent_combo].append(entry["efficiency_score"])
-        
+
         # Calculate average efficiency per combination
         combo_efficiency = {}
         for combo, scores in combinations.items():
             if len(scores) >= 2:  # At least 2 data points
                 combo_efficiency[combo] = statistics.mean(scores)
-        
+
         return combo_efficiency
-    
+
     def _analyze_workflow_efficiency(self, data: List[Dict[str, Any]]) -> Dict[str, float]:
         """Analyze workflow type efficiency."""
         workflow_efficiency = defaultdict(list)
-        
+
         for entry in data:
             if "workflow_type" in entry and "efficiency_score" in entry:
                 workflow_type = entry["workflow_type"]
                 workflow_efficiency[workflow_type].append(entry["efficiency_score"])
-        
+
         # Calculate average efficiency per workflow type
         return {
-            wf_type: statistics.mean(scores) 
-            for wf_type, scores in workflow_efficiency.items() 
+            wf_type: statistics.mean(scores)
+            for wf_type, scores in workflow_efficiency.items()
             if len(scores) >= 2
         }
-    
+
     def _calculate_workflow_success_rates(self, data: List[Dict[str, Any]]) -> Dict[str, float]:
         """Calculate workflow success rates."""
         workflow_results = defaultdict(lambda: {"success": 0, "total": 0})
-        
+
         for entry in data:
             if "workflow_id" in entry and "success" in entry:
                 workflow_id = entry["workflow_id"]
                 workflow_results[workflow_id]["total"] += 1
                 if entry["success"]:
                     workflow_results[workflow_id]["success"] += 1
-        
+
         return {
             wf_id: results["success"] / results["total"]
             for wf_id, results in workflow_results.items()
             if results["total"] > 0
         }
-    
+
     def _analyze_workflow_completion_times(self, data: List[Dict[str, Any]]) -> Dict[str, Dict[str, float]]:
         """Analyze workflow completion times."""
         completion_times = defaultdict(list)
-        
+
         for entry in data:
             if "workflow_id" in entry and "completion_time" in entry:
                 completion_times[entry["workflow_id"]].append(entry["completion_time"])
-        
+
         return {
             wf_id: {
                 "average": statistics.mean(times),
@@ -289,17 +289,17 @@ class LearningEngine:
             for wf_id, times in completion_times.items()
             if len(times) >= 2
         }
-    
+
     def _analyze_failure_patterns(self, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Analyze failure patterns."""
         failure_patterns = []
-        
+
         # Group failures by type
         failure_types = defaultdict(list)
         for entry in data:
             if "failure_type" in entry:
                 failure_types[entry["failure_type"]].append(entry)
-        
+
         # Analyze each failure type
         for failure_type, failures in failure_types.items():
             if len(failures) >= 2:
@@ -311,68 +311,68 @@ class LearningEngine:
                     "time_patterns": self._analyze_failure_timing(failures)
                 }
                 failure_patterns.append(pattern)
-        
+
         return failure_patterns
-    
+
     def _correlate_agent_load_performance(self, data: List[Dict[str, Any]]) -> float:
         """Correlate agent load with performance."""
         load_values = []
         performance_values = []
-        
+
         for entry in data:
             if "agent_load" in entry and "performance_score" in entry:
                 load_values.append(entry["agent_load"])
                 performance_values.append(entry["performance_score"])
-        
+
         if len(load_values) >= 3:
             return self._calculate_correlation(load_values, performance_values)
         return 0.0
-    
+
     def _correlate_complexity_time(self, data: List[Dict[str, Any]]) -> float:
         """Correlate workflow complexity with completion time."""
         complexity_values = []
         time_values = []
-        
+
         for entry in data:
             if "workflow_complexity" in entry and "completion_time" in entry:
                 complexity_values.append(entry["workflow_complexity"])
                 time_values.append(entry["completion_time"])
-        
+
         if len(complexity_values) >= 3:
             return self._calculate_correlation(complexity_values, time_values)
         return 0.0
-    
+
     def _calculate_correlation(self, x_values: List[float], y_values: List[float]) -> float:
         """Calculate correlation coefficient."""
         if len(x_values) != len(y_values) or len(x_values) < 2:
             return 0.0
-        
+
         n = len(x_values)
         sum_x = sum(x_values)
         sum_y = sum(y_values)
         sum_xy = sum(x * y for x, y in zip(x_values, y_values))
         sum_x2 = sum(x * x for x in x_values)
         sum_y2 = sum(y * y for y in y_values)
-        
+
         numerator = n * sum_xy - sum_x * sum_y
         denominator = ((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y)) ** 0.5
-        
+
         if denominator == 0:
             return 0.0
-        
+
         return numerator / denominator
-    
+
     def _extract_common_causes(self, failures: List[Dict[str, Any]]) -> List[str]:
         """Extract common causes from failures."""
         causes = defaultdict(int)
         for failure in failures:
             if "cause" in failure:
                 causes[failure["cause"]] += 1
-        
+
         # Return causes that appear in at least 30% of failures
         threshold = len(failures) * 0.3
         return [cause for cause, count in causes.items() if count >= threshold]
-    
+
     def _extract_affected_agents(self, failures: List[Dict[str, Any]]) -> List[str]:
         """Extract commonly affected agents."""
         agents = defaultdict(int)
@@ -380,11 +380,11 @@ class LearningEngine:
             if "affected_agents" in failure:
                 for agent in failure["affected_agents"]:
                     agents[agent] += 1
-        
+
         # Return agents affected in at least 50% of failures
         threshold = len(failures) * 0.5
         return [agent for agent, count in agents.items() if count >= threshold]
-    
+
     def _analyze_failure_timing(self, failures: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Analyze failure timing patterns."""
         hours = []
@@ -392,17 +392,17 @@ class LearningEngine:
             if "timestamp" in failure:
                 hour = datetime.fromisoformat(failure["timestamp"]).hour
                 hours.append(hour)
-        
+
         if not hours:
             return {}
-        
+
         # Find peak failure hours
         hour_counts = defaultdict(int)
         for hour in hours:
             hour_counts[hour] += 1
-        
+
         peak_hours = sorted(hour_counts.items(), key=lambda x: x[1], reverse=True)[:3]
-        
+
         return {
             "peak_hours": [hour for hour, _ in peak_hours],
             "total_failures": len(failures),
@@ -412,29 +412,29 @@ class LearningEngine:
 
 class ContinuousImprovementEngine:
     """Main continuous improvement engine for multi-agent coordination."""
-    
+
     def __init__(self, performance_monitor: PerformanceMonitor, analytics_dashboard: AnalyticsDashboard):
         self.logger = logging.getLogger(__name__)
         self.performance_monitor = performance_monitor
         self.analytics_dashboard = analytics_dashboard
         self.learning_engine = LearningEngine()
-        
+
         # Improvement tracking
         self.improvement_opportunities: Dict[str, ImprovementOpportunity] = {}
         self.improvement_actions: Dict[str, ImprovementAction] = {}
         self.improvement_results: Dict[str, ImprovementResult] = {}
-        
+
         # Analysis state
         self.coordination_history: deque = deque(maxlen=1000)
         self.pattern_analysis_cache: Dict[str, Any] = {}
         self.last_analysis_time: Optional[datetime] = None
         self.analysis_interval = timedelta(minutes=30)
-        
+
         # Improvement execution
         self.running = False
         self.improvement_thread: Optional[threading.Thread] = None
         self.execution_queue: asyncio.Queue = asyncio.Queue()
-        
+
         # Configuration
         self.improvement_thresholds = {
             ImprovementType.PERFORMANCE_OPTIMIZATION: 0.8,  # 80% confidence
@@ -443,30 +443,30 @@ class ContinuousImprovementEngine:
             ImprovementType.TASK_ROUTING: 0.85,
             ImprovementType.DEPENDENCY_MANAGEMENT: 0.8
         }
-        
+
         self.auto_implement_threshold = 0.9  # 90% confidence for auto-implementation
-        
+
         self.logger.info("ContinuousImprovementEngine initialized")
-    
+
     def start(self) -> None:
         """Start the continuous improvement engine."""
         self.running = True
         self.improvement_thread = threading.Thread(target=self._improvement_loop, daemon=True)
         self.improvement_thread.start()
         self.logger.info("Continuous improvement engine started")
-    
+
     def stop(self) -> None:
         """Stop the continuous improvement engine."""
         self.running = False
         if self.improvement_thread:
             self.improvement_thread.join(timeout=5.0)
         self.logger.info("Continuous improvement engine stopped")
-    
+
     def record_coordination_event(self, event_data: Dict[str, Any]) -> None:
         """Record coordination event for analysis."""
         event_data["timestamp"] = datetime.now().isoformat()
         self.coordination_history.append(event_data)
-    
+
     def _improvement_loop(self) -> None:
         """Main improvement analysis and execution loop."""
         while self.running:
@@ -474,86 +474,86 @@ class ContinuousImprovementEngine:
                 # Check if it's time for analysis
                 if self._should_run_analysis():
                     self._run_improvement_analysis()
-                
+
                 # Execute pending improvements
                 self._execute_pending_improvements()
-                
+
                 # Clean up old data
                 self._cleanup_old_data()
-                
+
                 time.sleep(60)  # Check every minute
-                
+
             except Exception as e:
                 self.logger.error(f"Error in improvement loop: {e}")
                 time.sleep(30)  # Shorter delay on error
-    
+
     def _should_run_analysis(self) -> bool:
         """Check if improvement analysis should be run."""
         if not self.last_analysis_time:
             return True
-        
+
         time_since_last = datetime.now() - self.last_analysis_time
         return time_since_last >= self.analysis_interval
-    
+
     def _run_improvement_analysis(self) -> None:
         """Run comprehensive improvement analysis."""
         try:
             self.logger.info("Running improvement analysis")
-            
+
             # Collect coordination data
             coordination_data = list(self.coordination_history)
-            
+
             if len(coordination_data) < 10:
                 self.logger.debug("Insufficient coordination data for analysis")
                 return
-            
+
             # Analyze patterns
             patterns = self.learning_engine.analyze_coordination_patterns(coordination_data)
-            
+
             # Identify improvement opportunities
             opportunities = self._identify_improvement_opportunities(patterns, coordination_data)
-            
+
             # Prioritize opportunities
             prioritized_opportunities = self._prioritize_opportunities(opportunities)
-            
+
             # Update improvement tracking
             for opportunity in prioritized_opportunities:
                 self.improvement_opportunities[opportunity.id] = opportunity
-            
+
             # Generate improvement actions
             self._generate_improvement_actions(prioritized_opportunities)
-            
+
             self.last_analysis_time = datetime.now()
             self.logger.info(f"Analysis complete. Found {len(prioritized_opportunities)} improvement opportunities")
-            
+
         except Exception as e:
             self.logger.error(f"Error in improvement analysis: {e}")
-    
+
     def _identify_improvement_opportunities(self, patterns: Dict[str, Any], coordination_data: List[Dict[str, Any]]) -> List[ImprovementOpportunity]:
         """Identify improvement opportunities from patterns."""
         opportunities = []
-        
+
         # Performance optimization opportunities
         opportunities.extend(self._identify_performance_opportunities(patterns, coordination_data))
-        
+
         # Coordination efficiency opportunities
         opportunities.extend(self._identify_coordination_opportunities(patterns, coordination_data))
-        
+
         # Resource allocation opportunities
         opportunities.extend(self._identify_resource_opportunities(patterns, coordination_data))
-        
+
         # Task routing opportunities
         opportunities.extend(self._identify_routing_opportunities(patterns, coordination_data))
-        
+
         # Dependency management opportunities
         opportunities.extend(self._identify_dependency_opportunities(patterns, coordination_data))
-        
+
         return opportunities
-    
+
     def _identify_performance_opportunities(self, patterns: Dict[str, Any], coordination_data: List[Dict[str, Any]]) -> List[ImprovementOpportunity]:
         """Identify performance improvement opportunities."""
         opportunities = []
-        
+
         # Check for bottlenecks
         bottlenecks = patterns.get("common_bottlenecks", [])
         for bottleneck in bottlenecks:
@@ -578,13 +578,13 @@ class ContinuousImprovementEngine:
                     confidence_score=0.85
                 )
                 opportunities.append(opportunity)
-        
+
         return opportunities
-    
+
     def _identify_coordination_opportunities(self, patterns: Dict[str, Any], coordination_data: List[Dict[str, Any]]) -> List[ImprovementOpportunity]:
         """Identify coordination efficiency opportunities."""
         opportunities = []
-        
+
         # Check for inefficient agent combinations
         agent_combinations = patterns.get("efficiency_patterns", {}).get("agent_combinations", {})
         if agent_combinations:
@@ -593,7 +593,7 @@ class ContinuousImprovementEngine:
                 (combo, efficiency) for combo, efficiency in agent_combinations.items()
                 if efficiency < 0.6
             ]
-            
+
             for combo, efficiency in low_efficiency_combos:
                 opportunity = ImprovementOpportunity(
                     id=f"coord_efficiency_{hash(combo)}",
@@ -616,13 +616,13 @@ class ContinuousImprovementEngine:
                     confidence_score=0.75
                 )
                 opportunities.append(opportunity)
-        
+
         return opportunities
-    
+
     def _identify_resource_opportunities(self, patterns: Dict[str, Any], coordination_data: List[Dict[str, Any]]) -> List[ImprovementOpportunity]:
         """Identify resource allocation opportunities."""
         opportunities = []
-        
+
         # Analyze resource utilization patterns
         peak_hours = patterns.get("efficiency_patterns", {}).get("peak_hours", [])
         if peak_hours:
@@ -646,13 +646,13 @@ class ContinuousImprovementEngine:
                 confidence_score=0.7
             )
             opportunities.append(opportunity)
-        
+
         return opportunities
-    
+
     def _identify_routing_opportunities(self, patterns: Dict[str, Any], coordination_data: List[Dict[str, Any]]) -> List[ImprovementOpportunity]:
         """Identify task routing opportunities."""
         opportunities = []
-        
+
         # Check for routing inefficiencies
         failure_patterns = patterns.get("workflow_patterns", {}).get("failure_patterns", [])
         for failure_pattern in failure_patterns:
@@ -678,17 +678,17 @@ class ContinuousImprovementEngine:
                     confidence_score=0.8
                 )
                 opportunities.append(opportunity)
-        
+
         return opportunities
-    
+
     def _identify_dependency_opportunities(self, patterns: Dict[str, Any], coordination_data: List[Dict[str, Any]]) -> List[ImprovementOpportunity]:
         """Identify dependency management opportunities."""
         opportunities = []
-        
+
         # Check for dependency-related delays
         bottlenecks = patterns.get("common_bottlenecks", [])
         dependency_bottlenecks = [b for b in bottlenecks if "dependency" in b.get("type", "")]
-        
+
         if dependency_bottlenecks:
             opportunity = ImprovementOpportunity(
                 id="dependency_optimization",
@@ -710,9 +710,9 @@ class ContinuousImprovementEngine:
                 confidence_score=0.75
             )
             opportunities.append(opportunity)
-        
+
         return opportunities
-    
+
     def _prioritize_opportunities(self, opportunities: List[ImprovementOpportunity]) -> List[ImprovementOpportunity]:
         """Prioritize improvement opportunities."""
         def priority_score(opportunity: ImprovementOpportunity) -> float:
@@ -720,34 +720,34 @@ class ContinuousImprovementEngine:
             impact_weight = 0.4
             effort_weight = 0.3  # Lower effort is better
             confidence_weight = 0.3
-            
+
             score = (
                 opportunity.expected_impact * impact_weight +
                 (1.0 - opportunity.implementation_effort) * effort_weight +
                 opportunity.confidence_score * confidence_weight
             )
-            
+
             # Boost score for high priority items
             if opportunity.priority == ImprovementPriority.CRITICAL:
                 score *= 1.5
             elif opportunity.priority == ImprovementPriority.HIGH:
                 score *= 1.2
-            
+
             return score
-        
+
         return sorted(opportunities, key=priority_score, reverse=True)
-    
+
     def _generate_improvement_actions(self, opportunities: List[ImprovementOpportunity]) -> None:
         """Generate concrete improvement actions."""
         for opportunity in opportunities:
             actions = self._create_actions_for_opportunity(opportunity)
             for action in actions:
                 self.improvement_actions[action.id] = action
-    
+
     def _create_actions_for_opportunity(self, opportunity: ImprovementOpportunity) -> List[ImprovementAction]:
         """Create actions for a specific improvement opportunity."""
         actions = []
-        
+
         if opportunity.type == ImprovementType.PERFORMANCE_OPTIMIZATION:
             actions.extend(self._create_performance_actions(opportunity))
         elif opportunity.type == ImprovementType.COORDINATION_EFFICIENCY:
@@ -758,13 +758,13 @@ class ContinuousImprovementEngine:
             actions.extend(self._create_routing_actions(opportunity))
         elif opportunity.type == ImprovementType.DEPENDENCY_MANAGEMENT:
             actions.extend(self._create_dependency_actions(opportunity))
-        
+
         return actions
-    
+
     def _create_performance_actions(self, opportunity: ImprovementOpportunity) -> List[ImprovementAction]:
         """Create performance optimization actions."""
         actions = []
-        
+
         # Analyze performance bottleneck
         analysis_action = ImprovementAction(
             id=f"{opportunity.id}_analyze",
@@ -779,7 +779,7 @@ class ContinuousImprovementEngine:
             execution_order=1
         )
         actions.append(analysis_action)
-        
+
         # Implement optimization
         optimization_action = ImprovementAction(
             id=f"{opportunity.id}_optimize",
@@ -794,13 +794,13 @@ class ContinuousImprovementEngine:
             execution_order=2
         )
         actions.append(optimization_action)
-        
+
         return actions
-    
+
     def _create_coordination_actions(self, opportunity: ImprovementOpportunity) -> List[ImprovementAction]:
         """Create coordination efficiency actions."""
         actions = []
-        
+
         # Optimize agent communication
         comm_action = ImprovementAction(
             id=f"{opportunity.id}_communication",
@@ -816,13 +816,13 @@ class ContinuousImprovementEngine:
             execution_order=1
         )
         actions.append(comm_action)
-        
+
         return actions
-    
+
     def _create_resource_actions(self, opportunity: ImprovementOpportunity) -> List[ImprovementAction]:
         """Create resource allocation actions."""
         actions = []
-        
+
         # Implement predictive resource allocation
         resource_action = ImprovementAction(
             id=f"{opportunity.id}_resource_allocation",
@@ -837,13 +837,13 @@ class ContinuousImprovementEngine:
             execution_order=1
         )
         actions.append(resource_action)
-        
+
         return actions
-    
+
     def _create_routing_actions(self, opportunity: ImprovementOpportunity) -> List[ImprovementAction]:
         """Create task routing actions."""
         actions = []
-        
+
         # Implement intelligent routing
         routing_action = ImprovementAction(
             id=f"{opportunity.id}_routing",
@@ -859,13 +859,13 @@ class ContinuousImprovementEngine:
             execution_order=1
         )
         actions.append(routing_action)
-        
+
         return actions
-    
+
     def _create_dependency_actions(self, opportunity: ImprovementOpportunity) -> List[ImprovementAction]:
         """Create dependency management actions."""
         actions = []
-        
+
         # Implement parallel dependency resolution
         dependency_action = ImprovementAction(
             id=f"{opportunity.id}_dependency",
@@ -880,19 +880,19 @@ class ContinuousImprovementEngine:
             execution_order=1
         )
         actions.append(dependency_action)
-        
+
         return actions
-    
+
     def _execute_pending_improvements(self) -> None:
         """Execute pending improvement actions."""
         pending_actions = [
             action for action in self.improvement_actions.values()
             if action.status == "pending"
         ]
-        
+
         # Sort by execution order
         pending_actions.sort(key=lambda x: x.execution_order)
-        
+
         for action in pending_actions:
             # Check if dependencies are satisfied
             if self._are_dependencies_satisfied(action):
@@ -900,7 +900,7 @@ class ContinuousImprovementEngine:
                 opportunity = self.improvement_opportunities.get(action.opportunity_id)
                 if opportunity and opportunity.confidence_score >= self.auto_implement_threshold:
                     self._execute_improvement_action(action)
-    
+
     def _are_dependencies_satisfied(self, action: ImprovementAction) -> bool:
         """Check if action dependencies are satisfied."""
         for dep_id in action.dependencies:
@@ -908,14 +908,14 @@ class ContinuousImprovementEngine:
             if not dep_action or dep_action.status != "completed":
                 return False
         return True
-    
+
     def _execute_improvement_action(self, action: ImprovementAction) -> None:
         """Execute a specific improvement action."""
         try:
             self.logger.info(f"Executing improvement action: {action.id}")
             action.status = "executing"
             action.executed_at = datetime.now()
-            
+
             # Execute based on action type
             if action.action_type == "performance_analysis":
                 self._execute_performance_analysis(action)
@@ -929,20 +929,20 @@ class ContinuousImprovementEngine:
                 self._execute_routing_optimization(action)
             elif action.action_type == "dependency_optimization":
                 self._execute_dependency_optimization(action)
-            
+
             action.status = "completed"
             self.logger.info(f"Improvement action completed: {action.id}")
-            
+
         except Exception as e:
             action.status = "failed"
             self.logger.error(f"Improvement action failed: {action.id} - {e}")
-    
+
     def _execute_performance_analysis(self, action: ImprovementAction) -> None:
         """Execute performance analysis action."""
         # This would integrate with the performance monitoring system
         # For now, simulate the analysis
         self.logger.info(f"Executing performance analysis: {action.parameters}")
-        
+
         # Record performance metrics
         self.performance_monitor.record_metric(
             PerformanceMetric(
@@ -952,74 +952,74 @@ class ContinuousImprovementEngine:
                 additional_context={"action_id": action.id}
             )
         )
-    
+
     def _execute_performance_optimization(self, action: ImprovementAction) -> None:
         """Execute performance optimization action."""
         self.logger.info(f"Executing performance optimization: {action.parameters}")
-        
+
         # Simulate optimization implementation
         optimization_strategies = action.parameters.get("optimization_strategies", [])
         for strategy in optimization_strategies:
             self.logger.info(f"Applying optimization strategy: {strategy}")
-    
+
     def _execute_communication_optimization(self, action: ImprovementAction) -> None:
         """Execute communication optimization action."""
         self.logger.info(f"Executing communication optimization: {action.parameters}")
-        
+
         # Simulate communication optimization
         target_agents = action.parameters.get("target_agents", [])
         improvements = action.parameters.get("improvements", [])
-        
+
         for agent in target_agents:
             for improvement in improvements:
                 self.logger.info(f"Applying {improvement} to agent {agent}")
-    
+
     def _execute_resource_optimization(self, action: ImprovementAction) -> None:
         """Execute resource optimization action."""
         self.logger.info(f"Executing resource optimization: {action.parameters}")
-        
+
         # Simulate resource optimization
         allocation_strategy = action.parameters.get("allocation_strategy")
         self.logger.info(f"Implementing {allocation_strategy} resource allocation")
-    
+
     def _execute_routing_optimization(self, action: ImprovementAction) -> None:
         """Execute routing optimization action."""
         self.logger.info(f"Executing routing optimization: {action.parameters}")
-        
+
         # Simulate routing optimization
         routing_algorithm = action.parameters.get("routing_algorithm")
         self.logger.info(f"Implementing {routing_algorithm} routing algorithm")
-    
+
     def _execute_dependency_optimization(self, action: ImprovementAction) -> None:
         """Execute dependency optimization action."""
         self.logger.info(f"Executing dependency optimization: {action.parameters}")
-        
+
         # Simulate dependency optimization
         resolution_strategy = action.parameters.get("resolution_strategy")
         self.logger.info(f"Implementing {resolution_strategy} dependency resolution")
-    
+
     def _cleanup_old_data(self) -> None:
         """Clean up old improvement data."""
         cutoff_time = datetime.now() - timedelta(days=7)
-        
+
         # Clean up old opportunities
         old_opportunities = [
             opp_id for opp_id, opp in self.improvement_opportunities.items()
             if opp.created_at < cutoff_time and opp.implementation_status in ["completed", "failed"]
         ]
-        
+
         for opp_id in old_opportunities:
             del self.improvement_opportunities[opp_id]
-        
+
         # Clean up old actions
         old_actions = [
             action_id for action_id, action in self.improvement_actions.items()
             if action.created_at < cutoff_time and action.status in ["completed", "failed"]
         ]
-        
+
         for action_id in old_actions:
             del self.improvement_actions[action_id]
-    
+
     def get_improvement_status(self) -> Dict[str, Any]:
         """Get current improvement status."""
         return {
@@ -1032,18 +1032,18 @@ class ContinuousImprovementEngine:
             "coordination_events": len(self.coordination_history),
             "running": self.running
         }
-    
+
     def get_improvement_recommendations(self) -> List[Dict[str, Any]]:
         """Get improvement recommendations."""
         recommendations = []
-        
+
         # Get top 5 opportunities
         opportunities = sorted(
             self.improvement_opportunities.values(),
             key=lambda x: x.confidence_score * x.expected_impact,
             reverse=True
         )[:5]
-        
+
         for opportunity in opportunities:
             recommendations.append({
                 "id": opportunity.id,
@@ -1058,5 +1058,5 @@ class ContinuousImprovementEngine:
                 "implementation_steps": opportunity.implementation_steps,
                 "status": opportunity.implementation_status
             })
-        
+
         return recommendations

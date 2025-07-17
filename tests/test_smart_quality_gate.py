@@ -36,9 +36,9 @@ class TestMetricsCalculator:
     def test_check_tests_passing(self, mock_run, calculator):
         """Test test checking with passing tests."""
         mock_run.return_value = Mock(returncode=0)
-        
+
         result = calculator._check_tests()
-        
+
         assert result is True
         mock_run.assert_called_once()
 
@@ -46,31 +46,31 @@ class TestMetricsCalculator:
     def test_check_tests_failing(self, mock_run, calculator):
         """Test test checking with failing tests."""
         mock_run.return_value = Mock(returncode=1)
-        
+
         result = calculator._check_tests()
-        
+
         assert result is False
 
     @patch('subprocess.run')
     def test_check_tests_timeout(self, mock_run, calculator):
         """Test test checking with timeout."""
         mock_run.side_effect = subprocess.TimeoutExpired(['pytest'], 300)
-        
+
         result = calculator._check_tests()
-        
+
         assert result is False
 
     @patch('subprocess.run')
-    @patch('builtins.open', new_callable=mock_open, 
+    @patch('builtins.open', new_callable=mock_open,
            read_data='{"totals": {"percent_covered": 85.5}}')
     @patch('pathlib.Path.exists')
     def test_get_coverage_success(self, mock_exists, mock_file, mock_run, calculator):
         """Test coverage calculation with successful result."""
         mock_exists.return_value = True
         mock_run.return_value = Mock(returncode=0)
-        
+
         result = calculator._get_coverage()
-        
+
         assert result == 85.5
 
     @patch('subprocess.run')
@@ -79,27 +79,27 @@ class TestMetricsCalculator:
         """Test coverage calculation when coverage file doesn't exist."""
         mock_exists.return_value = False
         mock_run.return_value = Mock(returncode=0)
-        
+
         result = calculator._get_coverage()
-        
+
         assert result == 0.0
 
     @patch('subprocess.run')
     def test_check_lint_passing(self, mock_run, calculator):
         """Test lint checking with passing lints."""
         mock_run.return_value = Mock(returncode=0)
-        
+
         result = calculator._check_lint()
-        
+
         assert result is True
 
     @patch('subprocess.run')
     def test_check_lint_failing(self, mock_run, calculator):
         """Test lint checking with failing lints."""
         mock_run.return_value = Mock(returncode=1)
-        
+
         result = calculator._check_lint()
-        
+
         assert result is False
 
     @patch('subprocess.run')
@@ -109,9 +109,9 @@ class TestMetricsCalculator:
             returncode=0,
             stdout='{"results": []}'
         )
-        
+
         result = calculator._check_security()
-        
+
         assert result == 0
 
     @patch('subprocess.run')
@@ -121,9 +121,9 @@ class TestMetricsCalculator:
             returncode=0,
             stdout='{"results": [{"issue1": "data"}, {"issue2": "data"}]}'
         )
-        
+
         result = calculator._check_security()
-        
+
         assert result == 2
 
     @patch('subprocess.run')
@@ -133,18 +133,18 @@ class TestMetricsCalculator:
             returncode=0,
             stdout='invalid json'
         )
-        
+
         result = calculator._check_security()
-        
+
         assert result == 0
 
     @patch('pathlib.Path.exists')
     def test_check_performance_no_benchmarks(self, mock_exists, calculator):
         """Test performance checking when no benchmark directory exists."""
         mock_exists.return_value = False
-        
+
         result = calculator._check_performance()
-        
+
         assert result is None
 
     def test_calculate_quality_score_perfect(self, calculator):
@@ -155,9 +155,9 @@ class TestMetricsCalculator:
             "lint_passed": True,
             "security_issues": 0
         }
-        
+
         score = calculator._calculate_quality_score(metrics)
-        
+
         assert score == 1.0
 
     def test_calculate_quality_score_failing_tests(self, calculator):
@@ -168,9 +168,9 @@ class TestMetricsCalculator:
             "lint_passed": True,
             "security_issues": 0
         }
-        
+
         score = calculator._calculate_quality_score(metrics)
-        
+
         # Should be reduced by test weight (default 0.4)
         assert score == 0.6
 
@@ -182,9 +182,9 @@ class TestMetricsCalculator:
             "lint_passed": True,
             "security_issues": 0
         }
-        
+
         score = calculator._calculate_quality_score(metrics)
-        
+
         # Should be reduced by coverage weight
         assert 0.8 < score < 0.9
 
@@ -196,24 +196,24 @@ class TestMetricsCalculator:
             "lint_passed": True,
             "security_issues": 3
         }
-        
+
         score = calculator._calculate_quality_score(metrics)
-        
+
         # Should be reduced by security penalty
         assert score < 1.0
 
     def test_calculate_comprehensive(self, calculator):
         """Test comprehensive metric calculation."""
         context = {"file_path": "test.py"}
-        
+
         with patch.object(calculator, '_check_tests', return_value=True), \
              patch.object(calculator, '_get_coverage', return_value=85.0), \
              patch.object(calculator, '_check_lint', return_value=True), \
              patch.object(calculator, '_check_security', return_value=1), \
              patch.object(calculator, '_check_performance', return_value=None):
-            
+
             metrics = calculator.calculate(context)
-            
+
             assert metrics["tests_passed"] is True
             assert metrics["coverage"] == 85.0
             assert metrics["lint_passed"] is True
@@ -269,7 +269,7 @@ class TestSmartQualityGate:
     def test_init_with_dependencies(self, mock_confidence_tracker, mock_metrics_calculator):
         """Test initialization with provided dependencies."""
         gate = SmartQualityGate(mock_confidence_tracker, mock_metrics_calculator)
-        
+
         assert gate.confidence_tracker == mock_confidence_tracker
         assert gate.metrics_calculator == mock_metrics_calculator
 
@@ -277,9 +277,9 @@ class TestSmartQualityGate:
         """Test initialization without provided dependencies."""
         with patch('quality.smart_quality_gate.ConfidenceTracker') as mock_ct, \
              patch('quality.smart_quality_gate.MetricsCalculator') as mock_mc:
-            
+
             gate = SmartQualityGate()
-            
+
             mock_ct.assert_called_once()
             mock_mc.assert_called_once()
 
@@ -290,12 +290,12 @@ class TestSmartQualityGate:
             "gemini_confidence": 0.85,
             "task_type": "simple_fix"
         }
-        
+
         # Mock confidence tracker to not require human involvement
         mock_confidence_tracker.should_involve_human.return_value = (False, 0.825)
-        
+
         result = quality_gate.evaluate(context)
-        
+
         assert result["decision"] == "allow"
         assert result["confidence"] == 0.825
         assert "metrics" in result
@@ -308,7 +308,7 @@ class TestSmartQualityGate:
             "claude_confidence": 0.8,
             "gemini_confidence": 0.8
         }
-        
+
         # Mock metrics with failing tests
         quality_gate.metrics_calculator.calculate.return_value = {
             "tests_passed": False,
@@ -318,16 +318,16 @@ class TestSmartQualityGate:
             "performance_impact": None,
             "quality_score": 0.5
         }
-        
+
         result = quality_gate.evaluate(context)
-        
+
         assert result["decision"] == "block"
         assert "tests failing" in result["reason"]
 
     def test_evaluate_block_decision_security_issues(self, quality_gate, mock_confidence_tracker):
         """Test evaluation resulting in block decision due to security issues."""
         context = {"claude_confidence": 0.9, "gemini_confidence": 0.9}
-        
+
         # Mock metrics with many security issues
         quality_gate.metrics_calculator.calculate.return_value = {
             "tests_passed": True,
@@ -337,9 +337,9 @@ class TestSmartQualityGate:
             "performance_impact": None,
             "quality_score": 0.3
         }
-        
+
         result = quality_gate.evaluate(context)
-        
+
         assert result["decision"] == "block"
 
     def test_evaluate_review_decision(self, quality_gate, mock_confidence_tracker):
@@ -348,25 +348,25 @@ class TestSmartQualityGate:
             "claude_confidence": 0.7,
             "gemini_confidence": 0.7
         }
-        
+
         # Mock confidence tracker to require human involvement with medium confidence
         mock_confidence_tracker.should_involve_human.return_value = (True, 0.7)
-        
+
         result = quality_gate.evaluate(context)
-        
+
         assert result["decision"] == "review"
         assert result["confidence"] == 0.7
 
     def test_evaluate_with_metrics_calculation_error(self, quality_gate, mock_confidence_tracker):
         """Test evaluation when metrics calculation fails."""
         context = {"claude_confidence": 0.8, "gemini_confidence": 0.8}
-        
+
         # Mock metrics calculator to raise exception
         quality_gate.metrics_calculator.calculate.side_effect = Exception("Calculation failed")
         mock_confidence_tracker.should_involve_human.return_value = (True, 0.8)
-        
+
         result = quality_gate.evaluate(context)
-        
+
         # Should use fallback metrics and block
         assert result["decision"] == "block"
         assert result["metrics"]["tests_passed"] is False
@@ -379,9 +379,9 @@ class TestSmartQualityGate:
             "security_issues": 1,
             "quality_score": 0.9
         }
-        
+
         decision = quality_gate._make_decision(metrics, need_human=False, confidence=0.8)
-        
+
         assert decision == "allow"
 
     def test_make_decision_block_failing_tests(self, quality_gate):
@@ -391,9 +391,9 @@ class TestSmartQualityGate:
             "coverage": 85.0,
             "security_issues": 0
         }
-        
+
         decision = quality_gate._make_decision(metrics, need_human=False, confidence=0.9)
-        
+
         assert decision == "block"
 
     def test_make_decision_block_low_coverage(self, quality_gate):
@@ -403,9 +403,9 @@ class TestSmartQualityGate:
             "coverage": 40.0,  # Below default threshold
             "security_issues": 0
         }
-        
+
         decision = quality_gate._make_decision(metrics, need_human=False, confidence=0.9)
-        
+
         assert decision == "block"
 
     def test_generate_reason_quality_issues(self, quality_gate):
@@ -416,9 +416,9 @@ class TestSmartQualityGate:
             "lint_passed": False,
             "security_issues": 2
         }
-        
+
         reason = quality_gate._generate_reason(metrics, need_human=False, decision="block")
-        
+
         assert "tests failing" in reason
         assert "coverage 65.0%" in reason
         assert "linting issues" in reason
@@ -433,9 +433,9 @@ class TestSmartQualityGate:
             "security_issues": 0,
             "quality_score": 0.95
         }
-        
+
         reason = quality_gate._generate_reason(metrics, need_human=False, decision="allow")
-        
+
         assert "All quality checks passed" in reason
         assert "0.95" in reason
 
@@ -447,15 +447,15 @@ class TestSmartQualityGate:
             "lint_passed": True,
             "security_issues": 0
         }
-        
+
         reason = quality_gate._generate_reason(metrics, need_human=True, decision="review")
-        
+
         assert "novel pattern" in reason.lower()
 
     def test_get_fallback_metrics(self, quality_gate):
         """Test fallback metrics generation."""
         metrics = quality_gate._get_fallback_metrics()
-        
+
         assert metrics["tests_passed"] is False
         assert metrics["coverage"] == 0.0
         assert metrics["lint_passed"] is False
@@ -471,9 +471,9 @@ class TestSmartQualityGate:
             "total_decisions": 100,
             "last_activity": "2024-01-01T12:00:00"
         }
-        
+
         stats = quality_gate.get_quality_stats(hours=48)
-        
+
         assert stats["total_patterns"] == 15
         assert stats["avg_success_rate"] == 0.85
         assert stats["total_decisions"] == 100
@@ -482,9 +482,9 @@ class TestSmartQualityGate:
     def test_get_quality_stats_error(self, quality_gate, mock_confidence_tracker):
         """Test getting quality statistics when error occurs."""
         mock_confidence_tracker.get_pattern_stats.side_effect = Exception("DB error")
-        
+
         stats = quality_gate.get_quality_stats()
-        
+
         assert "error" in stats
 
     @patch('quality.smart_quality_gate.get_config')
@@ -497,12 +497,12 @@ class TestSmartQualityGate:
         }
         mock_get_config.return_value = Mock()
         mock_get_config.return_value.get.side_effect = lambda key, default: mock_config.get(key, default)
-        
+
         confidence_tracker = Mock(spec=ConfidenceTracker)
         metrics_calculator = Mock(spec=MetricsCalculator)
-        
+
         gate = SmartQualityGate(confidence_tracker, metrics_calculator)
-        
+
         # Test with metrics that exceed configured security threshold
         metrics = {
             "tests_passed": True,
@@ -510,9 +510,9 @@ class TestSmartQualityGate:
             "security_issues": 3,  # Above configured threshold of 2
             "quality_score": 0.8
         }
-        
+
         decision = gate._make_decision(metrics, need_human=False, confidence=0.9)
-        
+
         # Should block due to exceeding security threshold
         assert decision == "block"
 
@@ -520,7 +520,7 @@ class TestSmartQualityGate:
         """Test recording final outcome."""
         # This is mostly a logging operation for now
         quality_gate.record_final_outcome("test_decision_123", "success")
-        
+
         # Test passes if no exception is raised
 
     def test_evaluate_comprehensive_flow(self, quality_gate, mock_confidence_tracker):
@@ -531,13 +531,13 @@ class TestSmartQualityGate:
             "task_type": "feature_implementation",
             "file_path": "src/feature.py"
         }
-        
+
         # Mock dependencies
         mock_confidence_tracker.should_involve_human.return_value = (False, 0.825)
         mock_confidence_tracker.record_outcome.return_value = None
-        
+
         result = quality_gate.evaluate(context)
-        
+
         # Verify comprehensive response
         assert "decision" in result
         assert "confidence" in result
@@ -547,7 +547,7 @@ class TestSmartQualityGate:
         assert "quality_score" in result
         assert "ml_recommendation" in result
         assert "timestamp" in result
-        
+
         # Verify confidence tracker was called
         mock_confidence_tracker.should_involve_human.assert_called_once()
         mock_confidence_tracker.record_outcome.assert_called_once()

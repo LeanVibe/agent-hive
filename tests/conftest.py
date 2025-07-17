@@ -133,7 +133,7 @@ def mock_config():
                 "max_retries": 3
             },
             "gemini": {
-                "cli_path": "/mock/gemini", 
+                "cli_path": "/mock/gemini",
                 "test_cli_path": "/mock/gemini_test",
                 "timeout": 180
             }
@@ -147,14 +147,14 @@ def mock_config():
             "use_mock_cli": True
         }
     }
-    
+
     config = MagicMock(spec=ConfigLoader)
     config.get.side_effect = lambda key, default=None: _get_nested_value(config_data, key, default)
     config.get_agent_config.side_effect = lambda agent: config_data.get("agents", {}).get(agent, {})
     config.should_use_mock_cli.return_value = True
     config.is_development_mode.return_value = True
     config.get_cli_path.side_effect = lambda agent: f"/mock/{agent}_test"
-    
+
     return config
 
 
@@ -162,13 +162,13 @@ def _get_nested_value(data: Dict[str, Any], key: str, default: Any = None) -> An
     """Helper function to get nested dictionary values using dot notation."""
     keys = key.split('.')
     current = data
-    
+
     for k in keys:
         if isinstance(current, dict) and k in current:
             current = current[k]
         else:
             return default
-    
+
     return current
 
 
@@ -218,20 +218,20 @@ def performance_thresholds():
 # Test utilities
 class TestUtils:
     """Utility functions for tests."""
-    
+
     @staticmethod
     async def wait_for_condition(condition_func, timeout=5.0, interval=0.1):
         """Wait for a condition to become true within timeout."""
         import asyncio
         start_time = asyncio.get_event_loop().time()
-        
+
         while asyncio.get_event_loop().time() - start_time < timeout:
             if condition_func():
                 return True
             await asyncio.sleep(interval)
-        
+
         return False
-    
+
     @staticmethod
     def assert_task_equal(task1: Task, task2: Task):
         """Assert that two tasks are equal (excluding timestamps)."""

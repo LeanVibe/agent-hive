@@ -13,16 +13,16 @@ from typing import Dict, List, Optional, Set
 
 class AgentCapabilityRegistry:
     """Registry of agent capabilities and specializations"""
-    
+
     def __init__(self, db_path: str = "agent_capabilities.db"):
         self.db_path = Path(db_path)
         self._init_database()
         self._populate_default_capabilities()
-    
+
     def _init_database(self):
         """Initialize capabilities database"""
         conn = sqlite3.connect(self.db_path)
-        
+
         # Agent capabilities table
         conn.execute("""
             CREATE TABLE IF NOT EXISTS agent_capabilities (
@@ -35,7 +35,7 @@ class AgentCapabilityRegistry:
                 UNIQUE(agent_name, capability)
             )
         """)
-        
+
         # Agent specializations table
         conn.execute("""
             CREATE TABLE IF NOT EXISTS agent_specializations (
@@ -48,7 +48,7 @@ class AgentCapabilityRegistry:
                 UNIQUE(agent_name, specialization)
             )
         """)
-        
+
         # Agent availability table
         conn.execute("""
             CREATE TABLE IF NOT EXISTS agent_availability (
@@ -60,10 +60,10 @@ class AgentCapabilityRegistry:
                 last_updated TEXT
             )
         """)
-        
+
         conn.commit()
         conn.close()
-    
+
     def _populate_default_capabilities(self):
         """Populate default capabilities for known agents"""
         default_agents = {
@@ -164,62 +164,62 @@ class AgentCapabilityRegistry:
                 ]
             }
         }
-        
+
         # Check if we already have data
         conn = sqlite3.connect(self.db_path)
         cursor = conn.execute("SELECT COUNT(*) FROM agent_capabilities")
         count = cursor.fetchone()[0]
         conn.close()
-        
+
         if count > 0:
             return  # Already populated
-        
+
         # Populate the database
         for agent_name, data in default_agents.items():
             for cap, level, desc in data["capabilities"]:
                 self.add_capability(agent_name, cap, level, desc)
-            
+
             for spec, desc, confidence in data["specializations"]:
                 self.add_specialization(agent_name, spec, desc, confidence)
-            
+
             self.update_availability(agent_name, "available", "", 0)
-    
-    def add_capability(self, agent_name: str, capability: str, 
+
+    def add_capability(self, agent_name: str, capability: str,
                       proficiency_level: int = 5, description: str = ""):
         """Add a capability for an agent"""
         conn = sqlite3.connect(self.db_path)
         conn.execute("""
-            INSERT OR REPLACE INTO agent_capabilities 
+            INSERT OR REPLACE INTO agent_capabilities
             (agent_name, capability, proficiency_level, description, last_updated)
             VALUES (?, ?, ?, ?, ?)
         """, (agent_name, capability, proficiency_level, description, datetime.now().isoformat()))
         conn.commit()
         conn.close()
-    
+
     def add_specialization(self, agent_name: str, specialization: str,
                           description: str = "", confidence_level: int = 8):
         """Add a specialization for an agent"""
         conn = sqlite3.connect(self.db_path)
         conn.execute("""
-            INSERT OR REPLACE INTO agent_specializations 
+            INSERT OR REPLACE INTO agent_specializations
             (agent_name, specialization, description, confidence_level, last_updated)
             VALUES (?, ?, ?, ?, ?)
         """, (agent_name, specialization, description, confidence_level, datetime.now().isoformat()))
         conn.commit()
         conn.close()
-    
+
     def update_availability(self, agent_name: str, status: str = "available",
                            current_task: str = "", workload_level: int = 0):
         """Update agent availability status"""
         conn = sqlite3.connect(self.db_path)
         conn.execute("""
-            INSERT OR REPLACE INTO agent_availability 
+            INSERT OR REPLACE INTO agent_availability
             (agent_name, status, current_task, workload_level, last_updated)
             VALUES (?, ?, ?, ?, ?)
         """, (agent_name, status, current_task, workload_level, datetime.now().isoformat()))
         conn.commit()
         conn.close()
-    
+
     def find_agents_by_capability(self, capability: str, min_level: int = 5) -> List[Dict]:
         """Find agents with a specific capability above minimum level"""
         conn = sqlite3.connect(self.db_path)
@@ -230,7 +230,7 @@ class AgentCapabilityRegistry:
             WHERE ac.capability = ? AND ac.proficiency_level >= ?
             ORDER BY ac.proficiency_level DESC
         """, (capability, min_level))
-        
+
         agents = []
         for row in cursor.fetchall():
             agents.append({
@@ -240,10 +240,10 @@ class AgentCapabilityRegistry:
                 'status': row[3] or 'unknown',
                 'workload_level': row[4] or 0
             })
-        
+
         conn.close()
         return agents
-    
+
     def find_agents_by_specialization(self, specialization: str, min_confidence: int = 6) -> List[Dict]:
         """Find agents with a specific specialization above minimum confidence"""
         conn = sqlite3.connect(self.db_path)
@@ -254,7 +254,7 @@ class AgentCapabilityRegistry:
             WHERE asp.specialization = ? AND asp.confidence_level >= ?
             ORDER BY asp.confidence_level DESC
         """, (specialization, min_confidence))
-        
+
         agents = []
         for row in cursor.fetchall():
             agents.append({
@@ -264,14 +264,14 @@ class AgentCapabilityRegistry:
                 'status': row[3] or 'unknown',
                 'workload_level': row[4] or 0
             })
-        
+
         conn.close()
         return agents
-    
+
     def get_agent_profile(self, agent_name: str) -> Dict:
         """Get complete profile for an agent"""
         conn = sqlite3.connect(self.db_path)
-        
+
         # Get capabilities
         cursor = conn.execute("""
             SELECT capability, proficiency_level, description
@@ -279,7 +279,7 @@ class AgentCapabilityRegistry:
             WHERE agent_name = ?
             ORDER BY proficiency_level DESC
         """, (agent_name,))
-        
+
         capabilities = []
         for row in cursor.fetchall():
             capabilities.append({
@@ -287,7 +287,7 @@ class AgentCapabilityRegistry:
                 'proficiency_level': row[1],
                 'description': row[2]
             })
-        
+
         # Get specializations
         cursor = conn.execute("""
             SELECT specialization, confidence_level, description
@@ -295,7 +295,7 @@ class AgentCapabilityRegistry:
             WHERE agent_name = ?
             ORDER BY confidence_level DESC
         """, (agent_name,))
-        
+
         specializations = []
         for row in cursor.fetchall():
             specializations.append({
@@ -303,14 +303,14 @@ class AgentCapabilityRegistry:
                 'confidence_level': row[1],
                 'description': row[2]
             })
-        
+
         # Get availability
         cursor = conn.execute("""
             SELECT status, current_task, workload_level, last_updated
             FROM agent_availability
             WHERE agent_name = ?
         """, (agent_name,))
-        
+
         availability = cursor.fetchone()
         availability_info = {
             'status': availability[0] if availability else 'unknown',
@@ -318,16 +318,16 @@ class AgentCapabilityRegistry:
             'workload_level': availability[2] if availability else 0,
             'last_updated': availability[3] if availability else ''
         }
-        
+
         conn.close()
-        
+
         return {
             'agent_name': agent_name,
             'capabilities': capabilities,
             'specializations': specializations,
             'availability': availability_info
         }
-    
+
     def get_all_agents(self) -> List[str]:
         """Get list of all known agents"""
         conn = sqlite3.connect(self.db_path)
@@ -337,16 +337,16 @@ class AgentCapabilityRegistry:
             SELECT DISTINCT agent_name FROM agent_specializations
             ORDER BY agent_name
         """)
-        
+
         agents = [row[0] for row in cursor.fetchall()]
         conn.close()
         return agents
-    
+
     def recommend_agent_for_task(self, task_description: str, task_type: str = "") -> List[Dict]:
         """Recommend best agents for a given task"""
         # Simple keyword matching for now - could be enhanced with ML
         task_lower = task_description.lower()
-        
+
         # Define task keywords to capability/specialization mapping
         task_mappings = {
             'documentation': ['technical_writing', 'api_documentation'],
@@ -362,16 +362,16 @@ class AgentCapabilityRegistry:
             'conflict': ['conflict_resolution'],
             'pr': ['pr_management', 'code_review']
         }
-        
+
         relevant_skills = set()
         for keyword, skills in task_mappings.items():
             if keyword in task_lower:
                 relevant_skills.update(skills)
-        
+
         if not relevant_skills:
             # Default to project management if no specific skills identified
             relevant_skills = {'project_management', 'communication'}
-        
+
         # Find agents with relevant capabilities
         recommendations = []
         for skill in relevant_skills:
@@ -380,14 +380,14 @@ class AgentCapabilityRegistry:
                 agent['matched_skill'] = skill
                 agent['skill_type'] = 'capability'
                 recommendations.append(agent)
-            
+
             # Also check specializations
             agents = self.find_agents_by_specialization(skill, min_confidence=6)
             for agent in agents:
                 agent['matched_skill'] = skill
                 agent['skill_type'] = 'specialization'
                 recommendations.append(agent)
-        
+
         # Remove duplicates and sort by skill level
         seen_agents = set()
         unique_recommendations = []
@@ -395,32 +395,32 @@ class AgentCapabilityRegistry:
             if rec['agent_name'] not in seen_agents:
                 unique_recommendations.append(rec)
                 seen_agents.add(rec['agent_name'])
-        
+
         return unique_recommendations[:5]  # Top 5 recommendations
-    
+
     def print_agent_profile(self, agent_name: str):
         """Print formatted agent profile"""
         profile = self.get_agent_profile(agent_name)
-        
+
         print(f"🤖 AGENT PROFILE: {agent_name}")
         print("=" * 50)
-        
+
         # Availability
         availability = profile['availability']
         status = availability['status']
         status_emoji = {
             'available': '✅',
-            'busy': '🔶', 
+            'busy': '🔶',
             'offline': '🔴',
             'unknown': '❓'
         }.get(status, '❓')
-        
+
         print(f"📊 STATUS: {status_emoji} {status.upper()}")
         if availability['current_task']:
             print(f"🎯 CURRENT TASK: {availability['current_task']}")
         print(f"📈 WORKLOAD: {availability['workload_level']}/10")
         print()
-        
+
         # Capabilities
         print("🛠️  CAPABILITIES:")
         for cap in profile['capabilities']:
@@ -430,7 +430,7 @@ class AgentCapabilityRegistry:
             if cap['description']:
                 print(f"    └─ {cap['description']}")
         print()
-        
+
         # Specializations
         print("🎯 SPECIALIZATIONS:")
         for spec in profile['specializations']:
@@ -443,9 +443,9 @@ class AgentCapabilityRegistry:
 def main():
     """Main CLI interface"""
     import sys
-    
+
     registry = AgentCapabilityRegistry()
-    
+
     if len(sys.argv) < 2:
         print("Usage:")
         print("  python agent_capabilities.py --list")
@@ -455,9 +455,9 @@ def main():
         print("  python agent_capabilities.py --recommend '<task description>'")
         print("  python agent_capabilities.py --update-status <agent-name> <status> [task] [workload]")
         return
-    
+
     command = sys.argv[1]
-    
+
     if command == "--list":
         agents = registry.get_all_agents()
         print(f"🤖 KNOWN AGENTS ({len(agents)}):")
@@ -466,47 +466,47 @@ def main():
             profile = registry.get_agent_profile(agent)
             status = profile['availability']['status']
             workload = profile['availability']['workload_level']
-            
+
             status_emoji = {
                 'available': '✅',
                 'busy': '🔶',
                 'offline': '🔴',
                 'unknown': '❓'
             }.get(status, '❓')
-            
+
             print(f"  {status_emoji} {agent} - {status} (workload: {workload}/10)")
-    
+
     elif command == "--agent" and len(sys.argv) > 2:
         agent_name = sys.argv[2]
         registry.print_agent_profile(agent_name)
-    
+
     elif command == "--find-capability" and len(sys.argv) > 2:
         capability = sys.argv[2]
         min_level = 5
         if "--min-level" in sys.argv:
             min_level = int(sys.argv[sys.argv.index("--min-level") + 1])
-        
+
         agents = registry.find_agents_by_capability(capability, min_level)
         print(f"🔍 AGENTS WITH CAPABILITY: {capability} (≥{min_level})")
         print("=" * 60)
-        
+
         for agent in agents:
             print(f"  {agent['agent_name']}: {agent['proficiency_level']}/10 ({agent['status']})")
             if agent['description']:
                 print(f"    └─ {agent['description']}")
-    
+
     elif command == "--recommend" and len(sys.argv) > 2:
         task_description = sys.argv[2]
         recommendations = registry.recommend_agent_for_task(task_description)
-        
+
         print(f"💡 RECOMMENDATIONS FOR: '{task_description}'")
         print("=" * 60)
-        
+
         for i, rec in enumerate(recommendations, 1):
             skill_level = rec.get('proficiency_level', rec.get('confidence_level', 0))
             print(f"  {i}. {rec['agent_name']} - {rec['matched_skill']} ({skill_level}/10)")
             print(f"     Status: {rec['status']} | Workload: {rec['workload_level']}/10")
-    
+
     else:
         print(f"Unknown command: {command}")
 
