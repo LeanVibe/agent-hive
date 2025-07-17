@@ -20,6 +20,13 @@ dependencies = [
     "pyjwt[crypto]>=2.10.1",
     "cryptography>=45.0.5",
     "requests>=2.32.4",
+    # Production monitoring dependencies
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+    "opentelemetry-instrumentation>=0.41b0",
+    "opentelemetry-exporter-jaeger>=1.20.0",
+    "opentelemetry-exporter-prometheus>=1.12.0rc1",
+    "prometheus-client>=0.19.0",
 ]
 
 [project.optional-dependencies]
