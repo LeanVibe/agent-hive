@@ -1,0 +1,52 @@
+{
+  "alerts": [
+    {
+      "event_type": "coordination_alert",
+      "event_id": "alert_PM_AGENT_ALERT_HIGH_1752702616",
+      "timestamp": "2025-07-17T00:50:16.628079",
+      "alert_type": "PM_AGENT_ALERT_HIGH",
+      "message": "[HIGH] Crisis: agent_timeout - Test crisis: agent_timeout",
+      "severity": "high",
+      "data": {
+        "crisis_id": "crisis_1752702616",
+        "impact_assessment": {
+          "phase1_risk_level": "high",
+          "timeline_impact_hours": 4,
+          "affected_components": [
+            "api_gateway_foundation"
+          ],
+          "quality_impact": "none",
+          "resource_impact": "none",
+          "mitigation_required": true
+        },
+        "response_required": true
+      },
+      "resolved": false,
+      "schema_version": "1.0"
+    },
+    {
+      "event_type": "coordination_alert",
+      "event_id": "alert_CRISIS_RESPONSE_HIGH_1752702617",
+      "timestamp": "2025-07-17T00:50:17.629448",
+      "alert_type": "CRISIS_RESPONSE_HIGH",
+      "message": "Crisis response executed for agent_timeout",
+      "severity": "high",
+      "data": {
+        "crisis_id": "crisis_1752702616",
+        "response_time": "2025-07-17T00:50:17.629433",
+        "impact_assessment": {
+          "phase1_risk_level": "high",
+          "timeline_impact_hours": 4,
+          "affected_components": [
+            "api_gateway_foundation"
+          ],
+          "quality_impact": "none",
+          "resource_impact": "none",
+          "mitigation_required": true
+        }
+      },
+      "resolved": false,
+      "schema_version": "1.0"
+    }
+  ]
+}
