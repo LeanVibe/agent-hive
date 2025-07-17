@@ -15,16 +15,16 @@ logger = logging.getLogger(__name__)
 
 class ClientLibraryGenerator(ABC):
     """Base class for client library generators."""
-    
+
     @abstractmethod
     def generate_client(self, api_endpoint: str, service_name: str) -> str:
         """
         Generate client library code.
-        
+
         Args:
             api_endpoint: Service Discovery API endpoint
             service_name: Target service name for the client
-            
+
         Returns:
             Generated client code
         """
@@ -33,10 +33,10 @@ class ClientLibraryGenerator(ABC):
 
 class PythonClientGenerator(ClientLibraryGenerator):
     """Python client library generator."""
-    
+
     def generate_client(self, api_endpoint: str, service_name: str) -> str:
         """Generate Python client library."""
-        
+
         template = '''"""
 Auto-generated Python client for {service_name} service.
 Generated for Service Discovery API at {api_endpoint}
@@ -70,24 +70,24 @@ class {service_name_class}Client:
     """
     Auto-generated client for {service_name} service discovery.
     """
-    
+
     def __init__(self, discovery_api_endpoint: str = "{api_endpoint}"):
         """
         Initialize client.
-        
+
         Args:
             discovery_api_endpoint: Service Discovery API endpoint
         """
         self.discovery_api_endpoint = discovery_api_endpoint.rstrip('/')
         self.service_name = "{service_name}"
-    
+
     async def discover_instances(self, healthy_only: bool = True) -> List[ServiceInstance]:
         """
         Discover available service instances.
-        
+
         Args:
             healthy_only: Only return healthy instances
-            
+
         Returns:
             List of service instances
         """
@@ -95,12 +95,12 @@ class {service_name_class}Client:
             async with aiohttp.ClientSession() as session:
                 url = f"{{self.discovery_api_endpoint}}/services/discover/{{self.service_name}}"
                 params = {{"healthy_only": healthy_only}}
-                
+
                 async with session.get(url, params=params) as response:
                     if response.status == 200:
                         data = await response.json()
                         instances = []
-                        
+
                         for service_data in data.get("services", []):
                             instances.append(ServiceInstance(
                                 service_id=service_data["service_id"],
@@ -112,28 +112,28 @@ class {service_name_class}Client:
                                 tags=service_data.get("tags", []),
                                 version=service_data.get("version", "1.0.0")
                             ))
-                        
+
                         logger.info(f"Discovered {{len(instances)}} instances of {{self.service_name}}")
                         return instances
                     else:
                         logger.error(f"Failed to discover services: HTTP {{response.status}}")
                         return []
-                        
+
         except Exception as e:
             logger.error(f"Error discovering {{self.service_name}} instances: {{e}}")
             return []
-    
+
     async def get_healthy_instance(self) -> Optional[ServiceInstance]:
         """
         Get a healthy service instance.
-        
+
         Returns:
             Healthy service instance or None
         """
         try:
             async with aiohttp.ClientSession() as session:
                 url = f"{{self.discovery_api_endpoint}}/services/healthy/{{self.service_name}}"
-                
+
                 async with session.get(url) as response:
                     if response.status == 200:
                         data = await response.json()
@@ -153,25 +153,25 @@ class {service_name_class}Client:
                     else:
                         logger.error(f"Failed to get healthy instance: HTTP {{response.status}}")
                         return None
-                        
+
         except Exception as e:
             logger.error(f"Error getting healthy {{self.service_name}} instance: {{e}}")
             return None
-    
+
     async def register_instance(self, instance: ServiceInstance) -> bool:
         """
         Register a service instance.
-        
+
         Args:
             instance: Service instance to register
-            
+
         Returns:
             True if registration successful
         """
         try:
             async with aiohttp.ClientSession() as session:
                 url = f"{{self.discovery_api_endpoint}}/services/register"
-                
+
                 data = {{
                     "service_id": instance.service_id,
                     "service_name": instance.service_name,
@@ -182,7 +182,7 @@ class {service_name_class}Client:
                     "tags": instance.tags or [],
                     "version": instance.version
                 }}
-                
+
                 async with session.post(url, json=data) as response:
                     if response.status == 200:
                         logger.info(f"Successfully registered {{instance.service_id}}")
@@ -190,25 +190,25 @@ class {service_name_class}Client:
                     else:
                         logger.error(f"Failed to register service: HTTP {{response.status}}")
                         return False
-                        
+
         except Exception as e:
             logger.error(f"Error registering {{instance.service_id}}: {{e}}")
             return False
-    
+
     async def deregister_instance(self, service_id: str) -> bool:
         """
         Deregister a service instance.
-        
+
         Args:
             service_id: Service ID to deregister
-            
+
         Returns:
             True if deregistration successful
         """
         try:
             async with aiohttp.ClientSession() as session:
                 url = f"{{self.discovery_api_endpoint}}/services/{{service_id}}"
-                
+
                 async with session.delete(url) as response:
                     if response.status == 200:
                         logger.info(f"Successfully deregistered {{service_id}}")
@@ -219,25 +219,25 @@ class {service_name_class}Client:
                     else:
                         logger.error(f"Failed to deregister service: HTTP {{response.status}}")
                         return False
-                        
+
         except Exception as e:
             logger.error(f"Error deregistering {{service_id}}: {{e}}")
             return False
-    
+
     async def send_heartbeat(self, service_id: str) -> bool:
         """
         Send heartbeat for a service instance.
-        
+
         Args:
             service_id: Service ID to send heartbeat for
-            
+
         Returns:
             True if heartbeat successful
         """
         try:
             async with aiohttp.ClientSession() as session:
                 url = f"{{self.discovery_api_endpoint}}/services/{{service_id}}/heartbeat"
-                
+
                 async with session.post(url) as response:
                     if response.status == 200:
                         logger.debug(f"Heartbeat sent for {{service_id}}")
@@ -248,7 +248,7 @@ class {service_name_class}Client:
                     else:
                         logger.error(f"Failed to send heartbeat: HTTP {{response.status}}")
                         return False
-                        
+
         except Exception as e:
             logger.error(f"Error sending heartbeat for {{service_id}}: {{e}}")
             return False
@@ -257,11 +257,11 @@ class {service_name_class}Client:
 # Example usage:
 async def main():
     client = {service_name_class}Client()
-    
+
     # Discover healthy instances
     instances = await client.discover_instances()
     print(f"Found {{len(instances)}} healthy instances")
-    
+
     # Get a specific healthy instance
     instance = await client.get_healthy_instance()
     if instance:
@@ -271,9 +271,9 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 '''
-        
+
         service_name_class = ''.join(word.capitalize() for word in service_name.replace('-', '_').split('_'))
-        
+
         return template.format(
             service_name=service_name,
             service_name_class=service_name_class,
@@ -283,10 +283,10 @@ if __name__ == "__main__":
 
 class JavaScriptClientGenerator(ClientLibraryGenerator):
     """JavaScript/Node.js client library generator."""
-    
+
     def generate_client(self, api_endpoint: str, service_name: str) -> str:
         """Generate JavaScript client library."""
-        
+
         template = '''/**
  * Auto-generated JavaScript client for {service_name} service.
  * Generated for Service Discovery API at {api_endpoint}
@@ -481,14 +481,14 @@ module.exports = {{ {service_name_class}Client, ServiceInstance }};
 
 // Example usage:
 // const {{ {service_name_class}Client }} = require('./path/to/this/file');
-// 
+//
 // async function main() {{
 //     const client = new {service_name_class}Client();
-//     
+//
 //     // Discover healthy instances
 //     const instances = await client.discoverInstances();
 //     console.log(`Found ${{instances.length}} healthy instances`);
-//     
+//
 //     // Get a specific healthy instance
 //     const instance = await client.getHealthyInstance();
 //     if (instance) {{
@@ -496,9 +496,9 @@ module.exports = {{ {service_name_class}Client, ServiceInstance }};
 //     }}
 // }}
 '''
-        
+
         service_name_class = ''.join(word.capitalize() for word in service_name.replace('-', '_').split('_'))
-        
+
         return template.format(
             service_name=service_name,
             service_name_class=service_name_class,
@@ -508,25 +508,25 @@ module.exports = {{ {service_name_class}Client, ServiceInstance }};
 
 class ClientLibraryFactory:
     """Factory for creating client library generators."""
-    
+
     _generators = {
         'python': PythonClientGenerator,
         'javascript': JavaScriptClientGenerator,
         'js': JavaScriptClientGenerator,
         'node': JavaScriptClientGenerator,
     }
-    
+
     @classmethod
     def get_generator(cls, language: str) -> ClientLibraryGenerator:
         """
         Get client library generator for specified language.
-        
+
         Args:
             language: Programming language (python, javascript, js, node)
-            
+
         Returns:
             Client library generator instance
-            
+
         Raises:
             ValueError: If language is not supported
         """
@@ -534,25 +534,25 @@ class ClientLibraryFactory:
         if language not in cls._generators:
             supported = ', '.join(cls._generators.keys())
             raise ValueError(f"Unsupported language: {language}. Supported: {supported}")
-        
+
         return cls._generators[language]()
-    
+
     @classmethod
     def generate_client_library(cls, language: str, api_endpoint: str, service_name: str) -> str:
         """
         Generate client library for specified language.
-        
+
         Args:
             language: Programming language
             api_endpoint: Service Discovery API endpoint
             service_name: Target service name
-            
+
         Returns:
             Generated client library code
         """
         generator = cls.get_generator(language)
         return generator.generate_client(api_endpoint, service_name)
-    
+
     @classmethod
     def get_supported_languages(cls) -> List[str]:
         """Get list of supported programming languages."""
@@ -573,25 +573,25 @@ def generate_javascript_client(api_endpoint: str, service_name: str) -> str:
 def save_client_library(language: str, api_endpoint: str, service_name: str, output_path: str) -> bool:
     """
     Generate and save client library to file.
-    
+
     Args:
         language: Programming language
         api_endpoint: Service Discovery API endpoint
         service_name: Target service name
         output_path: File path to save the client library
-        
+
     Returns:
         True if successful, False otherwise
     """
     try:
         client_code = ClientLibraryFactory.generate_client_library(language, api_endpoint, service_name)
-        
+
         with open(output_path, 'w') as f:
             f.write(client_code)
-        
+
         logger.info(f"Generated {language} client library for {service_name} at {output_path}")
         return True
-        
+
     except Exception as e:
         logger.error(f"Failed to generate {language} client library: {e}")
         return False
@@ -601,16 +601,16 @@ if __name__ == "__main__":
     # Example usage
     api_endpoint = "http://localhost:8000"
     service_name = "user-service"
-    
+
     # Generate Python client
     python_client = generate_python_client(api_endpoint, service_name)
     print("=== Python Client ===")
     print(python_client[:500] + "...")
-    
+
     # Generate JavaScript client
     js_client = generate_javascript_client(api_endpoint, service_name)
     print("\n=== JavaScript Client ===")
     print(js_client[:500] + "...")
-    
+
     # Show supported languages
     print(f"\nSupported languages: {ClientLibraryFactory.get_supported_languages()}")

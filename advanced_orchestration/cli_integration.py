@@ -24,13 +24,13 @@ from .models import (
 
 class EnhancedOrchestrationCLI:
     """Enhanced CLI interface for multi-agent orchestration with intelligent coordination."""
-    
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.enhanced_coordination: Optional[EnhancedCoordinationProtocol] = None
         self.workflow_coordinator: Optional[WorkflowCoordinator] = None
         self.running = False
-    
+
     async def initialize(self, config: Dict[str, Any] = None) -> None:
         """Initialize the enhanced orchestration system."""
         try:
@@ -47,35 +47,35 @@ class EnhancedOrchestrationCLI:
                     max_memory_mb=config.get('max_memory_mb', 8192) if config else 8192
                 )
             )
-            
+
             # Initialize enhanced coordination protocol
             self.enhanced_coordination = EnhancedCoordinationProtocol(coordinator_config)
             await self.enhanced_coordination.start()
-            
+
             # Get workflow coordinator reference
             self.workflow_coordinator = self.enhanced_coordination.workflow_coordinator
             self.running = True
-            
+
             self.logger.info("Enhanced multi-agent orchestration system initialized with intelligent coordination")
-            
+
         except Exception as e:
             self.logger.error(f"Failed to initialize enhanced orchestration system: {e}")
             raise
-    
+
     async def shutdown(self) -> None:
         """Shutdown the enhanced orchestration system."""
         if self.enhanced_coordination:
             await self.enhanced_coordination.stop()
             self.running = False
             self.logger.info("Enhanced orchestration system shutdown complete")
-    
+
     async def create_documentation_workflow(self, workflow_id: str = None) -> str:
         """Create the documentation workflow from the plan."""
         if not self.workflow_coordinator:
             raise RuntimeError("Orchestration system not initialized")
-        
+
         workflow_id = workflow_id or f"documentation-workflow-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-        
+
         # Create workflow definition based on the plan
         workflow_def = WorkflowDefinition(
             workflow_id=workflow_id,
@@ -92,7 +92,7 @@ class EnhancedOrchestrationCLI:
                 "A.2.2-enhance-deployment-docs",
                 "A.2.3-expand-troubleshooting",
                 "A.2.4-modernize-development-docs",
-                
+
                 # Track B: Medium Clone Tutorial
                 "B.1.1-tutorial-environment-setup",
                 "B.1.2-project-initialization",
@@ -103,7 +103,7 @@ class EnhancedOrchestrationCLI:
                 "B.3.2-monitoring-observability",
                 "B.3.3-cicd-pipeline",
                 "B.3.4-tutorial-validation",
-                
+
                 # Track C: Agent Integration Guide
                 "C.1.1-repository-setup-docs",
                 "C.1.2-project-integration-config",
@@ -113,7 +113,7 @@ class EnhancedOrchestrationCLI:
                 "C.2.2-workflow-coordination-patterns",
                 "C.2.3-prompt-engineering-guide",
                 "C.2.4-validation-examples",
-                
+
                 # Track D: Quality Assurance
                 "D.1.1-documentation-validation",
                 "D.1.2-code-example-testing",
@@ -123,7 +123,7 @@ class EnhancedOrchestrationCLI:
                 "D.2.2-step-by-step-validation",
                 "D.2.3-performance-benchmarking",
                 "D.2.4-troubleshooting-testing",
-                
+
                 # Track E: Archive & Maintenance
                 "E.1.1-archive-historical-docs",
                 "E.1.2-cleanup-duplicates",
@@ -143,7 +143,7 @@ class EnhancedOrchestrationCLI:
                 TaskDependency("A.2.2-enhance-deployment-docs", "A.2.1-update-api-reference", DependencyType.SOFT),
                 TaskDependency("A.2.3-expand-troubleshooting", "A.2.2-enhance-deployment-docs", DependencyType.SOFT),
                 TaskDependency("A.2.4-modernize-development-docs", "A.2.3-expand-troubleshooting", DependencyType.SOFT),
-                
+
                 # Track B dependencies
                 TaskDependency("B.1.2-project-initialization", "B.1.1-tutorial-environment-setup", DependencyType.BLOCKING),
                 TaskDependency("B.2.1-user-authentication-system", "B.1.2-project-initialization", DependencyType.BLOCKING),
@@ -153,7 +153,7 @@ class EnhancedOrchestrationCLI:
                 TaskDependency("B.3.2-monitoring-observability", "B.3.1-docker-containerization", DependencyType.BLOCKING),
                 TaskDependency("B.3.3-cicd-pipeline", "B.3.2-monitoring-observability", DependencyType.BLOCKING),
                 TaskDependency("B.3.4-tutorial-validation", "B.3.3-cicd-pipeline", DependencyType.BLOCKING),
-                
+
                 # Track C dependencies
                 TaskDependency("C.1.2-project-integration-config", "C.1.1-repository-setup-docs", DependencyType.BLOCKING),
                 TaskDependency("C.1.3-git-hooks-setup", "C.1.2-project-integration-config", DependencyType.BLOCKING),
@@ -162,7 +162,7 @@ class EnhancedOrchestrationCLI:
                 TaskDependency("C.2.2-workflow-coordination-patterns", "C.2.1-cli-commands-reference", DependencyType.BLOCKING),
                 TaskDependency("C.2.3-prompt-engineering-guide", "C.2.2-workflow-coordination-patterns", DependencyType.BLOCKING),
                 TaskDependency("C.2.4-validation-examples", "C.2.3-prompt-engineering-guide", DependencyType.BLOCKING),
-                
+
                 # Track D dependencies (validation tasks depend on respective track completions)
                 TaskDependency("D.1.1-documentation-validation", "A.2.4-modernize-development-docs", DependencyType.SOFT),
                 TaskDependency("D.1.2-code-example-testing", "D.1.1-documentation-validation", DependencyType.BLOCKING),
@@ -172,7 +172,7 @@ class EnhancedOrchestrationCLI:
                 TaskDependency("D.2.2-step-by-step-validation", "D.2.1-fresh-environment-testing", DependencyType.BLOCKING),
                 TaskDependency("D.2.3-performance-benchmarking", "D.2.2-step-by-step-validation", DependencyType.BLOCKING),
                 TaskDependency("D.2.4-troubleshooting-testing", "D.2.3-performance-benchmarking", DependencyType.BLOCKING),
-                
+
                 # Track E dependencies
                 TaskDependency("E.1.2-cleanup-duplicates", "E.1.1-archive-historical-docs", DependencyType.BLOCKING),
                 TaskDependency("E.1.3-create-archive-structure", "E.1.2-cleanup-duplicates", DependencyType.BLOCKING),
@@ -181,7 +181,7 @@ class EnhancedOrchestrationCLI:
                 TaskDependency("E.2.2-community-feedback-integration", "E.2.1-automated-update-triggers", DependencyType.BLOCKING),
                 TaskDependency("E.2.3-version-sync-monitoring", "E.2.2-community-feedback-integration", DependencyType.BLOCKING),
                 TaskDependency("E.2.4-sustainability-planning", "E.2.3-version-sync-monitoring", DependencyType.BLOCKING),
-                
+
                 # Cross-track integration dependencies
                 TaskDependency("C.1.1-repository-setup-docs", "A.1.4-update-readme-index", DependencyType.SOFT),
                 TaskDependency("B.1.1-tutorial-environment-setup", "A.1.4-update-readme-index", DependencyType.SOFT),
@@ -197,7 +197,7 @@ class EnhancedOrchestrationCLI:
                 "A.2.2-enhance-deployment-docs": AgentSpecialization.DOCUMENTATION,
                 "A.2.3-expand-troubleshooting": AgentSpecialization.DOCUMENTATION,
                 "A.2.4-modernize-development-docs": AgentSpecialization.DOCUMENTATION,
-                
+
                 # Track B: Tutorial Agent
                 "B.1.1-tutorial-environment-setup": AgentSpecialization.TUTORIAL,
                 "B.1.2-project-initialization": AgentSpecialization.TUTORIAL,
@@ -208,7 +208,7 @@ class EnhancedOrchestrationCLI:
                 "B.3.2-monitoring-observability": AgentSpecialization.TUTORIAL,
                 "B.3.3-cicd-pipeline": AgentSpecialization.TUTORIAL,
                 "B.3.4-tutorial-validation": AgentSpecialization.TUTORIAL,
-                
+
                 # Track C: Integration Agent
                 "C.1.1-repository-setup-docs": AgentSpecialization.INTEGRATION,
                 "C.1.2-project-integration-config": AgentSpecialization.INTEGRATION,
@@ -218,7 +218,7 @@ class EnhancedOrchestrationCLI:
                 "C.2.2-workflow-coordination-patterns": AgentSpecialization.INTEGRATION,
                 "C.2.3-prompt-engineering-guide": AgentSpecialization.INTEGRATION,
                 "C.2.4-validation-examples": AgentSpecialization.INTEGRATION,
-                
+
                 # Track D: Quality Agent
                 "D.1.1-documentation-validation": AgentSpecialization.QUALITY,
                 "D.1.2-code-example-testing": AgentSpecialization.QUALITY,
@@ -228,7 +228,7 @@ class EnhancedOrchestrationCLI:
                 "D.2.2-step-by-step-validation": AgentSpecialization.QUALITY,
                 "D.2.3-performance-benchmarking": AgentSpecialization.QUALITY,
                 "D.2.4-troubleshooting-testing": AgentSpecialization.QUALITY,
-                
+
                 # Track E: Archive Agent
                 "E.1.1-archive-historical-docs": AgentSpecialization.ARCHIVE,
                 "E.1.2-cleanup-duplicates": AgentSpecialization.ARCHIVE,
@@ -243,17 +243,17 @@ class EnhancedOrchestrationCLI:
             max_parallel_tasks=5,
             estimated_duration=960  # 16 hours total, 2 weeks parallel
         )
-        
+
         # Register workflow
         success = await self.workflow_coordinator.register_workflow(workflow_def)
         if not success:
             raise RuntimeError(f"Failed to register workflow {workflow_id}")
-        
+
         # Create quality gates
         await self._create_quality_gates(workflow_id)
-        
+
         return workflow_id
-    
+
     async def _create_quality_gates(self, workflow_id: str) -> None:
         """Create quality gates for the workflow."""
         quality_gates = [
@@ -275,7 +275,7 @@ class EnhancedOrchestrationCLI:
                 validation_criteria=["completeness", "accuracy", "consistency"],
                 blocking=True
             ),
-            
+
             # Track B completion gate
             QualityGate(
                 gate_id=f"{workflow_id}-track-b-completion",
@@ -295,7 +295,7 @@ class EnhancedOrchestrationCLI:
                 validation_criteria=["functionality", "performance", "usability"],
                 blocking=True
             ),
-            
+
             # Final integration gate
             QualityGate(
                 gate_id=f"{workflow_id}-final-integration",
@@ -310,15 +310,15 @@ class EnhancedOrchestrationCLI:
                 blocking=True
             )
         ]
-        
+
         for gate in quality_gates:
             self.workflow_coordinator.quality_gates[gate.gate_id] = gate
-    
+
     async def register_specialized_agents(self) -> None:
         """Register specialized agents for the workflow."""
         if not self.workflow_coordinator:
             raise RuntimeError("Orchestration system not initialized")
-        
+
         # Define agent capabilities
         agent_capabilities = {
             "documentation-agent": AgentCapabilities(
@@ -331,7 +331,7 @@ class EnhancedOrchestrationCLI:
                 learning_rate=0.1,
                 adaptation_score=0.8
             ),
-            
+
             "tutorial-agent": AgentCapabilities(
                 specialization=AgentSpecialization.TUTORIAL,
                 skill_level=0.85,
@@ -342,7 +342,7 @@ class EnhancedOrchestrationCLI:
                 learning_rate=0.15,
                 adaptation_score=0.7
             ),
-            
+
             "integration-agent": AgentCapabilities(
                 specialization=AgentSpecialization.INTEGRATION,
                 skill_level=0.88,
@@ -353,7 +353,7 @@ class EnhancedOrchestrationCLI:
                 learning_rate=0.12,
                 adaptation_score=0.85
             ),
-            
+
             "quality-agent": AgentCapabilities(
                 specialization=AgentSpecialization.QUALITY,
                 skill_level=0.92,
@@ -364,7 +364,7 @@ class EnhancedOrchestrationCLI:
                 learning_rate=0.08,
                 adaptation_score=0.9
             ),
-            
+
             "archive-agent": AgentCapabilities(
                 specialization=AgentSpecialization.ARCHIVE,
                 skill_level=0.8,
@@ -376,7 +376,7 @@ class EnhancedOrchestrationCLI:
                 adaptation_score=0.75
             )
         }
-        
+
         # Register agents
         for agent_id, capabilities in agent_capabilities.items():
             success = await self.workflow_coordinator.register_agent_capabilities(agent_id, capabilities)
@@ -384,18 +384,18 @@ class EnhancedOrchestrationCLI:
                 self.logger.info(f"Registered {agent_id} with {capabilities.specialization} specialization")
             else:
                 self.logger.error(f"Failed to register {agent_id}")
-    
+
     async def execute_workflow(self, workflow_id: str) -> Dict[str, Any]:
         """Execute a workflow with enhanced coordination."""
         if not self.workflow_coordinator or not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         # Execute workflow with enhanced coordination
         workflow_definition = self.workflow_coordinator.workflow_definitions[workflow_id]
         workflow_state = await self.enhanced_coordination.execute_enhanced_workflow(
             workflow_definition, {}
         )
-        
+
         return {
             "workflow_id": workflow_state.workflow_id,
             "status": workflow_state.status,
@@ -411,18 +411,18 @@ class EnhancedOrchestrationCLI:
                 "real_time_monitoring": True
             }
         }
-    
+
     async def get_workflow_status(self, workflow_id: str) -> Dict[str, Any]:
         """Get current workflow status."""
         if not self.workflow_coordinator:
             raise RuntimeError("Orchestration system not initialized")
-        
+
         workflow_state = await self.workflow_coordinator.get_workflow_state(workflow_id)
         if not workflow_state:
             return {"error": f"Workflow {workflow_id} not found"}
-        
+
         coordination_metrics = await self.workflow_coordinator.get_coordination_metrics(workflow_id)
-        
+
         return {
             "workflow_id": workflow_state.workflow_id,
             "status": workflow_state.status,
@@ -438,34 +438,34 @@ class EnhancedOrchestrationCLI:
                 "agent_utilization": coordination_metrics.agent_utilization if coordination_metrics else {}
             } if coordination_metrics else None
         }
-    
+
     async def get_system_statistics(self) -> Dict[str, Any]:
         """Get enhanced system-wide statistics."""
         if not self.workflow_coordinator or not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         stats = self.workflow_coordinator.get_coordination_statistics()
         enhanced_stats = self.enhanced_coordination.get_coordination_statistics()
-        
+
         return {
             "system_running": self.running,
             "coordination_stats": stats,
             "enhanced_coordination_stats": enhanced_stats,
             "timestamp": datetime.now().isoformat()
         }
-    
+
     async def get_coordination_metrics(self) -> Dict[str, Any]:
         """Get real-time coordination metrics."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         # Get enhanced metrics from performance monitor
         real_time_metrics = self.enhanced_coordination.performance_monitor.get_real_time_metrics()
-        
+
         # Get coordination metrics from enhanced coordination
         try:
             coordination_metrics = await self.enhanced_coordination.monitor_real_time_coordination()
-            
+
             return {
                 "real_time_metrics": {
                     "workflow_completion_rate": coordination_metrics.workflow_completion_rate,
@@ -494,14 +494,14 @@ class EnhancedOrchestrationCLI:
                 "performance_metrics": real_time_metrics,
                 "timestamp": datetime.now().isoformat()
             }
-    
+
     async def get_intelligent_routing_analytics(self) -> Dict[str, Any]:
         """Get intelligent routing analytics."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         coordination_stats = self.enhanced_coordination.get_coordination_statistics()
-        
+
         return {
             "routing_analytics": {
                 "cache_size": coordination_stats["routing_cache_size"],
@@ -514,16 +514,16 @@ class EnhancedOrchestrationCLI:
             "recent_events": coordination_stats["recent_events"],
             "timestamp": datetime.now().isoformat()
         }
-    
+
     async def optimize_workflow_dependencies(self, workflow_id: str, task_id: str) -> Dict[str, Any]:
         """Optimize dependencies for a specific workflow task."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         dependencies = await self.enhanced_coordination.resolve_dynamic_dependencies(
             workflow_id, task_id
         )
-        
+
         return {
             "workflow_id": workflow_id,
             "task_id": task_id,
@@ -531,19 +531,19 @@ class EnhancedOrchestrationCLI:
             "optimization_applied": True,
             "timestamp": datetime.now().isoformat()
         }
-    
+
     async def analyze_parallel_execution(self, workflow_id: str) -> Dict[str, Any]:
         """Analyze parallel execution opportunities for a workflow."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         # Get current task groups for analysis
         task_groups = [["task_1", "task_2"], ["task_3"], ["task_4", "task_5"]]
-        
+
         optimized_groups = await self.enhanced_coordination.optimize_parallel_execution(
             workflow_id, task_groups
         )
-        
+
         return {
             "workflow_id": workflow_id,
             "original_groups": task_groups,
@@ -555,25 +555,25 @@ class EnhancedOrchestrationCLI:
             },
             "timestamp": datetime.now().isoformat()
         }
-    
+
     def _calculate_parallel_improvement(self, original_groups: List[List[str]], optimized_groups: List[List[str]]) -> float:
         """Calculate parallel execution improvement percentage."""
         if not original_groups or not optimized_groups:
             return 0.0
-        
+
         original_efficiency = len(original_groups) / sum(len(group) for group in original_groups)
         optimized_efficiency = len(optimized_groups) / sum(len(group) for group in optimized_groups)
-        
+
         return (optimized_efficiency - original_efficiency) * 100
-    
-    async def get_analytics_dashboard(self, view_type: str = "overview", 
+
+    async def get_analytics_dashboard(self, view_type: str = "overview",
                                     hours: int = 24) -> Dict[str, Any]:
         """Get analytics dashboard data."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         from .analytics_dashboard import DashboardView
-        
+
         # Map string to enum
         view_type_enum = {
             "overview": DashboardView.OVERVIEW,
@@ -585,17 +585,17 @@ class EnhancedOrchestrationCLI:
             "alerts": DashboardView.ALERTS,
             "historical": DashboardView.HISTORICAL
         }.get(view_type, DashboardView.OVERVIEW)
-        
+
         # Define time range
         end_time = datetime.now()
         start_time = end_time - timedelta(hours=hours)
         time_range = (start_time, end_time)
-        
+
         # Get dashboard data
         dashboard_data = await self.enhanced_coordination.analytics_dashboard.generate_dashboard_data(
             view_type_enum, time_range
         )
-        
+
         # Export to dict format
         return {
             "view_type": dashboard_data.view_type.value,
@@ -643,20 +643,20 @@ class EnhancedOrchestrationCLI:
             "system_health": dashboard_data.system_health,
             "performance_summary": dashboard_data.performance_summary
         }
-    
+
     async def get_performance_report(self, hours: int = 24) -> Dict[str, Any]:
         """Get comprehensive performance report."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
-        
+
         # Define time range
         end_time = datetime.now()
         start_time = end_time - timedelta(hours=hours)
         time_range = (start_time, end_time)
-        
+
         # Generate performance report
         report = self.enhanced_coordination.performance_monitor.generate_performance_report(time_range)
-        
+
         return {
             "report_id": report.report_id,
             "generated_at": report.generated_at.isoformat(),
@@ -701,29 +701,29 @@ def orchestration_cli(ctx):
 def start(ctx, config_file):
     """Start the orchestration system."""
     cli = ctx.obj['cli']
-    
+
     config = {}
     if config_file:
         with open(config_file, 'r') as f:
             config = json.load(f)
-    
+
     async def run():
         try:
             await cli.initialize(config)
             await cli.register_specialized_agents()
             click.echo("✅ Enhanced multi-agent orchestration system started successfully")
-            
+
             # Keep running until interrupted
             while True:
                 await asyncio.sleep(1)
-                
+
         except KeyboardInterrupt:
             click.echo("\n⏹️  Shutting down...")
             await cli.shutdown()
         except Exception as e:
             click.echo(f"❌ Error: {e}")
             await cli.shutdown()
-    
+
     asyncio.run(run())
 
 
@@ -733,7 +733,7 @@ def start(ctx, config_file):
 def create_documentation_workflow(ctx, workflow_id):
     """Create and register the documentation workflow."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             workflow_id_result = await cli.create_documentation_workflow(workflow_id)
@@ -742,7 +742,7 @@ def create_documentation_workflow(ctx, workflow_id):
         except Exception as e:
             click.echo(f"❌ Error creating workflow: {e}")
             return None
-    
+
     result = asyncio.run(run())
     if result:
         click.echo(f"📋 Workflow ID: {result}")
@@ -754,7 +754,7 @@ def create_documentation_workflow(ctx, workflow_id):
 def execute(ctx, workflow_id):
     """Execute a workflow."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             result = await cli.execute_workflow(workflow_id)
@@ -766,7 +766,7 @@ def execute(ctx, workflow_id):
         except Exception as e:
             click.echo(f"❌ Error executing workflow: {e}")
             return None
-    
+
     asyncio.run(run())
 
 
@@ -777,16 +777,16 @@ def execute(ctx, workflow_id):
 def status(ctx, workflow_id, watch):
     """Get workflow status."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             while True:
                 result = await cli.get_workflow_status(workflow_id)
-                
+
                 if 'error' in result:
                     click.echo(f"❌ {result['error']}")
                     break
-                
+
                 click.clear()
                 click.echo(f"📋 Workflow: {result['workflow_id']}")
                 click.echo(f"📊 Status: {result['status']}")
@@ -795,23 +795,23 @@ def status(ctx, workflow_id, watch):
                 click.echo(f"✅ Completed tasks: {len(result['completed_tasks'])}")
                 click.echo(f"❌ Failed tasks: {len(result['failed_tasks'])}")
                 click.echo(f"🚫 Blocked tasks: {len(result['blocked_tasks'])}")
-                
+
                 if result['coordination_metrics']:
                     metrics = result['coordination_metrics']
                     click.echo(f"🔗 Parallel efficiency: {metrics['parallel_efficiency']:.1%}")
                     click.echo(f"🎯 Quality consistency: {metrics['quality_consistency']:.1%}")
                     click.echo(f"👥 Agent utilization: {len(metrics['agent_utilization'])} agents")
-                
+
                 if not watch:
                     break
-                
+
                 await asyncio.sleep(5)
-                
+
         except KeyboardInterrupt:
             click.echo("\n⏹️  Status monitoring stopped")
         except Exception as e:
             click.echo(f"❌ Error getting status: {e}")
-    
+
     asyncio.run(run())
 
 
@@ -820,17 +820,17 @@ def status(ctx, workflow_id, watch):
 def stats(ctx):
     """Get enhanced system statistics."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             result = await cli.get_system_statistics()
-            
+
             click.echo(f"🚀 System running: {result['system_running']}")
             click.echo(f"📊 Enhanced Coordination Statistics:")
-            
+
             stats = result['coordination_stats']
             enhanced_stats = result['enhanced_coordination_stats']
-            
+
             click.echo(f"  • Workflows executed: {stats['workflows_executed']}")
             click.echo(f"  • Parallel tasks executed: {stats['parallel_tasks_executed']}")
             click.echo(f"  • Quality gates passed: {stats['quality_gates_passed']}")
@@ -838,19 +838,19 @@ def stats(ctx):
             click.echo(f"  • Active workflows: {stats['active_workflows']}")
             click.echo(f"  • Total tasks: {stats['total_tasks']}")
             click.echo(f"  • Registered agents: {stats['registered_agents']}")
-            
+
             click.echo(f"🧠 Enhanced Features:")
             click.echo(f"  • Coordination events: {enhanced_stats['coordination_events']}")
             click.echo(f"  • Performance alerts: {enhanced_stats['performance_alerts']}")
             click.echo(f"  • Routing cache size: {enhanced_stats['routing_cache_size']}")
             click.echo(f"  • Dependency cache size: {enhanced_stats['dependency_cache_size']}")
             click.echo(f"  • Agent performance tracked: {enhanced_stats['agent_performance_tracked']}")
-            
+
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
-            
+
         except Exception as e:
             click.echo(f"❌ Error getting statistics: {e}")
-    
+
     asyncio.run(run())
 
 
@@ -859,30 +859,30 @@ def stats(ctx):
 def metrics(ctx):
     """Get real-time coordination metrics."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             result = await cli.get_coordination_metrics()
-            
+
             click.echo("📈 Real-time Coordination Metrics:")
             metrics = result['real_time_metrics']
-            
+
             click.echo(f"  • Workflow completion rate: {metrics['workflow_completion_rate']:.1%}")
             click.echo(f"  • Parallel efficiency: {metrics['parallel_efficiency']:.1%}")
             click.echo(f"  • Task distribution balance: {metrics['task_distribution_balance']:.1%}")
             click.echo(f"  • Quality consistency: {metrics['quality_consistency']:.1%}")
             click.echo(f"  • Dependency resolution time: {metrics['dependency_resolution_time']:.1f}s")
             click.echo(f"  • Coordination overhead: {metrics['coordination_overhead']:.1%}")
-            
+
             click.echo(f"👥 Agent Utilization:")
             for agent_id, utilization in result['agent_utilization'].items():
                 click.echo(f"  • {agent_id}: {utilization:.1%}")
-            
+
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
-            
+
         except Exception as e:
             click.echo(f"❌ Error getting metrics: {e}")
-    
+
     asyncio.run(run())
 
 
@@ -891,30 +891,30 @@ def metrics(ctx):
 def routing(ctx):
     """Get intelligent routing analytics."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             result = await cli.get_intelligent_routing_analytics()
-            
+
             click.echo("🧠 Intelligent Routing Analytics:")
             analytics = result['routing_analytics']
-            
+
             click.echo(f"  • Cache size: {analytics['cache_size']}")
             click.echo(f"  • Dependency cache size: {analytics['dependency_cache_size']}")
             click.echo(f"  • Coordination events: {analytics['coordination_events']}")
             click.echo(f"  • Performance alerts: {analytics['performance_alerts']}")
             click.echo(f"  • ML prediction enabled: {analytics['ml_prediction_enabled']}")
             click.echo(f"  • Learning enabled: {analytics['learning_enabled']}")
-            
+
             click.echo(f"📋 Recent Events:")
             for event in result['recent_events'][-5:]:  # Show last 5 events
                 click.echo(f"  • {event.get('type', 'unknown')}: {event.get('timestamp', 'no timestamp')}")
-            
+
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
-            
+
         except Exception as e:
             click.echo(f"❌ Error getting routing analytics: {e}")
-    
+
     asyncio.run(run())
 
 
@@ -925,22 +925,22 @@ def routing(ctx):
 def optimize_deps(ctx, workflow_id, task_id):
     """Optimize dependencies for a specific workflow task."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             result = await cli.optimize_workflow_dependencies(workflow_id, task_id)
-            
+
             click.echo(f"🔧 Dependency Optimization Results:")
             click.echo(f"  • Workflow ID: {result['workflow_id']}")
             click.echo(f"  • Task ID: {result['task_id']}")
             click.echo(f"  • Optimization applied: {result['optimization_applied']}")
             click.echo(f"  • Optimized dependencies: {result['optimized_dependencies']}")
-            
+
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
-            
+
         except Exception as e:
             click.echo(f"❌ Error optimizing dependencies: {e}")
-    
+
     asyncio.run(run())
 
 
@@ -950,27 +950,27 @@ def optimize_deps(ctx, workflow_id, task_id):
 def analyze_parallel(ctx, workflow_id):
     """Analyze parallel execution opportunities for a workflow."""
     cli = ctx.obj['cli']
-    
+
     async def run():
         try:
             result = await cli.analyze_parallel_execution(workflow_id)
-            
+
             click.echo(f"⚡ Parallel Execution Analysis:")
             click.echo(f"  • Workflow ID: {result['workflow_id']}")
             click.echo(f"  • Original groups: {result['original_groups']}")
             click.echo(f"  • Optimized groups: {result['optimized_groups']}")
-            
+
             metrics = result['optimization_metrics']
             click.echo(f"📊 Optimization Metrics:")
             click.echo(f"  • Original group count: {metrics['original_group_count']}")
             click.echo(f"  • Optimized group count: {metrics['optimized_group_count']}")
             click.echo(f"  • Efficiency improvement: {metrics['parallel_efficiency_improvement']:.1f}%")
-            
+
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
-            
+
         except Exception as e:
             click.echo(f"❌ Error analyzing parallel execution: {e}")
-    
+
     asyncio.run(run())
 
 
