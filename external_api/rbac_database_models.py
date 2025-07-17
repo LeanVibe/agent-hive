@@ -7,7 +7,7 @@ with ResourceType/ActionType granular permissions, hierarchical roles, and permi
 
 import uuid
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Dict, Any, Set
 
 from sqlalchemy import (
@@ -124,6 +124,10 @@ class EnhancedRole(Base):
     # Metadata
     role_metadata = Column(JSON, nullable=True)
     
+    # Compatibility fields for RBAC manager
+    parent_role_names = Column(JSON, nullable=True, default=list)
+    child_role_names = Column(JSON, nullable=True, default=list)
+    
     # Relationships
     users = relationship("SecurityUser", secondary="user_roles", back_populates="roles")
     permissions = relationship("EnhancedPermission", secondary=enhanced_role_permissions, back_populates="roles")
@@ -185,6 +189,14 @@ class EnhancedRole(Base):
             
             self.hierarchy_path = best_path
             self.hierarchy_level = min_level + 1
+    
+    def add_child_role(self, child_role_name: str) -> None:
+        """Add a child role name to the list."""
+        if self.child_role_names is None:
+            self.child_role_names = []
+        if child_role_name not in self.child_role_names:
+            self.child_role_names.append(child_role_name)
+    
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -254,7 +266,7 @@ class EnhancedPermission(Base):
     
     def is_valid(self) -> bool:
         """Check if permission is still valid."""
-        if self.expires_at and datetime.utcnow() > self.expires_at:
+        if self.expires_at and datetime.now(timezone.utc) > self.expires_at:
             return False
         return True
     
@@ -347,7 +359,7 @@ class PermissionCache(Base):
     
     def is_expired(self) -> bool:
         """Check if cache entry is expired."""
-        return datetime.utcnow() > self.expires_at
+        return datetime.now(timezone.utc) > self.expires_at
 
 
 class AuditLog(Base):
@@ -419,6 +431,9 @@ class SecurityUser(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = Column(String(100), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=True)
+    full_name = Column(String(255), nullable=True)
+    profile_data = Column(JSON, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -436,7 +451,8 @@ SecurityUser.direct_permissions = relationship(
 SecurityUser.enhanced_roles = relationship(
     "EnhancedRole", 
     secondary="user_roles", 
-    back_populates="users"
+    back_populates="users",
+    overlaps="roles"
 )
 
 # Aliases for compatibility
@@ -659,7 +675,7 @@ def setup_enhanced_rbac(session: Session) -> None:
 def cleanup_expired_cache(session: Session) -> int:
     """Clean up expired cache entries."""
     expired_count = session.query(PermissionCache).filter(
-        PermissionCache.expires_at < datetime.utcnow()
+        PermissionCache.expires_at < datetime.now(timezone.utc)
     ).delete()
     
     session.commit()
@@ -668,7 +684,7 @@ def cleanup_expired_cache(session: Session) -> int:
 
 def cleanup_old_audit_logs(session: Session, days: int = 90) -> int:
     """Clean up old audit logs."""
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
     
     deleted_count = session.query(AuditLog).filter(
         AuditLog.created_at < cutoff_date

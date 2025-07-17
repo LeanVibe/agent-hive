@@ -5,7 +5,7 @@ import logging
 import logging.handlers
 import sys
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional
 import json
@@ -35,7 +35,7 @@ class JSONFormatter(logging.Formatter):
 
     def format(self, record):
         log_entry = {
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
+            'timestamp': datetime.now(timezone.utc).isoformat() + 'Z',
             'level': record.levelname,
             'logger': record.name,
             'message': record.getMessage(),

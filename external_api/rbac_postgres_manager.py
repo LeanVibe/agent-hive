@@ -7,7 +7,7 @@ with hierarchical roles, granular permissions, and high-performance caching.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional, List, Set, Tuple
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
@@ -63,10 +63,15 @@ class PostgreSQLRBACManager(BaseRBACManager):
     
     def _to_rbac_permission(self, db_permission: PermissionModel) -> RBACPermission:
         """Convert database permission to RBAC framework permission."""
+        # Convert database enum values to RBAC framework enum values
+        resource_type_value = db_permission.resource_type.value if hasattr(db_permission.resource_type, 'value') else db_permission.resource_type
+        action_value = db_permission.action.value if hasattr(db_permission.action, 'value') else db_permission.action
+        scope_value = db_permission.scope.value if hasattr(db_permission.scope, 'value') else db_permission.scope
+        
         return RBACPermission(
-            resource_type=ResourceType(db_permission.resource_type),
-            action=ActionType(db_permission.action_type),
-            scope=PermissionScope(db_permission.scope),
+            resource_type=ResourceType(resource_type_value),
+            action=ActionType(action_value),
+            scope=PermissionScope(scope_value),
             resource_id=db_permission.resource_id,
             conditions=db_permission.conditions or {},
             created_at=db_permission.created_at,
@@ -127,7 +132,7 @@ class PostgreSQLRBACManager(BaseRBACManager):
                     description=description,
                     parent_role_names=parent_roles or [],
                     child_role_names=[],
-                    metadata=kwargs.get('metadata', {}),
+                    role_metadata=kwargs.get('metadata', {}),
                     is_system=kwargs.get('is_system', False)
                 )
                 
@@ -209,7 +214,7 @@ class PostgreSQLRBACManager(BaseRBACManager):
                     
                     db_role.parent_role_names = parent_roles
                 
-                db_role.updated_at = datetime.utcnow()
+                db_role.updated_at = datetime.now(timezone.utc)
                 session.commit()
                 
                 # Clear cache
@@ -330,10 +335,11 @@ class PostgreSQLRBACManager(BaseRBACManager):
                 
                 # Add roles if provided
                 if roles:
-                    for role_name in roles:
-                        db_role = session.query(Role).filter_by(name=role_name).first()
-                        if db_role:
-                            db_user.roles.append(db_role)
+                    with session.no_autoflush:
+                        for role_name in roles:
+                            db_role = session.query(Role).filter_by(name=role_name).first()
+                            if db_role and db_role not in db_user.roles:
+                                db_user.roles.append(db_role)
                 
                 # TODO: Add direct permissions support
                 
@@ -386,7 +392,7 @@ class PostgreSQLRBACManager(BaseRBACManager):
                 
                 # TODO: Update direct permissions
                 
-                db_user.updated_at = datetime.utcnow()
+                db_user.updated_at = datetime.now(timezone.utc)
                 session.commit()
                 
                 # Clear cache
@@ -601,7 +607,7 @@ class PostgreSQLRBACManager(BaseRBACManager):
     def _audit_log(self, action: str, details: Dict[str, Any]) -> None:
         """Log audit events."""
         audit_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "action": action,
             "details": details
         }
