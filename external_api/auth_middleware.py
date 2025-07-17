@@ -15,11 +15,19 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List, Callable
 from enum import Enum
 import uuid
+from passlib.context import CryptContext
+from passlib.hash import bcrypt
+import jwt
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
 from .models import ApiRequest, ApiResponse
+from ..config.security_config import get_auth_config, get_security_config
 
 
 logger = logging.getLogger(__name__)
+
+# Password context for secure hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class AuthMethod(Enum):
@@ -96,6 +104,31 @@ class AuthenticationMiddleware:
         self.path_permissions: Dict[str, List[Permission]] = {}
         
         logger.info(f"AuthenticationMiddleware initialized with methods: {self.enabled_methods}")
+    
+    @classmethod
+    def create_with_secure_config(cls) -> 'AuthenticationMiddleware':
+        """Create AuthenticationMiddleware with secure configuration from environment."""
+        config = get_auth_config()
+        middleware = cls(config)
+        
+        # Validate configuration
+        from ..config.security_config import security_config_manager
+        validation_result = security_config_manager.validate_config()
+        
+        if not validation_result["valid"]:
+            logger.warning("Security configuration validation failed:")
+            for issue in validation_result["issues"]:
+                logger.warning(f"  - {issue}")
+        
+        return middleware
+    
+    def hash_password(self, password: str) -> str:
+        """Hash a password using bcrypt."""
+        return pwd_context.hash(password)
+    
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        """Verify a password against its hash."""
+        return pwd_context.verify(plain_password, hashed_password)
     
     async def authenticate_request(self, request: ApiRequest) -> AuthResult:
         """
@@ -194,12 +227,8 @@ class AuthenticationMiddleware:
         token = auth_header[7:]  # Remove "Bearer " prefix
         
         try:
-            # Simple JWT validation (in production, use proper JWT library)
+            # Decode JWT token (PyJWT handles expiration automatically)
             payload = await self._decode_jwt(token)
-            
-            # Check expiration
-            if payload.get("exp") and payload["exp"] < time.time():
-                return AuthResult(success=False, error="JWT token has expired")
             
             # Check if token is blacklisted
             if token in self.jwt_tokens and self.jwt_tokens[token].get("blacklisted"):
@@ -265,8 +294,8 @@ class AuthenticationMiddleware:
             
             user_data = self.basic_auth_users[username]
             
-            # Verify password (in production, use proper password hashing)
-            if user_data.get("password") != password:
+            # Verify password using bcrypt
+            if not self.verify_password(password, user_data.get("password", "")):
                 return AuthResult(success=False, error="Invalid username or password")
             
             # Check if account is active
@@ -328,19 +357,14 @@ class AuthenticationMiddleware:
         return signature
     
     async def _decode_jwt(self, token: str) -> Dict[str, Any]:
-        """Decode JWT token (simplified implementation)."""
-        # In production, use proper JWT library like PyJWT
+        """Decode JWT token using PyJWT."""
         try:
-            # Simple base64 decode for demo purposes
-            import base64
-            header, payload, signature = token.split('.')
-            
-            # Add padding if needed
-            payload += '=' * (4 - len(payload) % 4)
-            decoded_payload = base64.b64decode(payload)
-            
-            return json.loads(decoded_payload)
-        except Exception as e:
+            # Decode and validate JWT token
+            payload = jwt.decode(token, self.jwt_secret, algorithms=[self.jwt_algorithm])
+            return payload
+        except ExpiredSignatureError:
+            raise ValueError("JWT token has expired")
+        except InvalidTokenError as e:
             raise ValueError(f"Invalid JWT token: {e}")
     
     async def _check_auth_rate_limit(self, client_ip: str) -> bool:
@@ -415,10 +439,9 @@ class AuthenticationMiddleware:
     
     def create_basic_auth_user(self, username: str, password: str, permissions: List[Permission],
                               active: bool = True) -> bool:
-        """Create a basic auth user."""
-        # WARNING: In production, use proper password hashing (bcrypt, scrypt, etc.)
+        """Create a basic auth user with bcrypt password hashing."""
         user_data = {
-            "password": password,  # In production: hash this!
+            "password": self.hash_password(password),  # Securely hash password
             "permissions": permissions,
             "active": active,
             "created_at": datetime.now().isoformat(),
@@ -441,7 +464,7 @@ class AuthenticationMiddleware:
         user_data = self.basic_auth_users[username]
         
         if password is not None:
-            user_data["password"] = password  # In production: hash this!
+            user_data["password"] = self.hash_password(password)  # Securely hash password
         
         if permissions is not None:
             user_data["permissions"] = permissions
@@ -464,37 +487,32 @@ class AuthenticationMiddleware:
     
     def create_jwt_token(self, user_id: str, permissions: List[Permission], 
                         expires_in_hours: Optional[int] = None) -> str:
-        """Create a JWT token."""
+        """Create a JWT token using PyJWT."""
+        current_time = datetime.utcnow()
+        
         payload = {
             "user_id": user_id,
             "permissions": [p.value for p in permissions],
-            "iat": time.time(),
+            "iat": current_time,
             "jti": str(uuid.uuid4())
         }
         
         if expires_in_hours:
-            payload["exp"] = time.time() + (expires_in_hours * 3600)
+            payload["exp"] = current_time + timedelta(hours=expires_in_hours)
+        else:
+            payload["exp"] = current_time + timedelta(hours=self.token_expiry)
         
-        # In production, use proper JWT library
-        import base64
-        import json
+        # Create JWT token using PyJWT
+        token = jwt.encode(payload, self.jwt_secret, algorithm=self.jwt_algorithm)
         
-        header = {"alg": self.jwt_algorithm, "typ": "JWT"}
-        header_b64 = base64.b64encode(json.dumps(header).encode()).decode().rstrip('=')
-        payload_b64 = base64.b64encode(json.dumps(payload).encode()).decode().rstrip('=')
-        
-        # Simple signature (use proper JWT library in production)
-        signature = hashlib.sha256(f"{header_b64}.{payload_b64}.{self.jwt_secret}".encode()).hexdigest()
-        
-        token = f"{header_b64}.{payload_b64}.{signature}"
-        
+        # Store token metadata for blacklisting
         self.jwt_tokens[token] = {
             "user_id": user_id,
-            "created_at": datetime.now().isoformat(),
+            "created_at": current_time.isoformat(),
             "blacklisted": False
         }
         
-        logger.info(f"Created JWT token for user {user_id}")
+        logger.info(f"Created JWT token for user {user_id} (expires: {payload['exp']})")
         return token
     
     def blacklist_jwt_token(self, token: str) -> bool:
@@ -504,6 +522,64 @@ class AuthenticationMiddleware:
             logger.info(f"Blacklisted JWT token")
             return True
         return False
+    
+    def refresh_jwt_token(self, token: str) -> Optional[str]:
+        """Refresh a JWT token by creating a new one and blacklisting the old one."""
+        try:
+            # Decode the old token to get user information
+            payload = jwt.decode(token, self.jwt_secret, algorithms=[self.jwt_algorithm])
+            
+            # Check if token is blacklisted
+            if token in self.jwt_tokens and self.jwt_tokens[token].get("blacklisted"):
+                logger.warning("Attempted to refresh blacklisted token")
+                return None
+            
+            # Extract user information
+            user_id = payload.get("user_id")
+            permissions = [Permission(p) for p in payload.get("permissions", [])]
+            
+            if not user_id:
+                logger.error("Cannot refresh token: no user_id in payload")
+                return None
+            
+            # Create new token
+            new_token = self.create_jwt_token(user_id, permissions)
+            
+            # Blacklist the old token
+            self.blacklist_jwt_token(token)
+            
+            logger.info(f"Refreshed JWT token for user {user_id}")
+            return new_token
+            
+        except ExpiredSignatureError:
+            logger.warning("Cannot refresh expired token")
+            return None
+        except InvalidTokenError as e:
+            logger.error(f"Cannot refresh invalid token: {e}")
+            return None
+    
+    def cleanup_expired_tokens(self) -> int:
+        """Clean up expired and blacklisted tokens from memory."""
+        current_time = datetime.utcnow()
+        tokens_to_remove = []
+        
+        for token, token_data in self.jwt_tokens.items():
+            try:
+                # Try to decode token to check if it's expired
+                jwt.decode(token, self.jwt_secret, algorithms=[self.jwt_algorithm])
+            except ExpiredSignatureError:
+                # Token is expired, mark for removal
+                tokens_to_remove.append(token)
+            except InvalidTokenError:
+                # Token is invalid, mark for removal
+                tokens_to_remove.append(token)
+        
+        # Remove expired/invalid tokens
+        for token in tokens_to_remove:
+            del self.jwt_tokens[token]
+        
+        logger.info(f"Cleaned up {len(tokens_to_remove)} expired/invalid tokens")
+        return len(tokens_to_remove)
     
     def set_path_permissions(self, path: str, permissions: List[Permission]) -> None:
         """Set required permissions for a path."""
