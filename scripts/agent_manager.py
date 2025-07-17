@@ -358,8 +358,12 @@ class TmuxAgentManager:
         print(f"🔗 Attaching to agent '{agent_name}'...")
         print(f"💡 Press Ctrl+B then D to detach")
 
-        # Use os.system to replace current process with tmux attach
-        os.system(f"tmux select-window -t {self.session_name}:{window_name} && tmux attach-session -t {self.session_name}")
+        # Use subprocess.run safely instead of os.system
+        try:
+            subprocess.run(["tmux", "select-window", "-t", f"{self.session_name}:{window_name}"], check=True)
+            subprocess.run(["tmux", "attach-session", "-t", self.session_name], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to attach to agent: {e}")
 
     def kill_agent(self, agent_name: str) -> bool:
         """Kill specific agent window."""
