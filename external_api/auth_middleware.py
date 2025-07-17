@@ -515,6 +515,61 @@ class AuthenticationMiddleware:
         logger.info(f"Created JWT token for user {user_id} (expires: {payload['exp']})")
         return token
     
+    def create_rbac_jwt_token(self, user_id: str, roles: List[str], permissions: List[Permission], 
+                             user_metadata: Optional[Dict[str, Any]] = None,
+                             expires_in_hours: Optional[int] = None) -> str:
+        """Create a JWT token with RBAC role information for authorization pipeline."""
+        current_time = datetime.utcnow()
+        
+        payload = {
+            "user_id": user_id,
+            "roles": roles,  # Role names for RBAC authorization
+            "permissions": [p.value for p in permissions],
+            "iat": current_time,
+            "jti": str(uuid.uuid4()),
+            "token_type": "access",
+            "scope": "api",
+            "issuer": "agent-hive-security",
+            "audience": "agent-hive-services"
+        }
+        
+        # Add user metadata if provided
+        if user_metadata:
+            payload["user_metadata"] = user_metadata
+        
+        # Add RBAC-specific claims
+        payload["rbac"] = {
+            "roles": roles,
+            "permissions": [
+                {
+                    "resource_type": getattr(p, 'resource_type', 'unknown'),
+                    "action": getattr(p, 'action', p.value),
+                    "scope": getattr(p, 'scope', 'global')
+                } for p in permissions
+            ],
+            "version": "1.0"
+        }
+        
+        if expires_in_hours:
+            payload["exp"] = current_time + timedelta(hours=expires_in_hours)
+        else:
+            payload["exp"] = current_time + timedelta(hours=self.token_expiry)
+        
+        # Create JWT token using PyJWT
+        token = jwt.encode(payload, self.jwt_secret, algorithm=self.jwt_algorithm)
+        
+        # Store token metadata for blacklisting
+        self.jwt_tokens[token] = {
+            "user_id": user_id,
+            "roles": roles,
+            "created_at": current_time.isoformat(),
+            "blacklisted": False,
+            "token_type": "rbac_access"
+        }
+        
+        logger.info(f"Created RBAC JWT token for user {user_id} with roles {roles} (expires: {payload['exp']})")
+        return token
+    
     def blacklist_jwt_token(self, token: str) -> bool:
         """Blacklist a JWT token."""
         if token in self.jwt_tokens:
@@ -580,6 +635,63 @@ class AuthenticationMiddleware:
         
         logger.info(f"Cleaned up {len(tokens_to_remove)} expired/invalid tokens")
         return len(tokens_to_remove)
+    
+    def extract_rbac_info_from_token(self, token: str) -> Optional[Dict[str, Any]]:
+        """Extract RBAC role and permission information from JWT token."""
+        try:
+            payload = jwt.decode(token, self.jwt_secret, algorithms=[self.jwt_algorithm])
+            
+            # Extract RBAC information
+            rbac_info = {
+                "user_id": payload.get("user_id"),
+                "roles": payload.get("roles", []),
+                "permissions": payload.get("permissions", []),
+                "rbac": payload.get("rbac", {}),
+                "token_type": payload.get("token_type", "access"),
+                "scope": payload.get("scope", "api"),
+                "user_metadata": payload.get("user_metadata", {}),
+                "issued_at": payload.get("iat"),
+                "expires_at": payload.get("exp"),
+                "token_id": payload.get("jti")
+            }
+            
+            return rbac_info
+            
+        except ExpiredSignatureError:
+            logger.warning("Cannot extract RBAC info from expired token")
+            return None
+        except InvalidTokenError as e:
+            logger.error(f"Cannot extract RBAC info from invalid token: {e}")
+            return None
+    
+    def validate_rbac_access(self, token: str, required_resource_type: str, 
+                           required_action: str, resource_id: Optional[str] = None) -> bool:
+        """Validate RBAC access for a specific resource and action."""
+        rbac_info = self.extract_rbac_info_from_token(token)
+        
+        if not rbac_info:
+            return False
+        
+        # Check if token is blacklisted
+        if token in self.jwt_tokens and self.jwt_tokens[token].get("blacklisted"):
+            return False
+        
+        # Check RBAC permissions
+        rbac_permissions = rbac_info.get("rbac", {}).get("permissions", [])
+        
+        for permission in rbac_permissions:
+            if (permission.get("resource_type") == required_resource_type and
+                permission.get("action") == required_action):
+                
+                # Check resource ID if specified
+                if resource_id:
+                    perm_resource_id = permission.get("resource_id")
+                    if perm_resource_id and perm_resource_id != "*" and perm_resource_id != resource_id:
+                        continue
+                
+                return True
+        
+        return False
     
     def set_path_permissions(self, path: str, permissions: List[Permission]) -> None:
         """Set required permissions for a path."""
