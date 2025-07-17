@@ -15,9 +15,9 @@ from .automated_coordination_orchestrator import AutomatedCoordinationOrchestrat
 from .integration_checkpoint_system import IntegrationCheckpointSystem
 from .cross_agent_protocols import CrossAgentCoordinator, AgentRole
 from .component_workflow import ComponentWorkflowManager
-from ..feedback_loops import RealTimeFeedbackEngine
-from ..performance_monitor import PerformanceMonitor
-from ..continuous_improvement import ContinuousImprovementEngine
+from advanced_orchestration.feedback_loops import RealTimeFeedbackEngine
+from advanced_orchestration.performance_monitor import PerformanceMonitor
+from advanced_orchestration.continuous_improvement import ContinuousImprovementEngine
 
 
 class PRCoordinationDriver:

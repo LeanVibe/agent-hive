@@ -17,7 +17,7 @@ import uuid
 
 from .cross_agent_protocols import CrossAgentCoordinator, CoordinationMessage, CoordinationMessageType, MessagePriority, AgentRole
 from .component_workflow import ComponentWorkflowManager, ComponentStatus, ComponentPriority
-from ..feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
+from advanced_orchestration.feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
 
 
 class CoordinationPhase(Enum):

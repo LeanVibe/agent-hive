@@ -14,7 +14,7 @@ from enum import Enum
 import json
 import uuid
 
-from ..feedback_loops import FeedbackSignal, FeedbackType, FeedbackPriority, RealTimeFeedbackEngine
+from advanced_orchestration.feedback_loops import FeedbackSignal, FeedbackType, FeedbackPriority, RealTimeFeedbackEngine
 
 
 class AgentRole(Enum):
