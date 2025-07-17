@@ -4608,3 +4608,320 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-17 14:08:14 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-17 14:08:16 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
 2025-07-17 14:08:16 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-17 14:08:44 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:08:44 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:44 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:44 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:44 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator started
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator stopped
+2025-07-17 14:08:44 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:44 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:44 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:44 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:44 ERROR    advanced_orchestration.multi_agent_coordinator                                Failed to register agent test-agent-001: Agent test-agent-001 already registered
+2025-07-17 14:08:44 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:44 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-3 registered successfully
+2025-07-17 14:08:44 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-4 registered successfully
+2025-07-17 14:08:44 ERROR    advanced_orchestration.multi_agent_coordinator                                Failed to register agent test-agent-001: Maximum number of agents (5) reached
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 unregistered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 65592827-d08c-476d-a5ba-259b70b654dd added to pending queue
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 6e59821b-7953-42d4-afd7-9e5a955ac485 assigned to agent test-agent-001
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 279e6c4e-0445-4b99-9b2e-c6b7ed58f881 assigned to agent test-agent-001
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 279e6c4e-0445-4b99-9b2e-c6b7ed58f881 completed successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task bb36e710-2fba-4c45-b03f-391ff0d76516 assigned to agent test-agent-001
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task bb36e710-2fba-4c45-b03f-391ff0d76516 completed with failure
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task a14967e5-4d0f-4a4f-a591-2f43003ea52c assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 37311630-91ef-4f9b-ba64-ca12a2166eb2 assigned to agent agent-1
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 0a5368a7-8e80-4b68-82d7-52a90a50a04f assigned to agent agent-2
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 154d2bf9-634e-4f8b-9182-438fb062dfe8 assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 2a523718-2d6b-4529-87a4-a4abfd8a3a7c assigned to agent agent-1
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task a00913ad-f46e-4b39-bbf5-78039f663fa2 assigned to agent agent-2
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task fa857219-a4ab-49c0-b13b-a51617c275ae assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task ccb6a15e-5257-42ee-980a-2111010ff659 assigned to agent agent-1
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 638e1e96-a9b2-40e7-a661-8649c8f46c6a assigned to agent agent-2
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 4ca00b11-1cc4-4ed0-a535-8637a4725ea9 assigned to agent test-agent-001
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 4ca00b11-1cc4-4ed0-a535-8637a4725ea9 reassigned from failed agent test-agent-001
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 WARNING  advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 exceeded failure threshold, removing
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 unregistered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 02bd11a1-e9b2-4207-a5b0-3b3c3889d00c assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 78b4b6a3-1425-4ae7-b06d-fc5eba18ff25 assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 3578ce08-9fc8-4b92-a9d7-c128e4631bb0 assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Starting load rebalancing
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Load rebalancing completed
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent test-agent-001 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=5, min_agents=1, health_check_interval=1.0, load_balance_interval=2.0, task_timeout=30.0, agent_startup_timeout=10.0, failure_threshold=2, scaling_check_interval=5.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator started
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator stopped
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=10)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=10, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=10, min_agents=2, health_check_interval=30.0, load_balance_interval=60.0, task_timeout=300.0, agent_startup_timeout=60.0, failure_threshold=3, scaling_check_interval=120.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=10))
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=10, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=10, min_agents=2, health_check_interval=30.0, load_balance_interval=60.0, task_timeout=300.0, agent_startup_timeout=60.0, failure_threshold=3, scaling_check_interval=120.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10))
+2025-07-17 14:08:45 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10)
+2025-07-17 14:08:45 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=10, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator initialized with config: CoordinatorConfig(max_agents=3, min_agents=2, health_check_interval=0.1, load_balance_interval=0.2, task_timeout=300.0, agent_startup_timeout=60.0, failure_threshold=3, scaling_check_interval=120.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10))
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                MultiAgentCoordinator started
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-0 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-1 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Agent agent-2 registered successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 8ef6e90e-cf6d-4f27-b811-9b67ecc699e8 assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 624d5146-fa67-4a09-a6f2-d7985e3d8439 assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 1571e0da-3b26-4590-86cf-65de66c71152 assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 77006d70-8608-4e86-9a4c-b1e792161295 assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 94bfdf5b-d317-409c-9ad8-2be553e6379b assigned to agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 8ef6e90e-cf6d-4f27-b811-9b67ecc699e8 completed successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 624d5146-fa67-4a09-a6f2-d7985e3d8439 completed successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 1571e0da-3b26-4590-86cf-65de66c71152 completed successfully
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 77006d70-8608-4e86-9a4c-b1e792161295 reassigned from failed agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 94bfdf5b-d317-409c-9ad8-2be553e6379b reassigned from failed agent agent-0
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Starting load rebalancing
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Load rebalancing completed
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 77006d70-8608-4e86-9a4c-b1e792161295 reassigned from failed agent agent-1
+2025-07-17 14:08:45 INFO     advanced_orchestration.multi_agent_coordinator                                Task 94bfdf5b-d317-409c-9ad8-2be553e6379b reassigned from failed agent agent-1
+2025-07-17 14:09:30 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:09:32 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-17 14:09:32 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-17 14:09:50 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:09:52 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-17 14:09:52 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-17 14:10:10 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:10:12 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-17 14:10:12 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-17 14:12:42 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:12:44 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-17 14:12:44 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-17 14:13:04 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:13:06 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-17 14:13:06 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-17 14:13:49 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Starting API gateway on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                API gateway started successfully
+2025-07-17 14:13:49 WARNING  external_api.api_gateway                                API gateway already started
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Stopping API gateway...
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                API gateway stopped
+2025-07-17 14:13:49 WARNING  external_api.api_gateway                                API gateway not running
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered route: POST /test
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Unregistered route: GET /test
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Unregistered route: POST /test
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Added middleware: test_middleware
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered API key with metadata: ['name', 'permissions', 'rate_limit']
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.02ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered API key with metadata: ['name']
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.02ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:13:49 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-17 14:14:19 ERROR    external_api.api_gateway                                Request timeout for req-123
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-17 14:14:19 ERROR    external_api.api_gateway                                Error handling request req-123: Test error
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Added middleware: middleware1
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Added middleware: middleware2
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Processed request req-123 in 0.02ms
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Added middleware: stopping_middleware
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Registered route: GET /route1
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Registered route: POST /route1
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Registered route: GET /route2
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                Starting API gateway on localhost:8081
+2025-07-17 14:14:19 INFO     external_api.api_gateway                                API gateway started successfully
+2025-07-17 14:14:24 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 14:14:26 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-17 14:14:26 INFO     personas.persona_manager                                Loaded 5 personas

@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 import json
 
-from ..feedback_loops import FeedbackSignal, FeedbackType, FeedbackPriority
+from advanced_orchestration.feedback_loops import FeedbackSignal, FeedbackType, FeedbackPriority
 
 
 class ComponentStatus(Enum):
