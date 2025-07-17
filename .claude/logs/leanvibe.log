@@ -6236,3 +6236,6 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-17 09:54:51 INFO     advanced_orchestration.multi_agent_coordinator                                Load rebalancing completed
 2025-07-17 09:54:51 INFO     advanced_orchestration.multi_agent_coordinator                                Task 730807bb-1db6-435e-8660-31861cda3dac reassigned from failed agent agent-1
 2025-07-17 09:54:51 INFO     advanced_orchestration.multi_agent_coordinator                                Task c3ab7ce4-9e9c-4ad2-84f6-9b10fd99c738 reassigned from failed agent agent-1
+2025-07-17 10:09:37 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 10:12:34 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 10:12:41 INFO     leanvibe.startup                                    Logging initialized with level INFO
