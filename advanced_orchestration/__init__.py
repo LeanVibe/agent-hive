@@ -30,12 +30,12 @@ try:
         AnalyticsResult,
         LearningMetrics
     )
-    
+
     ML_AVAILABLE = True
-    
+
     __all__ = [
         'MultiAgentCoordinator',
-        'ResourceManager', 
+        'ResourceManager',
         'ScalingManager',
         'WorkflowCoordinator',
         'EnhancedCoordinationProtocol',
@@ -49,13 +49,13 @@ try:
         'AnalyticsResult',
         'LearningMetrics'
     ]
-    
+
 except ImportError:
     ML_AVAILABLE = False
-    
+
     __all__ = [
         'MultiAgentCoordinator',
-        'ResourceManager', 
+        'ResourceManager',
         'ScalingManager',
         'WorkflowCoordinator',
         'EnhancedCoordinationProtocol',

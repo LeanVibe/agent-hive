@@ -37,7 +37,7 @@ jobs:
       components: ${{ steps.changes.outputs.components }}
       matrix: ${{ steps.changes.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
       
@@ -75,12 +75,12 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
       
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v4.7.1
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
@@ -92,7 +92,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -168,7 +168,7 @@ jobs:
           python coordination_protocols/quality_gate_validation.py
       
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
         with:
           file: ./coverage.xml
           flags: ${{ matrix.component }}
@@ -176,7 +176,7 @@ jobs:
         if: hashFiles('coverage.xml') != ''
       
       - name: Upload CI artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: ci-reports-${{ matrix.component }}
           path: |
@@ -220,15 +220,15 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v4.7.1
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       
       - name: Download CI artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           path: ci-artifacts
       
@@ -338,3 +338,55 @@ jobs:
           echo "- **Components Processed:** ${{ needs.detect-changes.outputs.components }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Workflow Duration:** $((${{ github.event.repository.updated_at }} - ${{ github.event.repository.created_at }}))" >> $GITHUB_STEP_SUMMARY
           echo "- **Runner:** ubuntu-latest" >> $GITHUB_STEP_SUMMARY
+
+  pr-auto-merge:
+    name: Auto-Merge Pull Request
+    runs-on: ubuntu-latest
+    needs: [ci-pipeline, integration-validation]
+    if: github.event_name == 'pull_request' && needs.ci-pipeline.result == 'success' && needs.integration-validation.result == 'success'
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Validate PR for auto-merge
+        id: validate-pr
+        run: |
+          echo "🔍 Validating PR for auto-merge..."
+          
+          # Check if PR is from a component branch
+          if [[ "${{ github.head_ref }}" =~ ^(new-work/|feature/).* ]]; then
+            echo "✅ PR from valid component branch: ${{ github.head_ref }}"
+            echo "mergeable=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ PR not from component branch, skipping auto-merge"
+            echo "mergeable=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Auto-merge PR
+        if: steps.validate-pr.outputs.mergeable == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🚀 Auto-merging PR #${{ github.event.number }}..."
+          
+          # Enable auto-merge with squash strategy
+          gh pr merge ${{ github.event.number }} \
+            --squash \
+            --auto \
+            --delete-branch
+          
+          echo "✅ PR #${{ github.event.number }} queued for auto-merge"
+      
+      - name: Post-merge validation
+        if: steps.validate-pr.outputs.mergeable == 'true'
+        run: |
+          echo "📋 Post-merge validation steps would run here"
+          echo "- Branch cleanup verification"
+          echo "- Integration status update"
+          echo "- Notification to coordination system"

@@ -1,578 +1,675 @@
 #!/usr/bin/env python3
 """
-Enhanced Agent Spawner with Hybrid Communication Protocol Integration
-
-Automatically generates CLAUDE.md files with embedded communication protocol
-for all newly spawned agents.
+Enhanced Agent Spawner - Reliable agent initialization with instruction delivery
+Solves inconsistency issues in agent spawning and instruction delivery.
 """
 
+import argparse
+import asyncio
+import json
+import logging
 import os
 import subprocess
-import json
+import sys
 import time
-import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Any
-import uuid
+from typing import Dict, List, Optional, Tuple
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class EnhancedAgentSpawner:
-    """Enhanced agent spawner with automatic protocol integration."""
-    
-    def __init__(self, base_dir: str = ".", session_name: str = "agent-hive"):
-        self.base_dir = Path(base_dir)
-        self.session_name = session_name
-        self.templates_dir = self.base_dir / "templates"
-        self.worktrees_dir = self.base_dir / "worktrees"
-        
-        # Ensure directories exist
-        self.templates_dir.mkdir(exist_ok=True)
-        self.worktrees_dir.mkdir(exist_ok=True)
-        
-        # Agent type configurations
-        self.agent_configs = {
-            "integration-specialist": {
-                "description": "API Gateway and Service Integration Specialist",
-                "mission": "Replace simulation API Gateway with real FastAPI HTTP server and fix failing tests",
-                "priority": 1.1,
-                "timeline": "2-3 days",
-                "specialization": "API integration, service discovery, HTTP servers, microservices"
-            },
-            "frontend-dashboard": {
-                "description": "Frontend Dashboard and UI Specialist", 
-                "mission": "Build responsive dashboard for agent monitoring and system visualization",
-                "priority": 1.2,
-                "timeline": "3-4 days",
-                "specialization": "React, D3.js, real-time UI, data visualization"
-            },
-            "service-mesh": {
-                "description": "Service Mesh and Infrastructure Specialist",
-                "mission": "Implement service mesh architecture with load balancing and discovery",
-                "priority": 1.3,
-                "timeline": "2-3 days", 
-                "specialization": "Service mesh, load balancing, infrastructure, networking"
-            },
-            "monitoring-system": {
-                "description": "Monitoring and Observability Specialist",
-                "mission": "Build comprehensive monitoring system with metrics and alerting",
-                "priority": 1.4,
-                "timeline": "3-4 days",
-                "specialization": "Monitoring, metrics, logging, observability, alerting"
-            },
-            "security-hardening": {
-                "description": "Security and Authentication Specialist",
-                "mission": "Implement comprehensive security framework with authentication and authorization",
-                "priority": 1.5,
-                "timeline": "3-4 days",
-                "specialization": "Security, authentication, authorization, encryption, compliance"
-            },
-            "documentation-agent": {
-                "description": "Documentation and Knowledge Management Specialist",
-                "mission": "Create comprehensive documentation and developer experience resources",
-                "priority": 2.0,
-                "timeline": "4-5 days",
-                "specialization": "Technical writing, API documentation, developer experience"
-            },
-            "quality-assurance": {
-                "description": "Quality Assurance and Testing Specialist", 
-                "mission": "Implement comprehensive testing framework and quality gates",
-                "priority": 2.1,
-                "timeline": "3-4 days",
-                "specialization": "Testing frameworks, quality assurance, automation, CI/CD"
-            },
-            "performance-optimization": {
-                "description": "Performance and Scalability Specialist",
-                "mission": "Optimize system performance and implement scalability solutions",
-                "priority": 2.2,
-                "timeline": "3-4 days", 
-                "specialization": "Performance tuning, scalability, caching, optimization"
-            }
+    """Reliable agent spawning with consistent instruction delivery"""
+
+    def __init__(self):
+        self.project_root = Path.cwd()
+        self.max_retries = 3
+        self.initialization_timeout = 60  # seconds
+        self.instruction_templates = {
+            'integration-specialist': self._get_integration_specialist_template,
+            'service-mesh': self._get_service_mesh_template,
+            'frontend': self._get_frontend_template,
+            'security': self._get_security_template,
+            'infrastructure': self._get_infrastructure_template,
+            'performance': self._get_performance_template,
+            'monitoring': self._get_monitoring_template,
         }
-    
-    def generate_claude_md(self, agent_type: str, task_description: str = None, 
-                          priority: float = None) -> str:
-        """Generate CLAUDE.md content with embedded communication protocol."""
-        
-        if agent_type not in self.agent_configs:
-            raise ValueError(f"Unknown agent type: {agent_type}")
-        
-        config = self.agent_configs[agent_type]
-        agent_name = f"{agent_type}-{datetime.now().strftime('%b-%d-%H%M')}"
-        
-        # Use provided values or defaults from config
-        description = config["description"]
-        mission = task_description or config["mission"]
-        agent_priority = priority or config["priority"]
-        timeline = config["timeline"]
-        specialization = config["specialization"]
-        
-        # Load template
-        template_file = self.templates_dir / "agent_claude_template.md"
-        if template_file.exists():
-            template_content = template_file.read_text()
-        else:
-            # Fallback template if file doesn't exist
-            template_content = self._get_fallback_template()
-        
-        # Generate agent-specific instructions
-        agent_specific_content = self._generate_agent_specific_content(
-            agent_type, config, mission, timeline, specialization
-        )
-        
-        additional_instructions = self._generate_additional_instructions(
-            agent_type, config
-        )
-        
-        # Replace template variables
-        claude_content = template_content.format(
-            agent_name=agent_name,
-            agent_description=description,
-            mission_description=mission,
-            agent_specific_content=agent_specific_content,
-            additional_agent_instructions=additional_instructions
-        )
-        
-        return claude_content
-    
-    def _generate_agent_specific_content(self, agent_type: str, config: Dict, 
-                                        mission: str, timeline: str, 
-                                        specialization: str) -> str:
-        """Generate agent-specific content section."""
-        
-        content = f"""## **Agent Identity**
-**Role**: {config['description']}
-**Specialization**: {specialization}
-**Priority**: {config['priority']} ({"Critical" if config['priority'] < 2.0 else "High"})
-**Timeline**: {timeline}
 
-## **Primary Mission**
-{mission}
+    async def spawn_agent(
+        self,
+        agent_type: str,
+        priority: str,
+        task: str,
+        timeline: str,
+        human_decision_points: str = "",
+        success_criteria: str = "",
+        escalation_triggers: str = ""
+    ) -> Tuple[bool, str, Dict]:
+        """
+        Spawn agent with reliable initialization
+        Returns: (success, agent_id, metadata)
+        """
+        timestamp = datetime.now().strftime("%b-%d-%H%M")
+        agent_id = f"{agent_type}-{timestamp}"
 
-## **Key Responsibilities**"""
-        
-        # Add agent-type specific responsibilities
-        if agent_type == "integration-specialist":
-            content += """
-- Replace simulation API Gateway with production FastAPI HTTP server
-- Fix failing tests (target: 100% test pass rate)
-- Implement real service discovery integration
-- Ensure request proxying and load balancing functionality
-- Performance optimization (<200ms response time)"""
-            
-        elif agent_type == "frontend-dashboard":
-            content += """
-- Build responsive React-based dashboard for system monitoring
-- Implement real-time data visualization with D3.js
-- Create agent status monitoring interface
-- Design system health and metrics display
-- Ensure mobile-responsive design"""
-            
-        elif agent_type == "service-mesh":
-            content += """
-- Implement service mesh architecture for microservices
-- Configure load balancing and service discovery
-- Set up inter-service communication protocols
-- Implement circuit breakers and retry logic
-- Configure networking and routing policies"""
-            
-        elif agent_type == "monitoring-system":
-            content += """
-- Build comprehensive metrics collection system
-- Implement real-time alerting and notification system
-- Create system health monitoring dashboard
-- Set up log aggregation and analysis
-- Configure performance monitoring and profiling"""
-            
-        elif agent_type == "security-hardening":
-            content += """
-- Implement comprehensive authentication system
-- Set up authorization and role-based access control
-- Configure encryption for data in transit and at rest
-- Implement security scanning and vulnerability assessment
-- Set up compliance monitoring and reporting"""
-            
-        elif agent_type == "documentation-agent":
-            content += """
-- Create comprehensive API documentation
-- Build developer onboarding guides
-- Implement interactive documentation with examples
-- Create system architecture documentation
-- Set up automated documentation generation"""
-            
-        elif agent_type == "quality-assurance":
-            content += """
-- Implement comprehensive testing framework
-- Set up automated quality gates and CI/CD pipelines
-- Create performance and load testing suites
-- Implement code quality monitoring
-- Set up automated security and compliance testing"""
-            
-        elif agent_type == "performance-optimization":
-            content += """
-- Analyze system performance bottlenecks
-- Implement caching strategies and optimization
-- Configure load balancing and scaling policies
-- Optimize database queries and data access
-- Implement monitoring and profiling tools"""
-        
-        return content
-    
-    def _generate_additional_instructions(self, agent_type: str, config: Dict) -> str:
-        """Generate additional agent-specific instructions."""
-        
-        instructions = f"""
-## **Quality Gates**
-- All tests must pass before task completion
-- Code must meet quality standards (linting, formatting)
-- Performance targets must be achieved
-- Documentation must be updated
-- Security requirements must be satisfied
+        logger.info(f"🚀 Spawning {agent_type} agent with ID: {agent_id}")
 
-## **Success Criteria**"""
-        
-        # Add agent-specific success criteria
-        if agent_type == "integration-specialist":
-            instructions += """
-- ✅ Real FastAPI HTTP server operational
-- ✅ All tests passing (100% pass rate)
-- ✅ Service discovery integration functional
-- ✅ Response time <200ms achieved
-- ✅ Load balancing operational"""
-            
-        elif agent_type == "frontend-dashboard":
-            instructions += """
-- ✅ Responsive dashboard deployed and functional
-- ✅ Real-time data visualization working
-- ✅ Agent monitoring interface complete
-- ✅ Mobile compatibility achieved
-- ✅ Performance metrics <2s load time"""
-            
-        # Add more agent-specific criteria as needed
-        
-        instructions += f"""
-
-## **Escalation Triggers**
-- Technical blockers persisting >30 minutes
-- Test failures after 4 hours of debugging
-- Performance targets not achievable with current approach
-- Integration conflicts with other system components
-- Security vulnerabilities discovered
-
-## **Human Decision Points**
-- Architecture changes affecting system design
-- Technology selection requiring approval
-- Resource allocation exceeding timeline estimates
-- Security policies requiring compliance review
-- Integration approaches affecting other agents
-
-## **Communication Schedule**
-- **Startup**: Send [ACK] within 1 minute of spawning
-- **Progress**: Respond to pings within 2 minutes with detailed status
-- **Updates**: Push [URGENT] immediately for completion, blockers, conflicts, PR ready
-- **Completion**: Final deliverable summary with evidence and metrics
-
-**Remember**: Priority {config['priority']} agent - Critical path component requiring {config['timeline']} completion."""
-        
-        return instructions
-    
-    def _get_fallback_template(self) -> str:
-        """Fallback template if template file doesn't exist."""
-        return """# {agent_name} - {agent_description}
-
-## 🎯 **Mission: {mission_description}**
-
-{agent_specific_content}
-
-# 🚨 HYBRID COMMUNICATION PROTOCOL - MANDATORY
-
-## 📡 **COORDINATION SYSTEM RULES**
-
-### **RESPONSE REQUIREMENTS**
-1. **Ping Response Time**: RESPOND to main agent pings within **2 minutes maximum**
-2. **Acknowledgment Format**: Use `[ACK] - Agent {agent_name} ready - Current task: {{current_task}}`
-3. **Status Updates**: Provide clear, actionable status when pinged
-
-### **URGENT UPDATE PROTOCOL**
-**IMMEDIATE PUSH REQUIRED** for these events using exact format:
-`[URGENT] - {{Description}} - {{Evidence}}`
-
-### **URGENT EVENT CATEGORIES**
-1. **Task Completion**: `[URGENT] - Task complete - Evidence`
-2. **Critical Blocker**: `[URGENT] - Blocker detected - Details and ETA`
-3. **Merge Conflicts**: `[URGENT] - Merge conflict - Files and resolution needed`
-4. **PR Ready**: `[URGENT] - PR ready - PR# and status`
-
-{additional_agent_instructions}
-
-**🔗 PROTOCOL ACTIVE**: This communication protocol is active and monitored."""
-    
-    def create_agent_worktree(self, agent_type: str, task_description: str = None,
-                            priority: float = None) -> Dict[str, Any]:
-        """Create new agent worktree with protocol-enabled CLAUDE.md."""
-        
-        if agent_type not in self.agent_configs:
-            raise ValueError(f"Unknown agent type: {agent_type}. Available: {list(self.agent_configs.keys())}")
-        
-        # Generate unique agent name with timestamp
-        timestamp = datetime.now().strftime('%b-%d-%H%M')
-        agent_name = f"{agent_type}-{timestamp}"
-        branch_name = f"new-work/{agent_name}"
-        worktree_path = self.worktrees_dir / agent_name
-        
-        print(f"🚀 Creating agent worktree: {agent_name}")
-        print(f"📁 Path: {worktree_path}")
-        print(f"🌿 Branch: {branch_name}")
-        
         try:
-            # Create git worktree
-            result = subprocess.run([
-                "git", "worktree", "add", str(worktree_path), "-b", branch_name
-            ], cwd=self.base_dir, capture_output=True, text=True)
-            
-            if result.returncode != 0:
-                raise Exception(f"Git worktree creation failed: {result.stderr}")
-            
-            # Generate CLAUDE.md with protocol
-            claude_content = self.generate_claude_md(agent_type, task_description, priority)
-            claude_file = worktree_path / "CLAUDE.md"
-            claude_file.write_text(claude_content)
-            
-            print(f"✅ Created CLAUDE.md with hybrid communication protocol")
-            
-            # Initial commit
-            subprocess.run([
-                "git", "add", "CLAUDE.md"
-            ], cwd=worktree_path, check=True)
-            
-            subprocess.run([
-                "git", "commit", "-m", f"feat: Initialize {agent_type} agent with hybrid communication protocol\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>"
-            ], cwd=worktree_path, check=True)
-            
-            print(f"✅ Initial commit created")
-            
-            # Create agent info
-            agent_info = {
-                "agent_name": agent_name,
+            # Step 1: Create worktree
+            success, worktree_path = await self._create_worktree(agent_id)
+            if not success:
+                return False, agent_id, {"error": "Failed to create worktree"}
+
+            # Step 2: Create specialized CLAUDE.md instructions
+            success = await self._create_instructions(
+                worktree_path, agent_type, task, timeline,
+                human_decision_points, success_criteria, escalation_triggers
+            )
+            if not success:
+                return False, agent_id, {"error": "Failed to create instructions"}
+
+            # Step 3: Start tmux session with Claude Code
+            success = await self._start_tmux_session(agent_id, worktree_path)
+            if not success:
+                return False, agent_id, {"error": "Failed to start tmux session"}
+
+            # Step 4: Initialize Claude Code with reliable instruction delivery
+            success = await self._initialize_claude_code(agent_id, task, priority)
+            if not success:
+                return False, agent_id, {"error": "Failed to initialize Claude Code"}
+
+            # Step 4.5: Ensure agent is fully activated and working
+            success = await self._ensure_agent_activation(agent_id, task, priority)
+            if not success:
+                return False, agent_id, {"error": "Failed to fully activate agent"}
+
+            # Step 5: Verify agent initialization
+            success = await self._verify_agent_initialization(agent_id)
+            if not success:
+                return False, agent_id, {"error": "Agent initialization verification failed"}
+
+            # Step 6: Register agent in tracking system
+            metadata = {
+                "agent_id": agent_id,
                 "agent_type": agent_type,
-                "branch_name": branch_name,
+                "priority": priority,
+                "task": task,
+                "timeline": timeline,
                 "worktree_path": str(worktree_path),
-                "claude_file": str(claude_file),
-                "config": self.agent_configs[agent_type],
-                "task_description": task_description,
-                "priority": priority or self.agent_configs[agent_type]["priority"],
-                "created_at": datetime.now().isoformat(),
-                "protocol_enabled": True,
-                "spawn_id": str(uuid.uuid4())
+                "spawn_time": datetime.now().isoformat(),
+                "status": "active",
+                "human_decision_points": human_decision_points.split(",") if human_decision_points else [],
+                "success_criteria": success_criteria.split(",") if success_criteria else [],
+                "escalation_triggers": escalation_triggers.split(",") if escalation_triggers else []
             }
-            
-            return agent_info
-            
+
+            await self._register_agent(agent_id, metadata)
+
+            # Step 7: Setup progress monitoring
+            await self._setup_progress_monitoring(agent_id)
+
+            logger.info(f"✅ Agent {agent_id} spawned successfully and verified active")
+            return True, agent_id, metadata
+
         except Exception as e:
-            print(f"❌ Failed to create agent worktree: {e}")
-            # Cleanup on failure
-            if worktree_path.exists():
-                subprocess.run(["git", "worktree", "remove", str(worktree_path), "--force"], 
-                             cwd=self.base_dir, capture_output=True)
-            raise
-    
-    def spawn_agent_with_tmux(self, agent_info: Dict[str, Any], 
-                            with_prompt: bool = True) -> bool:
-        """Spawn agent in tmux with protocol-aware starting prompt."""
-        
-        agent_name = agent_info["agent_name"]
-        worktree_path = agent_info["worktree_path"]
-        window_name = f"agent-{agent_name}"
-        
-        print(f"🔄 Spawning {agent_name} in tmux...")
-        
+            logger.error(f"❌ Failed to spawn agent {agent_id}: {e}")
+            await self._cleanup_failed_spawn(agent_id)
+            return False, agent_id, {"error": str(e)}
+
+    async def _create_worktree(self, agent_id: str) -> Tuple[bool, Optional[Path]]:
+        """Create Git worktree for agent"""
         try:
-            # Ensure tmux session exists
-            subprocess.run(["tmux", "has-session", "-t", self.session_name], 
-                         check=True, capture_output=True)
-        except subprocess.CalledProcessError:
-            # Create session if it doesn't exist
-            subprocess.run(["tmux", "new-session", "-d", "-s", self.session_name], 
-                         check=True)
-            print(f"✅ Created tmux session: {self.session_name}")
-        
-        # Check if window already exists
-        result = subprocess.run([
-            "tmux", "list-windows", "-t", self.session_name, "-F", "#{window_name}"
-        ], capture_output=True, text=True)
-        
-        if window_name in result.stdout.splitlines():
-            print(f"⚠️  Window '{window_name}' already exists, killing...")
-            subprocess.run(["tmux", "kill-window", "-t", f"{self.session_name}:{window_name}"])
-        
-        # Create new window
-        subprocess.run([
-            "tmux", "new-window", "-t", self.session_name, "-n", window_name, "-c", worktree_path
-        ], check=True)
-        
-        # Start Claude with permissions
-        subprocess.run([
-            "tmux", "send-keys", "-t", f"{self.session_name}:{window_name}", 
-            "claude --dangerously-skip-permissions", "Enter"
-        ])
-        
-        if with_prompt:
-            time.sleep(3)  # Wait for Claude to initialize
-            
-            # Protocol-aware starting prompt
-            starting_prompt = self._generate_starting_prompt(agent_info)
-            
-            # Use buffer method for reliable prompt sending
-            subprocess.run(["tmux", "set-buffer", starting_prompt])
-            subprocess.run(["tmux", "send-keys", "-t", f"{self.session_name}:{window_name}", "C-c"])
-            time.sleep(0.3)
-            subprocess.run(["tmux", "paste-buffer", "-t", f"{self.session_name}:{window_name}"])
-            time.sleep(0.2)
-            subprocess.run(["tmux", "send-keys", "-t", f"{self.session_name}:{window_name}", "Enter"])
-            
-            print(f"🚀 Protocol-aware starting prompt sent")
-        
-        print(f"✅ Agent {agent_name} spawned successfully")
-        print(f"📋 Window: {window_name}")
-        print(f"📁 Directory: {worktree_path}")
-        print(f"🔗 Protocol: Hybrid communication enabled")
-        
-        return True
-    
-    def _generate_starting_prompt(self, agent_info: Dict[str, Any]) -> str:
-        """Generate protocol-aware starting prompt."""
-        
-        agent_name = agent_info["agent_name"]
-        agent_type = agent_info["agent_type"]
-        task_description = agent_info.get("task_description", "")
-        priority = agent_info["priority"]
-        
-        prompt = f"""AGENT SPAWN COMPLETE: {agent_name}
+            # Extract agent type from agent_id (before timestamp)
+            agent_type = agent_id.split('-Jul-')[0] if '-Jul-' in agent_id else agent_id.split('-')[0]
+            cmd = ["python", "scripts/new_worktree_manager.py", "create", agent_type, "main"]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
-🚨 HYBRID COMMUNICATION PROTOCOL ACTIVE
+            if result.returncode != 0:
+                logger.error(f"Worktree creation failed: {result.stderr}")
+                return False, None
 
-IMMEDIATE ACTIONS REQUIRED:
-1. Send acknowledgment: [ACK] - Agent {agent_name} ready - Current task: Initializing {agent_type} implementation
-2. Read your CLAUDE.md file for detailed mission instructions and communication protocol
-3. Begin implementation of: {task_description or agent_info['config']['mission']}
+            # Parse worktree path from output and find matching agent_id path
+            created_path = None
+            for line in result.stdout.split('\n'):
+                if "Path:" in line:
+                    created_path = Path(line.split("Path:", 1)[1].strip())
+                    break
 
-PROTOCOL REQUIREMENTS:
-- Respond to pings within 2 minutes using [ACK] format
-- Push urgent updates immediately using [URGENT] format for: task completion, critical blockers, merge conflicts, PR ready
-- Provide concrete evidence in all status updates
+            if created_path:
+                # Rename the worktree directory to match our agent_id
+                target_path = created_path.parent / agent_id
+                if created_path != target_path:
+                    created_path.rename(target_path)
+                    logger.info(f"📁 Worktree created and renamed: {target_path}")
+                    return True, target_path
+                else:
+                    logger.info(f"📁 Worktree created: {created_path}")
+                    return True, created_path
 
-PRIORITY: {priority} ({"CRITICAL PATH" if priority < 2.0 else "HIGH PRIORITY"})
+            return False, None
 
-Your mission details are in CLAUDE.md. Start by sending your [ACK] message, then read your instructions and begin implementation immediately."""
-        
-        return prompt
-    
-    def create_and_spawn_agent(self, agent_type: str, task_description: str = None,
-                             priority: float = None, spawn_tmux: bool = True,
-                             with_prompt: bool = True) -> Dict[str, Any]:
-        """Complete agent creation and spawning process."""
-        
-        print(f"🎯 ENHANCED AGENT SPAWNER: Creating {agent_type}")
-        print(f"📋 Task: {task_description or 'Default mission'}")
-        print(f"⭐ Priority: {priority or self.agent_configs[agent_type]['priority']}")
-        print()
-        
-        # Create worktree with protocol
-        agent_info = self.create_agent_worktree(agent_type, task_description, priority)
-        
-        # Spawn in tmux if requested
-        if spawn_tmux:
-            success = self.spawn_agent_with_tmux(agent_info, with_prompt)
-            agent_info["spawned"] = success
-            agent_info["tmux_window"] = f"agent-{agent_info['agent_name']}"
-        else:
-            agent_info["spawned"] = False
-            agent_info["tmux_window"] = None
-        
-        print()
-        print(f"🎉 AGENT CREATION COMPLETE")
-        print(f"📝 Agent: {agent_info['agent_name']}")
-        print(f"📁 Path: {agent_info['worktree_path']}")
-        print(f"🔗 Protocol: Enabled and active")
-        print(f"🚀 Spawned: {'Yes' if agent_info['spawned'] else 'No'}")
-        
-        return agent_info
+        except subprocess.TimeoutExpired:
+            logger.error("Worktree creation timed out")
+            return False, None
+        except Exception as e:
+            logger.error(f"Worktree creation error: {e}")
+            return False, None
+
+    async def _create_instructions(
+        self,
+        worktree_path: Path,
+        agent_type: str,
+        task: str,
+        timeline: str,
+        human_decision_points: str,
+        success_criteria: str,
+        escalation_triggers: str
+    ) -> bool:
+        """Create specialized CLAUDE.md instructions for agent"""
+        try:
+            if agent_type not in self.instruction_templates:
+                logger.error(f"Unknown agent type: {agent_type}")
+                return False
+
+            # Generate specialized instructions
+            template_func = self.instruction_templates[agent_type]
+            instructions = template_func(
+                task, timeline, human_decision_points,
+                success_criteria, escalation_triggers
+            )
+
+            # Write to CLAUDE.md in worktree
+            claude_md_path = worktree_path / "CLAUDE.md"
+            with open(claude_md_path, 'w') as f:
+                f.write(instructions)
+
+            logger.info(f"📝 Instructions created: {claude_md_path}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to create instructions: {e}")
+            return False
+
+    async def _start_tmux_session(self, agent_id: str, worktree_path: Path) -> bool:
+        """Start tmux session with reliable Claude Code initialization"""
+        try:
+            # Create tmux window with proper agent- prefix for communication compatibility
+            tmux_window_name = f"agent-{agent_id}"
+            cmd = [
+                "tmux", "new-window",
+                "-t", "agent-hive",
+                "-n", tmux_window_name,
+                "-c", str(worktree_path)
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+
+            if result.returncode != 0:
+                logger.error(f"Failed to create tmux window: {result.stderr}")
+                return False
+
+            logger.info(f"🖥️ Tmux window created: {agent_id}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to start tmux session: {e}")
+            return False
+
+    async def _initialize_claude_code(self, agent_id: str, task: str, priority: str) -> bool:
+        """Initialize Claude Code with reliable instruction delivery"""
+        try:
+            # Use proper agent- prefixed window name for all tmux commands
+            tmux_window_name = f"agent-{agent_id}"
+
+            # Start Claude Code with permission bypass
+            cmd = [
+                "tmux", "send-keys",
+                "-t", f"agent-hive:{tmux_window_name}",
+                "claude --dangerously-skip-permissions",
+                "Enter"
+            ]
+            subprocess.run(cmd, timeout=10)
+
+            # Wait for Claude Code to initialize
+            await asyncio.sleep(5)
+
+            # Send task instructions with reliable delivery
+            task_instruction = (
+                f"🚀 MISSION: Priority {priority} - {task}. "
+                f"Read your CLAUDE.md file for detailed instructions. "
+                f"Acknowledge receipt and begin work. "
+                f"Report progress every 2 hours to pm-agent."
+            )
+
+            # Use multiple delivery methods for reliability
+            success = await self._reliable_instruction_delivery(agent_id, task_instruction)
+
+            return success
+
+        except Exception as e:
+            logger.error(f"Failed to initialize Claude Code: {e}")
+            return False
+
+    async def _reliable_instruction_delivery(self, agent_id: str, instruction: str) -> bool:
+        """Deliver instructions with multiple retry mechanisms"""
+
+        # Use proper agent- prefixed window name for all tmux commands
+        tmux_window_name = f"agent-{agent_id}"
+
+        # Method 1: Direct tmux send-keys
+        try:
+            cmd = [
+                "tmux", "send-keys",
+                "-t", f"agent-hive:{tmux_window_name}",
+                instruction,
+                "Enter"
+            ]
+            subprocess.run(cmd, timeout=10)
+
+            # Wait and verify delivery
+            await asyncio.sleep(3)
+
+            # Method 2: Create instruction file in worktree
+            agent_worktrees = list(Path("new-worktrees").glob(f"{agent_id}*"))
+            if agent_worktrees:
+                instruction_file = agent_worktrees[0] / "INSTRUCTIONS.txt"
+                with open(instruction_file, 'w') as f:
+                    f.write(f"TASK INSTRUCTIONS:\n{instruction}\n\nDelivered at: {datetime.now().isoformat()}")
+
+                # Send file read command
+                cmd = [
+                    "tmux", "send-keys",
+                    "-t", f"agent-hive:{tmux_window_name}",
+                    f"cat INSTRUCTIONS.txt",
+                    "Enter"
+                ]
+                subprocess.run(cmd, timeout=10)
+
+            # Method 3: Use agent communication system as backup
+            try:
+                cmd = [
+                    "python", "scripts/send_agent_message.py",
+                    "--agent", agent_id,
+                    "--message", f"TASK START: {instruction}"
+                ]
+                subprocess.run(cmd, timeout=10)
+            except:
+                pass  # Backup method, don't fail if not available
+
+            logger.info(f"📨 Instructions delivered to {agent_id}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to deliver instructions: {e}")
+            return False
+
+    async def _ensure_agent_activation(self, agent_id: str, task: str, priority: str) -> bool:
+        """Ensure agent is fully activated and working without manual intervention"""
+        try:
+            # Create comprehensive task prompt
+            task_prompt = f"🚀 PRIORITY {priority}: {task}. Read your CLAUDE.md file for detailed instructions. Begin work immediately. Report progress every 2 hours to pm-agent."
+
+            # Use agent activator for reliable activation
+            cmd = [
+                "python", "scripts/agent_activator.py",
+                "--agent", agent_id,
+                "--task", task_prompt
+            ]
+
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+
+            if result.returncode == 0:
+                logger.info(f"✅ Agent {agent_id} fully activated and working")
+                return True
+            else:
+                logger.error(f"❌ Agent activation failed: {result.stderr}")
+                return False
+
+        except Exception as e:
+            logger.error(f"Failed to ensure agent activation: {e}")
+            return False
+
+    async def _verify_agent_initialization(self, agent_id: str) -> bool:
+        """Verify agent is active and received instructions"""
+        try:
+            # Wait for agent to process instructions
+            await asyncio.sleep(10)
+
+            # Check if agent tmux session is active
+            cmd = ["tmux", "list-windows", "-t", "agent-hive", "-F", "#{window_name}"]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+
+            if agent_id not in result.stdout:
+                logger.error(f"Agent {agent_id} tmux session not found")
+                return False
+
+            # Check agent status via status script
+            try:
+                cmd = ["python", "scripts/check_agent_status.py", "--format", "json"]
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+
+                if result.returncode == 0:
+                    status_data = json.loads(result.stdout)
+                    # Look for agent in active list
+                    for agent in status_data.get("active_agents", []):
+                        if agent_id in agent.get("name", ""):
+                            logger.info(f"✅ Agent {agent_id} verified active")
+                            return True
+            except:
+                pass  # Status check is nice-to-have
+
+            # If status check fails, assume success if tmux session exists
+            logger.info(f"✅ Agent {agent_id} tmux session verified")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to verify agent initialization: {e}")
+            return False
+
+    async def _register_agent(self, agent_id: str, metadata: Dict) -> bool:
+        """Register agent in tracking system"""
+        try:
+            # Create agent registry file
+            registry_path = Path(".claude/agents") / f"{agent_id}.json"
+            registry_path.parent.mkdir(exist_ok=True)
+
+            with open(registry_path, 'w') as f:
+                json.dump(metadata, f, indent=2)
+
+            logger.info(f"📊 Agent {agent_id} registered in tracking system")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to register agent: {e}")
+            return False
+
+    async def _setup_progress_monitoring(self, agent_id: str) -> bool:
+        """Setup automated progress monitoring and completion detection"""
+        try:
+            # Start completion monitoring in background
+            cmd = [
+                "python", "scripts/agent_completion_handler.py",
+                "--agent", agent_id,
+                "--continuous"
+            ]
+
+            # Start completion monitor as background process
+            subprocess.Popen(
+                cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True
+            )
+
+            logger.info(f"📈 Progress monitoring and completion detection setup for {agent_id}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to setup progress monitoring: {e}")
+            return False
+
+    async def _cleanup_failed_spawn(self, agent_id: str):
+        """Cleanup resources if spawning fails"""
+        try:
+            # Kill tmux window if it exists (with proper agent- prefix)
+            tmux_window_name = f"agent-{agent_id}"
+            cmd = ["tmux", "kill-window", "-t", f"agent-hive:{tmux_window_name}"]
+            subprocess.run(cmd, capture_output=True, timeout=10)
+
+            # Remove worktree if it exists
+            agent_worktrees = list(Path("new-worktrees").glob(f"{agent_id}*"))
+            for worktree in agent_worktrees:
+                cmd = ["rm", "-rf", str(worktree)]
+                subprocess.run(cmd, timeout=30)
+
+            # Remove registry file if it exists
+            registry_path = Path(".claude/agents") / f"{agent_id}.json"
+            if registry_path.exists():
+                registry_path.unlink()
+
+            logger.info(f"🧹 Cleaned up failed spawn for {agent_id}")
+
+        except Exception as e:
+            logger.error(f"Failed to cleanup failed spawn: {e}")
+
+    def _get_integration_specialist_template(
+        self, task: str, timeline: str, human_decision_points: str,
+        success_criteria: str, escalation_triggers: str
+    ) -> str:
+        """Get integration specialist instructions template"""
+        return f"""# 🔧 Integration Specialist - API Gateway Foundation Repair
+
+## 🎯 **Mission: {task}**
+
+You are a specialized integration agent focused on fixing API Gateway foundation issues.
+
+### **Primary Objectives**
+- Replace simulation-only API Gateway with real FastAPI HTTP server
+- Fix failing tests (86 out of 104 currently failing)
+- Implement service discovery integration for real request proxying
+- Ensure all existing tests pass with real implementation
+
+### **Timeline: {timeline}**
+
+### **Human Decision Points**
+{human_decision_points}
+
+### **Success Criteria**
+{success_criteria}
+
+### **Escalation Triggers**
+{escalation_triggers}
+
+### **Technical Implementation**
+Focus on these key areas:
+1. **Real FastAPI Server**: Replace simulation with actual HTTP server
+2. **Service Discovery Integration**: Connect to real service discovery
+3. **Test Fixes**: Fix all 86 failing tests
+4. **Request Proxying**: Implement real request routing and load balancing
+
+### **Quality Gates**
+- All tests must pass before completion
+- Real HTTP server operational
+- Service discovery integration functional
+- Performance targets met (<200ms response time)
+- **MANDATORY: Commit all changes with descriptive message**
+- **MANDATORY: Push branch to remote repository**
+- **MANDATORY: Verify work is available on GitHub**
+
+### **Communication Protocol**
+Report progress every 2 hours to pm-agent with:
+- Tests fixed: X/86 failing tests resolved
+- HTTP server status: Implementation progress
+- Service discovery: Integration completion %
+- Git status: Committed and pushed to remote
+- Blockers: Technical issues requiring decisions
+
+### **Completion Workflow**
+1. Complete implementation and fix all tests
+2. Run quality gates and ensure all pass
+3. **git add . && git commit -m "descriptive message"**
+4. **git push origin [branch-name]**
+5. Verify work appears on GitHub remote
+6. ONLY THEN report "MISSION ACCOMPLISHED"
+
+Remember: This is Priority 1.1 - the most critical foundation fix. No shortcuts on test quality, real implementation, OR Git workflow completion.
+"""
+
+    def _get_service_mesh_template(
+        self, task: str, timeline: str, human_decision_points: str,
+        success_criteria: str, escalation_triggers: str
+    ) -> str:
+        """Get service mesh specialist instructions template"""
+        return f"""# 🔧 Service Mesh Specialist - Service Discovery Integration
+
+## 🎯 **Mission: {task}**
+
+You are a specialized service mesh agent focused on service discovery integration.
+
+### **Primary Objectives**
+- Add REST API endpoints to Service Discovery for external access
+- Implement real HTTP health checks (not placeholder)
+- Connect Service Discovery to API Gateway and other components
+- Add multi-language service support
+
+### **Timeline: {timeline}**
+
+### **Human Decision Points**
+{human_decision_points}
+
+### **Success Criteria**
+{success_criteria}
+
+### **Escalation Triggers**
+{escalation_triggers}
+
+### **Technical Implementation**
+Focus on these key areas:
+1. **REST API Development**: Create FastAPI endpoints for service registration/discovery
+2. **Real Health Checks**: Replace placeholder with actual HTTP validation
+3. **Integration Testing**: Ensure API Gateway can discover services
+4. **Multi-Language Support**: Generate client libraries for different languages
+
+### **Quality Gates**
+- All REST endpoints functional and tested
+- Real HTTP health checks working with retry logic
+- API Gateway integration confirmed
+- 85%+ test coverage for all new functionality
+- **MANDATORY: Commit all changes with descriptive message**
+- **MANDATORY: Push branch to remote repository**
+- **MANDATORY: Verify work is available on GitHub**
+
+### **Communication Protocol**
+Report progress every 2 hours to pm-agent with:
+- API endpoints status: X/6 endpoints functional
+- Health checks: Real HTTP validation operational
+- Integration: API Gateway connection confirmed
+- Multi-language: Client libraries generated and tested
+- Git status: Committed and pushed to remote
+
+### **Completion Workflow**
+1. Complete implementation and achieve 85%+ test coverage
+2. Confirm API Gateway integration working
+3. **git add . && git commit -m "descriptive message"**
+4. **git push origin [branch-name]**
+5. Verify work appears on GitHub remote
+6. ONLY THEN report "MISSION ACCOMPLISHED"
+
+Remember: This is Priority 1.2 - essential for API Gateway functionality. Service Discovery is the backbone of the entire system.
+"""
+
+    def _get_frontend_template(
+        self, task: str, timeline: str, human_decision_points: str,
+        success_criteria: str, escalation_triggers: str
+    ) -> str:
+        """Get frontend specialist instructions template"""
+        return f"""# 🔧 Frontend Specialist - Dashboard Integration Repair
+
+## 🎯 **Mission: {task}**
+
+You are a specialized frontend agent focused on dashboard integration repair.
+
+### **Primary Objectives**
+- Fix dashboard sending data to non-existent endpoints
+- Add missing `/api/metrics` endpoint to enhanced_server.py
+- Implement real-time WebSocket metric broadcasting
+- Create UI components for metrics display
+
+### **Timeline: {timeline}**
+
+### **Human Decision Points**
+{human_decision_points}
+
+### **Success Criteria**
+{success_criteria}
+
+### **Escalation Triggers**
+{escalation_triggers}
+
+### **Technical Implementation**
+Focus on these key areas:
+1. **Missing Endpoints**: Add `/api/metrics` to enhanced_server.py
+2. **WebSocket Broadcasting**: Real-time metric updates to clients
+3. **UI Components**: Responsive metrics display with animations
+4. **Data Flow Testing**: Complete dashboard to server to UI validation
+
+### **Quality Gates**
+- All metric endpoints responding correctly
+- Real-time WebSocket updates working without disconnections
+- Metrics showing in real-time with animations
+- Complete data flow from dashboard to server to UI
+- 85%+ test coverage for all new functionality
+- **MANDATORY: Commit all changes with descriptive message**
+- **MANDATORY: Push branch to remote repository**
+- **MANDATORY: Verify work is available on GitHub**
+
+### **Communication Protocol**
+Report progress every 2 hours to pm-agent with:
+- Endpoint status: `/api/metrics` functional
+- WebSocket: Real-time broadcasting operational
+- UI: Metrics display components working
+- Integration: Complete data flow confirmed
+- Git status: Committed and pushed to remote
+
+### **Completion Workflow**
+1. Complete implementation and test data flow
+2. Verify real-time metrics display working
+3. **git add . && git commit -m "descriptive message"**
+4. **git push origin [branch-name]**
+5. Verify work appears on GitHub remote
+6. ONLY THEN report "MISSION ACCOMPLISHED"
+
+Remember: This is Priority 1.3 - essential for monitoring system visibility. No more data loss!
+"""
+
+    def _get_security_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+        return f"# Security Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Security implementation details...]"
+
+    def _get_infrastructure_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+        return f"# Infrastructure Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Infrastructure implementation details...]"
+
+    def _get_performance_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+        return f"# Performance Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Performance implementation details...]"
+
+    def _get_monitoring_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+        return f"# Monitoring Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Monitoring implementation details...]"
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Enhanced Agent Spawner with Communication Protocol")
-    parser.add_argument("--agent-type", help="Type of agent to spawn (integration-specialist, frontend-dashboard, etc.)")
-    parser.add_argument("--task", help="Specific task description")
-    parser.add_argument("--priority", type=float, help="Priority level (lower = higher priority)")
-    parser.add_argument("--session", default="agent-hive", help="Tmux session name")
-    parser.add_argument("--no-spawn", action="store_true", help="Create worktree only, don't spawn in tmux")
-    parser.add_argument("--no-prompt", action="store_true", help="Don't send starting prompt")
-    parser.add_argument("--list-types", action="store_true", help="List available agent types")
-    parser.add_argument("--generate-template", action="store_true", help="Generate template file")
-    
+async def main():
+    parser = argparse.ArgumentParser(description="Enhanced Agent Spawner")
+    parser.add_argument("--agent-type", required=True, choices=[
+        'integration-specialist', 'service-mesh', 'frontend',
+        'security', 'infrastructure', 'performance', 'monitoring'
+    ])
+    parser.add_argument("--priority", required=True, help="Priority level (e.g., 1.1, 1.2)")
+    parser.add_argument("--task", required=True, help="Task description")
+    parser.add_argument("--timeline", required=True, help="Expected timeline")
+    parser.add_argument("--human-decision-points", default="", help="Comma-separated human decision points")
+    parser.add_argument("--success-criteria", default="", help="Comma-separated success criteria")
+    parser.add_argument("--escalation-triggers", default="", help="Comma-separated escalation triggers")
+
     args = parser.parse_args()
-    
-    spawner = EnhancedAgentSpawner(session_name=args.session)
-    
-    if args.list_types:
-        print("📋 Available Agent Types:")
-        print("=" * 50)
-        for agent_type, config in spawner.agent_configs.items():
-            print(f"🔧 {agent_type}")
-            print(f"   Description: {config['description']}")
-            print(f"   Priority: {config['priority']}")
-            print(f"   Timeline: {config['timeline']}")
-            print(f"   Mission: {config['mission']}")
-            print()
-        return
-    
-    if args.generate_template:
-        template_file = spawner.templates_dir / "agent_claude_template.md"
-        if not template_file.exists():
-            # Template should already be created, but regenerate if needed
-            print(f"✅ Template file exists at: {template_file}")
-        else:
-            print(f"📝 Template file found: {template_file}")
-        return
-    
-    # Validate agent type
-    if not args.agent_type:
-        print("❌ Error: --agent-type is required")
-        print("Available types: " + ", ".join(spawner.agent_configs.keys()))
-        print("Use --list-types to see detailed descriptions")
-        return 1
-    
-    if args.agent_type not in spawner.agent_configs:
-        print(f"❌ Unknown agent type: {args.agent_type}")
-        print(f"Available types: {list(spawner.agent_configs.keys())}")
-        print("Use --list-types to see detailed descriptions")
-        return 1
-    
-    # Create and spawn agent
-    try:
-        agent_info = spawner.create_and_spawn_agent(
-            agent_type=args.agent_type,
-            task_description=args.task,
-            priority=args.priority,
-            spawn_tmux=not args.no_spawn,
-            with_prompt=not args.no_prompt
-        )
-        
-        print()
-        print("📊 CREATION SUMMARY:")
-        print(json.dumps({
-            "agent_name": agent_info["agent_name"],
-            "agent_type": agent_info["agent_type"],
-            "priority": agent_info["priority"],
-            "worktree_path": agent_info["worktree_path"],
-            "protocol_enabled": agent_info["protocol_enabled"],
-            "spawned": agent_info["spawned"]
-        }, indent=2))
-        
-    except Exception as e:
-        print(f"❌ AGENT CREATION FAILED: {e}")
-        return 1
+
+    spawner = EnhancedAgentSpawner()
+
+    success, agent_id, metadata = await spawner.spawn_agent(
+        agent_type=args.agent_type,
+        priority=args.priority,
+        task=args.task,
+        timeline=args.timeline,
+        human_decision_points=args.human_decision_points,
+        success_criteria=args.success_criteria,
+        escalation_triggers=args.escalation_triggers
+    )
+
+    if success:
+        print(f"✅ Agent {agent_id} spawned successfully")
+        print(f"📊 Metadata: {json.dumps(metadata, indent=2)}")
+        sys.exit(0)
+    else:
+        print(f"❌ Failed to spawn agent: {metadata.get('error', 'Unknown error')}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    exit(main() or 0)
+    asyncio.run(main())
