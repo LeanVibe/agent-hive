@@ -28,18 +28,18 @@ class ConsistencyLevel(Enum):
 @dataclass
 class StateDistribution:
     """Defines how different state types are distributed across storage layers."""
-
+    
     # PostgreSQL - Persistent Storage
     postgresql_state: Dict[str, Any] = None
-
+    
     # Redis - Ephemeral Storage
     redis_cache: Dict[str, Any] = None
     redis_sessions: Dict[str, Any] = None
     redis_queues: Dict[str, Any] = None
-
+    
     # Distribution Strategy
     consistency_requirements: Dict[str, ConsistencyLevel] = None
-
+    
     def __post_init__(self):
         if self.postgresql_state is None:
             self.postgresql_state = {
@@ -64,7 +64,7 @@ class StateDistribution:
                     "tables": ["metrics", "performance_history"]
                 }
             }
-
+        
         if self.redis_cache is None:
             self.redis_cache = {
                 "agent_states": {
@@ -86,7 +86,7 @@ class StateDistribution:
                     "pattern": "coord:{operation_id}"
                 }
             }
-
+        
         if self.redis_queues is None:
             self.redis_queues = {
                 "task_queue": {
@@ -112,23 +112,23 @@ class StateDistribution:
 
 class StateManagerProtocol(Protocol):
     """Protocol defining the interface for distributed state managers."""
-
+    
     async def get_agent_state(self, agent_id: str) -> Optional[Dict[str, Any]]:
         """Get agent state with cache-first strategy."""
         ...
-
+    
     async def update_agent_state(self, agent_id: str, state: Dict[str, Any]) -> bool:
         """Update agent state with write-through caching."""
         ...
-
+    
     async def queue_task(self, task: Dict[str, Any]) -> str:
         """Queue task using Redis Streams."""
         ...
-
+    
     async def consume_tasks(self, consumer_group: str) -> List[Dict[str, Any]]:
         """Consume tasks from Redis Stream."""
         ...
-
+    
     async def create_checkpoint(self, checkpoint_data: Dict[str, Any]) -> str:
         """Create system checkpoint in PostgreSQL."""
         ...
@@ -137,11 +137,11 @@ class StateManagerProtocol(Protocol):
 @dataclass
 class MigrationStrategy:
     """Defines the migration strategy from SQLite to distributed architecture."""
-
+    
     phases: List[str] = None
     rollback_strategy: Dict[str, Any] = None
     performance_targets: Dict[str, float] = None
-
+    
     def __post_init__(self):
         if self.phases is None:
             self.phases = [
@@ -151,7 +151,7 @@ class MigrationStrategy:
                 "phase_4_write_migration",
                 "phase_5_sqlite_deprecation"
             ]
-
+        
         if self.performance_targets is None:
             self.performance_targets = {
                 "state_read_latency_ms": 10,     # < 10ms for cached reads
@@ -165,11 +165,11 @@ class MigrationStrategy:
 
 class DistributedStateArchitecture:
     """Main architecture coordinator for distributed state management."""
-
+    
     def __init__(self):
         self.distribution = StateDistribution()
         self.migration = MigrationStrategy()
-
+    
     def get_postgresql_schema(self) -> Dict[str, str]:
         """Returns optimized PostgreSQL schema definitions."""
         return {
@@ -185,12 +185,12 @@ class DistributedStateArchitecture:
                     created_at TIMESTAMPTZ DEFAULT NOW(),
                     updated_at TIMESTAMPTZ DEFAULT NOW()
                 );
-
+                
                 CREATE INDEX idx_agents_status ON agents(status);
                 CREATE INDEX idx_agents_last_activity ON agents(last_activity);
                 CREATE INDEX idx_agents_capabilities ON agents USING GIN(capabilities);
             """,
-
+            
             "tasks": """
                 CREATE TABLE tasks (
                     task_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -204,13 +204,13 @@ class DistributedStateArchitecture:
                     result JSONB,
                     updated_at TIMESTAMPTZ DEFAULT NOW()
                 );
-
+                
                 CREATE INDEX idx_tasks_status ON tasks(status);
                 CREATE INDEX idx_tasks_priority ON tasks(priority DESC);
                 CREATE INDEX idx_tasks_agent_id ON tasks(agent_id);
                 CREATE INDEX idx_tasks_created_at ON tasks(created_at);
             """,
-
+            
             "system_snapshots": """
                 CREATE TABLE system_snapshots (
                     id BIGSERIAL PRIMARY KEY,
@@ -224,11 +224,11 @@ class DistributedStateArchitecture:
                     quality_score DECIMAL(5,4) DEFAULT 0.0,
                     metadata JSONB DEFAULT '{}'
                 );
-
+                
                 CREATE INDEX idx_snapshots_timestamp ON system_snapshots(timestamp);
             """
         }
-
+    
     def get_redis_configuration(self) -> Dict[str, Any]:
         """Returns Redis configuration for different state types."""
         return {
@@ -244,7 +244,7 @@ class DistributedStateArchitecture:
                     "health_check_interval": 30
                 }
             },
-
+            
             "cache_strategies": {
                 "agent_states": {
                     "strategy": "write_through",
@@ -257,7 +257,7 @@ class DistributedStateArchitecture:
                     "batch_size": 100
                 }
             },
-
+            
             "stream_configuration": {
                 "task_queue": {
                     "maxlen": 10000,
@@ -271,7 +271,7 @@ class DistributedStateArchitecture:
                 }
             }
         }
-
+    
     def get_migration_phases(self) -> Dict[str, Dict[str, Any]]:
         """Returns detailed migration phase definitions."""
         return {
@@ -291,10 +291,10 @@ class DistributedStateArchitecture:
                     "Performance benchmarks baseline"
                 ]
             },
-
+            
             "phase_2_dual_write_mode": {
                 "description": "Implement dual-write to both SQLite and new systems",
-                "duration_estimate": "4-6 hours",
+                "duration_estimate": "4-6 hours", 
                 "tasks": [
                     "Create database abstraction layer",
                     "Implement dual-write logic",
@@ -307,7 +307,7 @@ class DistributedStateArchitecture:
                     "Rollback procedures tested"
                 ]
             },
-
+            
             "phase_3_read_migration": {
                 "description": "Migrate read operations to new systems",
                 "duration_estimate": "2-3 hours",
@@ -323,7 +323,7 @@ class DistributedStateArchitecture:
                     "No data inconsistencies"
                 ]
             },
-
+            
             "phase_4_write_migration": {
                 "description": "Migrate write operations to new systems",
                 "duration_estimate": "3-4 hours",
@@ -340,7 +340,7 @@ class DistributedStateArchitecture:
                     "Concurrent agent support > 100"
                 ]
             },
-
+            
             "phase_5_sqlite_deprecation": {
                 "description": "Remove SQLite dependencies and cleanup",
                 "duration_estimate": "1-2 hours",

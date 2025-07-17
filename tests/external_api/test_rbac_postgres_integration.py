@@ -18,7 +18,7 @@ import os
 # Import Security Agent's database models
 import sys
 sys.path.append('../security-Jul-17-0944')
-from external_api.database_models import (
+from external_api.rbac_database_models import (
     Base, User, Role, PermissionModel, ResourceType, ActionType, PermissionScope,
     setup_default_rbac, create_default_roles, create_default_permissions
 )
