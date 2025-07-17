@@ -60,17 +60,17 @@ class MessageHeaders:
     expiration: Optional[datetime] = None
     retries: int = 0
     max_retries: int = 3
-    
+
     def __post_init__(self):
         if self.timestamp is None:
             self.timestamp = datetime.now()
 
 
-@dataclass 
+@dataclass
 class Message:
     """
     Production message structure for agent communication.
-    
+
     Provides reliable, traceable message passing with acknowledgment support.
     """
     type: MessageType
@@ -81,7 +81,7 @@ class Message:
     target_agent: Optional[str] = None
     target_group: Optional[str] = None
     status: MessageStatus = MessageStatus.PENDING
-    
+
     def __post_init__(self):
         """Initialize message with defaults."""
         if not isinstance(self.type, MessageType):
@@ -90,9 +90,9 @@ class Message:
             self.priority = MessagePriority(self.priority)
         if not isinstance(self.status, MessageStatus):
             self.status = MessageStatus(self.status)
-    
+
     @classmethod
-    def create(cls, 
+    def create(cls,
                message_type: Union[MessageType, str],
                payload: Dict[str, Any],
                source_agent: str = "system",
@@ -105,7 +105,7 @@ class Message:
                expiration_seconds: Optional[int] = None) -> "Message":
         """
         Create a new message with automatic header generation.
-        
+
         Args:
             message_type: Type of message
             payload: Message payload data
@@ -117,16 +117,16 @@ class Message:
             reply_to: Reply-to queue name
             routing_key: Message routing key
             expiration_seconds: Message expiration in seconds
-            
+
         Returns:
             New message instance
         """
         message_id = str(uuid.uuid4())
-        
+
         expiration = None
         if expiration_seconds:
             expiration = datetime.now() + timedelta(seconds=expiration_seconds)
-        
+
         headers = MessageHeaders(
             message_id=message_id,
             correlation_id=correlation_id,
@@ -134,12 +134,12 @@ class Message:
             routing_key=routing_key,
             expiration=expiration
         )
-        
+
         if isinstance(message_type, str):
             message_type = MessageType(message_type)
         if isinstance(priority, int):
             priority = MessagePriority(priority)
-        
+
         return cls(
             type=message_type,
             payload=payload,
@@ -149,7 +149,7 @@ class Message:
             target_agent=target_agent,
             target_group=target_group
         )
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Serialize message to dictionary."""
         return {
@@ -173,7 +173,7 @@ class Message:
             "target_group": self.target_group,
             "status": self.status.value
         }
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Message":
         """Deserialize message from dictionary."""
@@ -190,7 +190,7 @@ class Message:
             retries=headers_data.get("retries", 0),
             max_retries=headers_data.get("max_retries", 3)
         )
-        
+
         return cls(
             type=MessageType(data["type"]),
             payload=data["payload"],
@@ -201,28 +201,28 @@ class Message:
             target_group=data.get("target_group"),
             status=MessageStatus(data.get("status", "pending"))
         )
-    
+
     def to_json(self) -> str:
         """Serialize message to JSON string."""
         return json.dumps(self.to_dict(), default=str)
-    
+
     @classmethod
     def from_json(cls, json_str: str) -> "Message":
         """Deserialize message from JSON string."""
         return cls.from_dict(json.loads(json_str))
-    
+
     def is_expired(self) -> bool:
         """Check if message has expired."""
         if not self.headers.expiration:
             return False
         return datetime.now() > self.headers.expiration
-    
+
     def should_retry(self) -> bool:
         """Check if message should be retried."""
-        return (self.status == MessageStatus.FAILED and 
+        return (self.status == MessageStatus.FAILED and
                 self.headers.retries < self.headers.max_retries and
                 not self.is_expired())
-    
+
     def increment_retry(self) -> None:
         """Increment retry count."""
         self.headers.retries += 1
@@ -230,16 +230,16 @@ class Message:
             self.status = MessageStatus.DEAD_LETTER
         else:
             self.status = MessageStatus.RETRY
-    
-    def create_reply(self, payload: Dict[str, Any], 
+
+    def create_reply(self, payload: Dict[str, Any],
                     message_type: MessageType = MessageType.RPC_RESPONSE) -> "Message":
         """
         Create a reply message.
-        
+
         Args:
             payload: Reply payload
             message_type: Reply message type
-            
+
         Returns:
             Reply message
         """
@@ -251,7 +251,7 @@ class Message:
             correlation_id=self.headers.message_id,
             routing_key=self.headers.reply_to or "replies"
         )
-    
+
     def __str__(self) -> str:
         """String representation of message."""
         target = self.target_agent or self.target_group or "broadcast"
@@ -260,7 +260,7 @@ class Message:
 
 # Predefined message factory functions for common use cases
 
-def create_task_assignment(task_id: str, description: str, agent: str, 
+def create_task_assignment(task_id: str, description: str, agent: str,
                           skills: List[str], confidence_threshold: float = 0.75) -> Message:
     """Create a task assignment message."""
     return Message.create(
@@ -295,7 +295,7 @@ def create_agent_heartbeat(agent_name: str, status: str, current_task: Optional[
     )
 
 
-def create_webhook_notification(event_type: str, data: Dict[str, Any], 
+def create_webhook_notification(event_type: str, data: Dict[str, Any],
                                priority: MessagePriority = MessagePriority.NORMAL) -> Message:
     """Create a webhook notification message."""
     return Message.create(
@@ -311,7 +311,7 @@ def create_webhook_notification(event_type: str, data: Dict[str, Any],
     )
 
 
-def create_system_command(command: str, args: Dict[str, Any], 
+def create_system_command(command: str, args: Dict[str, Any],
                          target_agent: Optional[str] = None) -> Message:
     """Create a system command message."""
     return Message.create(

@@ -12,7 +12,7 @@ from .rollback import RollbackManager, SafetyCheckpoint
 
 __all__ = [
     "TmuxMessageBridge",
-    "DualModeOperator", 
+    "DualModeOperator",
     "MigrationManager",
     "MigrationStrategy",
     "MigrationValidator",

@@ -1,0 +1,114 @@
+{
+  "checkpoint_id": "pre_migration_service-mesh-Jul-16-1221_1752661560",
+  "timestamp": "2025-07-16T13:26:00.680137",
+  "agent_states": {
+    "integration-specialist-Jul-16-1220": {
+      "mode": "tmux",
+      "tmux_available": true,
+      "message_bus_status": null,
+      "capabilities": [
+        "python",
+        "testing",
+        "fastapi",
+        "integration"
+      ],
+      "capture_time": "2025-07-16T13:26:00.674778"
+    },
+    "service-mesh-Jul-16-1221": {
+      "mode": "tmux",
+      "tmux_available": true,
+      "message_bus_status": null,
+      "capabilities": [
+        "microservices",
+        "kubernetes",
+        "performance",
+        "networking"
+      ],
+      "capture_time": "2025-07-16T13:26:00.674800"
+    },
+    "frontend-Jul-16-1222": {
+      "mode": "tmux",
+      "tmux_available": true,
+      "message_bus_status": null,
+      "capabilities": [
+        "react",
+        "typescript",
+        "ui/ux",
+        "frontend"
+      ],
+      "capture_time": "2025-07-16T13:26:00.674802"
+    },
+    "pm-new": {
+      "mode": "tmux",
+      "tmux_available": false,
+      "message_bus_status": null,
+      "capabilities": [
+        "general"
+      ],
+      "capture_time": "2025-07-16T13:26:00.674805"
+    },
+    "integration-specialist-Jul-16-1247": {
+      "mode": "tmux",
+      "tmux_available": true,
+      "message_bus_status": null,
+      "capabilities": [
+        "python",
+        "testing",
+        "fastapi",
+        "integration"
+      ],
+      "capture_time": "2025-07-16T13:26:00.674806"
+    },
+    "infrastructure-Jul-16-1300": {
+      "mode": "tmux",
+      "tmux_available": true,
+      "message_bus_status": null,
+      "capabilities": [
+        "general"
+      ],
+      "capture_time": "2025-07-16T13:26:00.674807"
+    },
+    "performance-Jul-16-1301": {
+      "mode": "tmux",
+      "tmux_available": true,
+      "message_bus_status": null,
+      "capabilities": [
+        "general"
+      ],
+      "capture_time": "2025-07-16T13:26:00.674809"
+    }
+  },
+  "migration_phase": "pre_migration",
+  "bridge_config": {
+    "migration_status": {
+      "tmux_agents": "{'integration-specialist-Jul-16-1220', 'integration-specialist-Jul-16-1247', 'performance-Jul-16-1301', 'pm-new', 'infrastructure-Jul-16-1300', 'service-mesh-Jul-16-1221', 'frontend-Jul-16-1222'}",
+      "hybrid_agents": "set()",
+      "message_bus_agents": "set()",
+      "failed_agents": "set()"
+    },
+    "stats": {
+      "tmux_messages": 1,
+      "message_bus_messages": 0,
+      "bridge_messages": 0,
+      "failed_messages": 0
+    },
+    "config": {},
+    "running": true,
+    "message_bus_available": false
+  },
+  "system_state": {
+    "timestamp": "2025-07-16T13:26:00.674825",
+    "working_directory": "/Users/bogdan/work/leanvibe-dev/agent-hive/new-worktrees/integration-specialist-Jul-16-1247",
+    "environment_variables": {},
+    "tmux_sessions": [
+      "agent-hive",
+      "dot",
+      "hive",
+      "incubator",
+      "vibe"
+    ]
+  },
+  "rollback_instructions": [
+    "Restore tmux connectivity for pm-new"
+  ]
+}

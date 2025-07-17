@@ -35,10 +35,10 @@ __all__ = [
     "ContextCompressor",
     "QualityValidator",
     "CompressionLevel",
-    
+
     # Global Instance
     "persona_manager",
-    
+
     # Convenience Functions
     "activate_persona",
     "switch_persona",
