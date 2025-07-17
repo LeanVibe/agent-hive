@@ -5958,3 +5958,134 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-17 08:51:48 INFO     advanced_orchestration.multi_agent_coordinator                                Load rebalancing completed
 2025-07-17 08:51:48 INFO     advanced_orchestration.multi_agent_coordinator                                Task ba391abc-93fd-4b63-b0a0-6f2adc48eda8 reassigned from failed agent agent-1
 2025-07-17 08:51:48 INFO     advanced_orchestration.multi_agent_coordinator                                Task 3b58347b-fb5b-4838-a88a-b68ea00415dd reassigned from failed agent agent-1
+2025-07-17 09:52:56 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created role: test-role
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Updated role: test-role
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Deleted role: test-role
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Updated user: test-user
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Deleted user: test-user
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created role: parent-role
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: user1
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: user2
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created role: custom-role
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: user1
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: user2
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: user1
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: user2
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 INFO     external_api.rbac_middleware                                Authorization granted: test-user -> service:read
+2025-07-17 09:52:56 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 WARNING  external_api.rbac_middleware                                Authorization denied: anonymous -> api_endpoint:read - Authentication failed: Invalid credentials
+2025-07-17 09:52:56 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 WARNING  external_api.rbac_middleware                                Authorization denied: test-user -> service:create - Insufficient permissions
+2025-07-17 09:52:56 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 INFO     external_api.rbac_middleware                                Authorization granted: test-user -> service:read
+2025-07-17 09:52:56 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:52:56 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:52:56 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:52:56 INFO     external_api.rbac_middleware                                Authorization granted: test-user -> service:read
+2025-07-17 09:52:56 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:52:56 ERROR    external_api.rbac_middleware                                Error calculating audit stats: object Mock can't be used in 'await' expression
+2025-07-17 09:54:00 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 09:54:06 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created role: test-role
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Updated role: test-role
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Deleted role: test-role
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Updated user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Deleted user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created role: parent-role
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created role: child-role
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: user1
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: user2
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created role: custom-role
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: user1
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: user2
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: user1
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: user2
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 INFO     external_api.rbac_middleware                                Authorization granted: test-user -> service:read
+2025-07-17 09:54:06 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 WARNING  external_api.rbac_middleware                                Authorization denied: anonymous -> api_endpoint:read - Authentication failed: Invalid credentials
+2025-07-17 09:54:06 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 INFO     external_api.rbac_middleware                                Authorization granted: test-user -> service:deploy
+2025-07-17 09:54:06 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 INFO     external_api.rbac_middleware                                Authorization granted: test-user -> service:read
+2025-07-17 09:54:06 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Initialized system roles with hierarchy
+2025-07-17 09:54:06 INFO     external_api.rbac_framework                                Created user: test-user
+2025-07-17 09:54:06 ERROR    external_api.permission_manager                                Error deserializing cache data: a bytes-like object is required, not 'Mock'
+2025-07-17 09:54:06 INFO     external_api.rbac_middleware                                Authorization granted: test-user -> service:read
+2025-07-17 09:54:06 ERROR    external_api.rbac_middleware                                Error storing audit log in Redis: object Mock can't be used in 'await' expression
+2025-07-17 09:54:06 ERROR    external_api.rbac_middleware                                Error calculating audit stats: object Mock can't be used in 'await' expression
