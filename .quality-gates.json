@@ -1,7 +1,7 @@
 {
-  "agent_name": "integration-specialist",
+  "agent_name": "monitoring",
   "task_description": "main",
-  "created_at": "2025-07-17T09:46:27.951792",
+  "created_at": "2025-07-17T09:46:52.055503",
   "quality_gates": {
     "max_pr_size": 500,
     "required_tests": true,
