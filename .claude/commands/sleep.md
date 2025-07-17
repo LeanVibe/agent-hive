@@ -1,5 +1,7 @@
 # /sleep - Memory Consolidation Command
 
+**Canonical system:** Automatic/manual memory system (see scripts/memory_*, .claude/memory/)
+
 Consolidates current context into persistent memory for knowledge preservation across context boundaries.
 
 ## Usage

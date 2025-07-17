@@ -17,7 +17,7 @@ import uuid
 
 from .automated_coordination_orchestrator import CoordinationPhase, CoordinationStatus
 from .component_workflow import ComponentWorkflowManager, ComponentStatus
-from ..feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
+from advanced_orchestration.feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
 
 
 class CheckpointType(Enum):

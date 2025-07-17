@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+CANONICAL: This is the canonical script for PR conflict resolution and sequential merge automation. Use this for all PR conflict and rebase workflows.
+
 PR Resolution Monitor
 
 Monitors PR conflict resolution progress and automatically coordinates
@@ -13,17 +15,26 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Optional
 
+
 class PRResolutionMonitor:
     """Monitors and coordinates PR conflict resolution"""
 
     def __init__(self):
         self.target_prs = [
-            {"number": 29, "agent": "documentation-agent", "title": "Documentation ecosystem"},
-            {"number": 30, "agent": "intelligence-agent", "title": "Intelligence framework"},
+            {
+                "number": 29,
+                "agent": "documentation-agent",
+                "title": "Documentation ecosystem",
+            },
+            {
+                "number": 30,
+                "agent": "intelligence-agent",
+                "title": "Intelligence framework",
+            },
             {"number": 31, "agent": "integration-agent", "title": "Auth middleware"},
             {"number": 35, "agent": "unknown", "title": "API Gateway"},
             {"number": 36, "agent": "unknown", "title": "Service Discovery"},
-            {"number": 38, "agent": "unknown", "title": "Monitoring System"}
+            {"number": 38, "agent": "unknown", "title": "Monitoring System"},
         ]
 
         self.current_pr_index = 0
@@ -33,10 +44,17 @@ class PRResolutionMonitor:
     def get_pr_status(self) -> List[Dict]:
         """Get current PR status"""
         try:
-            result = subprocess.run([
-                "gh", "pr", "list", "--json",
-                "number,title,mergeable,reviewDecision,headRefName,additions"
-            ], capture_output=True, text=True)
+            result = subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "list",
+                    "--json",
+                    "number,title,mergeable,reviewDecision,headRefName,additions",
+                ],
+                capture_output=True,
+                text=True,
+            )
 
             if result.returncode == 0:
                 return json.loads(result.stdout)
@@ -61,9 +79,11 @@ class PRResolutionMonitor:
         try:
             print(f"🚀 Attempting to merge PR #{pr_number}...")
 
-            result = subprocess.run([
-                "gh", "pr", "merge", str(pr_number), "--squash"
-            ], capture_output=True, text=True)
+            result = subprocess.run(
+                ["gh", "pr", "merge", str(pr_number), "--squash"],
+                capture_output=True,
+                text=True,
+            )
 
             if result.returncode == 0:
                 print(f"✅ Successfully merged PR #{pr_number}")
@@ -118,10 +138,17 @@ The previous PR has been resolved. Time to resolve your conflicts!
 Please start immediately and report progress!"""
 
         try:
-            subprocess.run([
-                "python", "scripts/send_agent_message.py",
-                "--agent", agent_name, "--message", message
-            ], check=True)
+            subprocess.run(
+                [
+                    "python",
+                    "scripts/send_agent_message.py",
+                    "--agent",
+                    agent_name,
+                    "--message",
+                    message,
+                ],
+                check=True,
+            )
 
             print(f"✅ Signaled {agent_name} to start rebase for PR #{pr_number}")
 
@@ -136,7 +163,7 @@ Please start immediately and report progress!"""
             31: "feature/auth-middleware-component",
             35: "feature/api-gateway-component",
             36: "feature/service-discovery-component",
-            38: "feature/monitoring-system-component"
+            38: "feature/monitoring-system-component",
         }
         return branch_mapping.get(pr_number, "unknown")
 
@@ -153,14 +180,16 @@ Please start immediately and report progress!"""
 
         try:
             # Remove worktree
-            subprocess.run([
-                "git", "worktree", "remove", worktree_path, "--force"
-            ], capture_output=True)
+            subprocess.run(
+                ["git", "worktree", "remove", worktree_path, "--force"],
+                capture_output=True,
+            )
 
             # Kill tmux session
-            subprocess.run([
-                "tmux", "kill-window", "-t", f"agent-hive:{agent_name}"
-            ], capture_output=True)
+            subprocess.run(
+                ["tmux", "kill-window", "-t", f"agent-hive:{agent_name}"],
+                capture_output=True,
+            )
 
             print(f"🧹 Cleaned up {agent_name} worktree and despawned agent")
 
@@ -231,6 +260,7 @@ Please start immediately and report progress!"""
             print("🎉 ALL PRS SUCCESSFULLY MERGED!")
         else:
             print("⚠️  Some PRs still need attention")
+
 
 if __name__ == "__main__":
     monitor = PRResolutionMonitor()

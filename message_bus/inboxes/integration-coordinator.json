@@ -1,0 +1,10 @@
+[
+  {
+    "timestamp": "2025-07-17T15:09:35.381113",
+    "from": "COORDINATOR",
+    "type": "protocol_update",
+    "priority": "high",
+    "content": "\ud83d\udd04 NEW COMMUNICATION PROTOCOL ACTIVE:\n\nSTRUCTURE:\n- Central Hub: agent-pm-coordinator\n- Hub-and-Spoke Model: All communication flows through PM\n- No direct agent-to-agent communication\n\nYOUR ACTIONS REQUIRED:\n1. Acknowledge this protocol change\n2. Send status update to PM coordinator immediately  \n3. Use message bus for all future PM communication\n4. Report progress every 15 minutes to PM\n\nCRITICAL: Old delegation chains discontinued. PM coordinator is your new authority.\n\nSend acknowledgment and current status to PM coordinator now.",
+    "id": "protocol_update_150935"
+  }
+]

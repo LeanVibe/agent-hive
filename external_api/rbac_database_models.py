@@ -7,7 +7,7 @@ with ResourceType/ActionType granular permissions, hierarchical roles, and permi
 
 import uuid
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Dict, Any, Set
 
 from sqlalchemy import (
@@ -23,7 +23,9 @@ import enum
 # Import Security Agent's base models
 import sys
 sys.path.append('../security-Jul-17-0944')
-from external_api.database_models import Base, User as SecurityUser, Role as SecurityRole, PermissionModel, AuditLog
+# Removed circular import - define Base locally
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
 
 # Import our RBAC enums
 from .rbac_framework import ResourceType, ActionType, PermissionScope
@@ -89,6 +91,13 @@ enhanced_role_permissions = Table(
     Column('permission_id', UUID(as_uuid=True), ForeignKey('enhanced_permissions.id'), primary_key=True)
 )
 
+user_roles = Table(
+    'user_roles',
+    Base.metadata,
+    Column('user_id', UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True),
+    Column('role_id', UUID(as_uuid=True), ForeignKey('enhanced_roles.id'), primary_key=True)
+)
+
 
 class EnhancedRole(Base):
     """Enhanced Role model with hierarchy support."""
@@ -113,10 +122,14 @@ class EnhancedRole(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    enhanced_metadata = Column(JSON, nullable=True)
+    role_metadata = Column(JSON, nullable=True)
+    
+    # Compatibility fields for RBAC manager
+    parent_role_names = Column(JSON, nullable=True, default=list)
+    child_role_names = Column(JSON, nullable=True, default=list)
     
     # Relationships
-    users = relationship("User", secondary="user_roles", back_populates="roles")
+    users = relationship("SecurityUser", secondary="user_roles", back_populates="roles")
     permissions = relationship("EnhancedPermission", secondary=enhanced_role_permissions, back_populates="roles")
     
     # Hierarchy relationships
@@ -177,6 +190,14 @@ class EnhancedRole(Base):
             self.hierarchy_path = best_path
             self.hierarchy_level = min_level + 1
     
+    def add_child_role(self, child_role_name: str) -> None:
+        """Add a child role name to the list."""
+        if self.child_role_names is None:
+            self.child_role_names = []
+        if child_role_name not in self.child_role_names:
+            self.child_role_names.append(child_role_name)
+    
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -190,7 +211,7 @@ class EnhancedRole(Base):
             'hierarchy_path': self.hierarchy_path,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.enhanced_metadata or {}
+            'metadata': self.role_metadata or {}
         }
 
 
@@ -222,11 +243,11 @@ class EnhancedPermission(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    enhanced_metadata = Column(JSON, nullable=True)
+    role_metadata = Column(JSON, nullable=True)
     
     # Relationships
     roles = relationship("EnhancedRole", secondary=enhanced_role_permissions, back_populates="permissions")
-    users = relationship("User", secondary=user_direct_permissions, back_populates="direct_permissions")
+    users = relationship("SecurityUser", secondary=user_direct_permissions, back_populates="direct_permissions")
     
     # Indexes
     __table_args__ = (
@@ -245,7 +266,7 @@ class EnhancedPermission(Base):
     
     def is_valid(self) -> bool:
         """Check if permission is still valid."""
-        if self.expires_at and datetime.utcnow() > self.expires_at:
+        if self.expires_at and datetime.now(timezone.utc) > self.expires_at:
             return False
         return True
     
@@ -292,7 +313,7 @@ class EnhancedPermission(Base):
             'expires_at': self.expires_at.isoformat() if self.expires_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.enhanced_metadata or {}
+            'metadata': self.role_metadata or {}
         }
     
     @classmethod
@@ -324,7 +345,7 @@ class PermissionCache(Base):
     hit_count = Column(Integer, default=0)
     
     # Relationships
-    user = relationship("User")
+    user = relationship("SecurityUser")
     
     # Indexes
     __table_args__ = (
@@ -338,13 +359,89 @@ class PermissionCache(Base):
     
     def is_expired(self) -> bool:
         """Check if cache entry is expired."""
-        return datetime.utcnow() > self.expires_at
+        return datetime.now(timezone.utc) > self.expires_at
 
 
-# AuditLog is imported from database_models.py to avoid duplication
+class AuditLog(Base):
+    """Audit log for authorization decisions."""
+    
+    __tablename__ = 'audit_logs'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
+    
+    # Request details
+    resource_type = Column(SQLEnum(ResourceTypeEnum), nullable=False)
+    action = Column(SQLEnum(ActionTypeEnum), nullable=False)
+    resource_id = Column(String(100), nullable=True)
+    
+    # Authorization result
+    authorized = Column(Boolean, nullable=False)
+    reason = Column(Text, nullable=True)
+    permissions_used = Column(JSON, nullable=True)
+    
+    # Context information
+    client_ip = Column(String(45), nullable=True)
+    user_agent = Column(Text, nullable=True)
+    request_context = Column(JSON, nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relationships
+    user = relationship("SecurityUser")
+    
+    # Indexes
+    __table_args__ = (
+        Index('idx_audit_logs_user_id', 'user_id'),
+        Index('idx_audit_logs_resource_type', 'resource_type'),
+        Index('idx_audit_logs_action', 'action'),
+        Index('idx_audit_logs_authorized', 'authorized'),
+        Index('idx_audit_logs_created_at', 'created_at'),
+        Index('idx_audit_logs_composite', 'user_id', 'resource_type', 'action', 'created_at'),
+    )
+    
+    def __repr__(self):
+        return f"<AuditLog(id={self.id}, user_id={self.user_id}, authorized={self.authorized})>"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id),
+            'resource_type': self.resource_type.value,
+            'action': self.action.value,
+            'resource_id': self.resource_id,
+            'authorized': self.authorized,
+            'reason': self.reason,
+            'permissions_used': self.permissions_used or [],
+            'client_ip': self.client_ip,
+            'user_agent': self.user_agent,
+            'request_context': self.request_context or {},
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
 
 
-# Extend the User model with additional relationships
+# Create SecurityUser model if not already imported
+class SecurityUser(Base):
+    """Security User model for RBAC integration."""
+    
+    __tablename__ = 'users'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    username = Column(String(100), unique=True, nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=True)
+    full_name = Column(String(255), nullable=True)
+    profile_data = Column(JSON, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationships
+    roles = relationship("EnhancedRole", secondary=user_roles, back_populates="users")
+
+# Extend the SecurityUser model with additional relationships
 SecurityUser.direct_permissions = relationship(
     "EnhancedPermission", 
     secondary=user_direct_permissions, 
@@ -354,8 +451,27 @@ SecurityUser.direct_permissions = relationship(
 SecurityUser.enhanced_roles = relationship(
     "EnhancedRole", 
     secondary="user_roles", 
-    back_populates="users"
+    back_populates="users",
+    overlaps="roles"
 )
+
+# Aliases for compatibility
+User = SecurityUser
+Role = EnhancedRole
+PermissionModel = EnhancedPermission
+
+# Compatibility functions
+def setup_default_rbac(session: Session) -> None:
+    """Setup default RBAC - alias for setup_enhanced_rbac."""
+    setup_enhanced_rbac(session)
+
+def create_default_roles(session: Session) -> None:
+    """Create default roles - alias for create_enhanced_system_roles."""
+    create_enhanced_system_roles(session)
+
+def create_default_permissions(session: Session) -> None:
+    """Create default permissions - alias for create_enhanced_system_permissions."""
+    create_enhanced_system_permissions(session)
 
 
 # Database utility functions
@@ -559,7 +675,7 @@ def setup_enhanced_rbac(session: Session) -> None:
 def cleanup_expired_cache(session: Session) -> int:
     """Clean up expired cache entries."""
     expired_count = session.query(PermissionCache).filter(
-        PermissionCache.expires_at < datetime.utcnow()
+        PermissionCache.expires_at < datetime.now(timezone.utc)
     ).delete()
     
     session.commit()
@@ -568,7 +684,7 @@ def cleanup_expired_cache(session: Session) -> int:
 
 def cleanup_old_audit_logs(session: Session, days: int = 90) -> int:
     """Clean up old audit logs."""
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
     
     deleted_count = session.query(AuditLog).filter(
         AuditLog.created_at < cutoff_date

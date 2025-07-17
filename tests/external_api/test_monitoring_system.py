@@ -48,7 +48,6 @@ class TestMonitoringSystem:
             component="test"
         )
 
-    @pytest.mark.asyncio
     async def test_monitoring_system_initialization(self, monitoring_system, monitoring_config):
         """Test monitoring system initialization."""
         assert monitoring_system.config == monitoring_config
@@ -65,7 +64,6 @@ class TestMonitoringSystem:
         assert "High Memory Usage" in monitoring_system.alert_rules
         assert "Low Disk Space" in monitoring_system.alert_rules
 
-    @pytest.mark.asyncio
     async def test_start_stop_monitoring(self, monitoring_system):
         """Test starting and stopping monitoring system."""
         # Test start
@@ -87,7 +85,6 @@ class TestMonitoringSystem:
         await monitoring_system.stop()  # Should not raise error
         assert monitoring_system._running is False
 
-    @pytest.mark.asyncio
     async def test_record_metric_basic(self, monitoring_system):
         """Test basic metric recording."""
         monitoring_system.record_metric("test.metric", 42.0, MetricType.GAUGE)
@@ -101,7 +98,6 @@ class TestMonitoringSystem:
         assert metric.metric_type == MetricType.GAUGE
         assert isinstance(metric.timestamp, datetime)
 
-    @pytest.mark.asyncio
     async def test_record_metric_with_tags(self, monitoring_system):
         """Test metric recording with tags."""
         tags = {"service": "test", "environment": "dev"}
@@ -110,7 +106,6 @@ class TestMonitoringSystem:
         metric = monitoring_system.metrics["test.metric"][0]
         assert metric.tags == tags
 
-    @pytest.mark.asyncio
     async def test_increment_counter(self, monitoring_system):
         """Test counter increment functionality."""
         monitoring_system.increment_counter("test.counter")
@@ -121,7 +116,6 @@ class TestMonitoringSystem:
         assert monitoring_system.metrics["test.counter"][1].value == 5
         assert monitoring_system.metrics["test.counter"][0].metric_type == MetricType.COUNTER
 
-    @pytest.mark.asyncio
     async def test_set_gauge(self, monitoring_system):
         """Test gauge setting functionality."""
         monitoring_system.set_gauge("test.gauge", 50.0)
@@ -130,7 +124,6 @@ class TestMonitoringSystem:
         assert monitoring_system.metrics["test.gauge"][0].value == 50.0
         assert monitoring_system.metrics["test.gauge"][0].metric_type == MetricType.GAUGE
 
-    @pytest.mark.asyncio
     async def test_record_timer(self, monitoring_system):
         """Test timer recording functionality."""
         monitoring_system.record_timer("test.timer", 150.5)
@@ -139,7 +132,6 @@ class TestMonitoringSystem:
         assert monitoring_system.metrics["test.timer"][0].value == 150.5
         assert monitoring_system.metrics["test.timer"][0].metric_type == MetricType.TIMER
 
-    @pytest.mark.asyncio
     async def test_add_remove_alert_rule(self, monitoring_system, sample_alert_rule):
         """Test adding and removing alert rules."""
         # Add rule
@@ -156,7 +148,6 @@ class TestMonitoringSystem:
         result = monitoring_system.remove_alert_rule("non-existent")
         assert result is False
 
-    @pytest.mark.asyncio
     async def test_add_alert_handler(self, monitoring_system):
         """Test adding alert handlers."""
         handler_called = []
@@ -167,7 +158,6 @@ class TestMonitoringSystem:
         monitoring_system.add_alert_handler(test_handler)
         assert len(monitoring_system.alert_handlers) > 0
 
-    @pytest.mark.asyncio
     async def test_get_metrics_no_filter(self, monitoring_system):
         """Test getting metrics without filters."""
         # Record some metrics
@@ -181,7 +171,6 @@ class TestMonitoringSystem:
         assert metrics[1].value == 20.0
         assert metrics[2].value == 30.0
 
-    @pytest.mark.asyncio
     async def test_get_metrics_with_time_filter(self, monitoring_system):
         """Test getting metrics with time filters."""
         now = datetime.now()
@@ -199,13 +188,11 @@ class TestMonitoringSystem:
         metrics = monitoring_system.get_metrics("test.metric", start_time=future_time)
         assert len(metrics) == 0
 
-    @pytest.mark.asyncio
     async def test_get_metrics_nonexistent(self, monitoring_system):
         """Test getting metrics for non-existent metric."""
         metrics = monitoring_system.get_metrics("nonexistent.metric")
         assert metrics == []
 
-    @pytest.mark.asyncio
     async def test_get_metric_summary(self, monitoring_system):
         """Test getting metric summary statistics."""
         # Record test metrics
@@ -220,7 +207,6 @@ class TestMonitoringSystem:
         assert summary["max"] == 30.0
         assert summary["latest"] == 30.0
 
-    @pytest.mark.asyncio
     async def test_get_metric_summary_empty(self, monitoring_system):
         """Test getting summary for non-existent metric."""
         summary = monitoring_system.get_metric_summary("nonexistent.metric")
@@ -229,7 +215,6 @@ class TestMonitoringSystem:
         assert summary["min"] == 0
         assert summary["max"] == 0
 
-    @pytest.mark.asyncio
     async def test_alert_creation_and_resolution(self, monitoring_system, sample_alert_rule):
         """Test alert creation and resolution."""
         # Add alert rule
@@ -252,13 +237,11 @@ class TestMonitoringSystem:
             assert result is True
             assert monitoring_system.alerts[alert_id].resolved is True
 
-    @pytest.mark.asyncio
     async def test_resolve_nonexistent_alert(self, monitoring_system):
         """Test resolving non-existent alert."""
         result = monitoring_system.resolve_alert("nonexistent-alert")
         assert result is False
 
-    @pytest.mark.asyncio
     async def test_update_component_health(self, monitoring_system):
         """Test updating component health."""
         health_data = {
@@ -280,7 +263,6 @@ class TestMonitoringSystem:
         assert "test-service.health" in monitoring_system.metrics
         assert "test-service.response_time" in monitoring_system.metrics
 
-    @pytest.mark.asyncio
     async def test_get_component_health_all(self, monitoring_system):
         """Test getting health for all components."""
         monitoring_system.update_component_health("service1", {"healthy": True})
@@ -292,7 +274,6 @@ class TestMonitoringSystem:
         assert all_health["service1"]["healthy"] is True
         assert all_health["service2"]["healthy"] is False
 
-    @pytest.mark.asyncio
     async def test_get_component_health_nonexistent(self, monitoring_system):
         """Test getting health for non-existent component."""
         health = monitoring_system.get_component_health("nonexistent")
@@ -301,7 +282,6 @@ class TestMonitoringSystem:
     @patch('psutil.cpu_percent')
     @patch('psutil.virtual_memory')
     @patch('psutil.disk_usage')
-    @pytest.mark.asyncio
     async def test_get_system_metrics(self, mock_disk, mock_memory, mock_cpu, monitoring_system):
         """Test getting system metrics."""
         # Mock psutil responses
@@ -320,7 +300,6 @@ class TestMonitoringSystem:
         assert "disk_total_gb" in metrics
 
     @patch('psutil.cpu_percent')
-    @pytest.mark.asyncio
     async def test_get_system_metrics_error(self, mock_cpu, monitoring_system):
         """Test system metrics error handling."""
         mock_cpu.side_effect = Exception("Test error")
@@ -328,7 +307,6 @@ class TestMonitoringSystem:
         metrics = monitoring_system.get_system_metrics()
         assert metrics == {}
 
-    @pytest.mark.asyncio
     async def test_export_metrics_json(self, monitoring_system):
         """Test exporting metrics in JSON format."""
         # Record some test data
@@ -345,7 +323,6 @@ class TestMonitoringSystem:
         assert "test.metric" in data["metrics"]
         assert "test-service" in data["component_health"]
 
-    @pytest.mark.asyncio
     async def test_export_metrics_prometheus(self, monitoring_system):
         """Test exporting metrics in Prometheus format."""
         monitoring_system.record_metric("test.metric", 42.0)
@@ -357,13 +334,11 @@ class TestMonitoringSystem:
         assert "test_metric 42.0" in lines
         assert "another_metric 100.0" in lines
 
-    @pytest.mark.asyncio
     async def test_export_metrics_invalid_format(self, monitoring_system):
         """Test exporting metrics with invalid format."""
         with pytest.raises(ValueError, match="Unsupported export format"):
             monitoring_system.export_metrics("invalid")
 
-    @pytest.mark.asyncio
     async def test_metric_data_to_dict(self):
         """Test MetricData to_dict method."""
         metric = MetricData(
@@ -381,7 +356,6 @@ class TestMonitoringSystem:
         assert data["tags"] == {"tag1": "value1"}
         assert "timestamp" in data
 
-    @pytest.mark.asyncio
     async def test_alert_to_dict(self):
         """Test Alert to_dict method."""
         alert = Alert(
@@ -408,7 +382,6 @@ class TestMonitoringSystem:
         assert data["resolved"] is False
         assert "timestamp" in data
 
-    @pytest.mark.asyncio
     async def test_alert_rule_dataclass(self):
         """Test AlertRule dataclass functionality."""
         rule = AlertRule(
@@ -429,7 +402,6 @@ class TestMonitoringSystem:
         assert rule.enabled is True
         assert rule.cooldown_minutes == 5
 
-    @pytest.mark.asyncio
     async def test_metric_type_enum(self):
         """Test MetricType enum values."""
         assert MetricType.COUNTER.value == "counter"
@@ -437,7 +409,6 @@ class TestMonitoringSystem:
         assert MetricType.HISTOGRAM.value == "histogram"
         assert MetricType.TIMER.value == "timer"
 
-    @pytest.mark.asyncio
     async def test_alert_severity_enum(self):
         """Test AlertSeverity enum values."""
         assert AlertSeverity.CRITICAL.value == "critical"
@@ -446,7 +417,6 @@ class TestMonitoringSystem:
         assert AlertSeverity.LOW.value == "low"
         assert AlertSeverity.INFO.value == "info"
 
-    @pytest.mark.asyncio
     async def test_concurrent_metric_recording(self, monitoring_system):
         """Test concurrent metric recording."""
         async def record_metrics(prefix, count):
@@ -467,7 +437,6 @@ class TestMonitoringSystem:
         assert len(monitoring_system.metrics["test2.metric"]) == 15
         assert len(monitoring_system.metrics["test3.metric"]) == 20
 
-    @pytest.mark.asyncio
     async def test_metrics_cleanup(self, monitoring_system):
         """Test metrics cleanup functionality."""
         # Set very short retention

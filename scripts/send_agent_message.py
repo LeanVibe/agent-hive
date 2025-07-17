@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+CANONICAL: This is the canonical script for agent-to-agent communication. Use this for all agent messaging workflows. Only use fixed_agent_communication.py if window naming is inconsistent.
+
 Inter-Agent Communication Tool
 
 Reliable message sending between agents that automatically submits without manual Enter.
@@ -14,7 +16,10 @@ from pathlib import Path
 # Add dashboard logging
 sys.path.append(str(Path(__file__).parent.parent))
 
-def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = True) -> bool:
+
+def send_message_to_agent(
+    agent_name: str, message: str, auto_submit: bool = True
+) -> bool:
     """
     Send a message to an agent with automatic submission.
 
@@ -33,7 +38,10 @@ def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = Tru
     # Log the message
     try:
         from dashboard.prompt_logger import prompt_logger
-        prompt_logger.log_prompt(f"to-{agent_name}", message, "Inter-agent message sent", True)
+
+        prompt_logger.log_prompt(
+            f"to-{agent_name}", message, "Inter-agent message sent", True
+        )
     except ImportError:
         pass  # Continue without logging if dashboard not available
 
@@ -42,25 +50,28 @@ def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = Tru
         print(f"📡 Sending message to {agent_name}...")
 
         # Set the message in tmux buffer
-        result = subprocess.run([
-            "tmux", "set-buffer", message
-        ], capture_output=True, text=True)
+        result = subprocess.run(
+            ["tmux", "set-buffer", message], capture_output=True, text=True
+        )
 
         if result.returncode != 0:
             print(f"❌ Failed to set buffer: {result.stderr}")
             return False
 
         # Clear any existing input first
-        subprocess.run([
-            "tmux", "send-keys", "-t", f"{session_name}:{window_name}", "C-c"
-        ], capture_output=True)
+        subprocess.run(
+            ["tmux", "send-keys", "-t", f"{session_name}:{window_name}", "C-c"],
+            capture_output=True,
+        )
 
         time.sleep(0.5)  # Brief pause to ensure clear
 
         # Paste the buffer content
-        result = subprocess.run([
-            "tmux", "paste-buffer", "-t", f"{session_name}:{window_name}"
-        ], capture_output=True, text=True)
+        result = subprocess.run(
+            ["tmux", "paste-buffer", "-t", f"{session_name}:{window_name}"],
+            capture_output=True,
+            text=True,
+        )
 
         if result.returncode != 0:
             print(f"❌ Failed to paste buffer: {result.stderr}")
@@ -69,9 +80,10 @@ def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = Tru
         # Auto-submit if requested
         if auto_submit:
             time.sleep(0.2)  # Brief pause before Enter
-            subprocess.run([
-                "tmux", "send-keys", "-t", f"{session_name}:{window_name}", "Enter"
-            ], capture_output=True)
+            subprocess.run(
+                ["tmux", "send-keys", "-t", f"{session_name}:{window_name}", "Enter"],
+                capture_output=True,
+            )
 
         print(f"✅ Message sent to {agent_name}")
         return True
@@ -79,6 +91,7 @@ def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = Tru
     except Exception as e:
         print(f"❌ Error sending message to {agent_name}: {e}")
         return False
+
 
 def send_message_chunked(agent_name: str, message: str, chunk_size: int = 200) -> bool:
     """
@@ -92,20 +105,23 @@ def send_message_chunked(agent_name: str, message: str, chunk_size: int = 200) -
 
     try:
         # Clear any existing input
-        subprocess.run([
-            "tmux", "send-keys", "-t", f"{session_name}:{window_name}", "C-c"
-        ], capture_output=True)
+        subprocess.run(
+            ["tmux", "send-keys", "-t", f"{session_name}:{window_name}", "C-c"],
+            capture_output=True,
+        )
 
         time.sleep(0.5)
 
         # Send message in chunks
         for i in range(0, len(message), chunk_size):
-            chunk = message[i:i + chunk_size]
+            chunk = message[i : i + chunk_size]
 
             # Send chunk without Enter
-            result = subprocess.run([
-                "tmux", "send-keys", "-t", f"{session_name}:{window_name}", chunk
-            ], capture_output=True, text=True)
+            result = subprocess.run(
+                ["tmux", "send-keys", "-t", f"{session_name}:{window_name}", chunk],
+                capture_output=True,
+                text=True,
+            )
 
             if result.returncode != 0:
                 print(f"❌ Failed to send chunk: {result.stderr}")
@@ -114,9 +130,10 @@ def send_message_chunked(agent_name: str, message: str, chunk_size: int = 200) -
             time.sleep(0.1)  # Brief pause between chunks
 
         # Send final Enter
-        subprocess.run([
-            "tmux", "send-keys", "-t", f"{session_name}:{window_name}", "Enter"
-        ], capture_output=True)
+        subprocess.run(
+            ["tmux", "send-keys", "-t", f"{session_name}:{window_name}", "Enter"],
+            capture_output=True,
+        )
 
         print(f"✅ Chunked message sent to {agent_name}")
         return True
@@ -124,6 +141,7 @@ def send_message_chunked(agent_name: str, message: str, chunk_size: int = 200) -
     except Exception as e:
         print(f"❌ Error sending chunked message: {e}")
         return False
+
 
 def ping_all_agents_improved():
     """Ping all agents with improved message delivery"""
@@ -134,7 +152,7 @@ def ping_all_agents_improved():
         "pm-agent",
         "intelligence-agent",
         "integration-agent",
-        "quality-agent"
+        "quality-agent",
     ]
 
     improved_message = """🚨 RESUME WORK - AUTO SUBMIT FIXED
@@ -161,6 +179,7 @@ Your message sending should now work automatically. Continue with your current t
     print(f"\n📊 Results: {success_count}/{len(agents)} agents contacted successfully")
     print("✅ All agents should now receive messages automatically")
 
+
 def test_message_methods(agent_name: str, test_message: str):
     """Test different message sending methods"""
 
@@ -183,10 +202,17 @@ def test_message_methods(agent_name: str, test_message: str):
     print("3. Testing direct send-keys...")
     escaped_message = test_message.replace('"', '\\"').replace("'", "\\'")
     try:
-        subprocess.run([
-            "tmux", "send-keys", "-t", f"agent-hive:agent-{agent_name}",
-            f"TEST 3 - Direct: {escaped_message}", "Enter"
-        ], check=True)
+        subprocess.run(
+            [
+                "tmux",
+                "send-keys",
+                "-t",
+                f"agent-hive:agent-{agent_name}",
+                f"TEST 3 - Direct: {escaped_message}",
+                "Enter",
+            ],
+            check=True,
+        )
         success3 = True
         print("✅ Direct method succeeded")
     except Exception as e:
@@ -198,15 +224,26 @@ def test_message_methods(agent_name: str, test_message: str):
     print(f"  Chunked: {'✅' if success2 else '❌'}")
     print(f"  Direct: {'✅' if success3 else '❌'}")
 
+
 def main():
     """Main CLI interface"""
 
     parser = argparse.ArgumentParser(description="Send messages to agents reliably")
     parser.add_argument("--agent", help="Agent name to send message to")
     parser.add_argument("--message", help="Message to send")
-    parser.add_argument("--ping-all", action="store_true", help="Ping all agents with improved communication")
-    parser.add_argument("--test", help="Test different message methods with specified agent")
-    parser.add_argument("--no-auto-submit", action="store_true", help="Don't automatically submit with Enter")
+    parser.add_argument(
+        "--ping-all",
+        action="store_true",
+        help="Ping all agents with improved communication",
+    )
+    parser.add_argument(
+        "--test", help="Test different message methods with specified agent"
+    )
+    parser.add_argument(
+        "--no-auto-submit",
+        action="store_true",
+        help="Don't automatically submit with Enter",
+    )
 
     args = parser.parse_args()
 
@@ -225,6 +262,7 @@ def main():
         print(f"  python {sys.argv[0]} --ping-all")
         print(f"  python {sys.argv[0]} --agent documentation-agent --message 'Hello!'")
         print(f"  python {sys.argv[0]} --test documentation-agent")
+
 
 if __name__ == "__main__":
     main()

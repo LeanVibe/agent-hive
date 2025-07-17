@@ -3,6 +3,8 @@ category: orchestration
 description: Orchestrate a workflow with validation and XP practices
 ---
 
+**Canonical script:** scripts/agent_manager.py, orchestrator
+
 /orchestrate --workflow "feature-dev" --validate
 
 1. Analyze requirements with evidence (cite metrics/docs).
@@ -12,4 +14,7 @@ description: Orchestrate a workflow with validation and XP practices
 5. Monitor progress with auto-checkpoints.
 6. Validate outputs via Gemini.
 
+**Note:** For health checks, debugging, and optimization, use `/monitor` with the appropriate options.
+
 $ARGUMENTS
+
