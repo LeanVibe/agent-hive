@@ -374,11 +374,23 @@ class ApiGateway:
 
                 # Update API key usage
                 if self.config.auth_required:
-                    self._update_api_key_usage(request.headers.get(self.config.api_key_header))
+                    # Look for API key in headers (case-insensitive)
+                    api_key = None
+                    for header_name, header_value in request.headers.items():
+                        if header_name.lower() == self.config.api_key_header.lower():
+                            api_key = header_value
+                            break
+                    api_key = api_key or request.headers.get(self.config.api_key_header)
+                    self._update_api_key_usage(api_key)
 
+                # Merge response headers with custom headers from handler
+                response_headers = self._get_response_headers()
+                if "headers" in result:
+                    response_headers.update(result["headers"])
+                
                 response = ApiResponse(
                     status_code=result.get("status_code", 200),
-                    headers=self._get_response_headers(),
+                    headers=response_headers,
                     body=result.get("body"),
                     timestamp=datetime.now(),
                     processing_time=(time.time() - start_time) * 1000,
@@ -417,7 +429,16 @@ class ApiGateway:
         Returns:
             Authentication result
         """
-        api_key = request.headers.get(self.config.api_key_header)
+        # Look for API key in headers (case-insensitive)
+        api_key = None
+        for header_name, header_value in request.headers.items():
+            if header_name.lower() == self.config.api_key_header.lower():
+                api_key = header_value
+                break
+        
+        # Fallback to exact match
+        if not api_key:
+            api_key = request.headers.get(self.config.api_key_header)
 
         if not api_key:
             return {
@@ -455,8 +476,14 @@ class ApiGateway:
         Returns:
             Rate limit check result
         """
-        # Use API key or client IP for rate limiting
-        rate_limit_key = request.headers.get(self.config.api_key_header, request.client_ip)
+        # Use API key or client IP for rate limiting (case-insensitive header lookup)
+        api_key = None
+        for header_name, header_value in request.headers.items():
+            if header_name.lower() == self.config.api_key_header.lower():
+                api_key = header_value
+                break
+        
+        rate_limit_key = api_key or request.headers.get(self.config.api_key_header, request.client_ip)
 
         current_time = time.time()
         window_start = current_time - self.config.rate_limit_window
@@ -521,9 +548,14 @@ class ApiGateway:
         best_length = 0
 
         for prefix, service_name in self.service_routes.items():
-            if path.startswith(prefix) and len(prefix) > best_length:
+            # Remove API prefix from the registered prefix if present
+            check_prefix = prefix
+            if check_prefix.startswith(self.config.api_prefix):
+                check_prefix = check_prefix[len(self.config.api_prefix):]
+            
+            if path.startswith(check_prefix) and len(check_prefix) > best_length:
                 best_match = service_name
-                best_length = len(prefix)
+                best_length = len(check_prefix)
 
         return best_match
 

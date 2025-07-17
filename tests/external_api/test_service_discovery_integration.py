@@ -490,6 +490,7 @@ class TestServiceDiscoveryIntegration:
                 headers={"Content-Type": "application/json"},
                 query_params={},
                 body=None,
+                timestamp=datetime.now(),
                 client_ip="127.0.0.1"
             )
 
