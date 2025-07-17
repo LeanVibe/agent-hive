@@ -36,7 +36,7 @@ class WebhookConfig:
     max_payload_size: int = 1048576  # 1MB
     rate_limit_requests: int = 100
     rate_limit_window: int = 60  # seconds
-    
+
     def __post_init__(self):
         """Validate configuration parameters."""
         if not 1 <= self.port <= 65535:
@@ -47,7 +47,7 @@ class WebhookConfig:
             raise ValueError(f"Max payload size must be positive, got {self.max_payload_size}")
 
 
-@dataclass 
+@dataclass
 class ApiGatewayConfig:
     """Configuration for API gateway."""
     host: str = "localhost"
@@ -60,7 +60,7 @@ class ApiGatewayConfig:
     auth_required: bool = False
     api_key_header: str = "X-API-Key"
     request_timeout: int = 30
-    
+
     def __post_init__(self):
         """Validate configuration parameters."""
         if not 1 <= self.port <= 65535:
@@ -80,7 +80,7 @@ class EventStreamConfig:
     compression_enabled: bool = True
     batch_size: int = 100
     event_ttl: int = 86400  # 24 hours
-    
+
     def __post_init__(self):
         """Validate configuration parameters."""
         if self.buffer_size <= 0:
@@ -102,7 +102,7 @@ class WebhookEvent:
     priority: EventPriority = EventPriority.MEDIUM
     retry_count: int = 0
     max_retries: int = 3
-    
+
     def __post_init__(self):
         """Validate event data."""
         if not self.event_id:
@@ -122,10 +122,10 @@ class ApiRequest:
     timestamp: datetime
     request_id: str
     client_ip: str
-    
+
     def __post_init__(self):
         """Validate request data."""
-        if self.method not in ["GET", "POST", "PUT", "DELETE", "PATCH"]:
+        if self.method not in ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]:
             raise ValueError(f"Invalid HTTP method: {self.method}")
         if not self.request_id:
             raise ValueError("Request ID cannot be empty")
@@ -141,7 +141,7 @@ class StreamEvent:
     partition_key: str
     priority: EventPriority = EventPriority.MEDIUM
     tags: Dict[str, str] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         """Validate stream event data."""
         if not self.event_id:
@@ -164,7 +164,7 @@ class WebhookDelivery:
     response_code: Optional[int] = None
     response_body: Optional[str] = None
     error_message: Optional[str] = None
-    
+
     def __post_init__(self):
         """Validate delivery data."""
         if not self.webhook_id:
@@ -184,7 +184,7 @@ class ApiResponse:
     timestamp: datetime
     processing_time: float  # milliseconds
     request_id: str
-    
+
     def __post_init__(self):
         """Validate response data."""
         if not 100 <= self.status_code <= 599:
