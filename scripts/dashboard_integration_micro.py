@@ -27,13 +27,13 @@ class DashboardMetric:
 
 class DashboardIntegrationMicro:
     """Micro-component for enhanced dashboard integration only."""
-    
-    def __init__(self, dashboard_url: str = "http://localhost:8002", 
+
+    def __init__(self, dashboard_url: str = "http://localhost:8002",
                  db_path: str = "dashboard_micro.db"):
         self.dashboard_url = dashboard_url
         self.db_path = db_path
         self.init_database()
-    
+
     def init_database(self):
         """Initialize minimal database for dashboard integration."""
         with sqlite3.connect(self.db_path) as conn:
@@ -48,7 +48,7 @@ class DashboardIntegrationMicro:
                 )
             """)
             conn.commit()
-    
+
     def push_xp_compliance_metric(self, compliance_score: float) -> bool:
         """Push XP compliance metric to dashboard - core functionality."""
         metric = DashboardMetric(
@@ -58,13 +58,13 @@ class DashboardIntegrationMicro:
             status=self._get_compliance_status(compliance_score),
             timestamp=datetime.now().isoformat()
         )
-        
+
         # Save locally first
         self.save_metric(metric)
-        
+
         # Try to push to dashboard
         return self._push_to_dashboard(metric)
-    
+
     def push_pr_size_metric(self, pr_number: int, line_count: int) -> bool:
         """Push PR size metric to dashboard - core functionality."""
         metric = DashboardMetric(
@@ -74,10 +74,10 @@ class DashboardIntegrationMicro:
             status=self._get_pr_size_status(line_count),
             timestamp=datetime.now().isoformat()
         )
-        
+
         self.save_metric(metric)
         return self._push_to_dashboard(metric)
-    
+
     def push_velocity_metric(self, velocity: float) -> bool:
         """Push velocity metric to dashboard - core functionality."""
         metric = DashboardMetric(
@@ -87,10 +87,10 @@ class DashboardIntegrationMicro:
             status=self._get_velocity_status(velocity),
             timestamp=datetime.now().isoformat()
         )
-        
+
         self.save_metric(metric)
         return self._push_to_dashboard(metric)
-    
+
     def get_dashboard_status(self) -> Dict:
         """Get dashboard connection status - core functionality."""
         try:
@@ -103,13 +103,13 @@ class DashboardIntegrationMicro:
                 }
         except Exception as e:
             pass
-        
+
         return {
             "status": "disconnected",
             "dashboard_url": self.dashboard_url,
             "error": "Dashboard not available"
         }
-    
+
     def get_recent_metrics(self, limit: int = 10) -> List[DashboardMetric]:
         """Get recent metrics - core functionality."""
         with sqlite3.connect(self.db_path) as conn:
@@ -120,9 +120,9 @@ class DashboardIntegrationMicro:
                 ORDER BY timestamp DESC
                 LIMIT ?
             """, (limit,))
-            
+
             return [DashboardMetric(*row) for row in cursor.fetchall()]
-    
+
     def retry_failed_pushes(self) -> int:
         """Retry pushing failed metrics to dashboard."""
         with sqlite3.connect(self.db_path) as conn:
@@ -134,16 +134,16 @@ class DashboardIntegrationMicro:
                 ORDER BY timestamp ASC
                 LIMIT 50
             """)
-            
+
             failed_metrics = [DashboardMetric(*row) for row in cursor.fetchall()]
             successful_pushes = 0
-            
+
             for metric in failed_metrics:
                 if self._push_to_dashboard(metric):
                     successful_pushes += 1
-            
+
             return successful_pushes
-    
+
     def save_metric(self, metric: DashboardMetric):
         """Save metric to local database."""
         with sqlite3.connect(self.db_path) as conn:
@@ -156,7 +156,7 @@ class DashboardIntegrationMicro:
                 metric.status, metric.timestamp
             ))
             conn.commit()
-    
+
     def _push_to_dashboard(self, metric: DashboardMetric) -> bool:
         """Push single metric to dashboard API."""
         try:
@@ -168,33 +168,33 @@ class DashboardIntegrationMicro:
                 "timestamp": metric.timestamp,
                 "source": "pm_xp_enforcer"
             }
-            
+
             response = requests.post(
                 f"{self.dashboard_url}/api/metrics",
                 json=payload,
                 timeout=10
             )
-            
+
             if response.status_code in [200, 201]:
                 self._mark_as_sent(metric.metric_id)
                 return True
-            
+
         except Exception:
             # Fail silently - metric saved locally for retry
             pass
-        
+
         return False
-    
+
     def _mark_as_sent(self, metric_id: str):
         """Mark metric as successfully sent to dashboard."""
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
-                UPDATE dashboard_metrics 
-                SET sent_to_dashboard = TRUE 
+                UPDATE dashboard_metrics
+                SET sent_to_dashboard = TRUE
                 WHERE metric_id = ?
             """, (metric_id,))
             conn.commit()
-    
+
     def _get_compliance_status(self, score: float) -> str:
         """Get XP compliance status based on score."""
         if score >= 80:
@@ -203,7 +203,7 @@ class DashboardIntegrationMicro:
             return "warning"
         else:
             return "violation"
-    
+
     def _get_pr_size_status(self, line_count: int) -> str:
         """Get PR size status based on XP limits."""
         if line_count <= 500:
@@ -212,7 +212,7 @@ class DashboardIntegrationMicro:
             return "warning"
         else:
             return "violation"
-    
+
     def _get_velocity_status(self, velocity: float) -> str:
         """Get velocity status based on targets."""
         if velocity >= 8.0:
@@ -226,7 +226,7 @@ class DashboardIntegrationMicro:
 def main():
     """CLI interface for dashboard integration micro-component."""
     import sys
-    
+
     if len(sys.argv) < 2:
         print("Dashboard Integration Micro-Component")
         print("Commands:")
@@ -237,10 +237,10 @@ def main():
         print("  metrics [limit]                  - Show recent metrics")
         print("  retry                            - Retry failed pushes")
         return
-    
+
     dashboard = DashboardIntegrationMicro()
     command = sys.argv[1]
-    
+
     if command == "status":
         status = dashboard.get_dashboard_status()
         print(f"Dashboard Status: {status['status']}")
@@ -249,47 +249,47 @@ def main():
             print(f"Response Time: {status['response_time_ms']:.1f}ms")
         elif 'error' in status:
             print(f"Error: {status['error']}")
-    
+
     elif command == "push-xp":
         if len(sys.argv) < 3:
             print("Usage: push-xp <score>")
             return
-        
+
         score = float(sys.argv[2])
         success = dashboard.push_xp_compliance_metric(score)
         print(f"{'✅' if success else '❌'} XP compliance metric: {score}%")
-    
+
     elif command == "push-pr":
         if len(sys.argv) < 4:
             print("Usage: push-pr <pr_number> <lines>")
             return
-        
+
         pr_number = int(sys.argv[2])
         lines = int(sys.argv[3])
         success = dashboard.push_pr_size_metric(pr_number, lines)
         print(f"{'✅' if success else '❌'} PR size metric: PR #{pr_number} ({lines} lines)")
-    
+
     elif command == "push-velocity":
         if len(sys.argv) < 3:
             print("Usage: push-velocity <velocity>")
             return
-        
+
         velocity = float(sys.argv[2])
         success = dashboard.push_velocity_metric(velocity)
         print(f"{'✅' if success else '❌'} Velocity metric: {velocity} points/person")
-    
+
     elif command == "metrics":
         limit = int(sys.argv[2]) if len(sys.argv) > 2 else 10
         metrics = dashboard.get_recent_metrics(limit)
-        
+
         print(f"Recent Dashboard Metrics (last {limit}):")
         for metric in metrics:
             print(f"  {metric.metric_type}: {metric.value} [{metric.status}] - {metric.timestamp}")
-    
+
     elif command == "retry":
         pushed = dashboard.retry_failed_pushes()
         print(f"✅ Retried failed pushes: {pushed} metrics sent")
-    
+
     else:
         print(f"Unknown command: {command}")
 

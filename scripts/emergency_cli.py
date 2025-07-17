@@ -28,10 +28,10 @@ def main():
         print("Full usage:")
         print("  python scripts/emergency_complete.py --help")
         return
-    
+
     command = sys.argv[1]
     args = sys.argv[2:] if len(sys.argv) > 2 else []
-    
+
     # Preset commands for common emergency scenarios
     emergency_commands = {
         "emergency-complete": [
@@ -40,7 +40,7 @@ def main():
             "--force"
         ],
         "emergency-force": [
-            "python", "scripts/emergency_complete.py", 
+            "python", "scripts/emergency_complete.py",
             "--template-type", "emergency",
             "--force", "--emergency"
         ],
@@ -50,12 +50,12 @@ def main():
             "--force"
         ]
     }
-    
+
     if command in emergency_commands:
         cmd = emergency_commands[command]
         if args:
             cmd.extend(["--task"] + args)
-        
+
         print(f"🚨 Executing: {' '.join(cmd)}")
         result = subprocess.run(cmd)
         sys.exit(result.returncode)
