@@ -7,7 +7,7 @@ class UnifiedDashboard:
 
     def __init__(self):
         print("Initializing UnifiedDashboard...")
-        
+
     def render_status(self):
         """Single comprehensive view - Phase 0 placeholder"""
         print("Rendering dashboard status...")
@@ -35,7 +35,7 @@ class UnifiedDashboard:
                 "confidence": 0.9,
             }
         ]
-        
+
     def get_performance_snapshot(self):
         """Performance metrics - Phase 0 placeholder"""
         print("Getting performance snapshot...")
@@ -44,12 +44,12 @@ class UnifiedDashboard:
             "average_confidence": 0.8,
             "success_rate": 1.0
         }
-        
+
     def get_critical_alerts(self):
         """Critical alerts - Phase 0 placeholder"""
         print("Getting critical alerts...")
         return []  # No alerts in Phase 0
-        
+
     def get_system_health(self):
         """System health - Phase 0 placeholder"""
         print("Getting system health...")

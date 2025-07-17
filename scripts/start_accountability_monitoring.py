@@ -30,11 +30,11 @@ logger = logging.getLogger(__name__)
 
 class AccountabilityLauncher:
     """Launcher for accountability monitoring system."""
-    
+
     def __init__(self):
         self.framework = AccountabilityFramework()
         self.running = False
-    
+
     async def start(self):
         """Start accountability monitoring."""
         try:
@@ -46,31 +46,31 @@ class AccountabilityLauncher:
             print("   - Max reassignments: 2 per task")
             print("   - Monitoring interval: 60 seconds")
             print()
-            
+
             await self.framework.start_monitoring()
             self.running = True
-            
+
             print("✅ Accountability monitoring active")
             print("📊 Use Ctrl+C to stop monitoring")
             print()
-            
+
             # Keep running until interrupted
             while self.running:
                 await asyncio.sleep(60)
-                
+
                 # Generate periodic status report
                 report = await self.framework.generate_accountability_report()
                 if report["summary"]["total_tasks"] > 0:
                     print(f"📈 Status: {report['summary']['completed_tasks']}/{report['summary']['total_tasks']} tasks completed "
                           f"({report['summary']['completion_rate']}% success rate)")
-                
+
         except KeyboardInterrupt:
             print("\n🛑 Stopping accountability monitoring...")
             await self.stop()
         except Exception as e:
             logger.error(f"Accountability monitoring error: {e}")
             await self.stop()
-    
+
     async def stop(self):
         """Stop accountability monitoring."""
         if self.framework.monitoring_active:
@@ -89,6 +89,6 @@ if __name__ == "__main__":
     # Handle shutdown signals
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    
+
     launcher = AccountabilityLauncher()
     asyncio.run(launcher.start())

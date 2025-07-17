@@ -88,13 +88,13 @@ class DashboardData:
 
 class AnalyticsDashboard:
     """Advanced analytics dashboard for multi-agent orchestration."""
-    
+
     def __init__(self, performance_monitor: PerformanceMonitor):
         self.logger = logging.getLogger(__name__)
         self.performance_monitor = performance_monitor
         self.cache = {}
         self.cache_ttl = 30  # seconds
-        
+
         # Dashboard configuration
         self.metric_colors = {
             "excellent": "#28a745",
@@ -102,7 +102,7 @@ class AnalyticsDashboard:
             "warning": "#ffc107",
             "critical": "#dc3545"
         }
-        
+
         # Insight templates
         self.insight_templates = {
             "agent_imbalance": {
@@ -127,37 +127,37 @@ class AnalyticsDashboard:
                 "category": "performance"
             }
         }
-        
+
         self.logger.info("AnalyticsDashboard initialized")
-    
-    async def generate_dashboard_data(self, view_type: DashboardView, 
+
+    async def generate_dashboard_data(self, view_type: DashboardView,
                                     time_range: Optional[Tuple[datetime, datetime]] = None) -> DashboardData:
         """Generate comprehensive dashboard data."""
         if not time_range:
             end_time = datetime.now()
             start_time = end_time - timedelta(hours=24)
             time_range = (start_time, end_time)
-        
+
         cache_key = f"{view_type.value}_{time_range[0].timestamp()}_{time_range[1].timestamp()}"
-        
+
         # Check cache
         if cache_key in self.cache:
             cached_data, cached_time = self.cache[cache_key]
             if (datetime.now() - cached_time).total_seconds() < self.cache_ttl:
                 return cached_data
-        
+
         # Generate fresh data
         dashboard_data = await self._generate_fresh_dashboard_data(view_type, time_range)
-        
+
         # Cache the result
         self.cache[cache_key] = (dashboard_data, datetime.now())
-        
+
         return dashboard_data
-    
-    async def _generate_fresh_dashboard_data(self, view_type: DashboardView, 
+
+    async def _generate_fresh_dashboard_data(self, view_type: DashboardView,
                                            time_range: Tuple[datetime, datetime]) -> DashboardData:
         """Generate fresh dashboard data."""
-        
+
         # Get base metrics
         metrics = await self._generate_metrics(view_type, time_range)
         alerts = await self._generate_alerts(view_type, time_range)
@@ -166,7 +166,7 @@ class AnalyticsDashboard:
         workflow_status = await self._generate_workflow_status(time_range)
         system_health = await self._generate_system_health(time_range)
         performance_summary = await self._generate_performance_summary(time_range)
-        
+
         return DashboardData(
             view_type=view_type,
             generated_at=datetime.now(),
@@ -179,12 +179,12 @@ class AnalyticsDashboard:
             system_health=system_health,
             performance_summary=performance_summary
         )
-    
-    async def _generate_metrics(self, view_type: DashboardView, 
+
+    async def _generate_metrics(self, view_type: DashboardView,
                               time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate dashboard metrics based on view type."""
         metrics = []
-        
+
         if view_type == DashboardView.OVERVIEW:
             metrics.extend(await self._generate_overview_metrics(time_range))
         elif view_type == DashboardView.REAL_TIME:
@@ -197,16 +197,16 @@ class AnalyticsDashboard:
             metrics.extend(await self._generate_system_health_metrics(time_range))
         elif view_type == DashboardView.OPTIMIZATION:
             metrics.extend(await self._generate_optimization_metrics(time_range))
-        
+
         return metrics
-    
+
     async def _generate_overview_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate overview dashboard metrics."""
         metrics = []
-        
+
         # System-wide coordination efficiency
         real_time_data = self.performance_monitor.get_real_time_metrics()
-        
+
         coordination_efficiency = real_time_data.get("metrics", {}).get("coordination_efficiency", {})
         if coordination_efficiency:
             metrics.append(DashboardMetric(
@@ -220,7 +220,7 @@ class AnalyticsDashboard:
                 color=self._get_color_from_status(self._get_status_from_value(coordination_efficiency.get("current", 0.0), 0.9, 0.7, 0.5)),
                 target_value=0.95
             ))
-        
+
         # Parallel efficiency
         parallel_efficiency = real_time_data.get("metrics", {}).get("parallel_efficiency", {})
         if parallel_efficiency:
@@ -235,7 +235,7 @@ class AnalyticsDashboard:
                 color=self._get_color_from_status(self._get_status_from_value(parallel_efficiency.get("current", 0.0), 0.85, 0.65, 0.45)),
                 target_value=0.90
             ))
-        
+
         # System throughput
         throughput = real_time_data.get("metrics", {}).get("throughput", {})
         if throughput:
@@ -250,7 +250,7 @@ class AnalyticsDashboard:
                 color=self._get_color_from_status(self._get_status_from_value(throughput.get("current", 0.0), 15.0, 10.0, 5.0)),
                 target_value=20.0
             ))
-        
+
         # Error rate
         error_rate = real_time_data.get("metrics", {}).get("error_rate", {})
         if error_rate:
@@ -265,15 +265,15 @@ class AnalyticsDashboard:
                 color=self._get_color_from_status(self._get_status_from_value(error_rate.get("current", 0.0), 0.01, 0.05, 0.10, reverse=True)),
                 target_value=0.005
             ))
-        
+
         return metrics
-    
+
     async def _generate_real_time_metrics(self) -> List[DashboardMetric]:
         """Generate real-time dashboard metrics."""
         metrics = []
-        
+
         real_time_data = self.performance_monitor.get_real_time_metrics()
-        
+
         for metric_name, metric_data in real_time_data.get("metrics", {}).items():
             metrics.append(DashboardMetric(
                 name=metric_name.replace("_", " ").title(),
@@ -286,15 +286,15 @@ class AnalyticsDashboard:
                 color=self._get_color_for_metric(metric_name, metric_data.get("current", 0.0)),
                 historical_data=self._get_historical_data(metric_name)
             ))
-        
+
         return metrics
-    
+
     async def _generate_agent_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate agent-specific metrics."""
         metrics = []
-        
+
         agent_summary = self.performance_monitor.get_agent_performance_summary()
-        
+
         for agent_id, agent_data in agent_summary.items():
             # Agent productivity
             productivity = agent_data.get("agent_productivity", {})
@@ -309,7 +309,7 @@ class AnalyticsDashboard:
                     chart_type="bar",
                     color=self._get_color_from_status(self._get_status_from_value(productivity.get("current", 0.0), 10.0, 7.0, 3.0))
                 ))
-            
+
             # Agent stability
             stability = agent_data.get("latency", {}).get("stability", 0.0)
             if stability:
@@ -323,22 +323,22 @@ class AnalyticsDashboard:
                     chart_type="gauge",
                     color=self._get_color_from_status(self._get_status_from_value(stability, 0.9, 0.7, 0.5))
                 ))
-        
+
         return metrics
-    
+
     async def _generate_workflow_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate workflow-specific metrics."""
         metrics = []
-        
+
         # This would integrate with workflow coordinator to get actual workflow metrics
         # For now, providing structure for when workflow metrics are available
-        
+
         return metrics
-    
+
     async def _generate_system_health_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate system health metrics."""
         metrics = []
-        
+
         # System uptime
         metrics.append(DashboardMetric(
             name="System Uptime",
@@ -351,7 +351,7 @@ class AnalyticsDashboard:
             color=self.metric_colors["excellent"],
             target_value=99.9
         ))
-        
+
         # Active alerts
         active_alerts = len([a for a in self.performance_monitor.alerts if a.severity in ["warning", "critical"]])
         metrics.append(DashboardMetric(
@@ -365,13 +365,13 @@ class AnalyticsDashboard:
             color=self.metric_colors["good" if active_alerts == 0 else "warning" if active_alerts < 5 else "critical"],
             target_value=0
         ))
-        
+
         return metrics
-    
+
     async def _generate_optimization_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate optimization-focused metrics."""
         metrics = []
-        
+
         # Optimization opportunities
         metrics.append(DashboardMetric(
             name="Optimization Opportunities",
@@ -383,14 +383,14 @@ class AnalyticsDashboard:
             chart_type="bar",
             color=self.metric_colors["good"]
         ))
-        
+
         return metrics
-    
-    async def _generate_alerts(self, view_type: DashboardView, 
+
+    async def _generate_alerts(self, view_type: DashboardView,
                              time_range: Tuple[datetime, datetime]) -> List[DashboardAlert]:
         """Generate dashboard alerts."""
         alerts = []
-        
+
         # Convert performance alerts to dashboard alerts
         for perf_alert in self.performance_monitor.alerts:
             if time_range[0] <= perf_alert.timestamp <= time_range[1]:
@@ -404,14 +404,14 @@ class AnalyticsDashboard:
                     auto_fix_available=perf_alert.auto_fix_available,
                     estimated_fix_time="5-10 minutes" if perf_alert.auto_fix_available else None
                 ))
-        
+
         return alerts
-    
-    async def _generate_insights(self, view_type: DashboardView, 
+
+    async def _generate_insights(self, view_type: DashboardView,
                                time_range: Tuple[datetime, datetime]) -> List[DashboardInsight]:
         """Generate dashboard insights."""
         insights = []
-        
+
         # Analyze agent performance balance
         agent_summary = self.performance_monitor.get_agent_performance_summary()
         if len(agent_summary) > 1:
@@ -420,11 +420,11 @@ class AnalyticsDashboard:
                 productivity = agent_data.get("agent_productivity", {})
                 if productivity:
                     productivities.append(productivity.get("current", 0.0))
-            
+
             if productivities and len(productivities) > 1:
                 avg_productivity = statistics.mean(productivities)
                 std_productivity = statistics.stdev(productivities)
-                
+
                 # Check for imbalance
                 if avg_productivity > 0 and std_productivity / avg_productivity > 0.3:
                     insight = DashboardInsight(
@@ -441,7 +441,7 @@ class AnalyticsDashboard:
                         estimated_improvement="15-25% efficiency gain"
                     )
                     insights.append(insight)
-        
+
         # Check for coordination overhead
         real_time_data = self.performance_monitor.get_real_time_metrics()
         coordination_efficiency = real_time_data.get("metrics", {}).get("coordination_efficiency", {})
@@ -460,13 +460,13 @@ class AnalyticsDashboard:
                 estimated_improvement="20-30% performance improvement"
             )
             insights.append(insight)
-        
+
         return insights
-    
+
     async def _generate_agent_status(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Dict[str, Any]]:
         """Generate agent status information."""
         agent_status = {}
-        
+
         agent_summary = self.performance_monitor.get_agent_performance_summary()
         for agent_id, agent_data in agent_summary.items():
             agent_status[agent_id] = {
@@ -478,18 +478,18 @@ class AnalyticsDashboard:
                 "performance_score": 85,  # Would calculate from metrics
                 "last_activity": datetime.now().isoformat()
             }
-        
+
         return agent_status
-    
+
     async def _generate_workflow_status(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Dict[str, Any]]:
         """Generate workflow status information."""
         workflow_status = {}
-        
+
         # This would integrate with workflow coordinator to get actual workflow status
         # For now, providing structure for when workflow data is available
-        
+
         return workflow_status
-    
+
     async def _generate_system_health(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Any]:
         """Generate system health information."""
         return {
@@ -501,7 +501,7 @@ class AnalyticsDashboard:
             "memory_usage": 0.42,
             "last_health_check": datetime.now().isoformat()
         }
-    
+
     async def _generate_performance_summary(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Any]:
         """Generate performance summary."""
         return {
@@ -512,8 +512,8 @@ class AnalyticsDashboard:
             "coordination_efficiency": 0.87,
             "parallel_efficiency": 0.78
         }
-    
-    def _get_status_from_value(self, value: float, excellent: float, good: float, 
+
+    def _get_status_from_value(self, value: float, excellent: float, good: float,
                              warning: float, reverse: bool = False) -> str:
         """Get status string from metric value."""
         if reverse:
@@ -534,11 +534,11 @@ class AnalyticsDashboard:
                 return "warning"
             else:
                 return "critical"
-    
+
     def _get_color_from_status(self, status: str) -> str:
         """Get color from status."""
         return self.metric_colors.get(status, "#6c757d")
-    
+
     def _get_unit_for_metric(self, metric_name: str) -> str:
         """Get unit for metric name."""
         unit_map = {
@@ -550,7 +550,7 @@ class AnalyticsDashboard:
             "agent_productivity": "tasks/hour"
         }
         return unit_map.get(metric_name, "")
-    
+
     def _get_status_for_metric(self, metric_name: str, value: float) -> str:
         """Get status for specific metric."""
         if metric_name == "latency":
@@ -561,17 +561,17 @@ class AnalyticsDashboard:
             return self._get_status_from_value(value, 0.9, 0.7, 0.5)
         else:
             return "good"
-    
+
     def _get_color_for_metric(self, metric_name: str, value: float) -> str:
         """Get color for specific metric."""
         status = self._get_status_for_metric(metric_name, value)
         return self._get_color_from_status(status)
-    
+
     def _get_historical_data(self, metric_name: str) -> List[float]:
         """Get historical data for metric."""
         history_key = f"{metric_name}_global"
         return self.performance_monitor.performance_history.get(history_key, [])[-50:]  # Last 50 points
-    
+
     def export_dashboard_data(self, dashboard_data: DashboardData, format: str = "json") -> str:
         """Export dashboard data in specified format."""
         if format == "json":

@@ -22,7 +22,7 @@ class Service:
     host: str
     port: int
     status: str = "healthy"
-    
+
     def endpoint(self) -> str:
         """Get service endpoint URL."""
         return f"http://{self.host}:{self.port}"
@@ -31,23 +31,23 @@ class Service:
 class SimpleServiceDiscovery:
     """
     Simple service discovery implementation.
-    
+
     Provides basic service registration and lookup functionality.
     """
-    
+
     def __init__(self):
         """Initialize service discovery."""
         self.services: Dict[str, Service] = {}
         self.registered_at: Dict[str, datetime] = {}
         logger.info("SimpleServiceDiscovery initialized")
-    
+
     def register(self, service: Service) -> bool:
         """
         Register a service.
-        
+
         Args:
             service: Service to register
-            
+
         Returns:
             True if successful
         """
@@ -59,14 +59,14 @@ class SimpleServiceDiscovery:
         except Exception as e:
             logger.error(f"Failed to register service {service.service_id}: {e}")
             return False
-    
+
     def unregister(self, service_id: str) -> bool:
         """
         Unregister a service.
-        
+
         Args:
             service_id: ID of service to remove
-            
+
         Returns:
             True if successful
         """
@@ -80,14 +80,14 @@ class SimpleServiceDiscovery:
         except Exception as e:
             logger.error(f"Failed to unregister service {service_id}: {e}")
             return False
-    
+
     def find_by_name(self, name: str) -> List[Service]:
         """
         Find services by name.
-        
+
         Args:
             name: Service name to search for
-            
+
         Returns:
             List of matching services
         """
@@ -95,32 +95,32 @@ class SimpleServiceDiscovery:
             service for service in self.services.values()
             if service.name == name and service.status == "healthy"
         ]
-    
+
     def get_service(self, service_id: str) -> Optional[Service]:
         """
         Get service by ID.
-        
+
         Args:
             service_id: Service ID to lookup
-            
+
         Returns:
             Service if found, None otherwise
         """
         return self.services.get(service_id)
-    
+
     def list_all(self) -> List[Service]:
         """
         List all registered services.
-        
+
         Returns:
             List of all services
         """
         return list(self.services.values())
-    
+
     def get_stats(self) -> Dict[str, int]:
         """
         Get discovery statistics.
-        
+
         Returns:
             Statistics dictionary
         """
