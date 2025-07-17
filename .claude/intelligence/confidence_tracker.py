@@ -20,31 +20,31 @@ logger = get_logger('confidence_tracker')
 
 class ConfidenceTracker:
     """Tracks and learns optimal confidence thresholds for decision making.
-    
+
     This ML system learns from past decisions to optimize when human intervention
     is needed. It uses SQLite for persistent storage and pattern recognition.
     """
 
     def __init__(self, db_path: str = None):
         """Initialize the confidence tracker.
-        
+
         Args:
             db_path: Optional custom database path. If None, uses config default.
         """
         config = get_config()
         if db_path is None:
-            self.db_path = Path(config.get('state_management.confidence_db_path', 
+            self.db_path = Path(config.get('state_management.confidence_db_path',
                                         '.claude/state/confidence.db'))
         else:
             self.db_path = Path(db_path)
-        
+
         self._init_db()
         logger.info(f"ConfidenceTracker initialized with database: {self.db_path}")
 
     def _init_db(self):
         """Initialize confidence tracking database with proper schema."""
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         with sqlite3.connect(self.db_path) as conn:
             conn.executescript("""
                 CREATE TABLE IF NOT EXISTS decisions (
@@ -57,7 +57,7 @@ class ConfidenceTracker:
                     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
-                
+
                 CREATE TABLE IF NOT EXISTS patterns (
                     pattern_hash TEXT PRIMARY KEY,
                     success_rate REAL NOT NULL,
@@ -65,36 +65,36 @@ class ConfidenceTracker:
                     last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
-                
+
                 -- Add indexes for better performance
-                CREATE INDEX IF NOT EXISTS idx_decisions_context_hash 
+                CREATE INDEX IF NOT EXISTS idx_decisions_context_hash
                     ON decisions(context_hash);
-                CREATE INDEX IF NOT EXISTS idx_decisions_timestamp 
+                CREATE INDEX IF NOT EXISTS idx_decisions_timestamp
                     ON decisions(timestamp);
-                CREATE INDEX IF NOT EXISTS idx_patterns_success_rate 
+                CREATE INDEX IF NOT EXISTS idx_patterns_success_rate
                     ON patterns(success_rate);
             """)
-        
+
         logger.debug("Database schema initialized successfully")
 
     def should_involve_human(self, context: Dict) -> Tuple[bool, float]:
         """Decide if human involvement is needed based on learned patterns.
-        
+
         Args:
             context: Decision context containing confidence scores and risk factors
-            
+
         Returns:
             Tuple of (should_involve_human: bool, combined_confidence: float)
         """
         context_hash = self._hash_context(context)
-        
+
         # Check if we've seen similar patterns with high success rate
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                SELECT success_rate, sample_count 
-                FROM patterns 
+                SELECT success_rate, sample_count
+                FROM patterns
                 WHERE pattern_hash = ?
                 """,
                 (context_hash,),
@@ -105,7 +105,7 @@ class ConfidenceTracker:
         config = get_config()
         min_samples = config.get('intelligence.confidence.min_samples', 5)
         high_success_threshold = config.get('intelligence.confidence.high_success_threshold', 0.9)
-        
+
         if result and result[1] >= min_samples:
             success_rate = result[0]
             if success_rate > high_success_threshold:
@@ -121,25 +121,25 @@ class ConfidenceTracker:
         risk_score = self._calculate_risk(context)
         base_threshold = config.get('intelligence.confidence.base_threshold', 0.75)
         high_risk_threshold = config.get('intelligence.confidence.high_risk_threshold', 0.85)
-        
+
         threshold = high_risk_threshold if risk_score > 0.7 else base_threshold
-        
+
         should_involve = combined < threshold
-        
+
         logger.debug(
             f"Decision: involve_human={should_involve}, "
             f"combined_confidence={combined:.3f}, "
             f"threshold={threshold:.3f}, "
             f"risk_score={risk_score:.3f}"
         )
-        
+
         return should_involve, combined
 
     def record_outcome(
         self, decision_id: str, context: Dict, human_involved: bool, outcome: str
     ) -> None:
         """Record decision outcome for learning and pattern recognition.
-        
+
         Args:
             decision_id: Unique identifier for this decision
             context: The decision context that was used
@@ -147,14 +147,14 @@ class ConfidenceTracker:
             outcome: Result of the decision ('success', 'failure', 'partial')
         """
         context_hash = self._hash_context(context)
-        
+
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            
+
             # Record the decision
             cursor.execute(
                 """
-                INSERT OR REPLACE INTO decisions 
+                INSERT OR REPLACE INTO decisions
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -184,9 +184,9 @@ class ConfidenceTracker:
 
             cursor.execute(
                 """
-                INSERT OR REPLACE INTO patterns 
+                INSERT OR REPLACE INTO patterns
                 VALUES (?, ?, ?, ?, COALESCE(
-                    (SELECT created_at FROM patterns WHERE pattern_hash = ?), 
+                    (SELECT created_at FROM patterns WHERE pattern_hash = ?),
                     ?
                 ))
                 """,
@@ -202,28 +202,28 @@ class ConfidenceTracker:
 
     def get_pattern_stats(self, context: Dict = None) -> Dict:
         """Get statistics about learned patterns.
-        
+
         Args:
             context: Optional context to get stats for specific pattern
-            
+
         Returns:
             Dictionary with pattern statistics
         """
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            
+
             if context:
                 context_hash = self._hash_context(context)
                 cursor.execute(
                     """
                     SELECT success_rate, sample_count, last_updated
-                    FROM patterns 
+                    FROM patterns
                     WHERE pattern_hash = ?
                     """,
                     (context_hash,),
                 )
                 result = cursor.fetchone()
-                
+
                 if result:
                     return {
                         "success_rate": result[0],
@@ -237,7 +237,7 @@ class ConfidenceTracker:
                 # Get overall statistics
                 cursor.execute(
                     """
-                    SELECT 
+                    SELECT
                         COUNT(*) as total_patterns,
                         AVG(success_rate) as avg_success_rate,
                         SUM(sample_count) as total_decisions,
@@ -246,7 +246,7 @@ class ConfidenceTracker:
                     """
                 )
                 result = cursor.fetchone()
-                
+
                 return {
                     "total_patterns": result[0] or 0,
                     "avg_success_rate": result[1] or 0.0,
@@ -256,10 +256,10 @@ class ConfidenceTracker:
 
     def _hash_context(self, context: Dict) -> str:
         """Create hash of context for pattern matching.
-        
+
         Args:
             context: Decision context dictionary
-            
+
         Returns:
             16-character hash string for pattern identification
         """
@@ -277,10 +277,10 @@ class ConfidenceTracker:
 
     def _calculate_risk(self, context: Dict) -> float:
         """Calculate risk score for decision context.
-        
+
         Args:
             context: Decision context dictionary
-            
+
         Returns:
             Risk score between 0.0 and 1.0
         """
@@ -302,38 +302,38 @@ class ConfidenceTracker:
 
     def cleanup_old_data(self, days_to_keep: int = 90) -> int:
         """Clean up old decision data to prevent database growth.
-        
+
         Args:
             days_to_keep: Number of days of data to retain
-            
+
         Returns:
             Number of records deleted
         """
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            
+
             # Delete old decisions
             cursor.execute(
                 """
-                DELETE FROM decisions 
+                DELETE FROM decisions
                 WHERE timestamp < datetime('now', '-{} days')
                 """.format(days_to_keep)
             )
             deleted_decisions = cursor.rowcount
-            
+
             # Update patterns based on remaining decisions
             cursor.execute("""
-                UPDATE patterns 
-                SET 
+                UPDATE patterns
+                SET
                     sample_count = (
-                        SELECT COUNT(*) 
-                        FROM decisions 
+                        SELECT COUNT(*)
+                        FROM decisions
                         WHERE decisions.context_hash = patterns.pattern_hash
                     ),
                     success_rate = (
-                        SELECT 
+                        SELECT
                             CAST(SUM(CASE WHEN outcome = 'success' THEN 1 ELSE 0 END) AS REAL) / COUNT(*)
-                        FROM decisions 
+                        FROM decisions
                         WHERE decisions.context_hash = patterns.pattern_hash
                     ),
                     last_updated = datetime('now')
@@ -341,15 +341,15 @@ class ConfidenceTracker:
                     SELECT DISTINCT context_hash FROM decisions
                 )
             """)
-            
+
             # Remove patterns with no remaining decisions
             cursor.execute("""
-                DELETE FROM patterns 
+                DELETE FROM patterns
                 WHERE pattern_hash NOT IN (
                     SELECT DISTINCT context_hash FROM decisions
                 )
             """)
             deleted_patterns = cursor.rowcount
-        
+
         logger.info(f"Cleanup completed: deleted {deleted_decisions} decisions and {deleted_patterns} patterns")
         return deleted_decisions + deleted_patterns

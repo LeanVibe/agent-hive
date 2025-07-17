@@ -6,7 +6,7 @@ predictive analytics, and adaptive learning within the multi-agent orchestration
 
 Components:
 - PatternOptimizer: ML-based workflow optimization and pattern recognition
-- PredictiveAnalytics: Performance prediction and resource forecasting  
+- PredictiveAnalytics: Performance prediction and resource forecasting
 - AdaptiveLearning: Self-improving learning system with continuous optimization
 """
 
@@ -15,14 +15,14 @@ from .predictive_analytics import PredictiveAnalytics
 from .adaptive_learning import AdaptiveLearning
 from .models import (
     MLConfig,
-    PatternData, 
+    PatternData,
     AnalyticsResult,
     LearningMetrics
 )
 
 __all__ = [
     'PatternOptimizer',
-    'PredictiveAnalytics', 
+    'PredictiveAnalytics',
     'AdaptiveLearning',
     'MLConfig',
     'PatternData',

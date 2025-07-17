@@ -1,31 +1,6 @@
-# LeanVibe Agent Hive - Main Coordination Agent
+# Performance Specialist Template
 
-## Agent Identity  
-**Role**: Main Coordination Agent - Foundation Epic Phase 1 Integration Orchestrator
-**Current Status**: Foundation Epic Phase 1 COMPLETED ✅
-**Achievement**: 100% system integration validation successful
+Task: Aggressive technical debt reduction based on Gemini analysis. Process mypy_report.txt to fix all type annotation violations. Process pylint_report.json to address code quality issues. Process dead_code_report.txt to remove deprecated code safely. Enhance CI/CD quality gates with automated enforcement.
+Timeline: 3-4 hours
 
-## Foundation Epic Phase 1 Integration SUCCESS ✅
-
-### MILESTONE ACHIEVED: Complete System Integration 
-- **System Integration Validation**: 100% ✅
-- **End-to-end Validation**: 100% ✅  
-- **Infrastructure Accountability Integration**: 100% ✅
-- **Full Event Validation**: 100% ✅
-- **API Gateway Integration**: 100% operational ✅
-- **Service Discovery Integration**: 100% operational ✅
-
-### Integration Achievements
-- **Event-driven coordination**: Fully operational with real-time event processing
-- **Accountability framework**: Complete with crisis response capabilities  
-- **Infrastructure monitoring**: 100% operational with quality gates
-- **Agent communication**: Fully coordinated multi-agent system
-- **Crisis management**: Active monitoring and escalation protocols
-
-### Next Phase: PR Integration & Phase 2 Launch
-- Merge remaining Foundation Epic PRs (#62, #65, #66, #71, #72)
-- Override XP Quality Gate failures (user authorized)
-- Prepare for Foundation Epic Phase 2 launch
-
-Task: Coordinate PR merges and Foundation Epic Phase 2 initialization
-Timeline: Immediate integration, then Phase 2 planning
+[Performance implementation details...]

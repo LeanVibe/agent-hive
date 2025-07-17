@@ -1,0 +1,79 @@
+{
+  "timestamp": "2025-07-17T08:32:00Z",
+  "overall_status": "FAIL",
+  "quality_gates": {
+    "mypy": {
+      "error_count": 1031,
+      "errors": [
+        "tutorials/validate_tutorials.py:19:1: error: Cannot find implementation or library stub for module named \"framework.tutorial_manager\"  [import-not-found]",
+        "tutorials/validate_tutorials.py:20:1: error: Cannot find implementation or library stub for module named \"framework.validation\"  [import-not-found]",
+        "tutorials/framework/tutorial_manager.py:228:5: error: Function is missing a return type annotation  [no-untyped-def]",
+        "scripts/run_quality_gates.py:42:17: error: Returning Any from function declared to return \"dict[str, Any]\"  [no-any-return]",
+        "scripts/run_quality_gates.py:62:9: error: Unsupported target for indexed assignment (\"object\")  [index]",
+        "scripts/run_quality_gates.py:65:13: error: \"object\" has no attribute \"extend\"  [attr-defined]",
+        "scripts/run_quality_gates.py:69:9: error: Unsupported target for indexed assignment (\"object\")  [index]",
+        "scripts/run_quality_gates.py:72:13: error: \"object\" has no attribute \"extend\"  [attr-defined]",
+        "scripts/run_quality_gates.py:76:9: error: Unsupported target for indexed assignment (\"object\")  [index]",
+        "scripts/run_quality_gates.py:79:13: error: \"object\" has no attribute \"extend\"  [attr-defined]"
+      ],
+      "passed": false,
+      "exit_code": 1
+    },
+    "pylint": {
+      "average_score": 8.555,
+      "module_scores": [
+        9.14,
+        8.31,
+        8.4,
+        8.37
+      ],
+      "passed": true,
+      "recommendation": "Consider addressing pylint warnings"
+    },
+    "complexity": {
+      "high_complexity_count": 153,
+      "high_complexity_functions": [
+        {
+          "file": "performance_monitoring_optimization.py",
+          "function": "_calculate_overall_health",
+          "complexity": 11
+        },
+        {
+          "file": "feedback_monitoring.py",
+          "function": "_update_agent_status",
+          "complexity": 13
+        },
+        {
+          "file": "cli.py",
+          "function": "coordinate",
+          "complexity": 27
+        },
+        {
+          "file": "cli.py",
+          "function": "main",
+          "complexity": 19
+        },
+        {
+          "file": "cli.py",
+          "function": "review",
+          "complexity": 17
+        }
+      ],
+      "passed": false,
+      "recommendation": "Consider refactoring complex functions"
+    },
+    "security": {
+      "passed": true,
+      "recommendation": "Security analysis not available"
+    }
+  },
+  "summary": {
+    "total_gates": 4,
+    "passed_gates": 2,
+    "recommendations": [
+      "Consider addressing pylint warnings",
+      "Consider refactoring complex functions",
+      "Security analysis not available"
+    ]
+  }
+}

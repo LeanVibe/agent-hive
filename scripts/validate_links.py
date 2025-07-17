@@ -32,136 +32,136 @@ class LinkValidationResult:
 
 class LinkValidator:
     """Comprehensive link and cross-reference validation."""
-    
+
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.results: List[LinkValidationResult] = []
         self.all_files: Set[Path] = set()
         self.markdown_files: List[Path] = []
         self.anchor_map: Dict[str, Set[str]] = {}  # file -> set of anchors
-        
+
     def scan_project_files(self):
         """Scan project for all files and build file index."""
         print("📂 Scanning project files...")
-        
+
         # Find all files (excluding common ignore patterns)
         ignore_patterns = {
             '.git', '__pycache__', '.pytest_cache', '.coverage', 'htmlcov',
             '.venv', 'node_modules', '.DS_Store', 'temp_test_'
         }
-        
+
         for file_path in self.project_root.rglob('*'):
             if file_path.is_file():
                 # Skip ignored files
                 if any(ignore in str(file_path) for ignore in ignore_patterns):
                     continue
-                
+
                 self.all_files.add(file_path)
-                
+
                 # Track markdown files separately
                 if file_path.suffix.lower() in {'.md', '.markdown'}:
                     self.markdown_files.append(file_path)
-        
+
         print(f"   Found {len(self.all_files)} total files")
         print(f"   Found {len(self.markdown_files)} markdown files")
-    
+
     def extract_anchors(self, file_path: Path) -> Set[str]:
         """Extract all anchor points (headers) from a markdown file."""
         if not file_path.exists():
             return set()
-        
+
         content = file_path.read_text(encoding='utf-8', errors='ignore')
         anchors = set()
-        
+
         # Find all headers (# ## ### etc.)
         header_pattern = r'^#+\s+(.+)$'
         for match in re.finditer(header_pattern, content, re.MULTILINE):
             header_text = match.group(1).strip()
-            
+
             # Convert to anchor format (GitHub style)
             anchor = self.text_to_anchor(header_text)
             anchors.add(anchor)
-        
+
         # Find explicit anchor tags
         anchor_pattern = r'<a\s+(?:name|id)="([^"]+)"'
         for match in re.finditer(anchor_pattern, content, re.IGNORECASE):
             anchors.add(match.group(1))
-        
+
         return anchors
-    
+
     def text_to_anchor(self, text: str) -> str:
         """Convert text to GitHub-style anchor."""
         # Convert to lowercase
         anchor = text.lower()
-        
+
         # Replace spaces and special chars with hyphens
         anchor = re.sub(r'[^a-z0-9\s-]', '', anchor)
         anchor = re.sub(r'\s+', '-', anchor)
         anchor = re.sub(r'-+', '-', anchor)
         anchor = anchor.strip('-')
-        
+
         return anchor
-    
+
     def build_anchor_map(self):
         """Build map of all anchors in all markdown files."""
         print("⚓ Building anchor map...")
-        
+
         for file_path in self.markdown_files:
             rel_path = str(file_path.relative_to(self.project_root))
             anchors = self.extract_anchors(file_path)
             self.anchor_map[rel_path] = anchors
-            
+
         total_anchors = sum(len(anchors) for anchors in self.anchor_map.values())
         print(f"   Found {total_anchors} total anchors")
-    
+
     def validate_internal_links(self) -> List[LinkValidationResult]:
         """Validate internal markdown links."""
         results = []
-        
+
         print("🔗 Validating internal links...")
-        
+
         for file_path in self.markdown_files:
             rel_path = str(file_path.relative_to(self.project_root))
             content = file_path.read_text(encoding='utf-8', errors='ignore')
             lines = content.split('\\n')
-            
+
             # Find all markdown links
             link_pattern = r'\[([^\]]+)\]\(([^)]+)\)'
-            
+
             for line_num, line in enumerate(lines, 1):
                 for match in re.finditer(link_pattern, line):
                     link_text = match.group(1)
                     link_target = match.group(2)
-                    
+
                     # Skip external links
                     if link_target.startswith(('http://', 'https://', 'mailto:')):
                         continue
-                    
+
                     # Skip images (alt text)
                     if match.start() > 0 and line[match.start()-1] == '!':
                         continue
-                    
+
                     # Validate internal link
                     result = self.validate_single_link(
                         rel_path, link_target, link_text, line_num, line.strip()
                     )
                     results.append(result)
-        
+
         return results
-    
-    def validate_single_link(self, source_file: str, target: str, link_text: str, 
+
+    def validate_single_link(self, source_file: str, target: str, link_text: str,
                            line_num: int, context: str) -> LinkValidationResult:
         """Validate a single internal link."""
-        
+
         # Parse the target
         if '#' in target:
             file_part, anchor_part = target.split('#', 1)
         else:
             file_part, anchor_part = target, None
-        
+
         # Resolve relative path
         source_path = self.project_root / source_file
-        
+
         if file_part:
             # File reference
             if file_part.startswith('/'):
@@ -170,7 +170,7 @@ class LinkValidator:
             else:
                 # Relative path
                 target_path = source_path.parent / file_part
-            
+
             # Normalize path
             try:
                 target_path = target_path.resolve()
@@ -185,7 +185,7 @@ class LinkValidator:
                     line_number=line_num,
                     context=context
                 )
-            
+
             # Check if file exists
             if not target_path.exists():
                 return LinkValidationResult(
@@ -197,7 +197,7 @@ class LinkValidator:
                     line_number=line_num,
                     context=context
                 )
-            
+
             # If there's an anchor, validate it
             if anchor_part:
                 target_rel_str = str(target_rel)
@@ -238,7 +238,7 @@ class LinkValidator:
                             line_number=line_num,
                             context=context
                         )
-        
+
         # If we get here, the link is valid
         return LinkValidationResult(
             source_file=source_file,
@@ -249,13 +249,13 @@ class LinkValidator:
             line_number=line_num,
             context=context
         )
-    
+
     def validate_cross_references(self) -> List[LinkValidationResult]:
         """Validate cross-references between documentation files."""
         results = []
-        
+
         print("🔄 Validating cross-references...")
-        
+
         # Common cross-reference patterns
         ref_patterns = [
             (r'see\s+\[([^\]]+)\]\(([^)]+)\)', "see_reference"),
@@ -263,49 +263,49 @@ class LinkValidator:
             (r'documented\s+in\s+\[([^\]]+)\]\(([^)]+)\)', "documentation_reference"),
             (r'\*\*\[([^\]]+)\]\(([^)]+)\)\*\*', "important_reference"),
         ]
-        
+
         for file_path in self.markdown_files:
             rel_path = str(file_path.relative_to(self.project_root))
             content = file_path.read_text(encoding='utf-8', errors='ignore')
             lines = content.split('\\n')
-            
+
             for line_num, line in enumerate(lines, 1):
                 for pattern, ref_type in ref_patterns:
                     for match in re.finditer(pattern, line, re.IGNORECASE):
                         link_text = match.group(1)
                         link_target = match.group(2)
-                        
+
                         # Skip external links
                         if link_target.startswith(('http://', 'https://')):
                             continue
-                        
+
                         # Validate the cross-reference
                         result = self.validate_single_link(
                             rel_path, link_target, link_text, line_num, line.strip()
                         )
                         result.link_type = ref_type
                         results.append(result)
-        
+
         return results
-    
+
     def validate_file_references(self) -> List[LinkValidationResult]:
         """Validate file path references in documentation."""
         results = []
-        
+
         print("📁 Validating file references...")
-        
+
         # Patterns for file references
         file_patterns = [
             (r'`([^`]+\.(py|md|yaml|yml|json|txt|sh|js|ts))`', "inline_file"),
             (r'\*\*([^*]+\.(py|md|yaml|yml|json|txt|sh|js|ts))\*\*', "bold_file"),
             (r'`([^`]*/)([^/`]+)`', "path_reference"),
         ]
-        
+
         for file_path in self.markdown_files:
             rel_path = str(file_path.relative_to(self.project_root))
             content = file_path.read_text(encoding='utf-8', errors='ignore')
             lines = content.split('\\n')
-            
+
             for line_num, line in enumerate(lines, 1):
                 for pattern, ref_type in file_patterns:
                     for match in re.finditer(pattern, line):
@@ -313,20 +313,20 @@ class LinkValidator:
                             file_ref = match.group(1) + match.group(2)
                         else:
                             file_ref = match.group(1)
-                        
+
                         # Skip obvious non-file references
                         if any(skip in file_ref.lower() for skip in [
                             'example', 'placeholder', 'your-', '<', '>', 'https://', 'http://'
                         ]):
                             continue
-                        
+
                         # Try to find the file
                         found = False
                         for project_file in self.all_files:
                             if str(project_file).endswith(file_ref) or file_ref in str(project_file):
                                 found = True
                                 break
-                        
+
                         if found:
                             results.append(LinkValidationResult(
                                 source_file=rel_path,
@@ -361,51 +361,51 @@ class LinkValidator:
                                     line_number=line_num,
                                     context=line.strip()
                                 ))
-        
+
         return results
-    
+
     def validate_all_links(self) -> List[LinkValidationResult]:
         """Run all link validation checks."""
         all_results = []
-        
+
         # Prepare
         self.scan_project_files()
         self.build_anchor_map()
-        
+
         # Run validations
         all_results.extend(self.validate_internal_links())
         all_results.extend(self.validate_cross_references())
         all_results.extend(self.validate_file_references())
-        
+
         self.results = all_results
         return all_results
-    
+
     def generate_report(self) -> str:
         """Generate comprehensive link validation report."""
         if not self.results:
             return "No link validation results available."
-        
+
         # Count results by status and type
         status_counts = {"valid": 0, "broken": 0, "warning": 0}
         type_counts = {}
-        
+
         for result in self.results:
             status_counts[result.status] += 1
             if result.link_type not in type_counts:
                 type_counts[result.link_type] = {"valid": 0, "broken": 0, "warning": 0}
             type_counts[result.link_type][result.status] += 1
-        
+
         # Calculate statistics
         total_links = len(self.results)
         validity_rate = (status_counts["valid"] / total_links * 100) if total_links > 0 else 0
-        
+
         # Generate report
         report = []
         report.append("=" * 80)
         report.append("🔗 LEANVIBE AGENT HIVE - LINK VALIDATION REPORT")
         report.append("=" * 80)
         report.append("")
-        
+
         # Summary
         report.append(f"📊 VALIDATION SUMMARY:")
         report.append(f"   Total Links Checked: {total_links}")
@@ -413,7 +413,7 @@ class LinkValidator:
         report.append(f"   ❌ Broken: {status_counts['broken']}")
         report.append(f"   ⚠️ Warnings: {status_counts['warning']}")
         report.append("")
-        
+
         # Breakdown by type
         report.append(f"📋 BREAKDOWN BY LINK TYPE:")
         for link_type, counts in sorted(type_counts.items()):
@@ -425,7 +425,7 @@ class LinkValidator:
             if counts["warning"] > 0:
                 report.append(f"      ⚠️ {counts['warning']} warnings")
         report.append("")
-        
+
         # Overall status
         if status_counts["broken"] == 0:
             report.append("🎉 OVERALL STATUS: EXCELLENT - All links are valid!")
@@ -435,21 +435,21 @@ class LinkValidator:
             report.append("⚠️ OVERALL STATUS: NEEDS ATTENTION - Several broken links")
         else:
             report.append("❌ OVERALL STATUS: CRITICAL - Many broken links found")
-        
+
         report.append("")
-        
+
         # Detailed broken links
         broken_links = [r for r in self.results if r.status == "broken"]
         if broken_links:
             report.append(f"❌ BROKEN LINKS ({len(broken_links)}):")
-            
+
             # Group by file
             broken_by_file: dict[str, list[LinkValidationResult]] = {}
             for result in broken_links:
                 if result.source_file not in broken_by_file:
                     broken_by_file[result.source_file] = []
                 broken_by_file[result.source_file].append(result)
-            
+
             for file_name, file_broken in sorted(broken_by_file.items()):
                 report.append(f"   📄 {file_name}:")
                 for result in file_broken:
@@ -458,7 +458,7 @@ class LinkValidator:
                     if result.context:
                         report.append(f"         Context: {result.context[:80]}...")
             report.append("")
-        
+
         # Warnings
         warnings = [r for r in self.results if r.status == "warning"]
         if warnings:
@@ -466,11 +466,11 @@ class LinkValidator:
             for result in warnings[:10]:  # Show first 10
                 line_info = f" (line {result.line_number})" if result.line_number else ""
                 report.append(f"   {result.message}{line_info}")
-            
+
             if len(warnings) > 10:
                 report.append(f"   ... and {len(warnings) - 10} more warnings")
             report.append("")
-        
+
         # Recommendations
         report.append("💡 RECOMMENDATIONS:")
         if status_counts["broken"] > 0:
@@ -480,7 +480,7 @@ class LinkValidator:
             report.append("   3. Review warnings for potential issues")
         report.append("   4. Add this validation to pre-commit hooks")
         report.append("   5. Consider using relative paths for better portability")
-        
+
         return "\\n".join(report)
 
 def main():
@@ -491,18 +491,18 @@ def main():
     parser.add_argument("--cross-references", action="store_true", help="Validate cross-references")
     parser.add_argument("--file-existence", action="store_true", help="Validate file references")
     parser.add_argument("--output", type=str, help="Output file for validation report")
-    
+
     args = parser.parse_args()
-    
+
     # Determine project root
     project_root = Path(__file__).parent.parent
     if not (project_root / "README.md").exists():
         print("❌ Cannot find project root (README.md not found)")
         sys.exit(1)
-    
+
     # Create validator
     validator = LinkValidator(project_root)
-    
+
     # Run validation
     if args.all or not any([args.internal_links, args.cross_references, args.file_existence]):
         results = validator.validate_all_links()
@@ -510,24 +510,24 @@ def main():
         results = []
         validator.scan_project_files()
         validator.build_anchor_map()
-        
+
         if args.internal_links:
             results.extend(validator.validate_internal_links())
         if args.cross_references:
             results.extend(validator.validate_cross_references())
         if args.file_existence:
             results.extend(validator.validate_file_references())
-    
+
     # Generate and display report
     report = validator.generate_report()
     print(report)
-    
+
     # Save report if requested
     if args.output:
         with open(args.output, 'w') as f:
             f.write(report)
         print(f"\\n📄 Report saved to: {args.output}")
-    
+
     # Exit with appropriate code
     broken_links = sum(1 for r in results if r.status == "broken")
     if broken_links > 0:

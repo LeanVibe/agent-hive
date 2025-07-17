@@ -16,16 +16,16 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 async def test_advanced_orchestration():
     """Test Advanced Orchestration APIs"""
     print("🔄 Testing Advanced Orchestration APIs...")
-    
+
     try:
         # Test imports
         from advanced_orchestration import MultiAgentCoordinator, ResourceManager, ScalingManager
         from advanced_orchestration.models import (
-            CoordinatorConfig, ResourceLimits, ResourceRequirements, 
+            CoordinatorConfig, ResourceLimits, ResourceRequirements,
             LoadBalancingStrategy
         )
         print("✅ Advanced Orchestration imports successful")
-        
+
         # Test MultiAgentCoordinator initialization
         config = CoordinatorConfig(
             max_agents=20,
@@ -34,7 +34,7 @@ async def test_advanced_orchestration():
         )
         coordinator = MultiAgentCoordinator(config)
         print("✅ MultiAgentCoordinator initialization successful")
-        
+
         # Test ResourceManager initialization
         resource_limits = ResourceLimits(
             max_cpu_cores=8,
@@ -44,11 +44,11 @@ async def test_advanced_orchestration():
         )
         resource_manager = ResourceManager(resource_limits)
         print("✅ ResourceManager initialization successful")
-        
+
         # Test ScalingManager initialization
         scaling_manager = ScalingManager(resource_limits)
         print("✅ ScalingManager initialization successful")
-        
+
         # Test ResourceRequirements
         requirements = ResourceRequirements(
             cpu_cores=2,
@@ -57,9 +57,9 @@ async def test_advanced_orchestration():
             network_mbps=10
         )
         print("✅ ResourceRequirements creation successful")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Advanced Orchestration test failed: {e}")
         import traceback
@@ -69,13 +69,13 @@ async def test_advanced_orchestration():
 async def test_external_api():
     """Test External API Integration"""
     print("🔄 Testing External API Integration...")
-    
+
     try:
         # Test imports
         from external_api import WebhookServer, ApiGateway, EventStreaming
         from external_api.models import WebhookConfig, ApiGatewayConfig, EventStreamConfig
         print("✅ External API imports successful")
-        
+
         # Test WebhookServer initialization
         webhook_config = WebhookConfig(
             host="localhost",
@@ -85,7 +85,7 @@ async def test_external_api():
         )
         webhook_server = WebhookServer(webhook_config)
         print("✅ WebhookServer initialization successful")
-        
+
         # Test ApiGateway initialization
         gateway_config = ApiGatewayConfig(
             host="localhost",
@@ -95,7 +95,7 @@ async def test_external_api():
         )
         api_gateway = ApiGateway(gateway_config)
         print("✅ ApiGateway initialization successful")
-        
+
         # Test EventStreaming initialization
         stream_config = EventStreamConfig(
             compression_enabled=True,
@@ -104,9 +104,9 @@ async def test_external_api():
         )
         event_streaming = EventStreaming(stream_config)
         print("✅ EventStreaming initialization successful")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ External API test failed: {e}")
         import traceback
@@ -116,13 +116,13 @@ async def test_external_api():
 async def test_ml_enhancements():
     """Test ML Enhancement APIs"""
     print("🔄 Testing ML Enhancement APIs...")
-    
+
     try:
         # Test imports
         from ml_enhancements import AdaptiveLearning, PatternOptimizer, PredictiveAnalytics
         from ml_enhancements.models import MLConfig
         print("✅ ML Enhancement imports successful")
-        
+
         # Test AdaptiveLearning initialization
         ml_config = MLConfig(
             learning_rate=0.01,
@@ -131,15 +131,15 @@ async def test_ml_enhancements():
         )
         adaptive_learning = AdaptiveLearning(ml_config)
         print("✅ AdaptiveLearning initialization successful")
-        
+
         # Test PatternOptimizer initialization
         pattern_optimizer = PatternOptimizer(ml_config)
         print("✅ PatternOptimizer initialization successful")
-        
+
         # Test PredictiveAnalytics initialization
         predictive_analytics = PredictiveAnalytics(ml_config)
         print("✅ PredictiveAnalytics initialization successful")
-        
+
         # Test feedback data creation
         feedback_data = {
             "task_id": "task-123",
@@ -149,9 +149,9 @@ async def test_ml_enhancements():
             "user_satisfaction": 9
         }
         print("✅ Feedback data creation successful")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ ML Enhancement test failed: {e}")
         import traceback
@@ -161,18 +161,18 @@ async def test_ml_enhancements():
 async def test_cli_integration():
     """Test CLI integration examples"""
     print("🔄 Testing CLI integration...")
-    
+
     try:
         # Test CLI imports
         from cli import LeanVibeCLI
         print("✅ CLI imports successful")
-        
+
         # Test CLI initialization
         cli = LeanVibeCLI()
         print("✅ CLI initialization successful")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ CLI integration test failed: {e}")
         import traceback
@@ -183,28 +183,28 @@ async def main():
     """Run all validation tests"""
     print("🚀 Starting API Reference Validation Tests")
     print("=" * 50)
-    
+
     tests = [
         ("Advanced Orchestration", test_advanced_orchestration),
         ("External API Integration", test_external_api),
         ("ML Enhancements", test_ml_enhancements),
         ("CLI Integration", test_cli_integration)
     ]
-    
+
     results = []
-    
+
     for test_name, test_func in tests:
         print(f"\n📋 {test_name}")
         print("-" * 30)
         result = await test_func()
         results.append((test_name, result))
-    
+
     print("\n🎯 Test Results Summary")
     print("=" * 50)
-    
+
     passed = 0
     failed = 0
-    
+
     for test_name, result in results:
         status = "✅ PASSED" if result else "❌ FAILED"
         print(f"{test_name}: {status}")
@@ -212,9 +212,9 @@ async def main():
             passed += 1
         else:
             failed += 1
-    
+
     print(f"\n📊 Total: {passed} passed, {failed} failed")
-    
+
     if failed == 0:
         print("🎉 All API reference examples validated successfully!")
         return 0
