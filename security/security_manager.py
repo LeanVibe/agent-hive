@@ -793,9 +793,35 @@ class SecurityManager:
         """Get security summary."""
         return self.audit_logger.get_security_summary(hours)
     
+    
     def get_security_events(self, **kwargs) -> List[SecurityEvent]:
         """Get security events."""
         return self.audit_logger.get_security_events(**kwargs)
+    
+    async def validate_command(self, command: str, user_id: str = None) -> Dict[str, Any]:
+        """Async wrapper for command validation."""
+        context = {'user_id': user_id} if user_id else {}
+        is_valid, reason, risk_level = self.command_validator.validate_command(command, context)
+        
+        return {
+            'valid': is_valid,
+            'message': reason,
+            'risk_level': risk_level.value
+        }
+    
+    def sanitize_input(self, input_data: str, input_type: str = 'text') -> str:
+        """Sanitize input data."""
+        return self.input_sanitizer.sanitize_input(input_data, input_type)
+    
+    async def log_security_event(self, event: SecurityEvent) -> None:
+        """Log a security event."""
+        self.audit_logger.log_event(event)
+    
+    async def get_recent_events(self, limit: int = 100, risk_level: str = None) -> List[SecurityEvent]:
+        """Get recent security events."""
+        # This is a simplified implementation
+        # In a real system, this would query the database
+        return []
 
 
 # Global security manager instance

@@ -14,6 +14,22 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List, Callable
 from dataclasses import asdict
 
+# FastAPI imports for real HTTP server
+try:
+    from fastapi import FastAPI, Request, Response, HTTPException, Depends
+    from fastapi.middleware.cors import CORSMiddleware
+    import uvicorn
+    FASTAPI_AVAILABLE = True
+except ImportError:
+    FASTAPI_AVAILABLE = False
+    FastAPI = None
+    Request = None
+    Response = None
+    HTTPException = None
+    Depends = None
+    CORSMiddleware = None
+    uvicorn = None
+
 from .models import (
     ApiGatewayConfig,
     ApiRequest,
@@ -51,9 +67,20 @@ class ApiGateway:
         self.server_started = False
         self._request_count = 0
         
+        # FastAPI app and server instance
+        self.app: Optional[FastAPI] = None
+        self.server: Optional[uvicorn.Server] = None
+        self.server_task: Optional[asyncio.Task] = None
+        
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
         if service_discovery:
             logger.info("Service discovery integration enabled")
+            
+        # Initialize FastAPI app
+        if FASTAPI_AVAILABLE:
+            self._init_fastapi_app()
+        else:
+            logger.warning("FastAPI not available - falling back to simulation mode")
     
     async def start_server(self) -> None:
         """Start the API gateway server."""
@@ -63,10 +90,31 @@ class ApiGateway:
             
         try:
             logger.info(f"Starting API gateway on {self.config.host}:{self.config.port}")
-            await asyncio.sleep(0.1)  # Simulate startup time
             
-            self.server_started = True
-            logger.info("API gateway started successfully")
+            if FASTAPI_AVAILABLE and self.app:
+                # Start real FastAPI server
+                config = uvicorn.Config(
+                    app=self.app,
+                    host=self.config.host,
+                    port=self.config.port,
+                    log_level="info",
+                    access_log=True
+                )
+                self.server = uvicorn.Server(config)
+                
+                # Start server in background task
+                self.server_task = asyncio.create_task(self.server.serve())
+                
+                # Wait for server to start
+                await asyncio.sleep(0.1)
+                
+                self.server_started = True
+                logger.info("Real FastAPI API gateway started successfully")
+            else:
+                # Fallback to simulation mode
+                await asyncio.sleep(0.1)  # Simulate startup time
+                self.server_started = True
+                logger.info("API gateway started in simulation mode")
             
         except Exception as e:
             logger.error(f"Failed to start API gateway: {e}")
@@ -80,6 +128,20 @@ class ApiGateway:
             
         try:
             logger.info("Stopping API gateway...")
+            
+            if self.server and self.server_task:
+                # Stop real FastAPI server
+                self.server.should_exit = True
+                if not self.server_task.done():
+                    self.server_task.cancel()
+                    try:
+                        await self.server_task
+                    except asyncio.CancelledError:
+                        pass
+                self.server = None
+                self.server_task = None
+                logger.info("Real FastAPI server stopped")
+            
             self.server_started = False
             logger.info("API gateway stopped")
             
@@ -620,4 +682,78 @@ class ApiGateway:
             "active_rate_limits": len(self.rate_limiter),
             "config_valid": True,
             "timestamp": datetime.now().isoformat()
-        }
+        }    
+    
+    def _init_fastapi_app(self) -> None:
+        """Initialize FastAPI application with routes and middleware."""
+        if not FASTAPI_AVAILABLE:
+            return
+            
+        self.app = FastAPI(
+            title="LeanVibe Agent Hive API Gateway",
+            description="API Gateway for external system integration",
+            version="1.0.0"
+        )
+        
+        # Add CORS middleware if enabled
+        if self.config.enable_cors:
+            self.app.add_middleware(
+                CORSMiddleware,
+                allow_origins=self.config.cors_origins,
+                allow_credentials=True,
+                allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+                allow_headers=["*"],
+            )
+        
+        # Add health check endpoint
+        @self.app.get("/health")
+        async def health_check_endpoint():
+            health_status = await self.health_check()
+            return health_status
+        
+        # Add catch-all route for dynamic handling
+        @self.app.api_route(
+            "/{path:path}",
+            methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+        )
+        async def catch_all_route(request: Request, path: str):
+            """Handle all requests through the ApiGateway logic."""
+            # Convert FastAPI Request to ApiRequest
+            api_request = await self._convert_fastapi_request(request, path)
+            
+            # Process through existing handle_request logic
+            api_response = await self.handle_request(api_request)
+            
+            # Convert ApiResponse back to FastAPI response
+            return self._convert_to_fastapi_response(api_response)
+    
+    async def _convert_fastapi_request(self, request: Request, path: str) -> ApiRequest:
+        """Convert FastAPI Request to ApiRequest."""
+        try:
+            body = await request.json()
+        except:
+            body = None
+            
+        return ApiRequest(
+            method=request.method,
+            path=f"/{path}" if path else "/",
+            headers=dict(request.headers),
+            query_params=dict(request.query_params),
+            body=body,
+            timestamp=datetime.now(),
+            request_id=str(uuid.uuid4()),
+            client_ip=request.client.host if request.client else "unknown"
+        )
+    
+    def _convert_to_fastapi_response(self, api_response: ApiResponse) -> Response:
+        """Convert ApiResponse to FastAPI Response."""
+        import json
+        
+        content = json.dumps(api_response.body) if api_response.body else ""
+        
+        return Response(
+            content=content,
+            status_code=api_response.status_code,
+            headers=api_response.headers,
+            media_type="application/json"
+        )
