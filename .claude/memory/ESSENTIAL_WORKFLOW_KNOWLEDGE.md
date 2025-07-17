@@ -7,19 +7,29 @@
 - **🎯 TOP PRIORITY**: MERGE current branch and switch to main branch when ready
 - **Strategic Approach**: Evidence-based integration, 80% fixes / 20% new features
 
-## 🔧 WORKING TOOLS (TESTED AND FUNCTIONAL)
+## 🔧 WORKING TOOLS (CANONICAL SCRIPTS)
 ```bash
 # Agent Communication (RELIABLE)
-python scripts/fixed_agent_communication.py --agent AGENT_NAME --message "MESSAGE"
+python scripts/send_agent_message.py --agent AGENT_NAME --message "MESSAGE"
+
+# Agent Lifecycle Management
+python scripts/agent_manager.py --spawn AGENT_NAME
+python scripts/agent_manager.py --status
+
+# Quality Gates (MANDATORY BEFORE ANY COMPLETION)
+python scripts/run_quality_gates.py
+python scripts/quality_gate_validation.py
+
+# PR/CI Automation
+python scripts/pr_manager.py
+python scripts/pr_merge_coordinator.py PR_NUMBER
+python scripts/pr_resolution_monitor.py
+
+# Emergency/Crisis
+python scripts/emergency_cli.py --task "Task Name"
 
 # Agent Status Check
 python scripts/check_agent_status.py --format json
-
-# Quality Gates (MANDATORY BEFORE ANY COMPLETION)
-pytest tests/ -x --tb=short
-python -m py_compile **/*.py
-git status && git log --oneline -3
-git push origin branch-name  # MANDATORY
 
 # Gemini CLI Strategic Analysis
 gemini -p "STRATEGIC_QUESTION"

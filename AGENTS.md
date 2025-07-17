@@ -11,6 +11,13 @@
 - **Pre-commit (all checks):** `pre-commit run --all-files`
 - **Test coverage:** `pytest --cov=.claude --cov-report=term-missing`
 
+## Canonical Agentic Workflow Scripts
+- **Agent messaging:** `python scripts/send_agent_message.py --agent AGENT_NAME --message "MESSAGE"`
+- **Agent lifecycle:** `python scripts/agent_manager.py --spawn AGENT_NAME` / `--status`
+- **Quality gates:** `python scripts/run_quality_gates.py` (worktree/codebase), `python scripts/quality_gate_validation.py` (PR)
+- **PR/CI:** `python scripts/pr_manager.py`, `python scripts/pr_merge_coordinator.py PR_NUMBER`, `python scripts/pr_resolution_monitor.py`
+- **Emergency:** `python scripts/emergency_cli.py --task "Task Name"`
+
 ## Code Style Guidelines
 - **Imports:** PEP8 order; use isort with black profile, line length 100.
 - **Formatting:** Use black (line length 100).
