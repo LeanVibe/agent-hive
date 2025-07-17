@@ -281,3 +281,8 @@ def get_security_config(profile: Optional[SecurityProfile] = None) -> UnifiedSec
 
 # Default configuration instance
 DEFAULT_CONFIG = get_security_config()
+
+# Named configuration instances for compatibility
+DEVELOPMENT_CONFIG = get_security_config(SecurityProfile.DEVELOPMENT)
+STAGING_CONFIG = get_security_config(SecurityProfile.STAGING)
+PRODUCTION_CONFIG = get_security_config(SecurityProfile.PRODUCTION)

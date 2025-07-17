@@ -23,7 +23,9 @@ import enum
 # Import Security Agent's base models
 import sys
 sys.path.append('../security-Jul-17-0944')
-from external_api.database_models import Base, User as SecurityUser, Role as SecurityRole, PermissionModel
+# Removed circular import - define Base locally
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
 
 # Import our RBAC enums
 from .rbac_framework import ResourceType, ActionType, PermissionScope
@@ -89,6 +91,13 @@ enhanced_role_permissions = Table(
     Column('permission_id', UUID(as_uuid=True), ForeignKey('enhanced_permissions.id'), primary_key=True)
 )
 
+user_roles = Table(
+    'user_roles',
+    Base.metadata,
+    Column('user_id', UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True),
+    Column('role_id', UUID(as_uuid=True), ForeignKey('enhanced_roles.id'), primary_key=True)
+)
+
 
 class EnhancedRole(Base):
     """Enhanced Role model with hierarchy support."""
@@ -113,7 +122,7 @@ class EnhancedRole(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    metadata = Column(JSON, nullable=True)
+    role_metadata = Column(JSON, nullable=True)
     
     # Relationships
     users = relationship("SecurityUser", secondary="user_roles", back_populates="roles")
@@ -190,7 +199,7 @@ class EnhancedRole(Base):
             'hierarchy_path': self.hierarchy_path,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.metadata or {}
+            'metadata': self.role_metadata or {}
         }
 
 
@@ -222,7 +231,7 @@ class EnhancedPermission(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    metadata = Column(JSON, nullable=True)
+    role_metadata = Column(JSON, nullable=True)
     
     # Relationships
     roles = relationship("EnhancedRole", secondary=enhanced_role_permissions, back_populates="permissions")
@@ -292,7 +301,7 @@ class EnhancedPermission(Base):
             'expires_at': self.expires_at.isoformat() if self.expires_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.metadata or {}
+            'metadata': self.role_metadata or {}
         }
     
     @classmethod
@@ -401,6 +410,22 @@ class AuditLog(Base):
         }
 
 
+# Create SecurityUser model if not already imported
+class SecurityUser(Base):
+    """Security User model for RBAC integration."""
+    
+    __tablename__ = 'users'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    username = Column(String(100), unique=True, nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationships
+    roles = relationship("EnhancedRole", secondary=user_roles, back_populates="users")
+
 # Extend the SecurityUser model with additional relationships
 SecurityUser.direct_permissions = relationship(
     "EnhancedPermission", 
@@ -413,6 +438,24 @@ SecurityUser.enhanced_roles = relationship(
     secondary="user_roles", 
     back_populates="users"
 )
+
+# Aliases for compatibility
+User = SecurityUser
+Role = EnhancedRole
+PermissionModel = EnhancedPermission
+
+# Compatibility functions
+def setup_default_rbac(session: Session) -> None:
+    """Setup default RBAC - alias for setup_enhanced_rbac."""
+    setup_enhanced_rbac(session)
+
+def create_default_roles(session: Session) -> None:
+    """Create default roles - alias for create_enhanced_system_roles."""
+    create_enhanced_system_roles(session)
+
+def create_default_permissions(session: Session) -> None:
+    """Create default permissions - alias for create_enhanced_system_permissions."""
+    create_enhanced_system_permissions(session)
 
 
 # Database utility functions
