@@ -444,7 +444,7 @@ class LinkValidator:
             report.append(f"❌ BROKEN LINKS ({len(broken_links)}):")
             
             # Group by file
-            broken_by_file = {}
+            broken_by_file: dict[str, list[LinkValidationResult]] = {}
             for result in broken_links:
                 if result.source_file not in broken_by_file:
                     broken_by_file[result.source_file] = []
