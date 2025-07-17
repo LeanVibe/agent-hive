@@ -21,7 +21,7 @@ class TestRunner:
 
     def __init__(self, verbose: bool = False):
         self.verbose = verbose
-        self.results = {
+        self.results: Dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "total_tests": 0,
             "passed": 0,
@@ -265,7 +265,8 @@ class TestRunner:
         """Load coverage data from JSON report."""
         try:
             with open("coverage.json", "r") as f:
-                return json.load(f)
+                data = json.load(f)
+                return data if isinstance(data, dict) else None
         except FileNotFoundError:
             return None
 
@@ -273,7 +274,8 @@ class TestRunner:
         """Load security data from JSON report."""
         try:
             with open("security_report.json", "r") as f:
-                return json.load(f)
+                data = json.load(f)
+                return data if isinstance(data, dict) else None
         except FileNotFoundError:
             return None
 

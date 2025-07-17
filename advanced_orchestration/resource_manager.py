@@ -8,7 +8,7 @@ for the multi-agent system.
 import asyncio
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 import psutil
 
 from .models import (
@@ -222,7 +222,7 @@ class ResourceManager:
         Returns:
             List[ResourceOptimization]: Optimization recommendations
         """
-        optimizations = []
+        optimizations: list[ResourceOptimization] = []
 
         try:
             # Analyze usage patterns
@@ -332,7 +332,7 @@ class ResourceManager:
 
         return None
 
-    async def get_allocation_summary(self) -> Dict[str, any]:
+    async def get_allocation_summary(self) -> Dict[str, Any]:
         """
         Get resource allocation summary.
 

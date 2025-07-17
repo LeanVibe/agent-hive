@@ -64,7 +64,7 @@ class GitHubIssueTemplate:
                                      metrics: AgentMetrics,
                                      next_milestone: str,
                                      action_items: List[ActionItem],
-                                     detailed_progress: str = None) -> str:
+                                     detailed_progress: Optional[str] = None) -> str:
         """Generate a structured agent progress update."""
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -2,7 +2,7 @@
 """
 Security Manager for LeanVibe Agent Hive Production Deployment
 
-Provides comprehensive security framework including command validation, 
+Provides comprehensive security framework including command validation,
 input sanitization, audit logging, and access control for production deployment.
 """
 
@@ -55,7 +55,7 @@ class SecurityEvent:
     details: Dict[str, Any]
     user_id: Optional[str] = None
     ip_address: Optional[str] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
         data = asdict(self)
@@ -74,7 +74,7 @@ class SecurityPolicy:
     enabled: bool = True
     created_at: datetime = None
     updated_at: datetime = None
-    
+
     def __post_init__(self):
         if self.created_at is None:
             self.created_at = datetime.now()
@@ -84,7 +84,7 @@ class SecurityPolicy:
 
 class CommandValidator:
     """Validates commands and operations against security policies."""
-    
+
     # Dangerous commands that should be blocked
     DANGEROUS_COMMANDS = {
         'rm -rf': 'Dangerous recursive deletion',
@@ -124,7 +124,7 @@ class CommandValidator:
         'os.system': 'Python OS system call',
         'shell=True': 'Shell execution in subprocess'
     }
-    
+
     # Suspicious patterns that should be flagged
     SUSPICIOUS_PATTERNS = {
         r'[;&|`]': 'Command chaining or injection',
@@ -152,7 +152,7 @@ class CommandValidator:
         r'setattr\s*\(': 'Dynamic attribute setting',
         r'hasattr\s*\(': 'Dynamic attribute checking'
     }
-    
+
     # Safe commands that are always allowed
     SAFE_COMMANDS = {
         'ls', 'cat', 'head', 'tail', 'grep', 'find', 'wc', 'sort', 'uniq',
@@ -163,68 +163,68 @@ class CommandValidator:
         'python', 'pip', 'npm', 'node', 'java', 'javac', 'gcc', 'make',
         'docker', 'kubectl', 'terraform', 'ansible', 'vim', 'nano', 'emacs'
     }
-    
+
     def __init__(self, config: Dict[str, Any] = None):
         self.config = config or {}
         self.custom_rules = []
         self.whitelist = set(self.SAFE_COMMANDS)
         self.blacklist = set(self.DANGEROUS_COMMANDS.keys())
         self.enabled = self.config.get('enabled', True)
-        
+
     def validate_command(self, command: str, context: Dict[str, Any] = None) -> Tuple[bool, str, RiskLevel]:
         """
         Validate a command against security policies.
-        
+
         Returns:
             Tuple of (is_valid, reason, risk_level)
         """
         if not self.enabled:
             return True, "Security validation disabled", RiskLevel.LOW
-        
+
         if not command or not command.strip():
             return False, "Empty command", RiskLevel.LOW
-        
+
         command = command.strip()
-        
+
         # Check for dangerous commands
         for dangerous_cmd, reason in self.DANGEROUS_COMMANDS.items():
             if dangerous_cmd.lower() in command.lower():
                 return False, f"Dangerous command detected: {reason}", RiskLevel.CRITICAL
-        
+
         # Check for suspicious patterns
         for pattern, reason in self.SUSPICIOUS_PATTERNS.items():
             if re.search(pattern, command, re.IGNORECASE):
                 return False, f"Suspicious pattern detected: {reason}", RiskLevel.HIGH
-        
+
         # Check custom rules
         for rule in self.custom_rules:
             if not self._evaluate_rule(rule, command, context):
                 return False, f"Custom rule violation: {rule['name']}", RiskLevel.MEDIUM
-        
+
         # Extract base command
         base_cmd = command.split()[0] if command.split() else ""
-        
+
         # Check if command is explicitly safe
         if base_cmd in self.whitelist:
             return True, "Safe command", RiskLevel.LOW
-        
+
         # Check if command is explicitly dangerous
         if base_cmd in self.blacklist:
             return False, "Blacklisted command", RiskLevel.HIGH
-        
+
         # Check for file system operations in sensitive directories
         sensitive_dirs = ['/etc', '/usr/bin', '/usr/sbin', '/bin', '/sbin', '/root', '/home']
         for dir_path in sensitive_dirs:
             if dir_path in command:
                 return False, f"Operation in sensitive directory: {dir_path}", RiskLevel.HIGH
-        
+
         # Default to medium risk for unknown commands
         return True, "Unknown command - proceed with caution", RiskLevel.MEDIUM
-    
+
     def _evaluate_rule(self, rule: Dict[str, Any], command: str, context: Dict[str, Any]) -> bool:
         """Evaluate a custom security rule."""
         rule_type = rule.get('type', 'regex')
-        
+
         if rule_type == 'regex':
             pattern = rule.get('pattern', '')
             return not re.search(pattern, command, re.IGNORECASE)
@@ -232,17 +232,17 @@ class CommandValidator:
             func = rule.get('function')
             if callable(func):
                 return func(command, context)
-        
+
         return True
-    
+
     def add_custom_rule(self, rule: Dict[str, Any]):
         """Add a custom security rule."""
         self.custom_rules.append(rule)
-    
+
     def add_to_whitelist(self, command: str):
         """Add a command to the whitelist."""
         self.whitelist.add(command)
-    
+
     def add_to_blacklist(self, command: str):
         """Add a command to the blacklist."""
         self.blacklist.add(command)
@@ -250,7 +250,7 @@ class CommandValidator:
 
 class InputSanitizer:
     """Sanitizes user input to prevent injection attacks."""
-    
+
     # Dangerous characters and patterns
     DANGEROUS_CHARS = {
         '<': '&lt;',
@@ -261,13 +261,13 @@ class InputSanitizer:
         '/': '&#x2F;',
         '\\': '&#x5C;'
     }
-    
+
     SQL_INJECTION_PATTERNS = [
         r"('|(\\')|(;)|(\\;)|(--|/\\*|\\*/)|(\bunion\b)|(\bselect\b)|(\binsert\b)|(\bdelete\b)|(\bupdate\b)|(\bcreate\b)|(\bdrop\b)|(\balter\b)|(\bexec\b)|(\bexecute\b)|(\bsp_\b))",
         r"(union)|(select)|(insert)|(delete)|(update)|(create)|(drop)|(alter)|(exec)|(execute)|(sp_)",
         r"(script)|(javascript)|(vbscript)|(onload)|(onerror)|(onclick)"
     ]
-    
+
     XSS_PATTERNS = [
         r"<script[^>]*>.*?</script>",
         r"javascript:",
@@ -283,32 +283,32 @@ class InputSanitizer:
         r"vbscript:",
         r"data:text/html"
     ]
-    
+
     def __init__(self, config: Dict[str, Any] = None):
         self.config = config or {}
         self.enabled = self.config.get('enabled', True)
         self.strict_mode = self.config.get('strict_mode', False)
-        
+
     def sanitize_input(self, input_data: str, input_type: str = 'text') -> str:
         """
         Sanitize input data to prevent injection attacks.
-        
+
         Args:
             input_data: The input string to sanitize
             input_type: Type of input (text, html, command, sql, etc.)
-            
+
         Returns:
             Sanitized input string
         """
         if not self.enabled:
             return input_data
-        
+
         if not input_data:
             return input_data
-        
+
         # Basic sanitization for all input types
         sanitized = self._basic_sanitize(input_data)
-        
+
         # Type-specific sanitization
         if input_type == 'html':
             sanitized = self._sanitize_html(sanitized)
@@ -318,42 +318,42 @@ class InputSanitizer:
             sanitized = self._sanitize_sql(sanitized)
         elif input_type == 'path':
             sanitized = self._sanitize_path(sanitized)
-        
+
         return sanitized
-    
+
     def _basic_sanitize(self, input_data: str) -> str:
         """Basic sanitization for all input types."""
         # Remove or escape dangerous characters
         sanitized = input_data
-        
+
         for char, replacement in self.DANGEROUS_CHARS.items():
             sanitized = sanitized.replace(char, replacement)
-        
+
         # Remove null bytes
         sanitized = sanitized.replace('\x00', '')
-        
+
         # Normalize whitespace
         sanitized = ' '.join(sanitized.split())
-        
+
         return sanitized
-    
+
     def _sanitize_html(self, input_data: str) -> str:
         """Sanitize HTML input to prevent XSS."""
         sanitized = input_data
-        
+
         # Remove dangerous patterns
         for pattern in self.XSS_PATTERNS:
             sanitized = re.sub(pattern, '', sanitized, flags=re.IGNORECASE)
-        
+
         # Remove script tags and their content
         sanitized = re.sub(r'<script[^>]*>.*?</script>', '', sanitized, flags=re.IGNORECASE | re.DOTALL)
-        
+
         return sanitized
-    
+
     def _sanitize_command(self, input_data: str) -> str:
         """Sanitize command input to prevent command injection."""
         sanitized = input_data
-        
+
         # Remove dangerous command patterns
         dangerous_patterns = [
             r'[;&|`]',  # Command separators
@@ -364,85 +364,85 @@ class InputSanitizer:
             r'<<.*',  # Here document
             r'>>.*',  # Append redirection
         ]
-        
+
         for pattern in dangerous_patterns:
             sanitized = re.sub(pattern, '', sanitized)
-        
+
         return sanitized
-    
+
     def _sanitize_sql(self, input_data: str) -> str:
         """Sanitize SQL input to prevent SQL injection."""
         sanitized = input_data
-        
+
         # Remove dangerous SQL patterns
         for pattern in self.SQL_INJECTION_PATTERNS:
             sanitized = re.sub(pattern, '', sanitized, flags=re.IGNORECASE)
-        
+
         # Escape single quotes
         sanitized = sanitized.replace("'", "''")
-        
+
         return sanitized
-    
+
     def _sanitize_path(self, input_data: str) -> str:
         """Sanitize file path input to prevent directory traversal."""
         sanitized = input_data
-        
+
         # Remove directory traversal patterns
         sanitized = re.sub(r'\.\./', '', sanitized)
         sanitized = re.sub(r'\.\.\\', '', sanitized)
         sanitized = re.sub(r'%2e%2e%2f', '', sanitized, flags=re.IGNORECASE)
         sanitized = re.sub(r'%2e%2e%5c', '', sanitized, flags=re.IGNORECASE)
-        
+
         # Normalize path separators
         sanitized = sanitized.replace('\\', '/')
-        
+
         # Remove multiple slashes
         sanitized = re.sub(r'/+', '/', sanitized)
-        
+
         return sanitized
-    
+
     def is_safe_input(self, input_data: str, input_type: str = 'text') -> Tuple[bool, str]:
         """
         Check if input is safe without sanitizing.
-        
+
         Returns:
             Tuple of (is_safe, reason)
         """
         if not input_data:
             return True, "Empty input"
-        
+
         # Check for dangerous patterns based on input type
         if input_type == 'html':
             for pattern in self.XSS_PATTERNS:
                 if re.search(pattern, input_data, re.IGNORECASE):
                     return False, f"XSS pattern detected: {pattern}"
-        
+
         elif input_type == 'sql':
             for pattern in self.SQL_INJECTION_PATTERNS:
                 if re.search(pattern, input_data, re.IGNORECASE):
                     return False, f"SQL injection pattern detected: {pattern}"
-        
+
         elif input_type == 'command':
             dangerous_patterns = [r'[;&|`]', r'\$\(.*\)', r'`.*`']
             for pattern in dangerous_patterns:
                 if re.search(pattern, input_data):
                     return False, f"Command injection pattern detected: {pattern}"
-        
+
         elif input_type == 'path':
             if re.search(r'\.\./', input_data) or re.search(r'\.\.\\', input_data):
                 return False, "Directory traversal pattern detected"
-        
+
         return True, "Input appears safe"
 
 
 class AuditLogger:
     """Handles audit logging for security events."""
-    
+
     def __init__(self, db_path: str = "security_audit.db"):
         self.db_path = db_path
         self.lock = threading.Lock()
         self._init_database()
-        
+
     def _init_database(self):
         """Initialize the audit database."""
         with self._get_db_connection() as conn:
@@ -462,19 +462,19 @@ class AuditLogger:
                     ip_address TEXT
                 )
             ''')
-            
+
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_timestamp ON security_events(timestamp)
             ''')
-            
+
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_agent_id ON security_events(agent_id)
             ''')
-            
+
             conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_risk_level ON security_events(risk_level)
             ''')
-    
+
     @contextmanager
     def _get_db_connection(self):
         """Get a database connection with proper locking."""
@@ -488,7 +488,7 @@ class AuditLogger:
                 raise
             finally:
                 conn.close()
-    
+
     def log_security_event(self, event: SecurityEvent):
         """Log a security event to the audit database."""
         with self._get_db_connection() as conn:
@@ -510,41 +510,41 @@ class AuditLogger:
                 event.user_id,
                 event.ip_address
             ))
-    
-    def get_security_events(self, 
+
+    def get_security_events(self,
                            start_time: datetime = None,
                            end_time: datetime = None,
                            agent_id: str = None,
                            risk_level: RiskLevel = None,
                            limit: int = 100) -> List[SecurityEvent]:
         """Retrieve security events from the audit log."""
-        
+
         query = "SELECT * FROM security_events WHERE 1=1"
         params = []
-        
+
         if start_time:
             query += " AND timestamp >= ?"
             params.append(start_time.isoformat())
-        
+
         if end_time:
             query += " AND timestamp <= ?"
             params.append(end_time.isoformat())
-        
+
         if agent_id:
             query += " AND agent_id = ?"
             params.append(agent_id)
-        
+
         if risk_level:
             query += " AND risk_level = ?"
             params.append(risk_level.value)
-        
+
         query += " ORDER BY timestamp DESC LIMIT ?"
         params.append(limit)
-        
+
         with self._get_db_connection() as conn:
             cursor = conn.execute(query, params)
             rows = cursor.fetchall()
-        
+
         events = []
         for row in rows:
             event = SecurityEvent(
@@ -561,13 +561,13 @@ class AuditLogger:
                 ip_address=row[11]
             )
             events.append(event)
-        
+
         return events
-    
+
     def get_security_summary(self, hours: int = 24) -> Dict[str, Any]:
         """Get security summary for the specified time period."""
         start_time = datetime.now() - timedelta(hours=hours)
-        
+
         with self._get_db_connection() as conn:
             # Get total events
             cursor = conn.execute(
@@ -575,36 +575,36 @@ class AuditLogger:
                 (start_time.isoformat(),)
             )
             total_events = cursor.fetchone()[0]
-            
+
             # Get events by risk level
             cursor = conn.execute('''
-                SELECT risk_level, COUNT(*) 
-                FROM security_events 
-                WHERE timestamp >= ? 
+                SELECT risk_level, COUNT(*)
+                FROM security_events
+                WHERE timestamp >= ?
                 GROUP BY risk_level
             ''', (start_time.isoformat(),))
             risk_summary = dict(cursor.fetchall())
-            
+
             # Get top agents by event count
             cursor = conn.execute('''
-                SELECT agent_id, COUNT(*) 
-                FROM security_events 
-                WHERE timestamp >= ? 
-                GROUP BY agent_id 
-                ORDER BY COUNT(*) DESC 
+                SELECT agent_id, COUNT(*)
+                FROM security_events
+                WHERE timestamp >= ?
+                GROUP BY agent_id
+                ORDER BY COUNT(*) DESC
                 LIMIT 10
             ''', (start_time.isoformat(),))
             top_agents = dict(cursor.fetchall())
-            
+
             # Get event types
             cursor = conn.execute('''
-                SELECT event_type, COUNT(*) 
-                FROM security_events 
-                WHERE timestamp >= ? 
+                SELECT event_type, COUNT(*)
+                FROM security_events
+                WHERE timestamp >= ?
                 GROUP BY event_type
             ''', (start_time.isoformat(),))
             event_types = dict(cursor.fetchall())
-        
+
         return {
             'period_hours': hours,
             'total_events': total_events,
@@ -617,13 +617,13 @@ class AuditLogger:
 
 class AccessControlManager:
     """Manages role-based access control."""
-    
+
     def __init__(self, config: Dict[str, Any] = None):
         self.config = config or {}
         self.permissions = self._init_permissions()
         self.user_roles = {}
         self.session_permissions = {}
-        
+
     def _init_permissions(self) -> Dict[AccessLevel, Set[str]]:
         """Initialize default permissions for each access level."""
         return {
@@ -646,33 +646,33 @@ class AccessControlManager:
                 'internal_operations', 'bypass_security'
             }
         }
-    
+
     def assign_role(self, user_id: str, role: AccessLevel):
         """Assign a role to a user."""
         self.user_roles[user_id] = role
-        
+
     def check_permission(self, user_id: str, permission: str, session_id: str = None) -> bool:
         """Check if a user has a specific permission."""
         # Check session-specific permissions first
         if session_id and session_id in self.session_permissions:
             if permission in self.session_permissions[session_id]:
                 return True
-        
+
         # Check user role permissions
         user_role = self.user_roles.get(user_id, AccessLevel.VIEWER)
         return permission in self.permissions.get(user_role, set())
-    
+
     def grant_session_permission(self, session_id: str, permission: str):
         """Grant a temporary permission for a session."""
         if session_id not in self.session_permissions:
             self.session_permissions[session_id] = set()
         self.session_permissions[session_id].add(permission)
-    
+
     def revoke_session_permission(self, session_id: str, permission: str):
         """Revoke a temporary permission for a session."""
         if session_id in self.session_permissions:
             self.session_permissions[session_id].discard(permission)
-    
+
     def get_user_permissions(self, user_id: str) -> Set[str]:
         """Get all permissions for a user."""
         user_role = self.user_roles.get(user_id, AccessLevel.VIEWER)
@@ -681,7 +681,7 @@ class AccessControlManager:
 
 class SecurityManager:
     """Main security manager that coordinates all security components."""
-    
+
     def __init__(self, config: Dict[str, Any] = None):
         self.config = config or {}
         self.command_validator = CommandValidator(self.config.get('command_validator', {}))
@@ -689,8 +689,8 @@ class SecurityManager:
         self.audit_logger = AuditLogger(self.config.get('audit_db_path', 'security_audit.db'))
         self.access_control = AccessControlManager(self.config.get('access_control', {}))
         self.enabled = self.config.get('enabled', True)
-        
-    def validate_operation(self, 
+
+    def validate_operation(self,
                           operation: str,
                           agent_id: str,
                           session_id: str,
@@ -698,15 +698,15 @@ class SecurityManager:
                           context: Dict[str, Any] = None) -> Tuple[bool, str, RiskLevel]:
         """
         Validate an operation against all security policies.
-        
+
         Returns:
             Tuple of (is_valid, reason, risk_level)
         """
         if not self.enabled:
             return True, "Security disabled", RiskLevel.LOW
-        
+
         context = context or {}
-        
+
         # Check access permissions
         if user_id:
             required_permission = self._get_required_permission(operation)
@@ -721,10 +721,10 @@ class SecurityManager:
                     details={"user_id": user_id, "required_permission": required_permission}
                 )
                 return False, f"Permission denied: {required_permission}", RiskLevel.MEDIUM
-        
+
         # Validate command
         is_valid, reason, risk_level = self.command_validator.validate_command(operation, context)
-        
+
         # Log the validation result
         self._log_security_event(
             agent_id=agent_id,
@@ -735,17 +735,17 @@ class SecurityManager:
             risk_level=risk_level,
             details={"reason": reason, "context": context}
         )
-        
+
         return is_valid, reason, risk_level
-    
+
     def sanitize_input(self, input_data: str, input_type: str = 'text') -> str:
         """Sanitize input data."""
         return self.input_sanitizer.sanitize_input(input_data, input_type)
-    
+
     def is_safe_input(self, input_data: str, input_type: str = 'text') -> Tuple[bool, str]:
         """Check if input is safe."""
         return self.input_sanitizer.is_safe_input(input_data, input_type)
-    
+
     def _get_required_permission(self, operation: str) -> str:
         """Get the required permission for an operation."""
         # Map operations to required permissions
@@ -759,10 +759,10 @@ class SecurityManager:
             'manage_security': 'manage_security',
             'system_admin': 'system_admin'
         }
-        
+
         return permission_map.get(operation, 'read_status')
-    
-    def _log_security_event(self, 
+
+    def _log_security_event(self,
                            agent_id: str,
                            session_id: str,
                            event_type: str,
@@ -786,42 +786,16 @@ class SecurityManager:
             user_id=user_id,
             ip_address=ip_address
         )
-        
+
         self.audit_logger.log_security_event(event)
-    
+
     def get_security_summary(self, hours: int = 24) -> Dict[str, Any]:
         """Get security summary."""
         return self.audit_logger.get_security_summary(hours)
-    
-    
+
     def get_security_events(self, **kwargs) -> List[SecurityEvent]:
         """Get security events."""
         return self.audit_logger.get_security_events(**kwargs)
-    
-    async def validate_command(self, command: str, user_id: str = None) -> Dict[str, Any]:
-        """Async wrapper for command validation."""
-        context = {'user_id': user_id} if user_id else {}
-        is_valid, reason, risk_level = self.command_validator.validate_command(command, context)
-        
-        return {
-            'valid': is_valid,
-            'message': reason,
-            'risk_level': risk_level.value
-        }
-    
-    def sanitize_input(self, input_data: str, input_type: str = 'text') -> str:
-        """Sanitize input data."""
-        return self.input_sanitizer.sanitize_input(input_data, input_type)
-    
-    async def log_security_event(self, event: SecurityEvent) -> None:
-        """Log a security event."""
-        self.audit_logger.log_event(event)
-    
-    async def get_recent_events(self, limit: int = 100, risk_level: str = None) -> List[SecurityEvent]:
-        """Get recent security events."""
-        # This is a simplified implementation
-        # In a real system, this would query the database
-        return []
 
 
 # Global security manager instance
@@ -854,9 +828,9 @@ if __name__ == "__main__":
             'input_sanitizer': {'enabled': True, 'strict_mode': True},
             'audit_db_path': 'test_security_audit.db'
         }
-        
+
         sm = SecurityManager(config)
-        
+
         # Test command validation
         test_commands = [
             "ls -la",
@@ -867,14 +841,14 @@ if __name__ == "__main__":
             "SELECT * FROM users",
             "git status"
         ]
-        
+
         print("Command Validation Tests:")
         for cmd in test_commands:
             is_valid, reason, risk_level = sm.validate_operation(cmd, "test_agent", "test_session")
             print(f"Command: {cmd}")
             print(f"  Valid: {is_valid}, Reason: {reason}, Risk: {risk_level.value}")
             print()
-        
+
         # Test input sanitization
         test_inputs = [
             ("<script>alert('xss')</script>", "html"),
@@ -883,7 +857,7 @@ if __name__ == "__main__":
             ("../../../etc/passwd", "path"),
             ("Normal text input", "text")
         ]
-        
+
         print("Input Sanitization Tests:")
         for input_data, input_type in test_inputs:
             is_safe, reason = sm.is_safe_input(input_data, input_type)
@@ -893,11 +867,11 @@ if __name__ == "__main__":
             print(f"  Safe: {is_safe}, Reason: {reason}")
             print(f"  Sanitized: {sanitized}")
             print()
-        
+
         # Test access control
         sm.access_control.assign_role("user1", AccessLevel.DEVELOPER)
         sm.access_control.assign_role("user2", AccessLevel.VIEWER)
-        
+
         print("Access Control Tests:")
         permissions = ["execute_commands", "manage_users", "read_logs"]
         for user in ["user1", "user2"]:
@@ -906,10 +880,10 @@ if __name__ == "__main__":
                 has_perm = sm.access_control.check_permission(user, perm)
                 print(f"  {perm}: {has_perm}")
             print()
-        
+
         # Get security summary
         print("Security Summary:")
         summary = sm.get_security_summary(hours=1)
         print(json.dumps(summary, indent=2))
-    
+
     main()
