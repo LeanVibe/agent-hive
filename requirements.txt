@@ -25,8 +25,9 @@ fastapi>=0.104.0
 uvicorn>=0.24.0
 pydantic>=2.0.0
 
-# HTTP and API clients
-aiohttp>=3.8.0
+# Database drivers and Redis
+asyncpg>=0.29.0
+redis>=5.0.0
 
 # Configuration and utilities
 python-dotenv>=1.0.0
