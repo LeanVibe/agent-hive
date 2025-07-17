@@ -234,7 +234,7 @@ class ScalingManager:
             self.logger.error(f"Error checking scale down conditions: {e}")
             return False, None
 
-    async def scale_up(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
+    async def scale_up(self, coordinator: 'MultiAgentCoordinator', count: int | None = None) -> List[str]:
         """
         Scale up the number of agents.
         
@@ -275,7 +275,7 @@ class ScalingManager:
             self.logger.error(f"Failed to scale up: {e}")
             raise ScalingException(f"Scale up failed: {e}")
 
-    async def scale_down(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
+    async def scale_down(self, coordinator: 'MultiAgentCoordinator', count: int | None = None) -> List[str]:
         """
         Scale down the number of agents.
         
@@ -353,7 +353,7 @@ class ScalingManager:
         Get scaling statistics.
         
         Returns:
-            Dict[str, any]: Scaling statistics
+            Dict[str, Any]: Scaling statistics
         """
         total_events = len(self.scaling_history)
         successful_events = len([e for e in self.scaling_history if e.success])
