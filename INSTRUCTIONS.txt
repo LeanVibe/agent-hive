@@ -1,4 +1,4 @@
 TASK INSTRUCTIONS:
-🚀 MISSION: Priority 1.0 - Product management role: Foundation Epic Phase 2 planning, sprint coordination, epic breakdown, and critical documentation workflow optimization. Read your CLAUDE.md file for detailed instructions. Acknowledge receipt and begin work. Report progress every 2 hours to pm-agent.
+🚀 MISSION: Priority 1.3-high - Repository cleanup and GitHub project synchronization. Identify and safely delete merged feature branches. Update all GitHub issues with Foundation Epic Phase 2 status. Consolidate main branch with completed Foundation Epic work. Clean up stale worktrees and temporary files.. Read your CLAUDE.md file for detailed instructions. Acknowledge receipt and begin work. Report progress every 2 hours to pm-agent.
 
-Delivered at: 2025-07-17T01:56:14.388946
+Delivered at: 2025-07-17T08:24:17.786039
