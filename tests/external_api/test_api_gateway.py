@@ -68,6 +68,7 @@ class TestApiGateway:
             client_ip="127.0.0.1"
         )
 
+    @pytest.mark.asyncio
     async def test_gateway_initialization(self, api_gateway, gateway_config):
         """Test API gateway initialization."""
         assert api_gateway.config == gateway_config
@@ -78,6 +79,7 @@ class TestApiGateway:
         assert not api_gateway.server_started
         assert api_gateway._request_count == 0
 
+    @pytest.mark.asyncio
     async def test_start_stop_server(self, api_gateway):
         """Test server start and stop functionality."""
         # Test start
@@ -96,6 +98,7 @@ class TestApiGateway:
         await api_gateway.stop_server()  # Should not raise error
         assert not api_gateway.server_started
 
+    @pytest.mark.asyncio
     async def test_register_route(self, api_gateway):
         """Test route registration."""
         async def test_handler(request):
@@ -114,6 +117,7 @@ class TestApiGateway:
         with pytest.raises(ValueError, match="Handler must be an async function"):
             api_gateway.register_route("/sync", "GET", sync_handler)
 
+    @pytest.mark.asyncio
     async def test_unregister_route(self, api_gateway):
         """Test route unregistration."""
         async def test_handler(request):
@@ -138,6 +142,7 @@ class TestApiGateway:
         result = api_gateway.unregister_route("/non_existent", "GET")
         assert result is False
 
+    @pytest.mark.asyncio
     async def test_add_middleware(self, api_gateway):
         """Test middleware addition."""
         async def test_middleware(request):
@@ -155,6 +160,7 @@ class TestApiGateway:
         with pytest.raises(ValueError, match="Middleware must be an async function"):
             api_gateway.add_middleware(sync_middleware)
 
+    @pytest.mark.asyncio
     async def test_register_api_key(self, auth_gateway):
         """Test API key registration."""
         metadata = {
@@ -172,6 +178,7 @@ class TestApiGateway:
         assert "created_at" in key_data
         assert key_data["request_count"] == 0
 
+    @pytest.mark.asyncio
     async def test_handle_request_success(self, api_gateway, sample_request):
         """Test successful request handling."""
         async def test_handler(request):
@@ -190,6 +197,7 @@ class TestApiGateway:
         assert response.request_id == sample_request.request_id
         assert response.processing_time > 0
 
+    @pytest.mark.asyncio
     async def test_handle_request_route_not_found(self, api_gateway, sample_request):
         """Test handling of non-existent routes."""
         response = await api_gateway.handle_request(sample_request)
@@ -197,6 +205,7 @@ class TestApiGateway:
         assert response.status_code == 404
         assert "Route not found" in response.body["error"]
 
+    @pytest.mark.asyncio
     async def test_handle_request_authentication_required(self, auth_gateway, sample_request):
         """Test authentication when required."""
         # No API key provided
@@ -221,6 +230,7 @@ class TestApiGateway:
         response = await auth_gateway.handle_request(sample_request)
         assert response.status_code == 200
 
+    @pytest.mark.asyncio
     async def test_handle_request_rate_limiting(self, api_gateway, sample_request):
         """Test rate limiting functionality."""
         async def test_handler(request):
@@ -238,6 +248,7 @@ class TestApiGateway:
         assert response.status_code == 429
         assert "Rate limit exceeded" in response.body["error"]
 
+    @pytest.mark.asyncio
     async def test_handle_request_cors_preflight(self, api_gateway):
         """Test CORS preflight handling."""
         options_request = ApiRequest(
@@ -257,6 +268,7 @@ class TestApiGateway:
         assert "Access-Control-Allow-Origin" in response.headers
         assert "Access-Control-Allow-Methods" in response.headers
 
+    @pytest.mark.asyncio
     async def test_handle_request_timeout(self, api_gateway, sample_request):
         """Test request timeout handling."""
         async def slow_handler(request):
@@ -269,6 +281,7 @@ class TestApiGateway:
         assert response.status_code == 504
         assert "Request timeout" in response.body["error"]
 
+    @pytest.mark.asyncio
     async def test_handle_request_handler_error(self, api_gateway, sample_request):
         """Test handler error handling."""
         async def error_handler(request):
@@ -280,6 +293,7 @@ class TestApiGateway:
         assert response.status_code == 500
         assert "Internal server error" in response.body["error"]
 
+    @pytest.mark.asyncio
     async def test_middleware_processing(self, api_gateway, sample_request):
         """Test middleware processing."""
         middleware_calls = []
@@ -321,6 +335,7 @@ class TestApiGateway:
         assert response.status_code == 403
         assert middleware_calls == ["middleware1", "middleware2", "stopping"]
 
+    @pytest.mark.asyncio
     async def test_find_handler(self, api_gateway):
         """Test route handler finding logic."""
         async def test_handler(request):
@@ -344,6 +359,7 @@ class TestApiGateway:
         handler = api_gateway._find_handler("/tasks", "POST")
         assert handler is None
 
+    @pytest.mark.asyncio
     async def test_get_gateway_info(self, api_gateway):
         """Test gateway information retrieval."""
         async def handler1(request):
@@ -365,6 +381,7 @@ class TestApiGateway:
         assert info["middleware_count"] == 0
         assert info["total_requests"] == 0
 
+    @pytest.mark.asyncio
     async def test_health_check(self, api_gateway):
         """Test health check functionality."""
         # Health check when stopped
@@ -379,6 +396,7 @@ class TestApiGateway:
         assert health["server_running"] is True
         assert "timestamp" in health
 
+    @pytest.mark.asyncio
     async def test_api_gateway_config_validation(self):
         """Test API gateway configuration validation."""
         # Test invalid port
@@ -392,6 +410,7 @@ class TestApiGateway:
         with pytest.raises(ValueError, match="Request timeout must be positive"):
             ApiGatewayConfig(request_timeout=0)
 
+    @pytest.mark.asyncio
     async def test_api_request_validation(self):
         """Test API request validation."""
         # Test valid request
@@ -433,6 +452,7 @@ class TestApiGateway:
                 client_ip="127.0.0.1"
             )
 
+    @pytest.mark.asyncio
     async def test_api_response_validation(self):
         """Test API response validation."""
         # Test valid response

@@ -1,7 +1,7 @@
 {
-  "agent_name": "frontend",
+  "agent_name": "integration-specialist",
   "task_description": "main",
-  "created_at": "2025-07-17T08:24:49.657566",
+  "created_at": "2025-07-17T01:56:06.349359",
   "quality_gates": {
     "max_pr_size": 500,
     "required_tests": true,
