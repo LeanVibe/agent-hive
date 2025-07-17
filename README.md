@@ -125,7 +125,7 @@ python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Verify installation
 pytest
@@ -309,7 +309,8 @@ tests/
 
 main.py                         # ✅ Basic entry point
 pyproject.toml                  # ✅ Project configuration
-requirements.txt               # ✅ Dependencies
+pyproject.toml                # ✅ Dependencies & project config
+uv.lock                       # ✅ Locked dependencies
 
 # NOT YET IMPLEMENTED ❌
 .claude/                       # ❌ Will be created in Phase 0
@@ -428,16 +429,12 @@ bun test
    ```
 3. **Modern Development Setup**:
    ```bash
-   uv sync --dev  # UV setup
-   # or
-   pip install -r requirements.txt  # Traditional setup
+   uv sync --dev  # Install dependencies with dev tools
    ```
 4. **Write Tests First**: Follow TDD approach
 5. **Run Test Suite**: Ensure all tests pass
    ```bash
-   uv run pytest  # UV
-   # or
-   pytest  # Traditional
+   uv run pytest  # Run tests with uv
    ```
 6. **Submit PR**: Include test results and clear description
 

@@ -152,7 +152,7 @@ fi
 
 # 7. Validate that required files exist
 print_step "Validating project structure"
-required_files=("cli.py" "advanced_orchestration/__init__.py" "requirements.txt")
+required_files=("cli.py" "advanced_orchestration/__init__.py" "pyproject.toml")
 for file in "${required_files[@]}"; do
     if [ ! -f "$file" ]; then
         print_status 1 "Project structure validation"
