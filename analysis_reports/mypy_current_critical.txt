@@ -1,0 +1,50 @@
+scripts/validate_links.py: note: In member "generate_report" of class "LinkValidator":
+scripts/validate_links.py:447:13: error: Need type annotation for "broken_by_file" (hint: "broken_by_file: dict[<type>, <type>] = ...")  [var-annotated]
+scripts/fix_documentation_issues.py: note: In member "__init__" of class "DocumentationFixer":
+scripts/fix_documentation_issues.py:23:9: error: Need type annotation for "fixes_applied" (hint: "fixes_applied: list[<type>] = ...")  [var-annotated]
+scripts/fix_documentation_issues.py: note: In member "fix_yaml_multi_document_issues" of class "DocumentationFixer":
+scripts/fix_documentation_issues.py:91:9: error: Need type annotation for "fixes" (hint: "fixes: list[<type>] = ...")  [var-annotated]
+test_runner.py: note: In member "run_unit_tests" of class "TestRunner":
+test_runner.py:77:13: error: Unsupported operand types for + ("object" and "float")  [operator]
+test_runner.py: note: In member "validate_quality_gates" of class "TestRunner":
+test_runner.py:210:23: error: Unsupported operand types for <= ("float" and "object")  [operator]
+test_runner.py:233:23: error: Unsupported operand types for >= ("float" and "object")  [operator]
+test_runner.py: note: In member "_load_coverage_data" of class "TestRunner":
+test_runner.py:268:17: error: Returning Any from function declared to return "dict[str, Any] | None"  [no-any-return]
+test_runner.py: note: In member "_load_security_data" of class "TestRunner":
+test_runner.py:276:17: error: Returning Any from function declared to return "dict[str, Any] | None"  [no-any-return]
+test_runner.py: note: In member "generate_report" of class "TestRunner":
+test_runner.py:286:28: error: Generator has incompatible item type "int"; expected "bool"  [misc]
+test_runner.py:286:42: error: "object" has no attribute "__iter__"; maybe "__dir__" or "__str__"? (not iterable)  [attr-defined]
+test_runner.py:287:27: error: Argument 1 to "len" has incompatible type "object"; expected "Sized"  [arg-type]
+test_runner.py:305:21: error: "object" has no attribute "__iter__"; maybe "__dir__" or "__str__"? (not iterable)  [attr-defined]
+test_runner.py:312:55: error: "object" has no attribute "__iter__"; maybe "__dir__" or "__str__"? (not iterable)  [attr-defined]
+github_issue_templates.py: note: In member "generate_agent_progress_update" of class "GitHubIssueTemplate":
+github_issue_templates.py:67:63: error: Incompatible default for argument "detailed_progress" (default has type "None", argument has type "str")  [assignment]
+github_issue_templates.py:67:63: note: PEP 484 prohibits implicit Optional. Accordingly, mypy has changed its default to no_implicit_optional=True
+github_issue_templates.py:67:63: note: Use https://github.com/hauntsaninja/no_implicit_optional to automatically upgrade your codebase
+tutorials/validate_tutorials.py:19:1: error: Cannot find implementation or library stub for module named "framework.tutorial_manager"  [import-not-found]
+tutorials/validate_tutorials.py:20:1: error: Cannot find implementation or library stub for module named "framework.validation"  [import-not-found]
+tutorials/framework/tutorial_manager.py: note: In member "save_progress" of class "TutorialManager":
+tutorials/framework/tutorial_manager.py:228:5: error: Function is missing a return type annotation  [no-untyped-def]
+scripts/run_quality_gates.py: note: In member "_load_quality_config" of class "QualityGatesRunner":
+scripts/run_quality_gates.py:42:17: error: Returning Any from function declared to return "dict[str, Any]"  [no-any-return]
+scripts/run_quality_gates.py: note: In member "run_all_gates" of class "QualityGatesRunner":
+scripts/run_quality_gates.py:62:9: error: Unsupported target for indexed assignment ("object")  [index]
+scripts/run_quality_gates.py:65:13: error: "object" has no attribute "extend"  [attr-defined]
+scripts/run_quality_gates.py:69:9: error: Unsupported target for indexed assignment ("object")  [index]
+scripts/run_quality_gates.py:72:13: error: "object" has no attribute "extend"  [attr-defined]
+scripts/run_quality_gates.py:76:9: error: Unsupported target for indexed assignment ("object")  [index]
+scripts/run_quality_gates.py:79:13: error: "object" has no attribute "extend"  [attr-defined]
+scripts/run_quality_gates.py:83:9: error: Unsupported target for indexed assignment ("object")  [index]
+scripts/run_quality_gates.py:86:13: error: "object" has no attribute "extend"  [attr-defined]
+scripts/run_quality_gates.py:90:9: error: Unsupported target for indexed assignment ("object")  [index]
+scripts/run_quality_gates.py:93:13: error: "object" has no attribute "extend"  [attr-defined]
+scripts/run_quality_gates.py:97:9: error: Unsupported target for indexed assignment ("object")  [index]
+scripts/run_quality_gates.py:100:13: error: "object" has no attribute "extend"  [attr-defined]
+scripts/run_quality_gates.py:103:29: error: Generator has incompatible item type "int"; expected "bool"  [misc]
+scripts/run_quality_gates.py:103:44: error: "object" has no attribute "values"  [attr-defined]
+scripts/run_quality_gates.py:104:28: error: Argument 1 to "len" has incompatible type "object"; expected "Sized"  [arg-type]
+scripts/run_quality_gates.py: note: In member "print_results" of class "QualityGatesRunner":
+scripts/run_quality_gates.py:431:5: error: Function is missing a return type annotation  [no-untyped-def]
+scripts/pr_resolution_monitor.py: note: In member "get_pr_status" of class "PRResolutionMonitor":
