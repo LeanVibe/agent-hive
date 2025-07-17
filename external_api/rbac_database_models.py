@@ -116,7 +116,7 @@ class EnhancedRole(Base):
     enhanced_metadata = Column(JSON, nullable=True)
     
     # Relationships
-    users = relationship("SecurityUser", secondary="user_roles", back_populates="roles")
+    users = relationship("User", secondary="user_roles", back_populates="roles")
     permissions = relationship("EnhancedPermission", secondary=enhanced_role_permissions, back_populates="roles")
     
     # Hierarchy relationships
@@ -226,7 +226,7 @@ class EnhancedPermission(Base):
     
     # Relationships
     roles = relationship("EnhancedRole", secondary=enhanced_role_permissions, back_populates="permissions")
-    users = relationship("SecurityUser", secondary=user_direct_permissions, back_populates="direct_permissions")
+    users = relationship("User", secondary=user_direct_permissions, back_populates="direct_permissions")
     
     # Indexes
     __table_args__ = (
@@ -324,7 +324,7 @@ class PermissionCache(Base):
     hit_count = Column(Integer, default=0)
     
     # Relationships
-    user = relationship("SecurityUser")
+    user = relationship("User")
     
     # Indexes
     __table_args__ = (
@@ -344,7 +344,7 @@ class PermissionCache(Base):
 # AuditLog is imported from database_models.py to avoid duplication
 
 
-# Extend the SecurityUser model with additional relationships
+# Extend the User model with additional relationships
 SecurityUser.direct_permissions = relationship(
     "EnhancedPermission", 
     secondary=user_direct_permissions, 
