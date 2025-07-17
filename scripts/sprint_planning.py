@@ -50,11 +50,11 @@ class SprintPlan:
 
 class SprintPlanningSystem:
     """Automated sprint planning system with GitHub integration."""
-    
+
     def __init__(self, db_path: str = "sprint_data.db"):
         self.db_path = db_path
         self.init_database()
-    
+
     def init_database(self):
         """Initialize SQLite database for sprint data."""
         with sqlite3.connect(self.db_path) as conn:
@@ -72,7 +72,7 @@ class SprintPlanningSystem:
                     updated_at TEXT NOT NULL
                 )
             """)
-            
+
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS stories (
                     id TEXT PRIMARY KEY,
@@ -88,7 +88,7 @@ class SprintPlanningSystem:
                     FOREIGN KEY (sprint_id) REFERENCES sprints (sprint_id)
                 )
             """)
-            
+
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS velocity_history (
                     sprint_id TEXT PRIMARY KEY,
@@ -98,9 +98,9 @@ class SprintPlanningSystem:
                     recorded_at TEXT NOT NULL
                 )
             """)
-            
+
             conn.commit()
-    
+
     def calculate_team_velocity(self, lookback_sprints: int = 3) -> Tuple[int, Dict]:
         """Calculate team velocity based on historical data."""
         with sqlite3.connect(self.db_path) as conn:
@@ -111,9 +111,9 @@ class SprintPlanningSystem:
                 ORDER BY recorded_at DESC
                 LIMIT ?
             """, (lookback_sprints,))
-            
+
             history = cursor.fetchall()
-        
+
         if not history:
             # Default velocity for new teams
             return 40, {
@@ -122,16 +122,16 @@ class SprintPlanningSystem:
                 "confidence": "low",
                 "recommendation": "Starting with conservative 40 points for new team"
             }
-        
+
         # Calculate statistics
         total_completed = sum(row[1] for row in history)
         total_planned = sum(row[0] for row in history)
         avg_completion_rate = sum(row[2] for row in history) / len(history)
-        
+
         # Calculate velocity with confidence adjustment
         avg_velocity = total_completed / len(history)
         confidence = "high" if len(history) >= 3 else "medium"
-        
+
         metrics = {
             "average_velocity": int(avg_velocity),
             "completion_rate": avg_completion_rate,
@@ -140,16 +140,16 @@ class SprintPlanningSystem:
             "total_completed": total_completed,
             "total_planned": total_planned
         }
-        
+
         return int(avg_velocity), metrics
-    
+
     def estimate_story_points(self, title: str, description: str) -> int:
         """Estimate story points based on title and description complexity."""
         # Simple heuristic-based estimation
         # In production, this could use ML models or historical data
-        
+
         complexity_score = 0
-        
+
         # Factor 1: Description length
         desc_length = len(description.split())
         if desc_length < 20:
@@ -158,27 +158,27 @@ class SprintPlanningSystem:
             complexity_score += 3
         else:
             complexity_score += 5
-        
+
         # Factor 2: Keywords indicating complexity
         high_complexity_keywords = [
             "integration", "api", "database", "authentication", "security",
             "performance", "optimization", "migration", "refactor", "architecture"
         ]
-        
+
         low_complexity_keywords = [
             "fix", "update", "text", "ui", "style", "copy", "documentation"
         ]
-        
+
         text = (title + " " + description).lower()
-        
+
         for keyword in high_complexity_keywords:
             if keyword in text:
                 complexity_score += 2
-        
+
         for keyword in low_complexity_keywords:
             if keyword in text:
                 complexity_score -= 1
-        
+
         # Factor 3: Title complexity indicators
         if "implement" in title.lower():
             complexity_score += 2
@@ -186,10 +186,10 @@ class SprintPlanningSystem:
             complexity_score += 1
         elif "fix" in title.lower():
             complexity_score -= 1
-        
+
         # Convert to Fibonacci story points (1, 2, 3, 5, 8, 13, 21)
         fibonacci_points = [1, 2, 3, 5, 8, 13, 21]
-        
+
         if complexity_score <= 2:
             return 1
         elif complexity_score <= 4:
@@ -204,62 +204,62 @@ class SprintPlanningSystem:
             return 13
         else:
             return 21
-    
+
     def fetch_github_issues(self, labels: List[str] = None) -> List[Dict]:
         """Fetch GitHub issues for sprint planning."""
         try:
             # Build gh command
             cmd = ["gh", "issue", "list", "--json", "number,title,body,labels,assignees", "--limit", "50"]
-            
+
             if labels:
                 for label in labels:
                     cmd.extend(["--label", label])
-            
+
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
             return json.loads(result.stdout)
-        
+
         except subprocess.CalledProcessError as e:
             print(f"Error fetching GitHub issues: {e}")
             return []
         except json.JSONDecodeError as e:
             print(f"Error parsing GitHub issues: {e}")
             return []
-    
-    def create_sprint_plan(self, 
-                          sprint_name: str, 
+
+    def create_sprint_plan(self,
+                          sprint_name: str,
                           goal: str,
                           duration_days: int = 14,
                           include_labels: List[str] = None) -> SprintPlan:
         """Create a new sprint plan with automated story selection."""
-        
+
         # Calculate sprint dates
         start_date = datetime.now().strftime("%Y-%m-%d")
         end_date = (datetime.now() + timedelta(days=duration_days)).strftime("%Y-%m-%d")
-        
+
         # Calculate team velocity
         team_velocity, velocity_metrics = self.calculate_team_velocity()
-        
+
         # Fetch and process GitHub issues
         github_issues = self.fetch_github_issues(include_labels)
-        
+
         # Convert issues to stories with point estimation
         stories = []
         total_points = 0
-        
+
         for issue in github_issues:
             if total_points >= team_velocity:
                 break
-            
+
             title = issue["title"]
             description = issue.get("body", "")
             estimated_points = self.estimate_story_points(title, description)
-            
+
             # Don't exceed velocity
             if total_points + estimated_points > team_velocity:
                 continue
-            
+
             assignee = issue["assignees"][0]["login"] if issue["assignees"] else None
-            
+
             story = SprintStory(
                 id=f"story-{issue['number']}",
                 title=title,
@@ -271,13 +271,13 @@ class SprintPlanningSystem:
                 created_at=datetime.now().isoformat(),
                 updated_at=datetime.now().isoformat()
             )
-            
+
             stories.append(story)
             total_points += estimated_points
-        
+
         # Create sprint plan
         sprint_id = f"sprint-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-        
+
         sprint_plan = SprintPlan(
             sprint_id=sprint_id,
             sprint_name=sprint_name,
@@ -291,19 +291,19 @@ class SprintPlanningSystem:
             created_at=datetime.now().isoformat(),
             updated_at=datetime.now().isoformat()
         )
-        
+
         # Save to database
         self.save_sprint_plan(sprint_plan)
-        
+
         return sprint_plan
-    
+
     def save_sprint_plan(self, sprint_plan: SprintPlan):
         """Save sprint plan to database."""
         with sqlite3.connect(self.db_path) as conn:
             # Save sprint
             conn.execute("""
-                INSERT OR REPLACE INTO sprints 
-                (sprint_id, sprint_name, start_date, end_date, goal, team_velocity, 
+                INSERT OR REPLACE INTO sprints
+                (sprint_id, sprint_name, start_date, end_date, goal, team_velocity,
                  planned_points, status, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
@@ -313,7 +313,7 @@ class SprintPlanningSystem:
                 sprint_plan.planned_points, sprint_plan.status,
                 sprint_plan.created_at, sprint_plan.updated_at
             ))
-            
+
             # Save stories
             for story in sprint_plan.stories:
                 conn.execute("""
@@ -327,33 +327,33 @@ class SprintPlanningSystem:
                     story.assignee, story.github_issue_url,
                     story.created_at, story.updated_at
                 ))
-            
+
             conn.commit()
-    
+
     def get_active_sprint(self) -> Optional[SprintPlan]:
         """Get the currently active sprint."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT * FROM sprints 
-                WHERE status = 'active' 
-                ORDER BY start_date DESC 
+                SELECT * FROM sprints
+                WHERE status = 'active'
+                ORDER BY start_date DESC
                 LIMIT 1
             """)
-            
+
             sprint_row = cursor.fetchone()
             if not sprint_row:
                 return None
-            
+
             # Get stories for this sprint
             cursor.execute("""
-                SELECT * FROM stories 
+                SELECT * FROM stories
                 WHERE sprint_id = ?
                 ORDER BY created_at
             """, (sprint_row[0],))
-            
+
             story_rows = cursor.fetchall()
-            
+
             # Convert to objects
             stories = []
             for row in story_rows:
@@ -362,7 +362,7 @@ class SprintPlanningSystem:
                     story_points=row[4], status=row[5], assignee=row[6],
                     github_issue_url=row[7], created_at=row[8], updated_at=row[9]
                 ))
-            
+
             return SprintPlan(
                 sprint_id=sprint_row[0], sprint_name=sprint_row[1],
                 start_date=sprint_row[2], end_date=sprint_row[3],
@@ -371,7 +371,7 @@ class SprintPlanningSystem:
                 status=sprint_row[7], created_at=sprint_row[8],
                 updated_at=sprint_row[9]
             )
-    
+
     def generate_sprint_report(self, sprint_plan: SprintPlan) -> str:
         """Generate a comprehensive sprint planning report."""
         report = f"""
@@ -391,7 +391,7 @@ class SprintPlanningSystem:
 
 ## Story Breakdown
 """
-        
+
         for story in sprint_plan.stories:
             report += f"""
 ### {story.title} ({story.story_points} points)
@@ -400,12 +400,12 @@ class SprintPlanningSystem:
 - **GitHub Issue**: {story.github_issue_url or 'Not linked'}
 - **Description**: {story.description[:200]}{'...' if len(story.description) > 200 else ''}
 """
-        
+
         # Add velocity analysis
         velocity_capacity = sprint_plan.team_velocity
         planned_capacity = sprint_plan.planned_points
         capacity_utilization = (planned_capacity / velocity_capacity) * 100
-        
+
         report += f"""
 ## Capacity Analysis
 - **Team Velocity**: {velocity_capacity} points
@@ -424,7 +424,7 @@ class SprintPlanningSystem:
 Generated by PM/XP Methodology Enforcer Agent
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
-        
+
         return report
 
 
@@ -438,53 +438,53 @@ def main():
         print("  velocity")
         print("  active")
         sys.exit(1)
-    
+
     planner = SprintPlanningSystem()
     command = sys.argv[1]
-    
+
     if command == "create":
         if len(sys.argv) < 4:
             print("Usage: python sprint_planning.py create <sprint_name> <goal> [duration_days]")
             sys.exit(1)
-        
+
         sprint_name = sys.argv[2]
         goal = sys.argv[3]
         duration_days = int(sys.argv[4]) if len(sys.argv) > 4 else 14
-        
+
         print(f"Creating sprint: {sprint_name}")
         print(f"Goal: {goal}")
         print(f"Duration: {duration_days} days")
         print("\nFetching GitHub issues...")
-        
+
         sprint_plan = planner.create_sprint_plan(sprint_name, goal, duration_days)
-        
+
         print(f"\n✅ Sprint created successfully!")
         print(f"Sprint ID: {sprint_plan.sprint_id}")
         print(f"Planned Points: {sprint_plan.planned_points}")
         print(f"Stories: {len(sprint_plan.stories)}")
-        
+
         # Generate and save report
         report = planner.generate_sprint_report(sprint_plan)
         report_file = f"sprint_report_{sprint_plan.sprint_id}.md"
         with open(report_file, 'w') as f:
             f.write(report)
-        
+
         print(f"Report saved to: {report_file}")
-    
+
     elif command == "report":
         active_sprint = planner.get_active_sprint()
         if not active_sprint:
             print("No active sprint found.")
             sys.exit(1)
-        
+
         report = planner.generate_sprint_report(active_sprint)
         print(report)
-    
+
     elif command == "velocity":
         velocity, metrics = planner.calculate_team_velocity()
         print(f"Team Velocity: {velocity} points")
         print(f"Metrics: {json.dumps(metrics, indent=2)}")
-    
+
     elif command == "active":
         active_sprint = planner.get_active_sprint()
         if active_sprint:

@@ -62,7 +62,7 @@ class TaskAssignment:
     last_update: datetime = None
     escalation_level: EscalationLevel = EscalationLevel.WARNING
     reassignment_count: int = 0
-    
+
     def __post_init__(self):
         if self.evidence_collected is None:
             self.evidence_collected = []
@@ -82,11 +82,11 @@ class EvidenceRequirement:
 class AccountabilityFramework:
     """
     Automated accountability system for agent task management.
-    
+
     Provides mandatory deadlines, evidence tracking, automated escalation,
     and task reassignment capabilities.
     """
-    
+
     def __init__(self, config_path: str = ".claude/accountability_config.json"):
         """Initialize accountability framework."""
         self.config_path = Path(config_path)
@@ -95,9 +95,9 @@ class AccountabilityFramework:
         self.config = self._load_config()
         self.monitoring_active = False
         self._monitoring_task: Optional[asyncio.Task] = None
-        
+
         logger.info("AccountabilityFramework initialized")
-    
+
     def _load_config(self) -> Dict[str, Any]:
         """Load accountability configuration."""
         default_config = {
@@ -112,7 +112,7 @@ class AccountabilityFramework:
             "max_reassignments": 2,
             "evidence_validation_timeout": 30
         }
-        
+
         if self.config_path.exists():
             try:
                 with open(self.config_path, 'r') as f:
@@ -120,9 +120,9 @@ class AccountabilityFramework:
                     default_config.update(config)
             except Exception as e:
                 logger.error(f"Failed to load config: {e}")
-        
+
         return default_config
-    
+
     def _load_evidence_types(self) -> Dict[str, EvidenceRequirement]:
         """Define evidence requirement types."""
         return {
@@ -157,7 +157,7 @@ class AccountabilityFramework:
                 required=True
             )
         }
-    
+
     async def assign_task(
         self,
         agent_id: str,
@@ -168,33 +168,33 @@ class AccountabilityFramework:
     ) -> str:
         """
         Assign task with mandatory accountability tracking.
-        
+
         Args:
             agent_id: Target agent identifier
             task_description: Clear task description
             deadline_hours: Hours until deadline (default from config)
             priority: Task priority level
             evidence_types: Required evidence types
-            
+
         Returns:
             Task ID for tracking
         """
         if deadline_hours is None:
             deadline_hours = self.config["default_deadline_hours"]
-        
+
         if evidence_types is None:
             evidence_types = ["git_commit", "file_modified", "tests_passing"]
-        
+
         task_id = f"task_{int(time.time())}_{agent_id}"
         assigned_at = datetime.now()
         deadline = assigned_at + timedelta(hours=deadline_hours)
-        
+
         # Calculate progress checkpoints
         checkpoints = []
         for interval in self.config["checkpoint_intervals"]:
             checkpoint_time = assigned_at + timedelta(hours=deadline_hours * interval)
             checkpoints.append(checkpoint_time)
-        
+
         task = TaskAssignment(
             task_id=task_id,
             agent_id=agent_id,
@@ -206,16 +206,16 @@ class AccountabilityFramework:
             evidence_required=evidence_types,
             progress_checkpoints=checkpoints
         )
-        
+
         self.tasks[task_id] = task
-        
+
         # Start monitoring if not active
         if not self.monitoring_active:
             await self.start_monitoring()
-        
+
         logger.info(f"Task {task_id} assigned to {agent_id}, deadline: {deadline}")
         return task_id
-    
+
     async def update_task_progress(
         self,
         task_id: str,
@@ -224,26 +224,26 @@ class AccountabilityFramework:
     ) -> bool:
         """
         Update task progress with evidence.
-        
+
         Args:
             task_id: Task identifier
             status: New task status
             evidence: Evidence of progress
-            
+
         Returns:
             True if update successful
         """
         if task_id not in self.tasks:
             logger.error(f"Task {task_id} not found")
             return False
-        
+
         task = self.tasks[task_id]
         task.status = status
         task.last_update = datetime.now()
-        
+
         if evidence:
             task.evidence_collected.extend(evidence)
-        
+
         # Validate evidence if task is completed
         if status == TaskStatus.COMPLETED:
             evidence_valid = await self._validate_evidence(task)
@@ -251,28 +251,28 @@ class AccountabilityFramework:
                 task.status = TaskStatus.BLOCKED
                 logger.warning(f"Task {task_id} completion blocked: insufficient evidence")
                 return False
-        
+
         logger.info(f"Task {task_id} updated to {status.value}")
         return True
-    
+
     async def _validate_evidence(self, task: TaskAssignment) -> bool:
         """
         Validate required evidence for task completion.
-        
+
         Args:
             task: Task assignment to validate
-            
+
         Returns:
             True if all required evidence provided
         """
         for evidence_type in task.evidence_required:
             if evidence_type not in self.evidence_types:
                 continue
-            
+
             requirement = self.evidence_types[evidence_type]
             if not requirement.required:
                 continue
-            
+
             try:
                 # Run validation command safely without shell=True
                 command_parts = requirement.validation_command.split()
@@ -282,34 +282,34 @@ class AccountabilityFramework:
                     text=True,
                     timeout=self.config["evidence_validation_timeout"]
                 )
-                
+
                 if result.returncode != 0:
                     logger.warning(f"Evidence validation failed for {evidence_type}: {result.stderr}")
                     return False
-                
+
             except subprocess.TimeoutExpired:
                 logger.error(f"Evidence validation timeout for {evidence_type}")
                 return False
             except Exception as e:
                 logger.error(f"Evidence validation error for {evidence_type}: {e}")
                 return False
-        
+
         return True
-    
+
     async def start_monitoring(self) -> None:
         """Start automated monitoring and escalation."""
         if self.monitoring_active:
             return
-        
+
         self.monitoring_active = True
         self._monitoring_task = asyncio.create_task(self._monitoring_loop())
         logger.info("Accountability monitoring started")
-    
+
     async def stop_monitoring(self) -> None:
         """Stop automated monitoring."""
         if not self.monitoring_active:
             return
-        
+
         self.monitoring_active = False
         if self._monitoring_task:
             self._monitoring_task.cancel()
@@ -317,9 +317,9 @@ class AccountabilityFramework:
                 await self._monitoring_task
             except asyncio.CancelledError:
                 pass
-        
+
         logger.info("Accountability monitoring stopped")
-    
+
     async def _monitoring_loop(self) -> None:
         """Main monitoring loop for deadline and escalation tracking."""
         while self.monitoring_active:
@@ -327,28 +327,28 @@ class AccountabilityFramework:
                 await self._check_deadlines()
                 await self._check_checkpoints()
                 await self._process_escalations()
-                
+
                 await asyncio.sleep(60)  # Check every minute
-                
+
             except asyncio.CancelledError:
                 break
             except Exception as e:
                 logger.error(f"Monitoring loop error: {e}")
                 await asyncio.sleep(60)
-    
+
     async def _check_deadlines(self) -> None:
         """Check task deadlines and update escalation levels."""
         current_time = datetime.now()
-        
+
         for task_id, task in self.tasks.items():
             if task.status in [TaskStatus.COMPLETED, TaskStatus.REASSIGNED]:
                 continue
-            
+
             # Calculate deadline progress
             total_time = (task.deadline - task.assigned_at).total_seconds()
             elapsed_time = (current_time - task.assigned_at).total_seconds()
             progress = elapsed_time / total_time if total_time > 0 else 1.0
-            
+
             # Determine escalation level
             thresholds = self.config["escalation_thresholds"]
             if progress >= thresholds["emergency"]:
@@ -362,30 +362,30 @@ class AccountabilityFramework:
                 new_level = EscalationLevel.WARNING
             else:
                 continue
-            
+
             if new_level != task.escalation_level:
                 task.escalation_level = new_level
                 await self._escalate_task(task)
-    
+
     async def _check_checkpoints(self) -> None:
         """Check progress checkpoints and request updates."""
         current_time = datetime.now()
-        
+
         for task_id, task in self.tasks.items():
             if task.status in [TaskStatus.COMPLETED, TaskStatus.REASSIGNED]:
                 continue
-            
+
             # Check if any checkpoint has passed without update
             for checkpoint in task.progress_checkpoints:
-                if (current_time >= checkpoint and 
+                if (current_time >= checkpoint and
                     task.last_update < checkpoint):
                     await self._request_progress_update(task)
                     break
-    
+
     async def _escalate_task(self, task: TaskAssignment) -> None:
         """
         Escalate task based on escalation level.
-        
+
         Args:
             task: Task to escalate
         """
@@ -395,29 +395,29 @@ class AccountabilityFramework:
             EscalationLevel.URGENT: self._urgent_escalation,
             EscalationLevel.EMERGENCY: self._emergency_escalation
         }
-        
+
         action = escalation_actions.get(task.escalation_level)
         if action:
             await action(task)
-    
+
     async def _warning_escalation(self, task: TaskAssignment) -> None:
         """Handle warning level escalation."""
         message = f"[WARNING] Task {task.task_id} approaching deadline - {task.task_description}"
         logger.warning(message)
         # Send notification to agent
-    
+
     async def _critical_escalation(self, task: TaskAssignment) -> None:
         """Handle critical level escalation."""
         message = f"[CRITICAL] Task {task.task_id} critically overdue - Immediate attention required"
         logger.critical(message)
         # Send urgent notification to agent and PM
-    
+
     async def _urgent_escalation(self, task: TaskAssignment) -> None:
         """Handle urgent level escalation."""
         message = f"[URGENT] Task {task.task_id} at deadline - Escalating to human intervention"
         logger.error(message)
         # Escalate to human coordination
-    
+
     async def _emergency_escalation(self, task: TaskAssignment) -> None:
         """Handle emergency level escalation - task reassignment."""
         if task.reassignment_count >= self.config["max_reassignments"]:
@@ -425,24 +425,24 @@ class AccountabilityFramework:
             logger.critical(message)
             task.status = TaskStatus.ESCALATED
             return
-        
+
         # Automatic task reassignment
         await self._reassign_task(task)
-    
+
     async def _reassign_task(self, task: TaskAssignment) -> None:
         """
         Automatically reassign task to different agent.
-        
+
         Args:
             task: Task to reassign
         """
         task.reassignment_count += 1
         task.status = TaskStatus.REASSIGNED
         old_agent = task.agent_id
-        
+
         # Logic to select new agent (placeholder)
         new_agent = f"agent-backup-{task.reassignment_count}"
-        
+
         # Create new task assignment
         new_task_id = await self.assign_task(
             agent_id=new_agent,
@@ -451,35 +451,35 @@ class AccountabilityFramework:
             priority=task.priority,
             evidence_types=task.evidence_required
         )
-        
+
         logger.critical(
             f"Task {task.task_id} reassigned from {old_agent} to {new_agent} "
             f"as {new_task_id}"
         )
-    
+
     async def _request_progress_update(self, task: TaskAssignment) -> None:
         """Request progress update from agent."""
         message = f"[CHECKPOINT] Progress update required for task {task.task_id}"
         logger.info(message)
         # Send progress request to agent
-    
+
     async def _process_escalations(self) -> None:
         """Process any pending escalations."""
         # Additional escalation processing logic
         pass
-    
+
     def get_task_status(self, task_id: str) -> Optional[Dict[str, Any]]:
         """Get current task status and progress."""
         if task_id not in self.tasks:
             return None
-        
+
         task = self.tasks[task_id]
         current_time = datetime.now()
-        
+
         total_time = (task.deadline - task.assigned_at).total_seconds()
         elapsed_time = (current_time - task.assigned_at).total_seconds()
         progress = min(elapsed_time / total_time, 1.0) if total_time > 0 else 1.0
-        
+
         return {
             "task_id": task.task_id,
             "agent_id": task.agent_id,
@@ -491,20 +491,20 @@ class AccountabilityFramework:
             "evidence_collected": task.evidence_collected,
             "reassignment_count": task.reassignment_count
         }
-    
+
     def get_all_tasks(self) -> List[Dict[str, Any]]:
         """Get status of all tasks."""
         return [self.get_task_status(task_id) for task_id in self.tasks.keys()]
-    
+
     async def generate_accountability_report(self) -> Dict[str, Any]:
         """Generate comprehensive accountability report."""
         current_time = datetime.now()
-        
+
         total_tasks = len(self.tasks)
         completed_tasks = len([t for t in self.tasks.values() if t.status == TaskStatus.COMPLETED])
         overdue_tasks = len([t for t in self.tasks.values() if t.status == TaskStatus.OVERDUE])
         reassigned_tasks = len([t for t in self.tasks.values() if t.status == TaskStatus.REASSIGNED])
-        
+
         return {
             "generated_at": current_time.isoformat(),
             "summary": {
@@ -521,7 +521,7 @@ class AccountabilityFramework:
 # CLI Interface
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Accountability Framework CLI")
     parser.add_argument("--assign", help="Assign task to agent")
     parser.add_argument("--agent", help="Target agent ID")
@@ -529,12 +529,12 @@ if __name__ == "__main__":
     parser.add_argument("--status", help="Get task status")
     parser.add_argument("--report", action="store_true", help="Generate accountability report")
     parser.add_argument("--monitor", action="store_true", help="Start monitoring")
-    
+
     args = parser.parse_args()
-    
+
     async def main():
         framework = AccountabilityFramework()
-        
+
         if args.assign and args.agent:
             task_id = await framework.assign_task(
                 agent_id=args.agent,
@@ -542,18 +542,18 @@ if __name__ == "__main__":
                 deadline_hours=args.deadline or 4
             )
             print(f"Task assigned: {task_id}")
-        
+
         elif args.status:
             status = framework.get_task_status(args.status)
             if status:
                 print(json.dumps(status, indent=2))
             else:
                 print("Task not found")
-        
+
         elif args.report:
             report = await framework.generate_accountability_report()
             print(json.dumps(report, indent=2))
-        
+
         elif args.monitor:
             print("Starting accountability monitoring...")
             await framework.start_monitoring()
@@ -563,5 +563,5 @@ if __name__ == "__main__":
             except KeyboardInterrupt:
                 await framework.stop_monitoring()
                 print("Monitoring stopped")
-    
+
     asyncio.run(main())

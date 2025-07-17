@@ -35,13 +35,13 @@ class AccuracyResult:
 
 class ImplementationVerifier:
     """Comprehensive implementation accuracy verification."""
-    
+
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.results: List[AccuracyResult] = []
         self.python_modules = {}
         self.test_files = []
-        
+
     def setup_environment(self):
         """Setup Python path for imports."""
         sys.path.insert(0, str(self.project_root))
@@ -49,27 +49,27 @@ class ImplementationVerifier:
         sys.path.insert(0, str(self.project_root / "intelligence_framework"))
         sys.path.insert(0, str(self.project_root / "external_api"))
         sys.path.insert(0, str(self.project_root / "ml_enhancements"))
-    
+
     def scan_implementation(self):
         """Scan project to understand actual implementation."""
         print("🔍 Scanning implementation...")
-        
+
         # Find Python files
         python_files = list(self.project_root.glob("**/*.py"))
         python_files = [f for f in python_files if not any(ignore in str(f) for ignore in [
             '.venv', '__pycache__', '.pytest_cache', 'temp_test_'
         ])]
-        
+
         # Find test files
         self.test_files = [f for f in python_files if 'test_' in f.name or '/tests/' in str(f)]
-        
+
         print(f"   Found {len(python_files)} Python files")
         print(f"   Found {len(self.test_files)} test files")
-        
+
         # Try to import key modules
         key_modules = [
             "advanced_orchestration.multi_agent_coordinator",
-            "advanced_orchestration.resource_manager", 
+            "advanced_orchestration.resource_manager",
             "advanced_orchestration.scaling_manager",
             "intelligence_framework",
             "intelligent_task_allocation",
@@ -78,7 +78,7 @@ class ImplementationVerifier:
             "external_api",
             "ml_enhancements"
         ]
-        
+
         for module_name in key_modules:
             try:
                 module = importlib.import_module(module_name)
@@ -86,17 +86,17 @@ class ImplementationVerifier:
             except ImportError:
                 # Module doesn't exist or can't be imported
                 pass
-    
+
     def verify_test_counts(self) -> List[AccuracyResult]:
         """Verify documented test counts against actual test files."""
         results = []
-        
+
         print("🧪 Verifying test counts...")
-        
+
         # Count actual tests
         actual_test_count = 0
         test_methods = 0
-        
+
         for test_file in self.test_files:
             try:
                 content = test_file.read_text()
@@ -107,32 +107,32 @@ class ImplementationVerifier:
                     actual_test_count += 1
             except Exception:
                 continue
-        
+
         # Find documented test counts
         doc_files = [
             self.project_root / "README.md",
             self.project_root / "DEVELOPMENT.md",
             self.project_root / "docs" / "TODO.md"
         ]
-        
+
         for doc_file in doc_files:
             if not doc_file.exists():
                 continue
-                
+
             content = doc_file.read_text()
-            
+
             # Look for test count claims
             test_patterns = [
                 (r'(\\d+)\\s*(?:comprehensive\\s*)?tests?', "test count"),
                 (r'(\\d+)\\s*tests?\\s*with\\s*(\\d+)%\\s*coverage', "coverage claim"),
                 (r'(\\d+)%\\s*(?:test\\s*)?coverage', "coverage percentage"),
             ]
-            
+
             for pattern, claim_type in test_patterns:
                 for match in re.finditer(pattern, content, re.IGNORECASE):
                     if claim_type == "test count":
                         documented_count = int(match.group(1))
-                        
+
                         # Verify accuracy
                         if documented_count == len(self.test_files):
                             accuracy = "accurate"
@@ -143,7 +143,7 @@ class ImplementationVerifier:
                         else:
                             accuracy = "inaccurate"
                             confidence = 0.3
-                        
+
                         results.append(AccuracyResult(
                             category="test_counts",
                             claim=f"Test count in {doc_file.name}",
@@ -153,15 +153,15 @@ class ImplementationVerifier:
                             message=f"Documented: {documented_count}, Actual: {len(self.test_files)} files",
                             confidence=confidence
                         ))
-        
+
         return results
-    
+
     def verify_feature_claims(self) -> List[AccuracyResult]:
         """Verify documented feature claims against implementation."""
         results = []
-        
+
         print("🎯 Verifying feature claims...")
-        
+
         # Define features to verify
         feature_checks = [
             ("CLI commands", self.verify_cli_commands),
@@ -170,7 +170,7 @@ class ImplementationVerifier:
             ("ML Enhancements", self.verify_ml_enhancements),
             ("Multi-Agent Coordination", self.verify_multi_agent_coordination),
         ]
-        
+
         for feature_name, check_function in feature_checks:
             try:
                 feature_results = check_function()
@@ -185,16 +185,16 @@ class ImplementationVerifier:
                     message=f"Could not verify {feature_name}: {str(e)}",
                     confidence=0.0
                 ))
-        
+
         return results
-    
+
     def verify_cli_commands(self) -> List[AccuracyResult]:
         """Verify CLI command claims."""
         results = []
-        
+
         # Check if CLI exists
         cli_file = self.project_root / "cli.py"
-        
+
         if not cli_file.exists():
             return [AccuracyResult(
                 category="cli",
@@ -205,13 +205,13 @@ class ImplementationVerifier:
                 message="CLI file does not exist",
                 confidence=1.0
             )]
-        
+
         # Count documented CLI commands
         readme_file = self.project_root / "README.md"
         if readme_file.exists():
             content = readme_file.read_text()
             cli_mentions = len(re.findall(r'python cli\\.py \\w+', content))
-            
+
             # Try to get actual CLI commands
             try:
                 result = subprocess.run(
@@ -221,11 +221,11 @@ class ImplementationVerifier:
                     timeout=10,
                     cwd=self.project_root
                 )
-                
+
                 if result.returncode == 0:
                     # Count subcommands in help output
                     actual_commands = len(re.findall(r'^\\s*\\w+\\s+', result.stdout, re.MULTILINE))
-                    
+
                     results.append(AccuracyResult(
                         category="cli",
                         claim="CLI commands count",
@@ -255,21 +255,21 @@ class ImplementationVerifier:
                     message=f"CLI test failed: {str(e)}",
                     confidence=0.0
                 ))
-        
+
         return results
-    
+
     def verify_intelligence_framework(self) -> List[AccuracyResult]:
         """Verify Intelligence Framework claims."""
         results = []
-        
+
         # Check if intelligence framework module exists
         if "intelligence_framework" in self.python_modules:
             module = self.python_modules["intelligence_framework"]
-            
+
             # Check for key classes
             expected_classes = ["IntelligenceFramework"]
             actual_classes = [name for name, obj in inspect.getmembers(module, inspect.isclass)]
-            
+
             for expected_class in expected_classes:
                 if expected_class in actual_classes:
                     results.append(AccuracyResult(
@@ -301,20 +301,20 @@ class ImplementationVerifier:
                 message="Intelligence Framework module cannot be imported",
                 confidence=1.0
             ))
-        
+
         return results
-    
+
     def verify_external_api(self) -> List[AccuracyResult]:
         """Verify External API Integration claims."""
         results = []
-        
+
         if "external_api" in self.python_modules:
             module = self.python_modules["external_api"]
-            
+
             # Check for key external API classes
             expected_classes = ["WebhookServer", "ApiGateway", "EventStreaming"]
             actual_classes = [name for name, obj in inspect.getmembers(module, inspect.isclass)]
-            
+
             for expected_class in expected_classes:
                 if expected_class in actual_classes:
                     results.append(AccuracyResult(
@@ -326,20 +326,20 @@ class ImplementationVerifier:
                         message=f"✅ {expected_class} is implemented",
                         confidence=1.0
                     ))
-        
+
         return results
-    
+
     def verify_ml_enhancements(self) -> List[AccuracyResult]:
         """Verify ML Enhancements claims."""
         results = []
-        
+
         if "ml_enhancements" in self.python_modules:
             module = self.python_modules["ml_enhancements"]
-            
+
             # Check for ML enhancement classes
             expected_classes = ["PatternOptimizer", "PredictiveAnalytics", "AdaptiveLearning"]
             actual_classes = [name for name, obj in inspect.getmembers(module, inspect.isclass)]
-            
+
             for expected_class in expected_classes:
                 if expected_class in actual_classes:
                     results.append(AccuracyResult(
@@ -351,20 +351,20 @@ class ImplementationVerifier:
                         message=f"✅ {expected_class} is implemented",
                         confidence=1.0
                     ))
-        
+
         return results
-    
+
     def verify_multi_agent_coordination(self) -> List[AccuracyResult]:
         """Verify Multi-Agent Coordination claims."""
         results = []
-        
+
         if "advanced_orchestration.multi_agent_coordinator" in self.python_modules:
             module = self.python_modules["advanced_orchestration.multi_agent_coordinator"]
-            
+
             # Check for coordination classes
             expected_classes = ["MultiAgentCoordinator"]
             actual_classes = [name for name, obj in inspect.getmembers(module, inspect.isclass)]
-            
+
             for expected_class in expected_classes:
                 if expected_class in actual_classes:
                     results.append(AccuracyResult(
@@ -376,38 +376,38 @@ class ImplementationVerifier:
                         message=f"✅ {expected_class} is implemented",
                         confidence=1.0
                     ))
-        
+
         return results
-    
+
     def verify_performance_claims(self) -> List[AccuracyResult]:
         """Verify performance and metric claims."""
         results = []
-        
+
         print("⚡ Verifying performance claims...")
-        
+
         # Look for performance claims in documentation
         doc_files = [
             self.project_root / "README.md",
             self.project_root / "DEVELOPMENT.md",
         ]
-        
+
         performance_patterns = [
             (r'<(\\d+)ms\\s+(?:latency|response)', "latency_claim"),
             (r'(\\d+)%\\+?\\s*(?:efficiency|utilization)', "efficiency_claim"),
             (r'<(\\d+)\\s*(?:minute|min)\\s*MTTR', "mttr_claim"),
             (r'(\\d+)\\+?\\s*agents?\\s*coordinating', "agent_count_claim"),
         ]
-        
+
         for doc_file in doc_files:
             if not doc_file.exists():
                 continue
-                
+
             content = doc_file.read_text()
-            
+
             for pattern, claim_type in performance_patterns:
                 for match in re.finditer(pattern, content, re.IGNORECASE):
                     value = match.group(1)
-                    
+
                     # These are aspirational claims that we mark as unverifiable
                     # since we can't easily test performance in this context
                     results.append(AccuracyResult(
@@ -419,52 +419,52 @@ class ImplementationVerifier:
                         message=f"Performance claim: {value} - requires runtime testing",
                         confidence=0.5
                     ))
-        
+
         return results
-    
+
     def verify_all_accuracy(self) -> List[AccuracyResult]:
         """Run all accuracy verification checks."""
         all_results = []
-        
+
         # Setup
         self.setup_environment()
         self.scan_implementation()
-        
+
         # Run verifications
         all_results.extend(self.verify_test_counts())
         all_results.extend(self.verify_feature_claims())
         all_results.extend(self.verify_performance_claims())
-        
+
         self.results = all_results
         return all_results
-    
+
     def generate_report(self) -> str:
         """Generate comprehensive accuracy verification report."""
         if not self.results:
             return "No accuracy verification results available."
-        
+
         # Count results by status and category
         status_counts = {"accurate": 0, "inaccurate": 0, "partially_accurate": 0, "unverifiable": 0}
         category_counts = {}
-        
+
         for result in self.results:
             status_counts[result.status] += 1
             if result.category not in category_counts:
                 category_counts[result.category] = {"accurate": 0, "inaccurate": 0, "partially_accurate": 0, "unverifiable": 0}
             category_counts[result.category][result.status] += 1
-        
+
         # Calculate statistics
         total_checks = len(self.results)
         accuracy_rate = ((status_counts["accurate"] + status_counts["partially_accurate"]) / total_checks * 100) if total_checks > 0 else 0
         confidence_avg = sum(r.confidence for r in self.results) / total_checks if total_checks > 0 else 0
-        
+
         # Generate report
         report = []
         report.append("=" * 80)
         report.append("✅ LEANVIBE AGENT HIVE - IMPLEMENTATION ACCURACY REPORT")
         report.append("=" * 80)
         report.append("")
-        
+
         # Summary
         report.append(f"📊 ACCURACY SUMMARY:")
         report.append(f"   Total Claims Verified: {total_checks}")
@@ -475,7 +475,7 @@ class ImplementationVerifier:
         report.append(f"   📈 Overall Accuracy Rate: {accuracy_rate:.1f}%")
         report.append(f"   🎯 Average Confidence: {confidence_avg:.2f}")
         report.append("")
-        
+
         # Breakdown by category
         report.append(f"📋 BREAKDOWN BY CATEGORY:")
         for category, counts in sorted(category_counts.items()):
@@ -487,7 +487,7 @@ class ImplementationVerifier:
             if counts["unverifiable"] > 0:
                 report.append(f"      ❓ {counts['unverifiable']} unverifiable claims")
         report.append("")
-        
+
         # Overall status
         if status_counts["inaccurate"] == 0 and accuracy_rate >= 90:
             report.append("🎉 OVERALL STATUS: EXCELLENT - Documentation is highly accurate!")
@@ -497,9 +497,9 @@ class ImplementationVerifier:
             report.append("⚠️ OVERALL STATUS: NEEDS ATTENTION - Several inaccuracies")
         else:
             report.append("❌ OVERALL STATUS: CRITICAL - Major accuracy problems")
-        
+
         report.append("")
-        
+
         # Detailed inaccuracies
         inaccurate_results = [r for r in self.results if r.status == "inaccurate"]
         if inaccurate_results:
@@ -510,7 +510,7 @@ class ImplementationVerifier:
                 report.append(f"      Actual: {result.actual_value}")
                 report.append(f"      {result.message}")
             report.append("")
-        
+
         # Partially accurate items
         partial_results = [r for r in self.results if r.status == "partially_accurate"]
         if partial_results:
@@ -518,7 +518,7 @@ class ImplementationVerifier:
             for result in partial_results:
                 report.append(f"   {result.claim}: {result.message}")
             report.append("")
-        
+
         # Recommendations
         report.append("💡 RECOMMENDATIONS:")
         if status_counts["inaccurate"] > 0:
@@ -530,7 +530,7 @@ class ImplementationVerifier:
             report.append("   4. Consider adding automated testing for performance claims")
         report.append("   5. Add this verification to CI/CD pipeline")
         report.append("   6. Regular accuracy audits when features change")
-        
+
         return "\\n".join(report)
 
 def main():
@@ -541,18 +541,18 @@ def main():
     parser.add_argument("--feature-claims", action="store_true", help="Verify feature implementation claims")
     parser.add_argument("--api-endpoints", action="store_true", help="Verify API endpoint claims")
     parser.add_argument("--output", type=str, help="Output file for verification report")
-    
+
     args = parser.parse_args()
-    
+
     # Determine project root
     project_root = Path(__file__).parent.parent
     if not (project_root / "README.md").exists():
         print("❌ Cannot find project root (README.md not found)")
         sys.exit(1)
-    
+
     # Create verifier
     verifier = ImplementationVerifier(project_root)
-    
+
     # Run verification
     if args.all or not any([args.test_counts, args.feature_claims, args.api_endpoints]):
         results = verifier.verify_all_accuracy()
@@ -560,23 +560,23 @@ def main():
         results = []
         verifier.setup_environment()
         verifier.scan_implementation()
-        
+
         if args.test_counts:
             results.extend(verifier.verify_test_counts())
         if args.feature_claims:
             results.extend(verifier.verify_feature_claims())
         # api_endpoints check would be implemented similarly
-    
+
     # Generate and display report
     report = verifier.generate_report()
     print(report)
-    
+
     # Save report if requested
     if args.output:
         with open(args.output, 'w') as f:
             f.write(report)
         print(f"\\n📄 Report saved to: {args.output}")
-    
+
     # Exit with appropriate code
     inaccurate_claims = sum(1 for r in results if r.status == "inaccurate")
     if inaccurate_claims > 0:
