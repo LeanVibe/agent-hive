@@ -19,13 +19,13 @@ async def test_basic_functionality():
     """Test basic system functionality without external dependencies."""
     print("🧪 Testing Message Queue System - Basic Functionality")
     print("=" * 60)
-    
+
     try:
         # Test 1: Message Model
         print("✅ Testing Message Model...")
         message = Message(
             sender="test-sender",
-            recipient="test-recipient", 
+            recipient="test-recipient",
             content="Hello, World!",
             priority=MessagePriority.HIGH
         )
@@ -36,7 +36,7 @@ async def test_basic_functionality():
         print(f"   Message ID: {message.id}")
         print(f"   Created: {message.created_at}")
         print(f"   Expires: {message.expires_at}")
-        
+
         # Test 2: Agent Model
         print("\n✅ Testing Agent Model...")
         agent = Agent(
@@ -50,32 +50,32 @@ async def test_basic_functionality():
         print(f"   Agent ID: {agent.id}")
         print(f"   Capabilities: {agent.capabilities}")
         print(f"   Is Online: {agent.is_online}")
-        
+
         # Test 3: Agent Registry
         print("\n✅ Testing Agent Registry...")
         registry = AgentRegistry([])  # Empty worktree paths
-        
+
         # Register agent
         success = await registry.register_agent(agent)
         assert success
         print(f"   Agent registered: {success}")
-        
+
         # Retrieve agent
         retrieved = await registry.get_agent_by_name("test-agent")
         assert retrieved is not None
         assert retrieved.name == "test-agent"
         print(f"   Agent retrieved: {retrieved.name}")
-        
+
         # List agents
         agents = await registry.list_agents()
         assert len(agents) >= 1
         print(f"   Total agents: {len(agents)}")
-        
+
         # Test capability search
         testing_agents = await registry.get_agents_by_capability("testing")
         assert len(testing_agents) >= 1
         print(f"   Agents with 'testing' capability: {len(testing_agents)}")
-        
+
         # Test 4: Registry Stats
         print("\n✅ Testing Registry Stats...")
         stats = await registry.get_registry_stats()
@@ -84,7 +84,7 @@ async def test_basic_functionality():
         print(f"   Total agents: {stats['total_agents']}")
         print(f"   Online agents: {stats['online_agents']}")
         print(f"   Capabilities: {stats['capabilities']}")
-        
+
         # Test 5: Message Validation
         print("\n✅ Testing Message Validation...")
         try:
@@ -92,19 +92,19 @@ async def test_basic_functionality():
             assert False, "Should have raised validation error"
         except ValueError as e:
             print(f"   ✅ Correctly caught validation error: {e}")
-        
+
         try:
             invalid_agent = Agent(name="")
             assert False, "Should have raised validation error"
         except ValueError as e:
             print(f"   ✅ Correctly caught validation error: {e}")
-        
+
         print("\n🎉 All basic functionality tests passed!")
         print("✅ System core logic is working correctly")
         print("📋 Ready for integration with Redis and full API testing")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"\n❌ Test failed with error: {e}")
         import traceback
@@ -115,7 +115,7 @@ async def test_basic_functionality():
 async def test_imports():
     """Test that all modules can be imported correctly."""
     print("\n🔧 Testing Module Imports...")
-    
+
     try:
         from message_queue import models
         from message_queue import agent_registry
@@ -125,7 +125,7 @@ async def test_imports():
         from message_queue import monitoring
         from message_queue import migration
         from message_queue import main
-        
+
         print("   ✅ Core models imported")
         print("   ✅ Agent registry imported")
         print("   ✅ Queue service imported")
@@ -134,10 +134,10 @@ async def test_imports():
         print("   ✅ Monitoring imported")
         print("   ✅ Migration tools imported")
         print("   ✅ Main orchestrator imported")
-        
+
         print("\n🎉 All imports successful!")
         return True
-        
+
     except Exception as e:
         print(f"\n❌ Import failed: {e}")
         import traceback
@@ -149,19 +149,19 @@ async def main():
     """Run all basic tests."""
     print("🚀 Message Queue System - Smoke Test")
     print("=" * 50)
-    
+
     # Test imports first
     import_success = await test_imports()
     if not import_success:
         print("❌ Import tests failed - cannot continue")
         sys.exit(1)
-    
+
     # Test basic functionality
     basic_success = await test_basic_functionality()
     if not basic_success:
         print("❌ Basic functionality tests failed")
         sys.exit(1)
-    
+
     print("\n" + "=" * 50)
     print("✅ ALL SMOKE TESTS PASSED")
     print("🚀 Message Queue System is ready for production!")

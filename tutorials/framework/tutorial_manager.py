@@ -74,11 +74,11 @@ class UserProgress:
 
 class Tutorial:
     """Complete tutorial with steps and metadata."""
-    
+
     def __init__(self, metadata: TutorialMetadata, steps: List[TutorialStep]):
         self.metadata = metadata
         self.steps = steps
-        
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Tutorial':
         """Create tutorial from dictionary."""
@@ -94,7 +94,7 @@ class Tutorial:
             version=data['metadata'].get('version', '1.0'),
             author=data['metadata'].get('author', 'LeanVibe Team')
         )
-        
+
         steps = []
         for step_data in data['steps']:
             step = TutorialStep(
@@ -110,9 +110,9 @@ class Tutorial:
                 dependencies=step_data.get('dependencies', [])
             )
             steps.append(step)
-        
+
         return cls(metadata, steps)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert tutorial to dictionary."""
         return {
@@ -147,20 +147,20 @@ class Tutorial:
 
 class TutorialManager:
     """Main tutorial management system."""
-    
+
     def __init__(self, tutorial_path: str = "tutorials"):
         self.tutorial_path = tutorial_path
         self.tutorials: Dict[str, Tutorial] = {}
         self.user_progress: Dict[str, Dict[str, UserProgress]] = {}
         self.load_tutorials()
-        
+
     def load_tutorials(self):
         """Load all available tutorials."""
         tutorial_dir = os.path.join(self.tutorial_path, "content")
         if not os.path.exists(tutorial_dir):
             os.makedirs(tutorial_dir, exist_ok=True)
             return
-            
+
         for filename in os.listdir(tutorial_dir):
             if filename.endswith('.json'):
                 tutorial_file = os.path.join(tutorial_dir, filename)
@@ -171,27 +171,27 @@ class TutorialManager:
                         self.tutorials[tutorial.metadata.tutorial_id] = tutorial
                 except Exception as e:
                     print(f"Error loading tutorial {filename}: {e}")
-    
+
     def get_tutorial(self, tutorial_id: str) -> Optional[Tutorial]:
         """Get tutorial by ID."""
         return self.tutorials.get(tutorial_id)
-    
+
     def list_tutorials(self, difficulty: Optional[DifficultyLevel] = None) -> List[Tutorial]:
         """List available tutorials, optionally filtered by difficulty."""
         tutorials = list(self.tutorials.values())
         if difficulty:
             tutorials = [t for t in tutorials if t.metadata.difficulty == difficulty]
         return sorted(tutorials, key=lambda t: t.metadata.estimated_time)
-    
+
     def start_tutorial(self, user_id: str, tutorial_id: str) -> bool:
         """Start a tutorial for a user."""
         tutorial = self.get_tutorial(tutorial_id)
         if not tutorial:
             return False
-            
+
         if user_id not in self.user_progress:
             self.user_progress[user_id] = {}
-            
+
         progress = UserProgress(
             user_id=user_id,
             tutorial_id=tutorial_id,
@@ -199,39 +199,39 @@ class TutorialManager:
             status=TutorialStatus.IN_PROGRESS,
             started_at=datetime.now()
         )
-        
+
         self.user_progress[user_id][tutorial_id] = progress
         self.save_progress(user_id)
         return True
-    
+
     def get_progress(self, user_id: str, tutorial_id: str) -> Optional[UserProgress]:
         """Get user progress for a tutorial."""
         return self.user_progress.get(user_id, {}).get(tutorial_id)
-    
+
     def complete_step(self, user_id: str, tutorial_id: str, step_id: str) -> bool:
         """Mark a step as completed."""
         progress = self.get_progress(user_id, tutorial_id)
         if not progress:
             return False
-            
+
         progress.step_progress[step_id] = TutorialStatus.COMPLETED
         progress.current_step += 1
-        
+
         tutorial = self.get_tutorial(tutorial_id)
         if tutorial and progress.current_step >= len(tutorial.steps):
             progress.status = TutorialStatus.COMPLETED
             progress.completed_at = datetime.now()
-            
+
         self.save_progress(user_id)
         return True
-    
+
     def save_progress(self, user_id: str):
         """Save user progress to file."""
         progress_dir = os.path.join(self.tutorial_path, "progress")
         os.makedirs(progress_dir, exist_ok=True)
-        
+
         progress_file = os.path.join(progress_dir, f"{user_id}.json")
-        
+
         progress_data = {}
         for tutorial_id, progress in self.user_progress.get(user_id, {}).items():
             progress_data[tutorial_id] = {
@@ -245,6 +245,6 @@ class TutorialManager:
                 "hints_used": progress.hints_used,
                 "time_spent": progress.time_spent
             }
-        
+
         with open(progress_file, 'w') as f:
             json.dump(progress_data, f, indent=2)

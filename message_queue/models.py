@@ -49,7 +49,7 @@ class Message:
     delivery_attempts: int = 0
     max_attempts: int = 3
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         """Validate message data."""
         if not self.sender:
@@ -58,21 +58,21 @@ class Message:
             raise ValueError("Message recipient cannot be empty")
         if not self.content:
             raise ValueError("Message content cannot be empty")
-        
+
         # Set default expiration if not provided (24 hours)
         if self.expires_at is None:
             self.expires_at = self.created_at + timedelta(hours=24)
-    
+
     @property
     def is_expired(self) -> bool:
         """Check if message has expired."""
         return datetime.utcnow() > self.expires_at
-    
+
     @property
     def can_retry(self) -> bool:
         """Check if message can be retried."""
-        return (self.delivery_attempts < self.max_attempts and 
-                not self.is_expired and 
+        return (self.delivery_attempts < self.max_attempts and
+                not self.is_expired and
                 self.status in [MessageStatus.PENDING, MessageStatus.FAILED])
 
 
@@ -87,14 +87,14 @@ class Agent:
     worktree_path: Optional[str] = None
     endpoint: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         """Validate agent data."""
         if not self.id:
             self.id = str(uuid.uuid4())
         if not self.name:
             raise ValueError("Agent name cannot be empty")
-    
+
     @property
     def is_online(self) -> bool:
         """Check if agent is considered online."""
@@ -110,7 +110,7 @@ class DeliveryReceipt:
     agent_id: str = ""
     delivered_at: datetime = field(default_factory=datetime.utcnow)
     acknowledgment_data: Optional[Dict[str, Any]] = None
-    
+
     def __post_init__(self):
         """Validate delivery receipt."""
         if not self.message_id:
@@ -129,7 +129,7 @@ class QueueConfig:
     max_retry_attempts: int = 3
     enable_persistence: bool = True
     persistence_backend: str = "redis"  # redis, sqlite, memory
-    
+
     def __post_init__(self):
         """Validate queue configuration."""
         if self.max_size <= 0:
@@ -164,23 +164,23 @@ class BroadcastMessage:
     created_at: datetime = field(default_factory=datetime.utcnow)
     expires_at: Optional[datetime] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         """Validate broadcast message."""
         if not self.sender:
             raise ValueError("Broadcast sender cannot be empty")
         if not self.content:
             raise ValueError("Broadcast content cannot be empty")
-        
+
         # Set default expiration if not provided (24 hours)
         if self.expires_at is None:
             self.expires_at = self.created_at + timedelta(hours=24)
-    
+
     def to_individual_messages(self, agent_ids: List[str]) -> List[Message]:
         """Convert broadcast to individual messages."""
         messages = []
         target_agents = self.recipients if self.recipients else agent_ids
-        
+
         for agent_id in target_agents:
             message = Message(
                 sender=self.sender,
@@ -191,5 +191,5 @@ class BroadcastMessage:
                 metadata={**self.metadata, "broadcast_id": self.id}
             )
             messages.append(message)
-        
+
         return messages
