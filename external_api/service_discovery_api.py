@@ -69,15 +69,15 @@ class SystemInfoResponse(BaseModel):
 class ServiceDiscoveryAPI:
     """
     REST API wrapper for Service Discovery system.
-    
+
     Provides HTTP endpoints for external systems to interact with
     service discovery functionality.
     """
-    
+
     def __init__(self, service_discovery: ServiceDiscovery, host: str = "0.0.0.0", port: int = 8000):
         """
         Initialize Service Discovery API.
-        
+
         Args:
             service_discovery: ServiceDiscovery instance
             host: API server host
@@ -92,23 +92,23 @@ class ServiceDiscoveryAPI:
             version="1.0.0"
         )
         self.server = None
-        
+
         # Setup routes
         self._setup_routes()
-        
+
         # Setup CORS middleware (after routes to ensure proper handling)
         self._setup_cors_middleware()
-        
+
         logger.info(f"ServiceDiscoveryAPI initialized on {host}:{port}")
-    
+
     def _setup_routes(self) -> None:
         """Setup API routes."""
-        
+
         @self.app.get("/health", response_model=Dict[str, str])
         async def health_check():
             """API health check endpoint."""
             return {"status": "healthy", "timestamp": datetime.now().isoformat()}
-        
+
         @self.app.post("/services/register", response_model=Dict[str, Any])
         async def register_service(request: ServiceInstanceRequest):
             """Register a new service instance."""
@@ -123,46 +123,46 @@ class ServiceDiscoveryAPI:
                     tags=request.tags,
                     version=request.version
                 )
-                
+
                 success = await self.service_discovery.register_service(instance)
-                
+
                 if not success:
                     raise HTTPException(
                         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         detail="Failed to register service"
                     )
-                
+
                 return {
                     "message": "Service registered successfully",
                     "service_id": request.service_id,
                     "timestamp": datetime.now().isoformat()
                 }
-                
+
             except Exception as e:
                 logger.error(f"Error registering service: {e}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Registration failed: {str(e)}"
                 )
-        
+
         @self.app.delete("/services/{service_id}", response_model=Dict[str, Any])
         async def deregister_service(service_id: str):
             """Deregister a service instance."""
             try:
                 success = await self.service_discovery.deregister_service(service_id)
-                
+
                 if not success:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Service not found"
                     )
-                
+
                 return {
                     "message": "Service deregistered successfully",
                     "service_id": service_id,
                     "timestamp": datetime.now().isoformat()
                 }
-                
+
             except HTTPException:
                 raise
             except Exception as e:
@@ -171,13 +171,13 @@ class ServiceDiscoveryAPI:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Deregistration failed: {str(e)}"
                 )
-        
+
         @self.app.get("/services/discover/{service_name}", response_model=ServiceDiscoveryResponse)
         async def discover_services(service_name: str, healthy_only: bool = True):
             """Discover services by name."""
             try:
                 instances = await self.service_discovery.discover_services(service_name, healthy_only)
-                
+
                 service_responses = []
                 for instance in instances:
                     # Get registration info for status and timestamps
@@ -196,33 +196,33 @@ class ServiceDiscoveryAPI:
                             registered_at=registration.registered_at.isoformat(),
                             last_heartbeat=registration.last_heartbeat.isoformat()
                         ))
-                
+
                 return ServiceDiscoveryResponse(
                     services=service_responses,
                     total_count=len(service_responses)
                 )
-                
+
             except Exception as e:
                 logger.error(f"Error discovering services: {e}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Service discovery failed: {str(e)}"
                 )
-        
+
         @self.app.get("/services/{service_id}", response_model=ServiceInstanceResponse)
         async def get_service(service_id: str):
             """Get service by ID."""
             try:
                 instance = await self.service_discovery.get_service_by_id(service_id)
-                
+
                 if not instance:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Service not found"
                     )
-                
+
                 registration = self.service_discovery.services.get(service_id)
-                
+
                 return ServiceInstanceResponse(
                     service_id=instance.service_id,
                     service_name=instance.service_name,
@@ -236,7 +236,7 @@ class ServiceDiscoveryAPI:
                     registered_at=registration.registered_at.isoformat() if registration else "",
                     last_heartbeat=registration.last_heartbeat.isoformat() if registration else ""
                 )
-                
+
             except HTTPException:
                 raise
             except Exception as e:
@@ -245,25 +245,25 @@ class ServiceDiscoveryAPI:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Failed to get service: {str(e)}"
                 )
-        
+
         @self.app.post("/services/{service_id}/heartbeat", response_model=Dict[str, Any])
         async def service_heartbeat(service_id: str):
             """Send heartbeat for a service."""
             try:
                 success = await self.service_discovery.heartbeat(service_id)
-                
+
                 if not success:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Service not found"
                     )
-                
+
                 return {
                     "message": "Heartbeat received",
                     "service_id": service_id,
                     "timestamp": datetime.now().isoformat()
                 }
-                
+
             except HTTPException:
                 raise
             except Exception as e:
@@ -272,13 +272,13 @@ class ServiceDiscoveryAPI:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Heartbeat failed: {str(e)}"
                 )
-        
+
         @self.app.get("/services", response_model=Dict[str, List[ServiceInstanceResponse]])
         async def list_all_services():
             """List all registered services."""
             try:
                 services_by_name = await self.service_discovery.list_services()
-                
+
                 result = {}
                 for service_name, service_list in services_by_name.items():
                     result[service_name] = [
@@ -297,22 +297,22 @@ class ServiceDiscoveryAPI:
                         )
                         for service_info in service_list
                     ]
-                
+
                 return result
-                
+
             except Exception as e:
                 logger.error(f"Error listing services: {e}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Failed to list services: {str(e)}"
                 )
-        
+
         @self.app.get("/system/info", response_model=SystemInfoResponse)
         async def get_system_info():
             """Get system information and statistics."""
             try:
                 info = await self.service_discovery.get_system_info()
-                
+
                 return SystemInfoResponse(
                     total_instances=info["total_instances"],
                     healthy_instances=info["healthy_instances"],
@@ -321,32 +321,32 @@ class ServiceDiscoveryAPI:
                     running=info["running"],
                     health_check_interval=info["health_check_interval"]
                 )
-                
+
             except Exception as e:
                 logger.error(f"Error getting system info: {e}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Failed to get system info: {str(e)}"
                 )
-        
+
         @self.app.get("/services/{service_id}/status", response_model=Dict[str, Any])
         async def get_service_status(service_id: str):
             """Get service status."""
             try:
                 status_result = await self.service_discovery.get_service_status(service_id)
-                
+
                 if status_result is None:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="Service not found"
                     )
-                
+
                 return {
                     "service_id": service_id,
                     "status": status_result.value,
                     "timestamp": datetime.now().isoformat()
                 }
-                
+
             except HTTPException:
                 raise
             except Exception as e:
@@ -355,21 +355,21 @@ class ServiceDiscoveryAPI:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Failed to get service status: {str(e)}"
                 )
-        
+
         @self.app.get("/services/healthy/{service_name}", response_model=ServiceInstanceResponse)
         async def get_healthy_instance(service_name: str):
             """Get a healthy instance of a service."""
             try:
                 instance = await self.service_discovery.get_healthy_instance(service_name)
-                
+
                 if not instance:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail="No healthy instances found"
                     )
-                
+
                 registration = self.service_discovery.services.get(instance.service_id)
-                
+
                 return ServiceInstanceResponse(
                     service_id=instance.service_id,
                     service_name=instance.service_name,
@@ -383,7 +383,7 @@ class ServiceDiscoveryAPI:
                     registered_at=registration.registered_at.isoformat() if registration else "",
                     last_heartbeat=registration.last_heartbeat.isoformat() if registration else ""
                 )
-                
+
             except HTTPException:
                 raise
             except Exception as e:
@@ -392,7 +392,7 @@ class ServiceDiscoveryAPI:
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Failed to get healthy instance: {str(e)}"
                 )
-    
+
     def _setup_cors_middleware(self) -> None:
         """Setup CORS middleware for FastAPI application."""
         # Add CORS middleware with comprehensive OPTIONS support
@@ -405,16 +405,16 @@ class ServiceDiscoveryAPI:
             expose_headers=["*"],  # Expose all headers
         )
         logger.info("CORS middleware configured with full OPTIONS support")
-    
+
     async def start_server(self) -> None:
         """Start the API server."""
         try:
             logger.info(f"Starting Service Discovery API server on {self.host}:{self.port}")
-            
+
             # Start the service discovery system if not already running
             if not self.service_discovery._running:
                 await self.service_discovery.start()
-            
+
             # Configure uvicorn server
             config = uvicorn.Config(
                 app=self.app,
@@ -423,14 +423,14 @@ class ServiceDiscoveryAPI:
                 log_level="info"
             )
             self.server = uvicorn.Server(config)
-            
+
             # Start server (non-blocking)
             await self.server.serve()
-            
+
         except Exception as e:
             logger.error(f"Failed to start API server: {e}")
             raise
-    
+
     async def stop_server(self) -> None:
         """Stop the API server."""
         try:
@@ -439,10 +439,10 @@ class ServiceDiscoveryAPI:
                 self.server.should_exit = True
                 await self.server.shutdown()
                 self.server = None
-            
+
             # Stop the service discovery system
             await self.service_discovery.stop()
-            
+
         except Exception as e:
             logger.error(f"Error stopping API server: {e}")
             raise
@@ -456,12 +456,12 @@ async def create_service_discovery_api(
 ) -> ServiceDiscoveryAPI:
     """
     Create and initialize a Service Discovery API instance.
-    
+
     Args:
         config: Service discovery configuration
         api_host: API server host
         api_port: API server port
-        
+
     Returns:
         ServiceDiscoveryAPI instance
     """
@@ -475,5 +475,5 @@ if __name__ == "__main__":
     async def main():
         api = await create_service_discovery_api()
         await api.start_server()
-    
+
     asyncio.run(main())

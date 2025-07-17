@@ -17,16 +17,16 @@ logger = logging.getLogger(__name__)
 
 class IntegrationAgentCommunicator:
     """Communication interface with integration agent."""
-    
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.communication_log = []
         self.coordination_session_id = None
         self.agent_status = "unknown"
-        
+
     async def initiate_pr_breakdown_coordination(self, pr_number: int = 28) -> Dict[str, Any]:
         """Initiate PR breakdown coordination with integration agent."""
-        
+
         coordination_message = {
             "message_type": "coordination_initiation",
             "timestamp": datetime.now().isoformat(),
@@ -133,23 +133,23 @@ class IntegrationAgentCommunicator:
             "response_timeout": "30 minutes",
             "escalation_procedure": "Notify PM agent if no response within timeout"
         }
-        
+
         # Log the coordination message
         self.communication_log.append(coordination_message)
-        
+
         # Save coordination message to file for integration agent
         coordination_file = Path("coordination_protocols/integration_agent_coordination_request.json")
         with open(coordination_file, "w") as f:
             json.dump(coordination_message, f, indent=2, default=str)
-        
+
         self.logger.info(f"✅ PR #{pr_number} coordination message sent to integration agent")
         self.logger.info(f"📋 Coordination request saved to: {coordination_file}")
-        
+
         return coordination_message
-    
+
     def create_coordination_acknowledgment_template(self) -> Dict[str, Any]:
         """Create template for integration agent acknowledgment."""
-        
+
         acknowledgment_template = {
             "message_type": "coordination_acknowledgment",
             "timestamp": "[TO_BE_FILLED]",
@@ -187,19 +187,19 @@ class IntegrationAgentCommunicator:
                 "escalation_threshold": "24_hours_no_progress"
             }
         }
-        
+
         # Save acknowledgment template
         template_file = Path("coordination_protocols/integration_agent_acknowledgment_template.json")
         with open(template_file, "w") as f:
             json.dump(acknowledgment_template, f, indent=2, default=str)
-        
+
         self.logger.info(f"📋 Acknowledgment template created: {template_file}")
-        
+
         return acknowledgment_template
-    
+
     def generate_coordination_status_report(self) -> Dict[str, Any]:
         """Generate coordination status report."""
-        
+
         status_report = {
             "report_timestamp": datetime.now().isoformat(),
             "coordination_status": "initiated",
@@ -238,41 +238,41 @@ class IntegrationAgentCommunicator:
                 ]
             }
         }
-        
+
         # Save status report
         report_file = Path("coordination_protocols/coordination_status_report.json")
         with open(report_file, "w") as f:
             json.dump(status_report, f, indent=2, default=str)
-        
+
         self.logger.info(f"📊 Coordination status report generated: {report_file}")
-        
+
         return status_report
 
 
 def initiate_integration_agent_coordination():
     """Main function to initiate integration agent coordination."""
-    
+
     print("🎛️ INITIATING INTEGRATION AGENT COORDINATION")
     print("=" * 60)
-    
+
     # Create communicator
     communicator = IntegrationAgentCommunicator()
-    
+
     # Send coordination message
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    
+
     try:
         coordination_message = loop.run_until_complete(
             communicator.initiate_pr_breakdown_coordination()
         )
-        
+
         # Create acknowledgment template
         acknowledgment_template = communicator.create_coordination_acknowledgment_template()
-        
+
         # Generate status report
         status_report = communicator.generate_coordination_status_report()
-        
+
         print("✅ COORDINATION INITIATED SUCCESSFULLY")
         print("=" * 60)
         print(f"📋 Coordination Request: coordination_protocols/integration_agent_coordination_request.json")
@@ -285,18 +285,18 @@ def initiate_integration_agent_coordination():
         print("")
         print("📞 COORDINATION PROTOCOL ACTIVE")
         print("✅ Ready for integration agent acknowledgment")
-        
+
         return {
             "status": "coordination_initiated",
             "coordination_message": coordination_message,
             "acknowledgment_template": acknowledgment_template,
             "status_report": status_report
         }
-        
+
     except Exception as e:
         print(f"❌ COORDINATION INITIATION FAILED: {e}")
         return {"status": "failed", "error": str(e)}
-    
+
     finally:
         loop.close()
 
