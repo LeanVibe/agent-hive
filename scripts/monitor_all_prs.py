@@ -21,12 +21,12 @@ def get_all_open_prs() -> List[Dict[str, Any]]:
     """Get all open PRs"""
     try:
         result = subprocess.run([
-            "gh", "pr", "list", "--json", 
+            "gh", "pr", "list", "--json",
             "number,title,author,additions,deletions,reviewDecision,mergeable,headRefName"
         ], capture_output=True, text=True, check=True)
-        
+
         return json.loads(result.stdout)
-        
+
     except Exception as e:
         print(f"❌ Error getting PRs: {e}")
         return []
@@ -35,16 +35,16 @@ def check_pr_quality_gates(pr: Dict[str, Any]) -> bool:
     """Check if PR passes quality gates"""
     pr_number = pr['number']
     additions = pr['additions']
-    
+
     print(f"\n🔍 Checking PR #{pr_number}: {pr['title']}")
-    
+
     # Size check
     if additions > 1000:
         print(f"  ❌ Size: {additions} lines (>1000)")
         return False
     else:
         print(f"  ✅ Size: {additions} lines (≤1000)")
-    
+
     # Review check
     review_decision = pr.get('reviewDecision', '')
     if review_decision == 'APPROVED':
@@ -52,14 +52,14 @@ def check_pr_quality_gates(pr: Dict[str, Any]) -> bool:
     else:
         print(f"  ❌ Reviews: {review_decision or 'Pending'}")
         return False
-    
+
     # Mergeable check
     if pr.get('mergeable') == 'MERGEABLE':
         print(f"  ✅ Mergeable: Yes")
     else:
         print(f"  ❌ Mergeable: {pr.get('mergeable', 'Unknown')}")
         return False
-    
+
     print(f"  🎉 PR #{pr_number} ready for merge!")
     return True
 
@@ -67,15 +67,15 @@ def merge_pr(pr_number: int) -> bool:
     """Merge a specific PR"""
     try:
         print(f"🚀 Merging PR #{pr_number}...")
-        
+
         result = subprocess.run([
             "gh", "pr", "merge", str(pr_number),
             "--squash", "--delete-branch"
         ], capture_output=True, text=True, check=True)
-        
+
         print(f"✅ PR #{pr_number} merged successfully!")
         return True
-        
+
     except subprocess.CalledProcessError as e:
         print(f"❌ Merge failed for PR #{pr_number}: {e.stderr}")
         return False
@@ -84,7 +84,7 @@ def notify_agents_about_pr_status():
     """Notify agents about overall PR status"""
     try:
         prs = get_all_open_prs()
-        
+
         if not prs:
             message = """📊 PR STATUS UPDATE
 
@@ -98,7 +98,7 @@ No open PRs found. Agents should create PRs for their completed work:
 📋 EXPECTED PRS FROM AGENTS:
 - Integration Agent: Auth middleware component
 - Documentation Agent: Integration docs and validation
-- Quality Agent: Quality gates and security framework  
+- Quality Agent: Quality gates and security framework
 - Orchestration Agent: Enhanced coordination system
 - Intelligence Agent: Phase 2 framework completion
 - PM Agent: Automated PM/XP methodology system
@@ -109,7 +109,7 @@ Please create your PRs so we can review and merge them!"""
                 f"- PR #{pr['number']}: {pr['title']} ({pr['additions']} lines)"
                 for pr in prs
             ])
-            
+
             message = f"""📊 PR STATUS UPDATE
 
 Found {len(prs)} open PR(s):
@@ -128,7 +128,7 @@ Keep working on your components and creating focused PRs!"""
             "python", "scripts/send_agent_message.py",
             "--agent", "pm-agent", "--message", message
         ], capture_output=True)
-        
+
         # Log the status
         try:
             from dashboard.prompt_logger import prompt_logger
@@ -140,7 +140,7 @@ Keep working on your components and creating focused PRs!"""
             )
         except:
             pass
-            
+
     except Exception as e:
         print(f"⚠️  Could not notify agents: {e}")
 
@@ -148,38 +148,38 @@ def monitor_all_prs():
     """Monitor all PRs and merge when ready"""
     print("🔍 Multi-PR Monitoring System Started")
     print("=" * 50)
-    
+
     last_notification = 0
     notification_interval = 1800  # 30 minutes
-    
+
     while True:
         try:
             current_time = time.time()
-            
+
             print(f"\n🕐 {datetime.now().strftime('%H:%M:%S')} - Checking all PRs...")
-            
+
             prs = get_all_open_prs()
-            
+
             if not prs:
                 print("📝 No open PRs found")
-                
+
                 # Notify agents every 30 minutes if no PRs
                 if current_time - last_notification > notification_interval:
                     notify_agents_about_pr_status()
                     last_notification = current_time
             else:
                 print(f"📋 Found {len(prs)} open PR(s)")
-                
+
                 ready_for_merge = []
-                
+
                 for pr in prs:
                     if check_pr_quality_gates(pr):
                         ready_for_merge.append(pr)
-                
+
                 # Merge ready PRs
                 for pr in ready_for_merge:
                     print(f"\n🎉 Merging ready PR #{pr['number']}...")
-                    
+
                     if merge_pr(pr['number']):
                         # Notify agents about successful merge
                         merge_message = f"""✅ PR MERGED SUCCESSFULLY
@@ -198,15 +198,15 @@ Great work on the component-based approach!"""
                             "python", "scripts/send_agent_message.py",
                             "--agent", "pm-agent", "--message", merge_message
                         ], capture_output=True)
-                
+
                 # Update status every 30 minutes
                 if current_time - last_notification > notification_interval:
                     notify_agents_about_pr_status()
                     last_notification = current_time
-            
+
             print(f"⏳ Next check in 300 seconds...")
             time.sleep(300)  # Check every 5 minutes
-            
+
         except KeyboardInterrupt:
             print("\n👋 Monitoring stopped by user")
             break
