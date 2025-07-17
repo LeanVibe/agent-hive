@@ -15,6 +15,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+# Add parent directory to Python path to import advanced_orchestration
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
 from advanced_orchestration.resource_manager import ResourceManager
 from advanced_orchestration.scaling_manager import ScalingManager

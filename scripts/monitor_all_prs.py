@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+DEPRECATED: Use pr_manager.py for PR review/monitoring and pr_merge_coordinator.py for merge automation. This script is superseded by the canonical PR workflow scripts.
+
 Monitor All Agent PRs
 
 Monitors all open PRs from agents and coordinates merge process
@@ -17,13 +19,22 @@ from typing import Dict, List, Optional, Any
 # Add dashboard logging
 sys.path.append(str(Path(__file__).parent.parent))
 
+
 def get_all_open_prs() -> List[Dict[str, Any]]:
     """Get all open PRs"""
     try:
-        result = subprocess.run([
-            "gh", "pr", "list", "--json",
-            "number,title,author,additions,deletions,reviewDecision,mergeable,headRefName"
-        ], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            [
+                "gh",
+                "pr",
+                "list",
+                "--json",
+                "number,title,author,additions,deletions,reviewDecision,mergeable,headRefName",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
 
         return json.loads(result.stdout)
 
@@ -31,10 +42,11 @@ def get_all_open_prs() -> List[Dict[str, Any]]:
         print(f"❌ Error getting PRs: {e}")
         return []
 
+
 def check_pr_quality_gates(pr: Dict[str, Any]) -> bool:
     """Check if PR passes quality gates"""
-    pr_number = pr['number']
-    additions = pr['additions']
+    pr_number = pr["number"]
+    additions = pr["additions"]
 
     print(f"\n🔍 Checking PR #{pr_number}: {pr['title']}")
 
@@ -46,15 +58,15 @@ def check_pr_quality_gates(pr: Dict[str, Any]) -> bool:
         print(f"  ✅ Size: {additions} lines (≤1000)")
 
     # Review check
-    review_decision = pr.get('reviewDecision', '')
-    if review_decision == 'APPROVED':
+    review_decision = pr.get("reviewDecision", "")
+    if review_decision == "APPROVED":
         print(f"  ✅ Reviews: Approved")
     else:
         print(f"  ❌ Reviews: {review_decision or 'Pending'}")
         return False
 
     # Mergeable check
-    if pr.get('mergeable') == 'MERGEABLE':
+    if pr.get("mergeable") == "MERGEABLE":
         print(f"  ✅ Mergeable: Yes")
     else:
         print(f"  ❌ Mergeable: {pr.get('mergeable', 'Unknown')}")
@@ -63,15 +75,18 @@ def check_pr_quality_gates(pr: Dict[str, Any]) -> bool:
     print(f"  🎉 PR #{pr_number} ready for merge!")
     return True
 
+
 def merge_pr(pr_number: int) -> bool:
     """Merge a specific PR"""
     try:
         print(f"🚀 Merging PR #{pr_number}...")
 
-        result = subprocess.run([
-            "gh", "pr", "merge", str(pr_number),
-            "--squash", "--delete-branch"
-        ], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["gh", "pr", "merge", str(pr_number), "--squash", "--delete-branch"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
 
         print(f"✅ PR #{pr_number} merged successfully!")
         return True
@@ -79,6 +94,7 @@ def merge_pr(pr_number: int) -> bool:
     except subprocess.CalledProcessError as e:
         print(f"❌ Merge failed for PR #{pr_number}: {e.stderr}")
         return False
+
 
 def notify_agents_about_pr_status():
     """Notify agents about overall PR status"""
@@ -105,10 +121,12 @@ No open PRs found. Agents should create PRs for their completed work:
 
 Please create your PRs so we can review and merge them!"""
         else:
-            pr_summary = "\n".join([
-                f"- PR #{pr['number']}: {pr['title']} ({pr['additions']} lines)"
-                for pr in prs
-            ])
+            pr_summary = "\n".join(
+                [
+                    f"- PR #{pr['number']}: {pr['title']} ({pr['additions']} lines)"
+                    for pr in prs
+                ]
+            )
 
             message = f"""📊 PR STATUS UPDATE
 
@@ -124,25 +142,34 @@ Found {len(prs)} open PR(s):
 Keep working on your components and creating focused PRs!"""
 
         # Send to PM agent for coordination
-        subprocess.run([
-            "python", "scripts/send_agent_message.py",
-            "--agent", "pm-agent", "--message", message
-        ], capture_output=True)
+        subprocess.run(
+            [
+                "python",
+                "scripts/send_agent_message.py",
+                "--agent",
+                "pm-agent",
+                "--message",
+                message,
+            ],
+            capture_output=True,
+        )
 
         # Log the status
         try:
             from dashboard.prompt_logger import prompt_logger
+
             prompt_logger.log_prompt(
                 "pr-monitor-status",
                 f"PR monitoring update: {len(prs)} open PRs",
                 "Status update sent",
-                True
+                True,
             )
         except:
             pass
 
     except Exception as e:
         print(f"⚠️  Could not notify agents: {e}")
+
 
 def monitor_all_prs():
     """Monitor all PRs and merge when ready"""
@@ -180,7 +207,7 @@ def monitor_all_prs():
                 for pr in ready_for_merge:
                     print(f"\n🎉 Merging ready PR #{pr['number']}...")
 
-                    if merge_pr(pr['number']):
+                    if merge_pr(pr["number"]):
                         # Notify agents about successful merge
                         merge_message = f"""✅ PR MERGED SUCCESSFULLY
 
@@ -194,10 +221,17 @@ PR #{pr['number']} has been merged: {pr['title']}
 
 Great work on the component-based approach!"""
 
-                        subprocess.run([
-                            "python", "scripts/send_agent_message.py",
-                            "--agent", "pm-agent", "--message", merge_message
-                        ], capture_output=True)
+                        subprocess.run(
+                            [
+                                "python",
+                                "scripts/send_agent_message.py",
+                                "--agent",
+                                "pm-agent",
+                                "--message",
+                                merge_message,
+                            ],
+                            capture_output=True,
+                        )
 
                 # Update status every 30 minutes
                 if current_time - last_notification > notification_interval:
@@ -213,6 +247,7 @@ Great work on the component-based approach!"""
         except Exception as e:
             print(f"❌ Error in monitoring loop: {e}")
             time.sleep(60)  # Wait 1 minute on error
+
 
 if __name__ == "__main__":
     monitor_all_prs()

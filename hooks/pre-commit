@@ -18,7 +18,8 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Check if we're in the right directory
-if [ ! -f "cli.py" ] || [ ! -d "advanced_orchestration" ]; then
+GIT_ROOT=$(git rev-parse --show-toplevel)
+if [ ! -f "$GIT_ROOT/scripts/cli.py" ] || [ ! -d "$GIT_ROOT/advanced_orchestration" ]; then
     echo -e "${RED}❌ Error: Not in LeanVibe Agent Hive project root${NC}"
     echo "💡 Run git commit from the project root directory"
     exit 1
@@ -64,7 +65,7 @@ fi
 
 # 3. Test CLI basic functionality
 print_step "Testing CLI basic functionality"
-if python cli.py --help >/dev/null 2>&1; then
+if python "$GIT_ROOT/scripts/cli.py" --help >/dev/null 2>&1; then
     print_status 0 "CLI help system"
 else
     print_status 1 "CLI help system" 
@@ -152,9 +153,9 @@ fi
 
 # 7. Validate that required files exist
 print_step "Validating project structure"
-required_files=("cli.py" "advanced_orchestration/__init__.py" "requirements.txt")
+required_files=("scripts/cli.py" "advanced_orchestration/__init__.py" "requirements.txt")
 for file in "${required_files[@]}"; do
-    if [ ! -f "$file" ]; then
+    if [ ! -f "$GIT_ROOT/$file" ]; then
         print_status 1 "Project structure validation"
         echo "💡 Required file missing: $file"
         exit 1

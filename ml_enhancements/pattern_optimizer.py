@@ -222,10 +222,10 @@ class PatternOptimizer:
     def _calculate_performance_score(self, metrics: Dict[str, float]) -> float:
         """Calculate overall performance score from metrics."""
         weights = {
-            'completion_time': -0.3,  # Lower is better
+            'completion_time': 0.3,  # Lower is better (inverted later)
             'resource_efficiency': 0.3,  # Higher is better
             'success_rate': 0.4,  # Higher is better
-            'error_count': -0.2,  # Lower is better
+            'error_count': 0.2,  # Lower is better (inverted later)
             'agent_utilization': 0.2  # Higher is better
         }
 
@@ -235,13 +235,20 @@ class PatternOptimizer:
         for metric, value in metrics.items():
             if metric in weights:
                 weight = weights[metric]
-                score += weight * value
-                total_weight += abs(weight)
+                # Invert metrics where lower is better
+                if metric in ['completion_time', 'error_count']:
+                    # Convert to "goodness" scale: 1 - value
+                    adjusted_value = 1.0 - value
+                else:
+                    adjusted_value = value
+
+                score += weight * adjusted_value
+                total_weight += weight
 
         if total_weight > 0:
             score = score / total_weight
 
-        # Normalize to 0-1 range
+        # Already normalized to 0-1 range due to input constraints
         return max(0.0, min(1.0, score))
 
     def _calculate_optimization_score(

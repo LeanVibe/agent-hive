@@ -59,7 +59,6 @@ class TestWebhookServer:
         assert not webhook_server.server_started
         assert webhook_server.delivery_status == {}
 
-    @pytest.mark.asyncio
     async def test_start_stop_server(self, webhook_server):
         """Test server start and stop functionality."""
         # Test start
@@ -78,7 +77,6 @@ class TestWebhookServer:
         await webhook_server.stop_server()  # Should not raise error
         assert not webhook_server.server_started
 
-    @pytest.mark.asyncio
     async def test_register_handler(self, webhook_server):
         """Test handler registration."""
         async def test_handler(event):
@@ -96,7 +94,6 @@ class TestWebhookServer:
         with pytest.raises(ValueError, match="Handler must be an async function"):
             webhook_server.register_handler("sync_event", sync_handler)
 
-    @pytest.mark.asyncio
     async def test_unregister_handler(self, webhook_server):
         """Test handler unregistration."""
         async def test_handler(event):
@@ -114,7 +111,6 @@ class TestWebhookServer:
         result = webhook_server.unregister_handler("non_existent")
         assert result is False
 
-    @pytest.mark.asyncio
     async def test_handle_webhook_success(self, webhook_server, sample_payload):
         """Test successful webhook handling."""
         async def test_handler(event):
@@ -128,7 +124,6 @@ class TestWebhookServer:
         assert result["code"] == 200
         assert "result" in result
 
-    @pytest.mark.asyncio
     async def test_handle_webhook_rate_limit(self, webhook_server, sample_payload):
         """Test webhook rate limiting."""
         # Fill up rate limit
@@ -141,7 +136,6 @@ class TestWebhookServer:
         assert result["code"] == 429
         assert "Rate limit exceeded" in result["message"]
 
-    @pytest.mark.asyncio
     async def test_handle_webhook_payload_too_large(self, webhook_server):
         """Test handling of oversized payloads."""
         large_payload = {
@@ -154,7 +148,6 @@ class TestWebhookServer:
         assert result["code"] == 413
         assert "Payload too large" in result["message"]
 
-    @pytest.mark.asyncio
     async def test_handle_webhook_missing_event_type(self, webhook_server):
         """Test handling of payload without event type."""
         invalid_payload = {"data": {"test": "value"}}
@@ -164,7 +157,6 @@ class TestWebhookServer:
         assert result["code"] == 400
         assert "Missing event type" in result["message"]
 
-    @pytest.mark.asyncio
     async def test_handle_webhook_no_handler(self, webhook_server, sample_payload):
         """Test handling when no handler is registered."""
         result = await webhook_server.handle_webhook(sample_payload, "127.0.0.1")
@@ -172,7 +164,6 @@ class TestWebhookServer:
         assert result["code"] == 404
         assert "No handler for event type" in result["message"]
 
-    @pytest.mark.asyncio
     async def test_handle_webhook_handler_timeout(self, webhook_server, sample_payload):
         """Test handler timeout handling."""
         async def slow_handler(event):
@@ -186,7 +177,6 @@ class TestWebhookServer:
         assert result["code"] == 504
         assert "Handler timeout" in result["message"]
 
-    @pytest.mark.asyncio
     async def test_handle_webhook_handler_error(self, webhook_server, sample_payload):
         """Test handler error handling."""
         async def error_handler(event):
@@ -199,7 +189,6 @@ class TestWebhookServer:
         assert result["code"] == 500
         assert "Handler error" in result["message"]
 
-    @pytest.mark.asyncio
     async def test_rate_limit_check(self, webhook_server):
         """Test rate limiting logic."""
         source_ip = "192.168.1.1"
@@ -211,7 +200,6 @@ class TestWebhookServer:
         # Should deny request exceeding limit
         assert webhook_server._check_rate_limit(source_ip) is False
 
-    @pytest.mark.asyncio
     async def test_get_delivery_status(self, webhook_server, sample_payload):
         """Test delivery status tracking."""
         async def test_handler(event):
@@ -232,7 +220,6 @@ class TestWebhookServer:
         assert delivery.status == "success"
         assert delivery.response_code == 200
 
-    @pytest.mark.asyncio
     async def test_get_handler_info(self, webhook_server):
         """Test handler information retrieval."""
         async def handler1(event):
@@ -251,7 +238,6 @@ class TestWebhookServer:
         assert info["server_status"] == "stopped"
         assert "config" in info
 
-    @pytest.mark.asyncio
     async def test_get_rate_limit_status(self, webhook_server):
         """Test rate limit status retrieval."""
         # Generate some rate limit activity
@@ -266,7 +252,6 @@ class TestWebhookServer:
         assert status["rate_limit_config"]["requests_per_window"] == 10
         assert status["total_active_clients"] == 2
 
-    @pytest.mark.asyncio
     async def test_health_check(self, webhook_server):
         """Test health check functionality."""
         # Health check when stopped
@@ -281,7 +266,6 @@ class TestWebhookServer:
         assert health["server_running"] is True
         assert "timestamp" in health
 
-    @pytest.mark.asyncio
     async def test_webhook_config_validation(self):
         """Test webhook configuration validation."""
         # Test invalid port
@@ -299,7 +283,6 @@ class TestWebhookServer:
         with pytest.raises(ValueError, match="Max payload size must be positive"):
             WebhookConfig(max_payload_size=0)
 
-    @pytest.mark.asyncio
     async def test_webhook_event_validation(self):
         """Test webhook event validation."""
         # Test valid event

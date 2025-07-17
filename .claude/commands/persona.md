@@ -1,4 +1,9 @@
-## Quick Start Commands for Personas
+# DEPRECATED: Use `/spawn --persona ...` instead
+
+Persona switching is now integrated into the agent spawning protocol.
+See `spawn.md` for all persona management options and usage.
+
+## Quick Start Commands for Personas (for reference)
 
 ```bash
 # .claude/commands/persona.md

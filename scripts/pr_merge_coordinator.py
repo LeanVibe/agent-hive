@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+CANONICAL: This is the canonical script for PR merge automation and coordination. Use this for all merge and post-review workflows.
+
 PR Merge Coordinator
 
 Monitors PR status and coordinates merge process once feedback is implemented.
@@ -18,6 +20,7 @@ import argparse
 # Add dashboard logging
 sys.path.append(str(Path(__file__).parent.parent))
 
+
 class PRMergeCoordinator:
     """Coordinates PR merge process with quality gates and agent notification"""
 
@@ -25,20 +28,29 @@ class PRMergeCoordinator:
         self.pr_number = pr_number
         self.pr_info = {}
         self.quality_gates = {
-            'size_check': False,
-            'tests_check': False,
-            'docs_check': False,
-            'security_check': False,
-            'reviews_check': False
+            "size_check": False,
+            "tests_check": False,
+            "docs_check": False,
+            "security_check": False,
+            "reviews_check": False,
         }
 
     def get_pr_info(self) -> Dict[str, Any]:
         """Get current PR information"""
         try:
-            result = subprocess.run([
-                "gh", "pr", "view", str(self.pr_number), "--json",
-                "title,state,additions,deletions,reviewDecision,mergeable,files,reviews"
-            ], capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "view",
+                    str(self.pr_number),
+                    "--json",
+                    "title,state,additions,deletions,reviewDecision,mergeable,files,reviews",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
 
             self.pr_info = json.loads(result.stdout)
             return self.pr_info
@@ -52,11 +64,11 @@ class PRMergeCoordinator:
         if not self.pr_info:
             return False
 
-        additions = self.pr_info.get('additions', 0)
+        additions = self.pr_info.get("additions", 0)
         max_size = 1000  # Max lines for component-based PR
 
         if additions <= max_size:
-            self.quality_gates['size_check'] = True
+            self.quality_gates["size_check"] = True
             print(f"✅ PR size check passed: {additions} lines (≤{max_size})")
             return True
         else:
@@ -67,22 +79,31 @@ class PRMergeCoordinator:
         """Check if tests are present and coverage is adequate"""
         try:
             # Check for test files in the PR
-            result = subprocess.run([
-                "gh", "pr", "diff", str(self.pr_number)
-            ], capture_output=True, text=True)
+            result = subprocess.run(
+                ["gh", "pr", "diff", str(self.pr_number)],
+                capture_output=True,
+                text=True,
+            )
 
             diff_content = result.stdout
 
             # Look for test files or test additions
             test_indicators = [
-                'test_', 'tests/', '_test.py', 'spec_', 'conftest.py',
-                'def test_', 'class Test', 'pytest', 'unittest'
+                "test_",
+                "tests/",
+                "_test.py",
+                "spec_",
+                "conftest.py",
+                "def test_",
+                "class Test",
+                "pytest",
+                "unittest",
             ]
 
             has_tests = any(indicator in diff_content for indicator in test_indicators)
 
             if has_tests:
-                self.quality_gates['tests_check'] = True
+                self.quality_gates["tests_check"] = True
                 print("✅ Test coverage check passed: Tests found in PR")
                 return True
             else:
@@ -96,22 +117,30 @@ class PRMergeCoordinator:
     def check_documentation(self) -> bool:
         """Check if documentation is present and adequate"""
         try:
-            result = subprocess.run([
-                "gh", "pr", "diff", str(self.pr_number)
-            ], capture_output=True, text=True)
+            result = subprocess.run(
+                ["gh", "pr", "diff", str(self.pr_number)],
+                capture_output=True,
+                text=True,
+            )
 
             diff_content = result.stdout
 
             # Look for documentation files or updates
             doc_indicators = [
-                '.md', 'README', 'docs/', 'api/', 'guide',
-                'documentation', 'example', 'usage'
+                ".md",
+                "README",
+                "docs/",
+                "api/",
+                "guide",
+                "documentation",
+                "example",
+                "usage",
             ]
 
             has_docs = any(indicator in diff_content for indicator in doc_indicators)
 
             if has_docs:
-                self.quality_gates['docs_check'] = True
+                self.quality_gates["docs_check"] = True
                 print("✅ Documentation check passed: Documentation found in PR")
                 return True
             else:
@@ -128,27 +157,38 @@ class PRMergeCoordinator:
         # In practice, this would integrate with security scanning tools
 
         try:
-            result = subprocess.run([
-                "gh", "pr", "diff", str(self.pr_number)
-            ], capture_output=True, text=True)
+            result = subprocess.run(
+                ["gh", "pr", "diff", str(self.pr_number)],
+                capture_output=True,
+                text=True,
+            )
 
             diff_content = result.stdout.lower()
 
             # Check for security-sensitive changes
             security_keywords = [
-                'auth', 'password', 'token', 'secret', 'key',
-                'login', 'session', 'security', 'credential'
+                "auth",
+                "password",
+                "token",
+                "secret",
+                "key",
+                "login",
+                "session",
+                "security",
+                "credential",
             ]
 
-            has_security_changes = any(keyword in diff_content for keyword in security_keywords)
+            has_security_changes = any(
+                keyword in diff_content for keyword in security_keywords
+            )
 
             if has_security_changes:
                 print("⚠️  Security review required: Security-related changes detected")
                 # For demo, we'll mark as passed but flag for attention
-                self.quality_gates['security_check'] = True
+                self.quality_gates["security_check"] = True
                 return True
             else:
-                self.quality_gates['security_check'] = True
+                self.quality_gates["security_check"] = True
                 print("✅ Security check passed: No security-sensitive changes")
                 return True
 
@@ -161,10 +201,10 @@ class PRMergeCoordinator:
         if not self.pr_info:
             return False
 
-        review_decision = self.pr_info.get('reviewDecision', '')
+        review_decision = self.pr_info.get("reviewDecision", "")
 
-        if review_decision == 'APPROVED':
-            self.quality_gates['reviews_check'] = True
+        if review_decision == "APPROVED":
+            self.quality_gates["reviews_check"] = True
             print("✅ Review check passed: PR approved")
             return True
         else:
@@ -186,7 +226,7 @@ class PRMergeCoordinator:
             self.check_test_coverage(),
             self.check_documentation(),
             self.check_security_review(),
-            self.check_reviews()
+            self.check_reviews(),
         ]
 
         all_passed = all(checks)
@@ -195,8 +235,12 @@ class PRMergeCoordinator:
         print(f"  Size Check: {'✅' if self.quality_gates['size_check'] else '❌'}")
         print(f"  Tests Check: {'✅' if self.quality_gates['tests_check'] else '❌'}")
         print(f"  Docs Check: {'✅' if self.quality_gates['docs_check'] else '❌'}")
-        print(f"  Security Check: {'✅' if self.quality_gates['security_check'] else '❌'}")
-        print(f"  Reviews Check: {'✅' if self.quality_gates['reviews_check'] else '❌'}")
+        print(
+            f"  Security Check: {'✅' if self.quality_gates['security_check'] else '❌'}"
+        )
+        print(
+            f"  Reviews Check: {'✅' if self.quality_gates['reviews_check'] else '❌'}"
+        )
 
         if all_passed:
             print("\n🎉 All quality gates passed! Ready for merge.")
@@ -211,8 +255,12 @@ class PRMergeCoordinator:
             from dashboard.prompt_logger import prompt_logger
 
             agents = [
-                "integration-agent", "pm-agent", "quality-agent",
-                "documentation-agent", "orchestration-agent", "intelligence-agent"
+                "integration-agent",
+                "pm-agent",
+                "quality-agent",
+                "documentation-agent",
+                "orchestration-agent",
+                "intelligence-agent",
             ]
 
             message = f"""🎉 PR #{self.pr_number} READY FOR MERGE
@@ -233,17 +281,24 @@ Merge proceeding now..."""
 
             for agent in agents:
                 # Send notification to agent
-                subprocess.run([
-                    "python", "scripts/send_agent_message.py",
-                    "--agent", agent, "--message", message
-                ], capture_output=True)
+                subprocess.run(
+                    [
+                        "python",
+                        "scripts/send_agent_message.py",
+                        "--agent",
+                        agent,
+                        "--message",
+                        message,
+                    ],
+                    capture_output=True,
+                )
 
                 # Log the notification
                 prompt_logger.log_prompt(
                     f"merge-coordinator-to-{agent}",
                     message,
                     "Merge notification sent",
-                    True
+                    True,
                 )
 
             print("✅ All agents notified of pending merge")
@@ -257,10 +312,19 @@ Merge proceeding now..."""
             print(f"🚀 Merging PR #{self.pr_number}...")
 
             # Merge the PR with squash
-            result = subprocess.run([
-                "gh", "pr", "merge", str(self.pr_number),
-                "--squash", "--delete-branch"
-            ], capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "merge",
+                    str(self.pr_number),
+                    "--squash",
+                    "--delete-branch",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
 
             print(f"✅ PR #{self.pr_number} merged successfully!")
             print(f"📝 Output: {result.stdout}")
@@ -268,11 +332,12 @@ Merge proceeding now..."""
             # Log the merge
             try:
                 from dashboard.prompt_logger import prompt_logger
+
                 prompt_logger.log_prompt(
                     "merge-coordinator",
                     f"Successfully merged PR #{self.pr_number}",
                     "PR merge completed",
-                    True
+                    True,
                 )
             except ImportError:
                 pass
@@ -290,9 +355,14 @@ Merge proceeding now..."""
         """Update related GitHub issues after merge"""
         try:
             # Comment on the related issue
-            subprocess.run([
-                "gh", "issue", "comment", "23", "--body",
-                f"""## ✅ PR #{self.pr_number} Successfully Merged
+            subprocess.run(
+                [
+                    "gh",
+                    "issue",
+                    "comment",
+                    "23",
+                    "--body",
+                    f"""## ✅ PR #{self.pr_number} Successfully Merged
 
 **Merge Status**: COMPLETED
 **Timestamp**: {datetime.now().isoformat()}
@@ -309,8 +379,10 @@ Merge proceeding now..."""
 - Feature branch cleaned up
 - Sprint can continue with next components
 
-**Integration Agent**: Please proceed with next component PR following the established component-based approach."""
-            ], capture_output=True)
+**Integration Agent**: Please proceed with next component PR following the established component-based approach.""",
+                ],
+                capture_output=True,
+            )
 
             print("✅ Related issues updated")
 
@@ -345,19 +417,32 @@ Merge proceeding now..."""
                     print("\n❌ Merge failed. Manual intervention required.")
                     return False
             else:
-                print(f"\n⏳ Quality gates not passed. Checking again in {check_interval}s...")
+                print(
+                    f"\n⏳ Quality gates not passed. Checking again in {check_interval}s..."
+                )
                 time.sleep(check_interval)
+
 
 def main():
     """Main CLI interface"""
-    parser = argparse.ArgumentParser(description="Monitor and coordinate PR merge process")
+    parser = argparse.ArgumentParser(
+        description="Monitor and coordinate PR merge process"
+    )
     parser.add_argument("pr_number", type=int, help="PR number to monitor")
-    parser.add_argument("--check-interval", type=int, default=300,
-                       help="Check interval in seconds (default: 300)")
-    parser.add_argument("--check-once", action="store_true",
-                       help="Check once and exit (don't monitor)")
-    parser.add_argument("--force-merge", action="store_true",
-                       help="Force merge if all gates pass (use with caution)")
+    parser.add_argument(
+        "--check-interval",
+        type=int,
+        default=300,
+        help="Check interval in seconds (default: 300)",
+    )
+    parser.add_argument(
+        "--check-once", action="store_true", help="Check once and exit (don't monitor)"
+    )
+    parser.add_argument(
+        "--force-merge",
+        action="store_true",
+        help="Force merge if all gates pass (use with caution)",
+    )
 
     args = parser.parse_args()
 
@@ -390,6 +475,7 @@ def main():
         # Monitor and merge when ready
         success = coordinator.monitor_and_merge(args.check_interval)
         sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main()

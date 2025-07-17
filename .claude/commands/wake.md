@@ -1,5 +1,7 @@
 # /wake - Memory Restoration Command
 
+**Canonical system:** Automatic/manual memory system (see scripts/memory_*, .claude/memory/)
+
 Restores essential knowledge and project state from persistent memory after context reset or session restart.
 
 ## Usage
@@ -91,9 +93,15 @@ Restores essential knowledge and project state from persistent memory after cont
 After `/wake`, you have instant access to:
 
 ### **🔧 Working Tools**
-- `scripts/fixed_agent_communication.py` - Reliable agent messaging (no manual Enter)
+- `scripts/send_agent_message.py` - Canonical agent-to-agent messaging (auto-submit, reliable)
+- `scripts/agent_manager.py` - Canonical agent lifecycle management (spawn, monitor, resume)
+- `scripts/run_quality_gates.py` - Canonical quality gate runner for worktrees and codebase
+- `scripts/quality_gate_validation.py` - Canonical PR integration quality gate validator
+- `scripts/pr_manager.py` - Canonical PR review and workflow automation
+- `scripts/pr_merge_coordinator.py` - Canonical PR merge automation and coordination
+- `scripts/pr_resolution_monitor.py` - Canonical PR conflict resolution and sequential merge
+- `scripts/emergency_cli.py` - Canonical emergency CLI for crisis workflows
 - `scripts/check_agent_status.py --format json` - Agent coordination status
-- Quality gate commands and evidence-based validation protocols
 
 ### **📋 Current Status** 
 - Recent commits and project progress

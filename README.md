@@ -66,6 +66,26 @@ All major intelligence components implemented and production-ready:
 
 ## Quick Start
 
+### Pre-commit, Test, and Lint Quickstart
+
+Before pushing any code, always run:
+
+```bash
+# Run all tests
+pytest
+
+# Lint and format
+ruff .
+black .
+isort . --profile black --line-length 100
+mypy .
+
+# Run all pre-commit checks
+pre-commit run --all-files
+```
+
+See `.claude/commands/ONBOARDING.md` for a full onboarding checklist and canonical workflow scripts.
+
 **📋 Intelligence Framework Implementation Status**:
 - ✅ **Intelligence Framework**: Core ML-based decision making with confidence scoring
 - ✅ **Intelligent Task Allocation**: Advanced task routing and agent performance profiling
