@@ -20,16 +20,103 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 import enum
 
-# Import Security Agent's base models
-import sys
-sys.path.append('../security-Jul-17-0944')
-from external_api.database_models import Base, User as SecurityUser, Role as SecurityRole, PermissionModel
+# Create base models directly
+Base = declarative_base()
 
 # Import our RBAC enums
 from .rbac_framework import ResourceType, ActionType, PermissionScope
 
-# Extend the base from security agent
-Base = Base
+
+# Basic User and Role models (compatible with security agent expectations)
+user_roles = Table(
+    'user_roles',
+    Base.metadata,
+    Column('user_id', UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True),
+    Column('role_id', UUID(as_uuid=True), ForeignKey('roles.id'), primary_key=True)
+)
+
+
+class User(Base):
+    """Base User model for RBAC system."""
+    
+    __tablename__ = 'users'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    username = Column(String(100), unique=True, nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    full_name = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
+    
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    last_login = Column(DateTime(timezone=True), nullable=True)
+    
+    # Relationships
+    roles = relationship("Role", secondary=user_roles, back_populates="users")
+    
+    def __repr__(self):
+        return f"<User(id={self.id}, username='{self.username}')>"
+
+
+class Role(Base):
+    """Base Role model for RBAC system."""
+    
+    __tablename__ = 'roles'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(100), unique=True, nullable=False)
+    description = Column(Text, nullable=True)
+    is_active = Column(Boolean, default=True)
+    is_system = Column(Boolean, default=False)
+    
+    # For hierarchy support
+    parent_role_names = Column(JSON, nullable=True)
+    child_role_names = Column(JSON, nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationships
+    users = relationship("User", secondary=user_roles, back_populates="roles")
+    permissions = relationship("PermissionModel", back_populates="role")
+    
+    def __repr__(self):
+        return f"<Role(id={self.id}, name='{self.name}')>"
+
+
+class PermissionModel(Base):
+    """Base Permission model for RBAC system."""
+    
+    __tablename__ = 'permissions'
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    role_id = Column(UUID(as_uuid=True), ForeignKey('roles.id'), nullable=False)
+    name = Column(String(200), nullable=False)
+    resource_type = Column(String(50), nullable=False)
+    action_type = Column(String(50), nullable=False)
+    scope = Column(String(50), nullable=False)
+    
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relationships
+    role = relationship("Role", back_populates="permissions")
+    
+    def __repr__(self):
+        return f"<PermissionModel(id={self.id}, name='{self.name}')>"
+    
+    def to_rbac_permission(self):
+        """Convert to RBAC Permission object."""
+        from .rbac_framework import Permission
+        return Permission(
+            resource_type=ResourceType(self.resource_type),
+            action=ActionType(self.action_type),
+            scope=PermissionScope(self.scope)
+        )
 
 
 class ResourceTypeEnum(enum.Enum):
@@ -113,10 +200,10 @@ class EnhancedRole(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    metadata = Column(JSON, nullable=True)
+    meta_data = Column(JSON, nullable=True)
     
     # Relationships
-    users = relationship("SecurityUser", secondary="user_roles", back_populates="roles")
+    users = relationship("User", secondary="user_roles", back_populates="roles")
     permissions = relationship("EnhancedPermission", secondary=enhanced_role_permissions, back_populates="roles")
     
     # Hierarchy relationships
@@ -190,7 +277,7 @@ class EnhancedRole(Base):
             'hierarchy_path': self.hierarchy_path,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.metadata or {}
+            'metadata': self.meta_data or {}
         }
 
 
@@ -222,11 +309,11 @@ class EnhancedPermission(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Metadata
-    metadata = Column(JSON, nullable=True)
+    meta_data = Column(JSON, nullable=True)
     
     # Relationships
     roles = relationship("EnhancedRole", secondary=enhanced_role_permissions, back_populates="permissions")
-    users = relationship("SecurityUser", secondary=user_direct_permissions, back_populates="direct_permissions")
+    users = relationship("User", secondary=user_direct_permissions, back_populates="direct_permissions")
     
     # Indexes
     __table_args__ = (
@@ -292,7 +379,7 @@ class EnhancedPermission(Base):
             'expires_at': self.expires_at.isoformat() if self.expires_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'metadata': self.metadata or {}
+            'metadata': self.meta_data or {}
         }
     
     @classmethod
@@ -324,7 +411,7 @@ class PermissionCache(Base):
     hit_count = Column(Integer, default=0)
     
     # Relationships
-    user = relationship("SecurityUser")
+    user = relationship("User")
     
     # Indexes
     __table_args__ = (
@@ -368,7 +455,7 @@ class AuditLog(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
-    user = relationship("SecurityUser")
+    user = relationship("User")
     
     # Indexes
     __table_args__ = (
@@ -401,14 +488,14 @@ class AuditLog(Base):
         }
 
 
-# Extend the SecurityUser model with additional relationships
-SecurityUser.direct_permissions = relationship(
+# Extend the User model with additional relationships
+User.direct_permissions = relationship(
     "EnhancedPermission", 
     secondary=user_direct_permissions, 
     back_populates="users"
 )
 
-SecurityUser.enhanced_roles = relationship(
+User.enhanced_roles = relationship(
     "EnhancedRole", 
     secondary="user_roles", 
     back_populates="users"
@@ -633,3 +720,67 @@ def cleanup_old_audit_logs(session: Session, days: int = 90) -> int:
     
     session.commit()
     return deleted_count
+
+
+# Compatibility functions for tests
+def setup_default_rbac(session: Session) -> None:
+    """Set up default RBAC roles and permissions."""
+    create_default_roles(session)
+    create_default_permissions(session)
+
+
+def create_default_roles(session: Session) -> None:
+    """Create default roles for the system."""
+    default_roles = [
+        {"name": "admin", "description": "Administrator role with full permissions"},
+        {"name": "developer", "description": "Developer role with development permissions"},
+        {"name": "readonly", "description": "Read-only role with limited permissions"},
+        {"name": "operator", "description": "Operations role with deployment permissions"},
+    ]
+    
+    for role_data in default_roles:
+        existing_role = session.query(Role).filter_by(name=role_data["name"]).first()
+        if not existing_role:
+            role = Role(**role_data)
+            session.add(role)
+    
+    session.commit()
+
+
+def create_default_permissions(session: Session) -> None:
+    """Create default permissions for the system."""
+    # Create basic permissions for each role
+    permissions = [
+        {"name": "admin_all", "resource_type": "api_endpoint", "action_type": "admin", "scope": "global"},
+        {"name": "developer_read", "resource_type": "api_endpoint", "action_type": "read", "scope": "project"},
+        {"name": "developer_write", "resource_type": "api_endpoint", "action_type": "create", "scope": "project"},
+        {"name": "readonly_read", "resource_type": "api_endpoint", "action_type": "read", "scope": "project"},
+        {"name": "operator_deploy", "resource_type": "service", "action_type": "deploy", "scope": "global"},
+    ]
+    
+    # Get roles
+    admin_role = session.query(Role).filter_by(name="admin").first()
+    developer_role = session.query(Role).filter_by(name="developer").first()
+    readonly_role = session.query(Role).filter_by(name="readonly").first()
+    operator_role = session.query(Role).filter_by(name="operator").first()
+    
+    # Create permissions and assign to roles
+    for perm_data in permissions:
+        existing_perm = session.query(PermissionModel).filter_by(name=perm_data["name"]).first()
+        if not existing_perm:
+            # Assign permission to appropriate role
+            if perm_data["name"].startswith("admin") and admin_role:
+                perm_data["role_id"] = admin_role.id
+            elif perm_data["name"].startswith("developer") and developer_role:
+                perm_data["role_id"] = developer_role.id
+            elif perm_data["name"].startswith("readonly") and readonly_role:
+                perm_data["role_id"] = readonly_role.id
+            elif perm_data["name"].startswith("operator") and operator_role:
+                perm_data["role_id"] = operator_role.id
+            else:
+                continue
+                
+            permission = PermissionModel(**perm_data)
+            session.add(permission)
+    
+    session.commit()

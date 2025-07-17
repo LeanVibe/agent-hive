@@ -14,6 +14,11 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List, Callable
 from dataclasses import asdict
 
+from fastapi import FastAPI, Request, HTTPException, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import uvicorn
+
 from .models import (
     ApiGatewayConfig,
     ApiRequest,
@@ -50,10 +55,83 @@ class ApiGateway:
         self.api_keys: Dict[str, Dict[str, Any]] = {}
         self.server_started = False
         self._request_count = 0
+        self.server = None
+        
+        # Initialize FastAPI app
+        self.app = FastAPI(
+            title="LeanVibe Agent Hive API Gateway",
+            description="API Gateway for external systems to interact with the LeanVibe Agent Hive orchestration system",
+            version="1.0.0"
+        )
+        
+        # Setup FastAPI middleware and routes
+        self._setup_fastapi_routes()
 
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
         if service_discovery:
             logger.info("Service discovery integration enabled")
+
+    def _setup_fastapi_routes(self) -> None:
+        """Setup FastAPI routes for the API Gateway."""
+        
+        @self.app.get("/health")
+        async def health_check():
+            """Health check endpoint."""
+            return await self.health_check()
+        
+        @self.app.get("/info")
+        async def gateway_info():
+            """Gateway information endpoint."""
+            return self.get_gateway_info()
+        
+        @self.app.get("/stats")
+        async def route_stats():
+            """Route statistics endpoint."""
+            return self.get_route_statistics()
+        
+        # Catch-all route for proxying requests
+        @self.app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+        async def proxy_request(path: str, request: Request):
+            """Proxy all requests through the gateway."""
+            # Convert FastAPI request to ApiRequest
+            api_request = await self._convert_fastapi_request(request, path)
+            
+            # Handle through the existing gateway logic
+            response = await self.handle_request(api_request)
+            
+            # Convert ApiResponse back to FastAPI response
+            return JSONResponse(
+                status_code=response.status_code,
+                content=response.body,
+                headers=response.headers
+            )
+
+    async def _convert_fastapi_request(self, request: Request, path: str) -> ApiRequest:
+        """Convert FastAPI request to ApiRequest."""
+        # Get request body
+        body = None
+        if request.method in ["POST", "PUT", "PATCH"]:
+            try:
+                body = await request.json()
+            except:
+                # If JSON parsing fails, try to get raw body
+                body_bytes = await request.body()
+                if body_bytes:
+                    body = body_bytes.decode('utf-8')
+        
+        # Get client IP
+        client_ip = request.client.host if request.client else "unknown"
+        
+        return ApiRequest(
+            path=f"/{path}",
+            method=request.method,
+            headers=dict(request.headers),
+            query_params=dict(request.query_params),
+            body=body,
+            client_ip=client_ip,
+            request_id=str(uuid.uuid4()),
+            timestamp=datetime.now()
+        )
 
     async def start_server(self) -> None:
         """Start the API gateway server."""
@@ -63,13 +141,26 @@ class ApiGateway:
 
         try:
             logger.info(f"Starting API gateway on {self.config.host}:{self.config.port}")
-            await asyncio.sleep(0.1)  # Simulate startup time
+            
+            # Configure uvicorn server
+            config = uvicorn.Config(
+                app=self.app,
+                host=self.config.host,
+                port=self.config.port,
+                log_level="info"
+            )
+            self.server = uvicorn.Server(config)
 
+            # Start server (non-blocking for testing)
             self.server_started = True
             logger.info("API gateway started successfully")
+            
+            # Create background task for server
+            asyncio.create_task(self.server.serve())
 
         except Exception as e:
             logger.error(f"Failed to start API gateway: {e}")
+            self.server_started = False
             raise
 
     async def stop_server(self) -> None:
@@ -80,11 +171,49 @@ class ApiGateway:
 
         try:
             logger.info("Stopping API gateway...")
+            
+            if self.server:
+                self.server.should_exit = True
+                # Only call shutdown if server has been started
+                if hasattr(self.server, 'servers') and self.server.servers:
+                    await self.server.shutdown()
+                self.server = None
+                
             self.server_started = False
             logger.info("API gateway stopped")
 
         except Exception as e:
             logger.error(f"Error stopping API gateway: {e}")
+            raise
+    
+    async def start_server_background(self) -> None:
+        """Start the API gateway server in background (for testing)."""
+        if self.server_started:
+            logger.warning("API gateway already started")
+            return
+
+        try:
+            logger.info(f"Starting API gateway on {self.config.host}:{self.config.port}")
+            
+            # Configure uvicorn server
+            config = uvicorn.Config(
+                app=self.app,
+                host=self.config.host,
+                port=self.config.port,
+                log_level="info"
+            )
+            self.server = uvicorn.Server(config)
+
+            # Start server in background task
+            self.server_started = True
+            logger.info("API gateway started successfully")
+            
+            # Create background task for server
+            asyncio.create_task(self.server.serve())
+
+        except Exception as e:
+            logger.error(f"Failed to start API gateway: {e}")
+            self.server_started = False
             raise
 
     def register_route(self, path: str, method: str, handler: Callable) -> None:
