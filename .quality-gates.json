@@ -1,7 +1,7 @@
 {
-  "agent_name": "infrastructure",
+  "agent_name": "monitoring",
   "task_description": "main",
-  "created_at": "2025-07-17T08:22:58.805527",
+  "created_at": "2025-07-17T08:24:30.315737",
   "quality_gates": {
     "max_pr_size": 500,
     "required_tests": true,

@@ -1,6 +1,6 @@
-# Infrastructure Specialist Template
+# Monitoring Specialist Template
 
-Task: Resolve SQLite state management bottleneck identified by Gemini expert analysis. Design and implement PostgreSQL migration strategy for concurrent agent operations. Implement Redis integration for ephemeral state and event queues. Create distributed state architecture blueprint for production deployment.
-Timeline: 4-5 hours
+Task: Implement production-ready monitoring and alerting framework. Implement agent-level business metrics (task throughput, conflict resolution rate). Set up proactive alerting for critical system conditions. Enhance OpenTelemetry distributed tracing for end-to-end workflow visibility.
+Timeline: 3-4 hours
 
-[Infrastructure implementation details...]
+[Monitoring implementation details...]
