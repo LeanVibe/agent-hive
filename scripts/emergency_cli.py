@@ -1,67 +1,82 @@
 #!/usr/bin/env python3
 """
-LeanVibe Agent Hive CLI
-Main command-line interface for the LeanVibe Agent Hive orchestration system.
+CANONICAL: This is the canonical script for emergency CLI actions. Use this for all emergency and crisis workflows.
+
+Emergency Completion CLI Wrapper
+=================================
+
+Quick access interface for emergency completion functionality.
+Integrates with existing LeanVibe CLI for seamless workflow automation.
+
+Usage:
+    python scripts/emergency_cli.py --task "Task Name"
+    python scripts/emergency_cli.py --emergency --force
 """
 
-import argparse
 import sys
+import subprocess
 from pathlib import Path
-
-VERSION = "1.0.0"
 
 
 def main():
-    """Main CLI entry point."""
-    parser = argparse.ArgumentParser(
-        description="LeanVibe Agent Hive - Multi-agent orchestration system",
-        prog="cli.py"
-    )
-    
-    parser.add_argument(
-        "--version", 
-        action="version", 
-        version=f"LeanVibe Agent Hive {VERSION}"
-    )
-    
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-    
-    # Orchestrate command
-    orchestrate_parser = subparsers.add_parser("orchestrate", help="Orchestrate multi-agent workflows")
-    orchestrate_parser.add_argument("--config", help="Configuration file path")
-    
-    # Spawn command
-    spawn_parser = subparsers.add_parser("spawn", help="Spawn new agents")
-    spawn_parser.add_argument("agent_type", help="Type of agent to spawn")
-    
-    # Monitor command
-    monitor_parser = subparsers.add_parser("monitor", help="Monitor system status")
-    monitor_parser.add_argument("--detailed", action="store_true", help="Show detailed monitoring")
-    
-    # Checkpoint command
-    checkpoint_parser = subparsers.add_parser("checkpoint", help="Create system checkpoints")
-    checkpoint_parser.add_argument("--name", help="Checkpoint name")
-    
-    args = parser.parse_args()
-    
-    if not args.command:
-        parser.print_help()
-        return 0
-    
-    # Route to appropriate handlers
-    if args.command == "orchestrate":
-        print(f"🎯 Orchestrating workflow with config: {args.config or 'default'}")
-    elif args.command == "spawn":
-        print(f"🚀 Spawning {args.agent_type} agent")
-    elif args.command == "monitor":
-        detail_level = "detailed" if args.detailed else "basic"
-        print(f"📊 Monitoring system ({detail_level} mode)")
-    elif args.command == "checkpoint":
-        checkpoint_name = args.name or "auto"
-        print(f"💾 Creating checkpoint: {checkpoint_name}")
-    
-    return 0
+    """Quick emergency completion wrapper."""
+    if len(sys.argv) < 2:
+        print("🚨 EMERGENCY COMPLETION CLI")
+        print("=" * 40)
+        print("Quick commands:")
+        print("  emergency-complete <task>     - Emergency complete with defaults")
+        print(
+            "  emergency-force <task>        - Force complete with emergency settings"
+        )
+        print("  emergency-milestone <task>    - Milestone completion")
+        print("")
+        print("Full usage:")
+        print("  python scripts/emergency_complete.py --help")
+        return
+
+    command = sys.argv[1]
+    args = sys.argv[2:] if len(sys.argv) > 2 else []
+
+    # Preset commands for common emergency scenarios
+    emergency_commands = {
+        "emergency-complete": [
+            "python",
+            "scripts/emergency_complete.py",
+            "--template-type",
+            "emergency",
+            "--force",
+        ],
+        "emergency-force": [
+            "python",
+            "scripts/emergency_complete.py",
+            "--template-type",
+            "emergency",
+            "--force",
+            "--emergency",
+        ],
+        "emergency-milestone": [
+            "python",
+            "scripts/emergency_complete.py",
+            "--template-type",
+            "milestone",
+            "--force",
+        ],
+    }
+
+    if command in emergency_commands:
+        cmd = emergency_commands[command]
+        if args:
+            cmd.extend(["--task"] + args)
+
+        print(f"🚨 Executing: {' '.join(cmd)}")
+        result = subprocess.run(cmd)
+        sys.exit(result.returncode)
+    else:
+        # Pass through to main emergency completion script
+        cmd = ["python", "scripts/emergency_complete.py"] + sys.argv[1:]
+        result = subprocess.run(cmd)
+        sys.exit(result.returncode)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
