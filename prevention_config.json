@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "prevention_systems": {
+    "git_hooks": {
+      "enabled": true,
+      "pr_size_limit": 500,
+      "pr_size_warning": 300,
+      "syntax_check": true,
+      "quality_gates": true
+    },
+    "pm_monitor": {
+      "enabled": true,
+      "check_interval": 30,
+      "max_restart_attempts": 3,
+      "restart_cooldown": 60
+    },
+    "github_actions": {
+      "enabled": true,
+      "pr_validation": true,
+      "quality_gates": true,
+      "security_scan": true,
+      "performance_check": true
+    }
+  },
+  "alerts": {
+    "console": true,
+    "webhook": false,
+    "email": false
+  },
+  "quality_thresholds": {
+    "pr_size_limit": 500,
+    "pr_size_warning": 300,
+    "syntax_errors": 0,
+    "test_coverage": 80
+  }
+}
