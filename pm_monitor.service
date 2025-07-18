@@ -1,0 +1,14 @@
+[Unit]
+Description=LeanVibe PM Monitor
+After=network.target
+
+[Service]
+Type=simple
+User=${USER}
+WorkingDirectory=/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823
+ExecStart=/usr/bin/python3 /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/scripts/pm_monitor.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

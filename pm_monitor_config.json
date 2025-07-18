@@ -1,0 +1,33 @@
+{
+  "check_interval": 30,
+  "max_restart_attempts": 3,
+  "restart_cooldown": 60,
+  "health_check_timeout": 10,
+  "processes": {
+    "cli": {
+      "command": [
+        "python",
+        "cli.py",
+        "--help"
+      ],
+      "health_check": "cli_health_check",
+      "critical": true,
+      "auto_restart": true
+    },
+    "quality_gates": {
+      "command": [
+        "python",
+        "scripts/enhanced_quality_gates.py",
+        "--status"
+      ],
+      "health_check": "quality_gates_health_check",
+      "critical": true,
+      "auto_restart": true
+    }
+  },
+  "alerts": {
+    "email": false,
+    "webhook": false,
+    "console": true
+  }
+}
