@@ -267,8 +267,15 @@ class AuthenticationMiddleware:
 
             user_data = self.basic_auth_users[username]
 
-            # Verify password (in production, use proper password hashing)
-            if user_data.get("password") != password:
+            # SECURITY: Password hashing required - this is a critical vulnerability
+            # Use bcrypt or similar for password hashing in production
+            stored_password = user_data.get("password")
+            if not stored_password:
+                return AuthResult(success=False, error="Invalid username or password")
+            
+            # For immediate security: Use secure comparison to prevent timing attacks
+            import secrets
+            if not secrets.compare_digest(stored_password, password):
                 return AuthResult(success=False, error="Invalid username or password")
 
             # Check if account is active
