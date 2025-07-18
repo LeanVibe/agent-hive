@@ -33,6 +33,24 @@ from external_api.models import (
     EventStreamConfig
 )
 
+# Performance monitoring
+try:
+    from performance_monitor import performance_monitor
+except ImportError:
+    # Fallback for when performance_monitor is not available
+    class MockPerformanceMonitor:
+        def track_operation(self, operation_name, metadata=None):
+            from contextlib import nullcontext
+            return nullcontext()
+        
+        def print_dashboard(self):
+            print("📊 Performance monitoring not available")
+            
+        def clear_metrics(self):
+            pass
+    
+    performance_monitor = MockPerformanceMonitor()
+
 
 class LeanVibeCLI:
     """Main CLI interface for LeanVibe Agent Hive."""
@@ -721,8 +739,6 @@ class LeanVibeCLI:
             priority: Task priority (high, medium, low)
             update: Progress update message
         """
-        from performance_monitor import performance_monitor
-        
         async with performance_monitor.track_operation(f"coordinate-{action}", {"priority": priority}):
             print("🎯 LeanVibe Parallel Work Coordination")
             print("=" * 37)
@@ -868,8 +884,6 @@ Ready to begin! Comment on issue #{issue} to confirm start.
             agents: Comma-separated list of review agents
             format: Report format (text, markdown, json)
         """
-        from performance_monitor import performance_monitor
-        
         async with performance_monitor.track_operation(f"review-{action}", {"pr": pr, "format": format}):
             print("🔍 LeanVibe Multi-Agent Code Review")
             print("=" * 35)
@@ -991,8 +1005,6 @@ Ready to begin! Comment on issue #{issue} to confirm start.
             action: Performance action (dashboard, clear)
             clear: Clear performance metrics
         """
-        from performance_monitor import performance_monitor
-        
         if action == "dashboard":
             performance_monitor.print_dashboard()
         elif action == "clear":
@@ -1310,82 +1322,75 @@ async def main() -> None:
 
     cli = LeanVibeCLI()
 
+    # Command mapping for cleaner code
+    command_handlers = {
+        "orchestrate": lambda: cli.orchestrate(
+            workflow=args.workflow,
+            validate=args.validate
+        ),
+        "spawn": lambda: cli.spawn(
+            task=args.task,
+            depth=args.depth,
+            parallel=args.parallel
+        ),
+        "monitor": lambda: cli.monitor(
+            metrics=args.metrics,
+            real_time=args.real_time
+        ),
+        "checkpoint": lambda: cli.checkpoint(
+            name=args.name,
+            list_checkpoints=args.list
+        ),
+        "webhook": lambda: cli.webhook(
+            action=args.action,
+            port=args.port
+        ),
+        "gateway": lambda: cli.gateway(
+            action=args.action,
+            port=args.port
+        ),
+        "streaming": lambda: cli.streaming(
+            action=args.action,
+            publish_test=args.publish_test
+        ),
+        "external-api": lambda: cli.external_api(
+            command=args.api_command
+        ),
+        "pr": lambda: cli.pr(
+            action=args.action,
+            title=args.title,
+            pr_number=args.pr_number,
+            auto_review=args.auto_review,
+            reviewers=args.reviewers
+        ),
+        "review": lambda: cli.review(
+            action=args.action,
+            pr=args.pr,
+            agent=args.agent,
+            agents=args.agents,
+            format=args.format
+        ),
+        "coordinate": lambda: cli.coordinate(
+            action=args.action,
+            issue=args.issue,
+            worktree=args.worktree,
+            agent_type=args.agent_type,
+            priority=args.priority,
+            update=args.update
+        ),
+        "performance": lambda: cli.performance(
+            action=args.action,
+            clear=args.clear
+        ),
+        "dashboard": lambda: cli.dashboard(
+            live=args.live,
+            format=args.format
+        )
+    }
+
     try:
-        if args.command == "orchestrate":
-            await cli.orchestrate(
-                workflow=args.workflow,
-                validate=args.validate
-            )
-        elif args.command == "spawn":
-            await cli.spawn(
-                task=args.task,
-                depth=args.depth,
-                parallel=args.parallel
-            )
-        elif args.command == "monitor":
-            await cli.monitor(
-                metrics=args.metrics,
-                real_time=args.real_time
-            )
-        elif args.command == "checkpoint":
-            await cli.checkpoint(
-                name=args.name,
-                list_checkpoints=args.list
-            )
-        elif args.command == "webhook":
-            await cli.webhook(
-                action=args.action,
-                port=args.port
-            )
-        elif args.command == "gateway":
-            await cli.gateway(
-                action=args.action,
-                port=args.port
-            )
-        elif args.command == "streaming":
-            await cli.streaming(
-                action=args.action,
-                publish_test=args.publish_test
-            )
-        elif args.command == "external-api":
-            await cli.external_api(
-                command=args.api_command
-            )
-        elif args.command == "pr":
-            await cli.pr(
-                action=args.action,
-                title=args.title,
-                pr_number=args.pr_number,
-                auto_review=args.auto_review,
-                reviewers=args.reviewers
-            )
-        elif args.command == "review":
-            await cli.review(
-                action=args.action,
-                pr=args.pr,
-                agent=args.agent,
-                agents=args.agents,
-                format=args.format
-            )
-        elif args.command == "coordinate":
-            await cli.coordinate(
-                action=args.action,
-                issue=args.issue,
-                worktree=args.worktree,
-                agent_type=args.agent_type,
-                priority=args.priority,
-                update=args.update
-            )
-        elif args.command == "performance":
-            await cli.performance(
-                action=args.action,
-                clear=args.clear
-            )
-        elif args.command == "dashboard":
-            await cli.dashboard(
-                live=args.live,
-                format=args.format
-            )
+        if args.command in command_handlers:
+            await command_handlers[args.command]()
         else:
             parser.print_help()
 
