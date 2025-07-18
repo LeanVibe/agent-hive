@@ -1,0 +1,7 @@
+2025-07-18 19:13:17,205 - INFO - 🔍 Starting integration checkpoint...
+2025-07-18 19:13:17,226 - WARNING - Failed to check divergence for new-work/integration-specialist-Jul-18-1830: can't subtract offset-naive and offset-aware datetimes
+2025-07-18 19:13:17,226 - WARNING - Failed to check divergence for new-work/service-mesh-Jul-18-1831: can't subtract offset-naive and offset-aware datetimes
+2025-07-18 19:13:17,226 - WARNING - Failed to check divergence for new-work/frontend-Jul-18-1831: can't subtract offset-naive and offset-aware datetimes
+2025-07-18 19:13:17,226 - WARNING - Failed to check divergence for new-work/performance-Jul-18-1832: can't subtract offset-naive and offset-aware datetimes
+2025-07-18 19:13:17,226 - WARNING - Failed to check divergence for pm-coordinator-Jul-18-1810: can't subtract offset-naive and offset-aware datetimes
+2025-07-18 19:13:17,226 - INFO - ✅ Integration checkpoint completed: 0 opportunities found
