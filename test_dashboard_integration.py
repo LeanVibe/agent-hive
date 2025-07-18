@@ -14,7 +14,7 @@ import time
 class DashboardIntegrationTest:
     """Test complete dashboard integration data flow"""
     
-    def __init__(self, server_url="http://localhost:8000"):
+    def __init__(self, server_url="http://localhost:8002"):
         self.server_url = server_url
         self.ws_url = server_url.replace("http", "ws") + "/ws"
         

@@ -169,7 +169,7 @@ async def receive_metrics(request: Request):
 ### **UI Integration**
 ```javascript
 // WebSocket connection for real-time updates
-const ws = new WebSocket('ws://localhost:8000/ws');
+const ws = new WebSocket('ws://localhost:8002/ws');
 
 ws.onmessage = function(event) {
     const data = JSON.parse(event.data);
