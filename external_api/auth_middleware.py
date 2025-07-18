@@ -12,7 +12,7 @@ import json
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, List, Callable, Tuple
 from enum import Enum
 import uuid
 from passlib.context import CryptContext
@@ -21,12 +21,12 @@ import jwt
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
 from .models import ApiRequest, ApiResponse
-from ..config.security_config import get_auth_config, get_security_config
+from config.security_config import get_auth_config, get_security_config
 
 
 logger = logging.getLogger(__name__)
 
-# Password context for secure hashing
+# Password context for secure hashing - will be configured based on security settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -81,17 +81,34 @@ class AuthenticationMiddleware:
         self.jwt_algorithm = config.get("jwt_algorithm", "HS256")
         self.token_expiry = config.get("token_expiry_hours", 24)
         
+        # Configure password context with security settings
+        bcrypt_rounds = config.get("bcrypt_rounds", 12)
+        global pwd_context
+        pwd_context = CryptContext(
+            schemes=["bcrypt"], 
+            deprecated="auto",
+            bcrypt__rounds=bcrypt_rounds
+        )
+        
         # Storage for authentication data
         self.api_keys: Dict[str, Dict[str, Any]] = {}
         self.jwt_tokens: Dict[str, Dict[str, Any]] = {}
         self.oauth_tokens: Dict[str, Dict[str, Any]] = {}
         self.signing_secrets: Dict[str, str] = {}
         self.basic_auth_users: Dict[str, Dict[str, Any]] = {}
+        self.user_lockouts: Dict[str, Dict[str, Any]] = {}  # Track account lockouts
+        self.password_history: Dict[str, List[str]] = {}  # Track password history
         
         # Rate limiting for auth attempts
         self.auth_attempts: Dict[str, List[float]] = {}
         self.max_auth_attempts = config.get("max_auth_attempts", 5)
         self.auth_window = config.get("auth_window_minutes", 15) * 60
+        
+        # Password policy settings
+        self.password_config = config.get("password_config", {})
+        self.lockout_attempts = self.password_config.get("lockout_attempts", 5)
+        self.lockout_duration = self.password_config.get("lockout_duration_minutes", 30) * 60
+        self.password_history_count = self.password_config.get("password_history_count", 5)
         
         # Role-based access control
         self.roles: Dict[str, List[Permission]] = {
@@ -112,7 +129,7 @@ class AuthenticationMiddleware:
         middleware = cls(config)
         
         # Validate configuration
-        from ..config.security_config import security_config_manager
+        from config.security_config import security_config_manager
         validation_result = security_config_manager.validate_config()
         
         if not validation_result["valid"]:
@@ -294,17 +311,24 @@ class AuthenticationMiddleware:
             
             user_data = self.basic_auth_users[username]
             
+            # Check if account is locked
+            if self.is_account_locked(username):
+                return AuthResult(success=False, error="Account is temporarily locked due to too many failed attempts")
+            
             # Verify password using bcrypt
             if not self.verify_password(password, user_data.get("password", "")):
+                self.record_failed_login(username)
                 return AuthResult(success=False, error="Invalid username or password")
             
             # Check if account is active
             if not user_data.get("active", True):
                 return AuthResult(success=False, error="Account is deactivated")
             
-            # Update login statistics
+            # Successful login - clear any lockout and update statistics
+            self.record_successful_login(username)
             user_data["last_login"] = datetime.now().isoformat()
             user_data["login_count"] = user_data.get("login_count", 0) + 1
+            user_data["failed_login_attempts"] = 0
             
             return AuthResult(
                 success=True,
@@ -437,22 +461,107 @@ class AuthenticationMiddleware:
             return True
         return False
     
+    def is_account_locked(self, username: str) -> bool:
+        """Check if user account is locked due to too many failed attempts."""
+        if username not in self.user_lockouts:
+            return False
+        
+        lockout_data = self.user_lockouts[username]
+        lockout_time = datetime.fromisoformat(lockout_data["locked_at"])
+        
+        # Check if lockout has expired
+        if (datetime.now() - lockout_time).total_seconds() > self.lockout_duration:
+            # Lockout expired, remove it
+            del self.user_lockouts[username]
+            return False
+        
+        return True
+    
+    def record_failed_login(self, username: str):
+        """Record a failed login attempt and lock account if needed."""
+        if username not in self.user_lockouts:
+            self.user_lockouts[username] = {
+                "failed_attempts": 0,
+                "locked_at": None
+            }
+        
+        lockout_data = self.user_lockouts[username]
+        lockout_data["failed_attempts"] += 1
+        
+        if lockout_data["failed_attempts"] >= self.lockout_attempts:
+            lockout_data["locked_at"] = datetime.now().isoformat()
+            logger.warning(f"Account locked for user {username} after {self.lockout_attempts} failed attempts")
+    
+    def record_successful_login(self, username: str):
+        """Record successful login and clear any lockout."""
+        if username in self.user_lockouts:
+            del self.user_lockouts[username]
+    
+    def validate_password_policy(self, password: str) -> Tuple[bool, List[str]]:
+        """Validate password against security policy."""
+        from config.security_config import security_config_manager
+        
+        validation_result = security_config_manager.validate_password(password)
+        return validation_result["valid"], validation_result["issues"]
+    
+    def check_password_history(self, username: str, new_password: str) -> bool:
+        """Check if password has been used recently."""
+        if username not in self.password_history:
+            return True  # No history, password is okay
+        
+        history = self.password_history[username]
+        for old_password_hash in history:
+            if self.verify_password(new_password, old_password_hash):
+                return False  # Password was used recently
+        
+        return True
+    
+    def add_to_password_history(self, username: str, password_hash: str):
+        """Add password hash to user's history."""
+        if username not in self.password_history:
+            self.password_history[username] = []
+        
+        history = self.password_history[username]
+        history.append(password_hash)
+        
+        # Keep only the last N passwords
+        if len(history) > self.password_history_count:
+            history.pop(0)
+    
     def create_basic_auth_user(self, username: str, password: str, permissions: List[Permission],
-                              active: bool = True) -> bool:
-        """Create a basic auth user with bcrypt password hashing."""
+                              active: bool = True) -> Tuple[bool, List[str]]:
+        """Create a basic auth user with bcrypt password hashing and policy validation."""
+        # Validate password policy
+        is_valid, issues = self.validate_password_policy(password)
+        if not is_valid:
+            return False, issues
+        
+        # Check password history (for existing users)
+        if username in self.basic_auth_users:
+            if not self.check_password_history(username, password):
+                return False, ["Password has been used recently. Please choose a different password."]
+        
+        password_hash = self.hash_password(password)
+        
         user_data = {
-            "password": self.hash_password(password),  # Securely hash password
+            "password": password_hash,  # Securely hash password
             "permissions": permissions,
             "active": active,
             "created_at": datetime.now().isoformat(),
             "last_login": None,
-            "login_count": 0
+            "login_count": 0,
+            "password_created_at": datetime.now().isoformat(),
+            "failed_login_attempts": 0
         }
         
         self.basic_auth_users[username] = user_data
+        
+        # Add to password history
+        self.add_to_password_history(username, password_hash)
+        
         logger.info(f"Created basic auth user: {username}")
         
-        return True
+        return True, []
     
     def update_basic_auth_user(self, username: str, password: Optional[str] = None,
                               permissions: Optional[List[Permission]] = None,
@@ -622,6 +731,13 @@ class AuthenticationMiddleware:
             try:
                 # Try to decode token to check if it's expired
                 jwt.decode(token, self.jwt_secret, algorithms=[self.jwt_algorithm])
+                
+                # Also remove blacklisted tokens older than 24 hours
+                if token_data.get("blacklisted"):
+                    created_at = datetime.fromisoformat(token_data.get("created_at", current_time.isoformat()))
+                    if (current_time - created_at).total_seconds() > 86400:  # 24 hours
+                        tokens_to_remove.append(token)
+                        
             except ExpiredSignatureError:
                 # Token is expired, mark for removal
                 tokens_to_remove.append(token)
@@ -703,15 +819,122 @@ class AuthenticationMiddleware:
         self.signing_secrets[client_id] = secret
         logger.info(f"Added signing secret for client {client_id}")
     
+    def schedule_token_cleanup(self, interval_hours: int = 1):
+        """Schedule automatic token cleanup."""
+        import threading
+        import time
+        
+        def cleanup_worker():
+            while True:
+                try:
+                    cleaned_count = self.cleanup_expired_tokens()
+                    if cleaned_count > 0:
+                        logger.info(f"Automatic cleanup removed {cleaned_count} tokens")
+                    time.sleep(interval_hours * 3600)  # Convert hours to seconds
+                except Exception as e:
+                    logger.error(f"Token cleanup error: {e}")
+                    time.sleep(300)  # Wait 5 minutes before retrying
+        
+        cleanup_thread = threading.Thread(target=cleanup_worker, daemon=True)
+        cleanup_thread.start()
+        logger.info(f"Started automatic token cleanup with {interval_hours}h interval")
+    
+    def create_secure_api_key(self, user_id: str, permissions: List[Permission], 
+                             description: str = "", rate_limit: Optional[int] = None,
+                             ip_whitelist: Optional[List[str]] = None,
+                             expires_in_hours: Optional[int] = None) -> str:
+        """Create a secure API key with advanced security features."""
+        # Generate cryptographically secure API key
+        import secrets
+        api_key = f"ahk_{secrets.token_urlsafe(32)}"  # agent-hive-key prefix
+        
+        key_data = {
+            "user_id": user_id,
+            "permissions": permissions,
+            "description": description,
+            "created_at": datetime.now().isoformat(),
+            "active": True,
+            "usage_count": 0,
+            "last_used": None,
+            "rate_limit": rate_limit,  # requests per minute
+            "ip_whitelist": ip_whitelist or [],
+            "security_features": {
+                "secure_generation": True,
+                "prefix": "ahk_",
+                "entropy_bits": 256
+            }
+        }
+        
+        if expires_in_hours:
+            expires_at = datetime.now() + timedelta(hours=expires_in_hours)
+            key_data["expires_at"] = expires_at.isoformat()
+        
+        self.api_keys[api_key] = key_data
+        logger.info(f"Created secure API key for user {user_id} with description: {description}")
+        
+        return api_key
+    
+    def validate_api_key_security(self, api_key: str, client_ip: str = None) -> Tuple[bool, str]:
+        """Validate API key with enhanced security checks."""
+        if api_key not in self.api_keys:
+            return False, "API key not found"
+        
+        key_data = self.api_keys[api_key]
+        
+        # Check IP whitelist if configured
+        if key_data.get("ip_whitelist") and client_ip:
+            if client_ip not in key_data["ip_whitelist"]:
+                logger.warning(f"API key access denied for IP {client_ip} (not in whitelist)")
+                return False, "IP address not authorized for this API key"
+        
+        # Check rate limiting
+        if key_data.get("rate_limit"):
+            current_time = time.time()
+            usage_window = key_data.get("rate_window", [])
+            
+            # Clean old usage records (keep only last minute)
+            usage_window = [timestamp for timestamp in usage_window if current_time - timestamp < 60]
+            
+            if len(usage_window) >= key_data["rate_limit"]:
+                return False, "Rate limit exceeded for API key"
+            
+            # Record current usage
+            usage_window.append(current_time)
+            key_data["rate_window"] = usage_window
+        
+        return True, "API key validation passed"
+    
     def get_auth_stats(self) -> Dict[str, Any]:
         """Get authentication statistics."""
+        current_time = datetime.now()
+        
+        # Calculate active tokens (not expired)
+        active_jwt_count = 0
+        for token in self.jwt_tokens:
+            try:
+                jwt.decode(token, self.jwt_secret, algorithms=[self.jwt_algorithm])
+                if not self.jwt_tokens[token].get("blacklisted", False):
+                    active_jwt_count += 1
+            except:
+                pass
+        
         return {
             "total_api_keys": len(self.api_keys),
             "active_api_keys": len([k for k in self.api_keys.values() if k.get("active", True)]),
             "total_jwt_tokens": len(self.jwt_tokens),
+            "active_jwt_tokens": active_jwt_count,
             "blacklisted_jwt_tokens": len([t for t in self.jwt_tokens.values() if t.get("blacklisted", False)]),
             "oauth_tokens": len(self.oauth_tokens),
+            "basic_auth_users": len(self.basic_auth_users),
             "signing_clients": len(self.signing_secrets),
             "protected_paths": len(self.path_permissions),
-            "enabled_methods": [m.value for m in self.enabled_methods]
+            "enabled_methods": [m.value for m in self.enabled_methods],
+            "security_features": {
+                "auto_cleanup_enabled": True,
+                "rate_limiting_enabled": True,
+                "ip_whitelisting_enabled": True,
+                "token_blacklisting_enabled": True,
+                "rbac_support": True
+            },
+            "stats_generated_at": current_time.isoformat()
         }

@@ -20,6 +20,7 @@ from .models import (
     ApiResponse
 )
 from .service_discovery import ServiceDiscovery, ServiceInstance
+from .auth_middleware import AuthenticationMiddleware, AuthResult
 
 
 logger = logging.getLogger(__name__)
@@ -33,16 +34,19 @@ class ApiGateway:
     and response formatting for the orchestration system.
     """
     
-    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
+    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None,
+                 auth_middleware: Optional[AuthenticationMiddleware] = None):
         """
         Initialize API gateway.
         
         Args:
             config: API gateway configuration
             service_discovery: Service discovery instance for dynamic routing
+            auth_middleware: Authentication middleware for request security
         """
         self.config = config
         self.service_discovery = service_discovery
+        self.auth_middleware = auth_middleware
         self.routes: Dict[str, Dict[str, Callable]] = {}  # {path: {method: handler}}
         self.service_routes: Dict[str, str] = {}  # {path_prefix: service_name}
         self.middleware: List[Callable] = []
@@ -50,10 +54,28 @@ class ApiGateway:
         self.api_keys: Dict[str, Dict[str, Any]] = {}
         self.server_started = False
         self._request_count = 0
+        self.security_headers = {
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "X-XSS-Protection": "1; mode=block",
+            "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+            "Content-Security-Policy": "default-src 'self'",
+            "Referrer-Policy": "strict-origin-when-cross-origin"
+        }
+        
+        # Protected paths that require authentication
+        self.protected_paths = {
+            "/api/v1/agents",
+            "/api/v1/orchestration", 
+            "/api/v1/admin",
+            "/api/v1/configuration"
+        }
         
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
         if service_discovery:
             logger.info("Service discovery integration enabled")
+        if auth_middleware:
+            logger.info("Authentication middleware integrated")
     
     async def start_server(self) -> None:
         """Start the API gateway server."""
@@ -290,15 +312,20 @@ class ApiGateway:
         start_time = time.time()
         
         try:
+            # Security headers
+            security_headers = self._get_security_headers()
+            
             # Authentication check
-            if self.config.auth_required:
+            auth_result = None
+            if self.config.auth_required or self._requires_authentication(request.path):
                 auth_result = await self._authenticate_request(request)
                 if not auth_result["success"]:
                     return self._create_error_response(
                         request.request_id,
                         401,
                         auth_result["message"],
-                        start_time
+                        start_time,
+                        extra_headers=security_headers
                     )
             
             # Rate limiting check
@@ -328,7 +355,7 @@ class ApiGateway:
                         
                         response = ApiResponse(
                             status_code=result.get("status_code", 200),
-                            headers={**self._get_response_headers(), **result.get("headers", {})},
+                            headers={**self._get_response_headers(), **security_headers, **result.get("headers", {})},
                             body=result.get("body"),
                             timestamp=datetime.now(),
                             processing_time=(time.time() - start_time) * 1000,
@@ -543,11 +570,99 @@ class ApiGateway:
         
         return headers
     
-    def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
+    def _requires_authentication(self, path: str) -> bool:
+        """Check if path requires authentication."""
+        # Remove API prefix for comparison
+        clean_path = path
+        if path.startswith(self.config.api_prefix):
+            clean_path = path[len(self.config.api_prefix):]
+        
+        # Check if path starts with any protected path
+        for protected_path in self.protected_paths:
+            if clean_path.startswith(protected_path):
+                return True
+        return False
+    
+    def _get_security_headers(self) -> Dict[str, str]:
+        """Get security headers for response."""
+        return self.security_headers.copy()
+    
+    async def _authenticate_request(self, request: ApiRequest) -> Dict[str, Any]:
+        """Authenticate request using integrated auth middleware."""
+        if not self.auth_middleware:
+            # Fallback to basic API key authentication
+            return await self._basic_auth_check(request)
+        
+        try:
+            auth_result = await self.auth_middleware.authenticate_request(request)
+            
+            if auth_result.success:
+                # Store auth info in request context for later use
+                request.auth_context = {
+                    "user_id": auth_result.user_id,
+                    "permissions": auth_result.permissions,
+                    "metadata": auth_result.metadata
+                }
+                return {
+                    "success": True,
+                    "message": "Authentication successful",
+                    "user_id": auth_result.user_id,
+                    "permissions": [p.value for p in auth_result.permissions] if auth_result.permissions else []
+                }
+            else:
+                logger.warning(f"Authentication failed for request {request.request_id}: {auth_result.error}")
+                return {
+                    "success": False,
+                    "message": auth_result.error or "Authentication failed"
+                }
+                
+        except Exception as e:
+            logger.error(f"Authentication error for request {request.request_id}: {e}")
+            return {
+                "success": False,
+                "message": "Authentication service error"
+            }
+    
+    async def _basic_auth_check(self, request: ApiRequest) -> Dict[str, Any]:
+        """Basic API key authentication fallback."""
+        api_key = request.headers.get(self.config.api_key_header) or request.headers.get("Authorization", "").replace("Bearer ", "")
+        
+        if not api_key:
+            return {
+                "success": False,
+                "message": "API key required"
+            }
+        
+        if api_key not in self.api_keys:
+            return {
+                "success": False,
+                "message": "Invalid API key"
+            }
+        
+        key_data = self.api_keys[api_key]
+        if not key_data.get("active", True):
+            return {
+                "success": False,
+                "message": "API key is inactive"
+            }
+        
+        return {
+            "success": True,
+            "message": "API key authentication successful",
+            "user_id": key_data.get("user_id"),
+            "permissions": key_data.get("permissions", [])
+        }
+    
+    def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float, 
+                              extra_headers: Optional[Dict[str, str]] = None) -> ApiResponse:
         """Create error response."""
+        headers = self._get_response_headers()
+        if extra_headers:
+            headers.update(extra_headers)
+            
         return ApiResponse(
             status_code=status_code,
-            headers=self._get_response_headers(),
+            headers=headers,
             body={"error": message, "request_id": request_id},
             timestamp=datetime.now(),
             processing_time=(time.time() - start_time) * 1000,
