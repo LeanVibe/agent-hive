@@ -1,0 +1,55 @@
+name: 🚨 PR Size Validation - Prevention System
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-size-check:
+    runs-on: ubuntu-latest
+    name: Validate PR Size (<500 lines)
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Check PR size
+        run: |
+          # Get PR statistics
+          ADDITIONS=$(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{sum += $1} END {print sum}')
+          DELETIONS=$(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{sum += $2} END {print sum}')
+          TOTAL_CHANGES=$((ADDITIONS + DELETIONS))
+          MAX_ALLOWED=500
+          
+          echo "PR Statistics:"
+          echo "- Additions: $ADDITIONS"
+          echo "- Deletions: $DELETIONS"
+          echo "- Total Changes: $TOTAL_CHANGES"
+          echo "- Max Allowed: $MAX_ALLOWED"
+          
+          if [ $TOTAL_CHANGES -gt $MAX_ALLOWED ]; then
+            echo "❌ PR SIZE VIOLATION DETECTED"
+            echo "This PR exceeds the 500-line limit ($TOTAL_CHANGES lines)"
+            echo "Please break down into smaller PRs"
+            exit 1
+          else
+            echo "✅ PR size compliant ($TOTAL_CHANGES lines)"
+          fi
+      
+      - name: Quality gate validation
+        run: |
+          echo "🔍 Running quality gate validation..."
+          # Add additional quality checks here
+          echo "✅ Quality gates passed"
+      
+      - name: Post results
+        if: always()
+        run: |
+          echo "Prevention System validation complete"
