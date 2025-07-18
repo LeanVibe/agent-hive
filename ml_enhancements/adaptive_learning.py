@@ -68,10 +68,8 @@ class AdaptiveLearning:
         # Learning state tracking - properly typed
         self.learning_state: Dict[str, Any] = {
             'current_session': None,
-            'model_performance': {},
             'adaptation_history': [],
             'last_update': {},
-            'convergence_tracking': {}
         }
 
         # Type-safe accessors
@@ -304,9 +302,9 @@ class AdaptiveLearning:
         accuracy_change = after_performance - before_performance
 
         # Update learning state
-        session_performance = self.learning_state['model_performance'].get(session_id, [])
+        session_performance = self.model_performance.get(session_id, [])
         session_performance.append(after_performance)
-        self.learning_state['model_performance'][session_id] = session_performance
+        self.model_performance[session_id] = session_performance
 
         # Create learning metrics
         metrics = LearningMetrics(
@@ -406,7 +404,7 @@ class AdaptiveLearning:
     def _calculate_convergence_time(self, session_id: str) -> float:
         """Calculate time to convergence for learning session."""
 
-        performance_history = self.learning_state['model_performance'].get(session_id, [])
+        performance_history = self.model_performance.get(session_id, [])
 
         if len(performance_history) < 3:
             return 0.0
@@ -507,7 +505,7 @@ class AdaptiveLearning:
     def _check_convergence(self, session_id: str, model_type: str) -> bool:
         """Check if model has converged and should stop learning."""
 
-        performance_history = self.learning_state['model_performance'].get(session_id, [])
+        performance_history = self.model_performance.get(session_id, [])
 
         if len(performance_history) < 5:
             return False
@@ -520,7 +518,7 @@ class AdaptiveLearning:
         converged = bool(variance < convergence_threshold)
 
         if converged:
-            self.learning_state['convergence_tracking'][session_id] = {
+            self.convergence_tracking[session_id] = {
                 'converged': True,
                 'convergence_time': self._calculate_convergence_time(session_id),
                 'final_performance': recent_performance[-1],
@@ -588,11 +586,11 @@ class AdaptiveLearning:
         """End learning session and return summary metrics."""
 
         # Get final performance
-        performance_history = self.learning_state['model_performance'].get(session_id, [])
+        performance_history = self.model_performance.get(session_id, [])
         final_performance = performance_history[-1] if performance_history else 0.5
 
         # Calculate session metrics
-        convergence_info = self.learning_state['convergence_tracking'].get(session_id, {})
+        convergence_info = self.convergence_tracking.get(session_id, {})
 
         session_summary = {
             'session_id': session_id,

@@ -12,7 +12,7 @@ import time
 import uuid
 import gzip
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Callable, AsyncGenerator
+from typing import Dict, Any, Optional, List, Callable, AsyncGenerator, Deque
 from dataclasses import asdict
 from collections import deque
 
@@ -32,7 +32,7 @@ class EventBuffer:
     def __init__(self, max_size: int):
         """Initialize event buffer."""
         self.max_size = max_size
-        self.buffer = deque(maxlen=max_size)
+        self.buffer: Deque[StreamEvent] = deque(maxlen=max_size)
         self.lock = asyncio.Lock()
         self._total_events = 0
         self._dropped_events = 0
@@ -312,7 +312,7 @@ class EventStreaming:
 
     def _group_events_by_priority(self, events: List[StreamEvent]) -> Dict[EventPriority, List[StreamEvent]]:
         """Group events by priority level."""
-        groups = {}
+        groups: Dict[EventPriority, List[StreamEvent]] = {}
         for event in events:
             if event.priority not in groups:
                 groups[event.priority] = []

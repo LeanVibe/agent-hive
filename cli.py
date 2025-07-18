@@ -180,8 +180,8 @@ class LeanVibeCLI:
 
         if self.scaling_manager and self.coordinator:
             # Get scaling metrics
-            metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
-            print(f"📈 Scaling Metrics: {metrics}")
+            scaling_metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
+            print(f"📈 Scaling Metrics: {scaling_metrics}")
 
             # Get scaling statistics
             stats = self.scaling_manager.get_scaling_statistics()
@@ -326,13 +326,13 @@ class LeanVibeCLI:
             await self.api_gateway.start_server()
 
             # Register sample routes
-            async def tasks_handler(request):
+            async def tasks_handler(_request):
                 return {
                     "status_code": 200,
                     "body": {"tasks": [], "total": 0}
                 }
 
-            async def agents_handler(request):
+            async def agents_handler(_request):
                 return {
                     "status_code": 200,
                     "body": {"agents": [], "active": 0}
@@ -852,6 +852,7 @@ Ready to begin! Comment on issue #{issue} to confirm start.
 
         print("✅ Agent instructions generated")
         print("📋 Instructions saved and ready for agent deployment")
+        print(f"\n{instructions}")
 
     async def review(self, action: str = "status", pr: Optional[int] = None, agent: Optional[str] = None,
                      agents: Optional[str] = None, format: str = "text") -> None:
@@ -909,8 +910,8 @@ Ready to begin! Comment on issue #{issue} to confirm start.
             print("🔄 Coordinating review agents...")
 
             # Simulate parallel review execution
-            agents = ["security-reviewer", "architecture-reviewer", "qa-reviewer"]
-            for i, agent in enumerate(agents, 1):
+            default_agents = ["security-reviewer", "architecture-reviewer", "qa-reviewer"]
+            for i, agent in enumerate(default_agents, 1):
                 print(f"  📝 {agent} reviewing... ({i}/3)")
                 await asyncio.sleep(0.5)
 

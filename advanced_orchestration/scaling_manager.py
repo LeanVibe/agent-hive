@@ -234,7 +234,7 @@ class ScalingManager:
             self.logger.error(f"Error checking scale down conditions: {e}")
             return False, None
 
-    async def scale_up(self, coordinator: 'MultiAgentCoordinator', count: int | None = None) -> List[str]:
+    async def scale_up(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
         """
         Scale up the number of agents.
 
@@ -275,7 +275,7 @@ class ScalingManager:
             self.logger.error(f"Failed to scale up: {e}")
             raise ScalingException(f"Scale up failed: {e}")
 
-    async def scale_down(self, coordinator: 'MultiAgentCoordinator', count: int | None = None) -> List[str]:
+    async def scale_down(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
         """
         Scale down the number of agents.
 
@@ -565,7 +565,7 @@ class ScalingManager:
         recent_metrics = self.scaling_metrics_history[-3:]
 
         # Check queue depth stability
-        queue_depths = [m.queue_depth for m in recent_metrics]
+        queue_depths = [float(m.queue_depth) for m in recent_metrics]
         queue_variance = self._calculate_variance(queue_depths)
 
         # Check response time stability

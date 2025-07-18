@@ -24,12 +24,14 @@ class TechnicalDebtEnforcer:
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.quality_thresholds = {
-            'mypy_error_limit': 50,  # Maximum allowed mypy errors
-            'pylint_score_minimum': 8.0,  # Minimum pylint score
-            'complexity_threshold': 10,  # Maximum cyclomatic complexity
-            'duplicate_code_threshold': 5,  # Maximum % duplicate code
-            'test_coverage_minimum': 85,  # Minimum test coverage %
+            'mypy_error_limit': 10,  # Maximum allowed mypy errors (reduced from 50)
+            'pylint_score_minimum': 8.5,  # Minimum pylint score (increased from 8.0)
+            'complexity_threshold': 8,  # Maximum cyclomatic complexity (reduced from 10)
+            'duplicate_code_threshold': 3,  # Maximum % duplicate code (reduced from 5)
+            'test_coverage_minimum': 90,  # Minimum test coverage % (increased from 85)
             'security_issues_limit': 0,  # Maximum security issues
+            'dead_code_threshold': 5,  # Maximum % dead code
+            'type_annotation_coverage': 95,  # Minimum type annotation coverage %
         }
         self.results: Dict[str, Any] = {}
 
@@ -180,6 +182,70 @@ class TechnicalDebtEnforcer:
         except (subprocess.CalledProcessError, json.JSONDecodeError, FileNotFoundError):
             return {'passed': True, 'recommendation': 'Security analysis not available'}
 
+    def run_dead_code_analysis(self) -> Dict[str, Any]:
+        """Detect dead/unused code."""
+        logger.info("🧹 Running dead code analysis...")
+
+        try:
+            result = subprocess.run(
+                ['python', '-m', 'vulture', '.', '--exclude', 'new-worktrees', '--min-confidence', '80'],
+                capture_output=True,
+                text=True,
+                cwd=self.project_root
+            )
+
+            # Count dead code findings
+            lines = result.stdout.strip().split('\n') if result.stdout.strip() else []
+            dead_code_count = len([line for line in lines if line and not line.startswith('#')])
+
+            # Calculate dead code percentage (rough estimate)
+            total_files = len(list(self.project_root.rglob('*.py')))
+            dead_code_percentage = (dead_code_count / max(total_files * 10, 1)) * 100  # Rough estimate
+
+            passed = dead_code_percentage <= self.quality_thresholds['dead_code_threshold']
+
+            return {
+                'passed': passed,
+                'dead_code_count': dead_code_count,
+                'dead_code_percentage': round(dead_code_percentage, 2),
+                'recommendation': f"Remove {dead_code_count} dead code items" if not passed else "Dead code levels acceptable"
+            }
+
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return {'passed': True, 'recommendation': 'Dead code analysis not available'}
+
+    def run_type_annotation_analysis(self) -> Dict[str, Any]:
+        """Check type annotation coverage."""
+        logger.info("🏷️ Running type annotation analysis...")
+
+        try:
+            result = subprocess.run(
+                ['python', '-m', 'mypy', '.', '--config-file=mypy.ini', '--exclude', 'new-worktrees', '--strict'],
+                capture_output=True,
+                text=True,
+                cwd=self.project_root
+            )
+
+            # Count type annotation issues
+            lines = result.stdout.split('\n')
+            annotation_errors = len([line for line in lines if 'annotation' in line.lower() or 'untyped' in line.lower()])
+
+            # Estimate type annotation coverage
+            total_python_files = len(list(self.project_root.rglob('*.py')))
+            coverage_estimate = max(0, 100 - (annotation_errors / max(total_python_files, 1)) * 10)
+
+            passed = coverage_estimate >= self.quality_thresholds['type_annotation_coverage']
+
+            return {
+                'passed': passed,
+                'annotation_errors': annotation_errors,
+                'coverage_estimate': round(coverage_estimate, 2),
+                'recommendation': f"Add type annotations to improve coverage" if not passed else "Type annotation coverage acceptable"
+            }
+
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return {'passed': True, 'recommendation': 'Type annotation analysis not available'}
+
     def generate_quality_report(self) -> None:
         """Generate comprehensive quality report."""
         logger.info("📊 Generating quality gate report...")
@@ -188,6 +254,8 @@ class TechnicalDebtEnforcer:
         self.results['pylint'] = self.run_pylint_analysis()
         self.results['complexity'] = self.run_complexity_analysis()
         self.results['security'] = self.run_security_analysis()
+        self.results['dead_code'] = self.run_dead_code_analysis()
+        self.results['type_annotations'] = self.run_type_annotation_analysis()
 
         # Calculate overall status
         all_passed = all(result.get('passed', False) for result in self.results.values())
