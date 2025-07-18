@@ -25,10 +25,13 @@ def send_message_to_agent_fixed(agent_name: str, message: str, auto_submit: bool
 
     session_name = "agent-hive"
 
-    # Try both naming conventions
+    # Try multiple naming conventions
     window_names_to_try = [
         f"agent-{agent_name}",  # New convention
-        agent_name              # Current convention
+        agent_name,             # Current convention
+        f"{agent_name.upper()}-Input-⏳",  # Status pattern (PM-Input-⏳)
+        f"{agent_name.upper()}-Input-⏳-",  # Status pattern variant
+        f"{agent_name.upper()}-Input-⏳*"   # Active status pattern
     ]
 
     for window_name in window_names_to_try:
