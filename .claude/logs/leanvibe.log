@@ -9835,6 +9835,7 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-18 03:47:41 INFO     advanced_orchestration.multi_agent_coordinator                                Load rebalancing completed
 2025-07-18 03:47:41 INFO     advanced_orchestration.multi_agent_coordinator                                Task 75682aa9-d97c-49fb-8bb5-abcd8a32925a reassigned from failed agent agent-1
 2025-07-18 03:47:41 INFO     advanced_orchestration.multi_agent_coordinator                                Task 4569d62c-6b5f-42ab-a1ae-5d0856bdc3d9 reassigned from failed agent agent-1
+<<<<<<< HEAD
 2025-07-18 08:16:32 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-18 08:16:33 INFO     advanced_orchestration.resource_manager                                ResourceManager initialized with limits: ResourceLimits(max_cpu_cores=4, max_memory_mb=4096, max_disk_mb=8192, max_network_mbps=1000, max_agents=5)
 2025-07-18 08:16:33 INFO     advanced_orchestration.scaling_manager                                ScalingManager initialized with config: ScalingConfig(scale_up_threshold=0.8, scale_down_threshold=0.3, min_agents=2, max_agents=5, cooldown_period=300.0, scale_up_step=1, scale_down_step=1, queue_depth_threshold=100, response_time_threshold=5.0, resource_threshold=0.9)
@@ -9993,3 +9994,19 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-18 18:54:37 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-18 18:54:38 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
 2025-07-18 18:54:38 INFO     personas.persona_manager                                Loaded 5 personas
+||||||| parent of fcb2004 (feat: complete technical debt reduction initiative based on Gemini analysis)
+2025-07-18 12:29:30 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 12:29:31 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-18 12:29:45 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 12:29:46 INFO     personas.persona_manager                                Loaded 5 personas
+=======
+2025-07-18 12:29:30 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 12:29:31 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-18 12:29:45 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 12:29:46 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-18 14:55:43 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 14:55:43 INFO     personas.persona_manager                                Loaded 5 personas
+>>>>>>> fcb2004 (feat: complete technical debt reduction initiative based on Gemini analysis)
+2025-07-18 19:06:11 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 19:06:16 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 19:06:16 INFO     personas.persona_manager                                Loaded 5 personas
