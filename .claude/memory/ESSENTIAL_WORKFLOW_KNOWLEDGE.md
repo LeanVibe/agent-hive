@@ -107,6 +107,24 @@ After reading this file, immediately:
 - **Streamlined Workflows**: All agents on unified structure
 - **Evidence-based**: Verify all claims and reports
 
+## 📋 DOCUMENTATION CONSOLIDATION RULES (July 18, 2025)
+
+### Single Source of Truth (MANDATORY)
+- **BACKLOG.md**: MASTER priority list - check here FIRST for all priorities
+- **GitHub Issues**: Sprint execution tracking (auto-synced with BACKLOG.md)
+- **docs/archived/**: Historical reference only (read-only)
+
+### Documentation Workflow
+- **Check BACKLOG.md FIRST** before any new work planning
+- **Update priorities in BACKLOG.md** (auto-syncs to GitHub via git hooks)
+- **Archive old plans** to docs/archived/ (don't delete, preserve history)
+- **Use priority labels**: P0 (48hr), P1 (1wk), P2 (1mo), P3 (future)
+
+### Automation Active
+- **scripts/backlog_sync.py**: GitHub Issues ↔ BACKLOG.md sync
+- **Git hooks**: Pre-commit validation, post-commit auto-sync
+- **Priority management**: Automatic GitHub issue creation for P0/P1
+
 ---
 **🎯 MEMORY COMMITMENT**: This knowledge MUST persist across all context boundaries. Always read this file first after /wake command.
 

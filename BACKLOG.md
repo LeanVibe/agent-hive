@@ -20,6 +20,8 @@
 - [ ] **API Documentation Enhancement** (GitHub #8) - update CLI reference (Est: 3hr)
 - [ ] **Setup Documentation** (GitHub #10) - streamline onboarding (Est: 2hr)
 - [ ] **Agent Workflow Documentation** (GitHub #9) - standardize patterns (Est: 2hr)
+- [ ] **Database Integration for BACKLOG.md** - optional sync table for reporting (Est: 2hr)
+- [ ] **Slack Notifications for Priority Changes** - real-time updates (Est: 1hr)
 
 ### System Architecture
 - [ ] **Service Discovery Completion** - finalize API Gateway integration (Est: 6hr)
@@ -81,8 +83,12 @@
 - **Issue #21**: Production Agent Sprint → P1 PRIORITY
 - **Issues #7-10**: Documentation/Debt → P1-P2 PRIORITY
 
-### Last Sync: Manual (July 18, 2025)
-### Next Auto-Sync: Post-commit hook (Pending implementation)
+### Last Sync: Automated (July 18, 2025) ✅
+### Next Auto-Sync: Git post-commit hook (Active)
+### Maintenance Items:
+- [ ] **Weekly BACKLOG.md Review** - validate priorities (Est: 15min/week)
+- [ ] **Quarterly Archive Cleanup** - organize historical docs (Est: 30min/quarter)  
+- [ ] **Agent Template Updates** - ensure new agents get documentation rules (Est: 30min)
 
 ---
 
