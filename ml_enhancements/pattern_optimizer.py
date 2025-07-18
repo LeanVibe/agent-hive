@@ -212,10 +212,18 @@ class PatternOptimizer:
                 normalized_features[key] = int(value // 1)
             elif key in ['resource_usage', 'historical_success_rate']:
                 # Bin into 10% increments
-                normalized_features[key] = round(value, 1)
+                normalized_features[key] = round(float(value), 1)
             else:
+<<<<<<< HEAD
                 normalized_features[key] = value
 
+||||||| 48e9100
+                normalized_features[key] = value
+        
+=======
+                normalized_features[key] = float(value)
+
+>>>>>>> new-work/performance-Jul-17-0823
         feature_str = json.dumps(normalized_features, sort_keys=True)
         return hashlib.sha256(feature_str.encode()).hexdigest()[:16]
 

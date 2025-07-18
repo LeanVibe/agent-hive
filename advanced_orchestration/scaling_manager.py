@@ -353,7 +353,7 @@ class ScalingManager:
         Get scaling statistics.
 
         Returns:
-            Dict[str, any]: Scaling statistics
+            Dict[str, Any]: Scaling statistics
         """
         total_events = len(self.scaling_history)
         successful_events = len([e for e in self.scaling_history if e.success])
@@ -565,7 +565,7 @@ class ScalingManager:
         recent_metrics = self.scaling_metrics_history[-3:]
 
         # Check queue depth stability
-        queue_depths = [m.queue_depth for m in recent_metrics]
+        queue_depths = [float(m.queue_depth) for m in recent_metrics]
         queue_variance = self._calculate_variance(queue_depths)
 
         # Check response time stability

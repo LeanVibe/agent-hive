@@ -25,10 +25,16 @@ def send_message_to_agent_fixed(agent_name: str, message: str, auto_submit: bool
 
     session_name = "agent-hive"
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     # Try both naming conventions
 ||||||| 48e9100
     
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
     # Try both naming conventions
 =======
 

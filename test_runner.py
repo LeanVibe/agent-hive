@@ -21,7 +21,7 @@ class TestRunner:
 
     def __init__(self, verbose: bool = False):
         self.verbose = verbose
-        self.results = {
+        self.results: Dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "total_tests": 0,
             "passed": 0,
@@ -73,8 +73,16 @@ class TestRunner:
                 "stderr": result.stderr,
                 "coverage": coverage_data
             }
+<<<<<<< HEAD
 
             self.results["duration"] += duration
+||||||| 48e9100
+            
+            self.results["duration"] += duration
+=======
+
+            self.results["duration"] = float(self.results["duration"]) + duration
+>>>>>>> new-work/performance-Jul-17-0823
             if coverage_data:
                 self.results["coverage"] = coverage_data.get("totals", {}).get("percent_covered", 0)
 
@@ -207,7 +215,7 @@ class TestRunner:
             "name": "Code Coverage",
             "threshold": 80.0,
             "actual": self.results["coverage"],
-            "passed": self.results["coverage"] >= 80.0,
+            "passed": float(self.results["coverage"]) >= 80.0,
             "details": f"Coverage: {self.results['coverage']:.1f}%"
         }
         gates.append(coverage_gate)
@@ -230,7 +238,7 @@ class TestRunner:
             "name": "Test Performance",
             "threshold": 300.0,  # 5 minutes max
             "actual": self.results["duration"],
-            "passed": self.results["duration"] <= 300.0,
+            "passed": float(self.results["duration"]) <= 300.0,
             "details": f"Duration: {self.results['duration']:.1f}s"
         }
         gates.append(performance_gate)
@@ -265,7 +273,8 @@ class TestRunner:
         """Load coverage data from JSON report."""
         try:
             with open("coverage.json", "r") as f:
-                return json.load(f)
+                data = json.load(f)
+                return data if isinstance(data, dict) else None
         except FileNotFoundError:
             return None
 
@@ -273,7 +282,8 @@ class TestRunner:
         """Load security data from JSON report."""
         try:
             with open("security_report.json", "r") as f:
-                return json.load(f)
+                data = json.load(f)
+                return data if isinstance(data, dict) else None
         except FileNotFoundError:
             return None
 
@@ -283,9 +293,20 @@ class TestRunner:
         print("=" * 50)
 
         # Summary
+<<<<<<< HEAD
         passed_gates = sum(1 for gate in self.results["quality_gates"] if gate["passed"])
         total_gates = len(self.results["quality_gates"])
 
+||||||| 48e9100
+        passed_gates = sum(1 for gate in self.results["quality_gates"] if gate["passed"])
+        total_gates = len(self.results["quality_gates"])
+        
+=======
+        quality_gates: List[Dict[str, Any]] = self.results["quality_gates"]
+        passed_gates = sum(1 for gate in quality_gates if gate["passed"])
+        total_gates = len(quality_gates)
+
+>>>>>>> new-work/performance-Jul-17-0823
         print(f"📅 Timestamp: {self.results['timestamp']}")
         print(f"⏱️  Duration: {self.results['duration']:.1f}s")
         print(f"📈 Coverage: {self.results['coverage']:.1f}%")
@@ -302,14 +323,14 @@ class TestRunner:
 
         # Quality gates
         print("\n🚪 Quality Gates:")
-        for gate in self.results["quality_gates"]:
+        for gate in quality_gates:
             status = "✅ PASS" if gate["passed"] else "❌ FAIL"
             print(f"  {gate['name']}: {status}")
             print(f"    {gate['details']}")
 
         # Overall result
         all_passed = all(r["return_code"] == 0 for r in results)
-        gates_passed = all(gate["passed"] for gate in self.results["quality_gates"])
+        gates_passed = all(gate["passed"] for gate in quality_gates)
         overall_passed = all_passed and gates_passed
 
         print(f"\n🎯 Overall Result: {'✅ PASS' if overall_passed else '❌ FAIL'}")
@@ -359,7 +380,7 @@ class TestRunner:
         return 0 if all_passed and gates_passed else 1
 
 
-def main():
+def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Comprehensive test runner for LeanVibe Quality Agent")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
@@ -375,16 +396,16 @@ def main():
 
     if args.unit_only:
         result = runner.run_unit_tests(args.pattern)
-        return result["return_code"]
+        return int(result["return_code"])
     elif args.integration_only:
         result = runner.run_integration_tests()
-        return result["return_code"]
+        return int(result["return_code"])
     elif args.performance_only:
         result = runner.run_performance_tests()
-        return result["return_code"]
+        return int(result["return_code"])
     elif args.security_only:
         result = runner.run_security_tests()
-        return result["return_code"]
+        return int(result["return_code"])
     else:
         return runner.run_all_tests()
 

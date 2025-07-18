@@ -184,6 +184,7 @@ class QualityGateValidator:
             self.warnings.append(f"Structure check error: {e}")
             return True
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     def check_pr_size_limit(self) -> bool:
         """Check if PR size is within 500 line limit."""
@@ -235,6 +236,11 @@ class QualityGateValidator:
 =======
 
 >>>>>>> new-work/frontend-Jul-17-0824
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
     def run_security_check(self) -> bool:
 <<<<<<< HEAD
         """Run enhanced security checks for critical vulnerabilities."""
@@ -243,12 +249,18 @@ class QualityGateValidator:
 ||||||| 48e9100
         """Run basic security checks."""
         logger.info("🔒 Running security checks...")
+<<<<<<< HEAD
         
 =======
         """Run basic security checks."""
         logger.info("🔒 Running security checks...")
 
 >>>>>>> new-work/frontend-Jul-17-0824
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
         try:
             # Check for common security issues in Python files
             python_files = list(self.project_root.rglob("*.py"))
@@ -269,7 +281,7 @@ class QualityGateValidator:
                 ('input(', 'Be cautious with input() in production'),
 ||||||| 48e9100
             security_issues = []
-            
+
             dangerous_patterns = [
                 ('eval(', 'Use of eval() can be dangerous'),
                 ('exec(', 'Use of exec() can be dangerous'),
@@ -293,11 +305,17 @@ class QualityGateValidator:
                     with open(py_file, 'r', encoding='utf-8') as f:
                         content = f.read()
 <<<<<<< HEAD
+<<<<<<< HEAD
 
                         # Check critical patterns
                         for pattern, message in critical_patterns:
 ||||||| 48e9100
                         
+||||||| 48e9100
+                        
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
                         for pattern, message in dangerous_patterns:
 =======
 
@@ -319,6 +337,7 @@ class QualityGateValidator:
                 except Exception:
                     continue
 <<<<<<< HEAD
+<<<<<<< HEAD
 
             # Handle critical issues
             if critical_security_issues:
@@ -338,10 +357,15 @@ class QualityGateValidator:
             logger.info("✅ Security check completed - no critical vulnerabilities")
 ||||||| 48e9100
             
+||||||| 48e9100
+            
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
             if security_issues:
                 for issue in security_issues:
                     self.warnings.append(f"Security consideration: {issue}")
-            
+
             logger.info("✅ Security check completed")
 =======
 

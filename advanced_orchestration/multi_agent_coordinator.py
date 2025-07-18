@@ -66,7 +66,7 @@ class MultiAgentCoordinator:
         self.scaling_manager = ScalingManager(config.resource_limits)
 
         # Metrics
-        self.performance_metrics = {
+        self.performance_metrics: Dict[str, Any] = {
             'tasks_completed': 0,
             'tasks_failed': 0,
             'agent_failures': 0,
@@ -391,7 +391,7 @@ class MultiAgentCoordinator:
         else:
             return healthy_agents[0]
 
-    def _select_round_robin(self, agents: List[str]) -> str:
+    def _select_round_robin(self, agents: List[str]) -> Optional[str]:
         """Select agent using round-robin strategy."""
         if not agents:
             return None
@@ -400,14 +400,14 @@ class MultiAgentCoordinator:
         self.current_round_robin_index += 1
         return selected
 
-    def _select_least_connections(self, agents: List[str]) -> str:
+    def _select_least_connections(self, agents: List[str]) -> Optional[str]:
         """Select agent with least active tasks."""
         if not agents:
             return None
 
         return min(agents, key=lambda a: self.agents[a].active_tasks)
 
-    async def _select_resource_based(self, agents: List[str]) -> str:
+    async def _select_resource_based(self, agents: List[str]) -> Optional[str]:
         """Select agent based on resource utilization."""
         if not agents:
             return None
@@ -432,7 +432,7 @@ class MultiAgentCoordinator:
         # Return agent with lowest resource utilization
         return min(agent_scores, key=lambda x: x[1])[0]
 
-    def _select_weighted(self, agents: List[str]) -> str:
+    def _select_weighted(self, agents: List[str]) -> Optional[str]:
         """Select agent based on weights."""
         if not agents:
             return None

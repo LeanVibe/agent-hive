@@ -224,8 +224,16 @@ class TutorialManager:
 
         self.save_progress(user_id)
         return True
+<<<<<<< HEAD
 
     def save_progress(self, user_id: str):
+||||||| 48e9100
+    
+    def save_progress(self, user_id: str):
+=======
+
+    def save_progress(self, user_id: str) -> None:
+>>>>>>> new-work/performance-Jul-17-0823
         """Save user progress to file."""
         progress_dir = os.path.join(self.tutorial_path, "progress")
         os.makedirs(progress_dir, exist_ok=True)

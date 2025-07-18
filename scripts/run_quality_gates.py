@@ -39,14 +39,15 @@ class QualityGatesRunner:
 
         try:
             with open(config_file, 'r') as f:
-                return json.load(f)
+                loaded_data = json.load(f)
+            return loaded_data if isinstance(loaded_data, dict) else {"quality_gates": {"max_pr_size": 500, "min_coverage": 85}}
         except (json.JSONDecodeError, IOError):
             print("⚠️ Invalid quality gates configuration, using defaults")
             return {"quality_gates": {"max_pr_size": 500, "min_coverage": 85}}
 
     def run_all_gates(self) -> Dict[str, Any]:
         """Run all quality gates"""
-        results = {
+        results: Dict[str, Any] = {
             "success": True,
             "checks": {},
             "warnings": [],
@@ -308,9 +309,19 @@ class QualityGatesRunner:
                         content = f.read()
                         if '"""' in content or "'''" in content:
                             documented_files += 1
+<<<<<<< HEAD
                 except:
                     pass
 
+||||||| 48e9100
+                except:
+                    pass
+            
+=======
+                except (IOError, UnicodeDecodeError):
+                    pass  # Skip files that can't be read
+
+>>>>>>> new-work/performance-Jul-17-0823
             if not readme_files and python_files:
                 return {
                     "passed": False,
@@ -359,10 +370,22 @@ class QualityGatesRunner:
                             security_issues.append(f"shell=True in subprocess call in {py_file}")
                         if "password" in content.lower() and "=" in content:
                             security_issues.append(f"Potential hardcoded password in {py_file}")
+<<<<<<< HEAD
 
                 except:
                     pass
 
+||||||| 48e9100
+                            
+                except:
+                    pass
+            
+=======
+
+                except (IOError, UnicodeDecodeError):
+                    pass  # Skip files that can't be read
+
+>>>>>>> new-work/performance-Jul-17-0823
             if security_issues:
                 return {
                     "passed": False,
@@ -404,10 +427,22 @@ class QualityGatesRunner:
                     max_complexity = self.quality_config["quality_gates"]["max_complexity"]
                     if max_indent > max_complexity:
                         complex_files.append(f"{py_file} (complexity: {max_indent})")
+<<<<<<< HEAD
 
                 except:
                     pass
 
+||||||| 48e9100
+                        
+                except:
+                    pass
+            
+=======
+
+                except (IOError, UnicodeDecodeError):
+                    pass  # Skip files that can't be read
+
+>>>>>>> new-work/performance-Jul-17-0823
             if complex_files:
                 return {
                     "passed": False,
@@ -427,8 +462,16 @@ class QualityGatesRunner:
                 "errors": [f"Error checking complexity: {e}"],
                 "details": str(e)
             }
+<<<<<<< HEAD
 
     def print_results(self, results: Dict[str, Any]):
+||||||| 48e9100
+    
+    def print_results(self, results: Dict[str, Any]):
+=======
+
+    def print_results(self, results: Dict[str, Any]) -> None:
+>>>>>>> new-work/performance-Jul-17-0823
         """Print quality gates results"""
         print("\n" + "=" * 50)
         print("📊 QUALITY GATES RESULTS")
@@ -454,7 +497,7 @@ class QualityGatesRunner:
             for error in results["errors"]:
                 print(f"  - {error}")
 
-def main():
+def main() -> None:
     """Main entry point"""
     worktree_path = sys.argv[1] if len(sys.argv) > 1 else "."
 

@@ -35,7 +35,13 @@ class ApiGateway:
     """
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
     def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
 ||||||| 64640d5
     
@@ -70,6 +76,7 @@ class ApiGateway:
         self._request_count = 0
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 ||||||| 64640d5
         
@@ -97,9 +104,15 @@ class ApiGateway:
 =======
 
 >>>>>>> new-work/frontend-Jul-17-0824
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
         if service_discovery:
             logger.info("Service discovery integration enabled")
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -115,6 +128,11 @@ class ApiGateway:
 =======
 
 >>>>>>> new-work/frontend-Jul-17-0824
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
     async def start_server(self) -> None:
         """Start the API gateway server."""
         if self.server_started:
@@ -609,7 +627,13 @@ class ApiGateway:
         return headers
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/performance-Jul-17-0823
     def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
 ||||||| 64640d5
     

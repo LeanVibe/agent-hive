@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-07-17T08:32:00Z",
+  "overall_status": "FAIL",
+  "quality_gates": {
+    "mypy": {
+      "error_count": 1000,
+      "errors": [
+        "tutorials/validate_tutorials.py:19:1: error: Cannot find implementation or library stub for module named \"framework.tutorial_manager\"  [import-not-found]",
+        "tutorials/validate_tutorials.py:20:1: error: Cannot find implementation or library stub for module named \"framework.validation\"  [import-not-found]",
+        "scripts/pr_resolution_monitor.py:42:17: error: Returning Any from function declared to return \"list[dict[Any, Any]]\"  [no-any-return]",
+        "scripts/pr_resolution_monitor.py:56:17: error: Returning Any from function declared to return \"bool\"  [no-any-return]",
+        "scripts/pr_resolution_monitor.py:79:5: error: Function is missing a return type annotation  [no-untyped-def]",
+        "scripts/pr_resolution_monitor.py:143:5: error: Function is missing a return type annotation  [no-untyped-def]",
+        "scripts/pr_resolution_monitor.py:183:40: error: Argument 1 to \"check_pr_mergeable\" of \"PRResolutionMonitor\" has incompatible type \"object\"; expected \"int\"  [arg-type]",
+        "scripts/pr_resolution_monitor.py:187:34: error: Argument 1 to \"merge_pr\" of \"PRResolutionMonitor\" has incompatible type \"object\"; expected \"int\"  [arg-type]",
+        "scripts/new_worktree_manager.py:36:88: error: Function \"builtins.any\" is not valid as a type  [valid-type]",
+        "scripts/new_worktree_manager.py:80:5: error: Function is missing a return type annotation  [no-untyped-def]"
+      ],
+      "passed": false,
+      "exit_code": 1
+    },
+    "pylint": {
+      "average_score": 8.567499999999999,
+      "module_scores": [
+        9.19,
+        8.31,
+        8.4,
+        8.37
+      ],
+      "passed": true,
+      "recommendation": "Consider addressing pylint warnings"
+    },
+    "complexity": {
+      "high_complexity_count": 272,
+      "high_complexity_functions": [
+        {
+          "file": "test_coordination_basic.py",
+          "function": "test_pr_breakdown_strategy",
+          "complexity": 10
+        },
+        {
+          "file": "test_coordination_basic.py",
+          "function": "test_coordination_report",
+          "complexity": 9
+        },
+        {
+          "file": "performance_monitoring_optimization.py",
+          "function": "_calculate_overall_health",
+          "complexity": 11
+        },
+        {
+          "file": "performance_monitoring_optimization.py",
+          "function": "_generate_optimization_recommendations",
+          "complexity": 9
+        },
+        {
+          "file": "feedback_monitoring.py",
+          "function": "_update_agent_status",
+          "complexity": 13
+        }
+      ],
+      "passed": false,
+      "recommendation": "Consider refactoring complex functions"
+    },
+    "security": {
+      "passed": true,
+      "recommendation": "Security analysis not available"
+    },
+    "dead_code": {
+      "passed": true,
+      "dead_code_count": 19,
+      "dead_code_percentage": 0.81,
+      "recommendation": "Dead code levels acceptable"
+    },
+    "type_annotations": {
+      "passed": false,
+      "annotation_errors": 1162,
+      "coverage_estimate": 50.34,
+      "recommendation": "Add type annotations to improve coverage"
+    }
+  },
+  "summary": {
+    "total_gates": 6,
+    "passed_gates": 3,
+    "recommendations": [
+      "Consider addressing pylint warnings",
+      "Consider refactoring complex functions",
+      "Security analysis not available",
+      "Dead code levels acceptable",
+      "Add type annotations to improve coverage"
+    ]
+  }
+}

@@ -20,8 +20,16 @@ class DocumentationFixer:
 
     def __init__(self, project_root: Path):
         self.project_root = project_root
+<<<<<<< HEAD
         self.fixes_applied = []
 
+||||||| 48e9100
+        self.fixes_applied = []
+    
+=======
+        self.fixes_applied: List[str] = []
+
+>>>>>>> new-work/performance-Jul-17-0823
     def fix_async_code_examples(self) -> List[str]:
         """Fix async code examples by wrapping them in async functions."""
         fixes = []
@@ -88,8 +96,16 @@ class DocumentationFixer:
 
     def fix_yaml_multi_document_issues(self) -> List[str]:
         """Fix YAML multi-document syntax issues."""
+<<<<<<< HEAD
         fixes = []
 
+||||||| 48e9100
+        fixes = []
+        
+=======
+        fixes: List[str] = []
+
+>>>>>>> new-work/performance-Jul-17-0823
         deployment_file = self.project_root / "DEPLOYMENT.md"
         if not deployment_file.exists():
             return fixes

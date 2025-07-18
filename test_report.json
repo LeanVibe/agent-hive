@@ -1,0 +1,1165 @@
+{
+  "results": {
+    "timestamp": "2025-07-18T03:28:58.903404",
+    "total_tests": 0,
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "coverage": 0.0,
+    "duration": 3.8723158836364746,
+    "quality_gates": [
+      {
+        "name": "Code Coverage",
+        "threshold": 80.0,
+        "actual": 0.0,
+        "passed": false,
+        "details": "Coverage: 0.0%"
+      },
+      {
+        "name": "Test Success Rate",
+        "threshold": 100.0,
+        "actual": 0.0,
+        "passed": false,
+        "details": "Success rate: 0.0%"
+      },
+      {
+        "name": "Test Performance",
+        "threshold": 300.0,
+        "actual": 3.8723158836364746,
+        "passed": true,
+        "details": "Duration: 3.9s"
+      },
+      {
+        "name": "Security",
+        "threshold": 0,
+        "actual": 0,
+        "passed": true,
+        "details": "High severity issues: 0"
+      }
+    ]
+  },
+  "test_results": [
+    {
+      "type": "unit_tests",
+      "duration": 3.8723158836364746,
+      "return_code": 2,
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.13.5, pytest-8.4.1, pluggy-1.6.0 -- /Users/bogdan/.local/share/mise/installs/python/3.13.5/bin/python\ncachedir: .pytest_cache\nrootdir: /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823\nconfigfile: pytest.ini\nplugins: anyio-4.9.0, asyncio-1.1.0, cov-6.2.1\nasyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 763 items / 4 errors\n\n==================================== ERRORS ====================================\n_______ ERROR collecting tests/integration/test_orchestrator_workflow.py _______\nImportError while importing test module '/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_orchestrator_workflow.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/integration/test_orchestrator_workflow.py:19: in <module>\n    from orchestrator import LeanVibeOrchestrator\n.claude/orchestrator.py:15: in <module>\n    from state.trigger_manager import TriggerManager\nE   ModuleNotFoundError: No module named 'state.trigger_manager'\n_____________ ERROR collecting tests/test_git_milestone_manager.py _____________\nImportError while importing test module '/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/test_git_milestone_manager.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_git_milestone_manager.py:21: in <module>\n    from state.git_milestone_manager import GitMilestoneManager, GitMilestone, CommitRecommendation\nE   ModuleNotFoundError: No module named 'state.git_milestone_manager'\n_________________ ERROR collecting tests/test_orchestrator.py __________________\nImportError while importing test module '/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/test_orchestrator.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_orchestrator.py:27: in <module>\n    from orchestrator import LeanVibeOrchestrator\n.claude/orchestrator.py:15: in <module>\n    from state.trigger_manager import TriggerManager\nE   ModuleNotFoundError: No module named 'state.trigger_manager'\n___________ ERROR collecting tests/test_orchestrator_integration.py ____________\nImportError while importing test module '/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/test_orchestrator_integration.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_orchestrator_integration.py:18: in <module>\n    from orchestrator import LeanVibeOrchestrator\n.claude/orchestrator.py:15: in <module>\n    from state.trigger_manager import TriggerManager\nE   ModuleNotFoundError: No module named 'state.trigger_manager'\n=============================== warnings summary ===============================\ntests/distributed/test_distributed_framework.py:466\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/distributed/test_distributed_framework.py:466: PytestUnknownMarkWarning: Unknown pytest.mark.distributed - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.distributed\n\ntests/distributed/test_distributed_framework.py:27\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/distributed/test_distributed_framework.py:27: PytestCollectionWarning: cannot collect test class 'TestNode' because it has a __init__ constructor (from: tests/distributed/test_distributed_framework.py)\n    @dataclass\n\ntests/distributed/test_distributed_framework.py:46\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/distributed/test_distributed_framework.py:46: PytestCollectionWarning: cannot collect test class 'TestJob' because it has a __init__ constructor (from: tests/distributed/test_distributed_framework.py)\n    @dataclass\n\ntests/distributed/test_distributed_framework.py:79\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/distributed/test_distributed_framework.py:79: PytestCollectionWarning: cannot collect test class 'TestNodeManager' because it has a __init__ constructor (from: tests/distributed/test_distributed_framework.py)\n    class TestNodeManager:\n\ntests/integration/test_system_integration.py:28\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:28: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_system_integration.py:138\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:138: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_system_integration.py:263\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:263: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_system_integration.py:405\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:405: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/mutation/test_mutation_framework.py:400\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/mutation/test_mutation_framework.py:400: PytestUnknownMarkWarning: Unknown pytest.mark.mutation - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.mutation\n\ntests/performance/test_performance_benchmarks.py:67\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:67: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/performance/test_performance_benchmarks.py:232\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:232: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/performance/test_performance_benchmarks.py:329\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:329: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/performance/test_performance_benchmarks.py:424\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:424: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/reporting/test_report_generator.py:656\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/reporting/test_report_generator.py:656: PytestUnknownMarkWarning: Unknown pytest.mark.reporting - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.reporting\n\ntests/reporting/test_report_generator.py:31\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/reporting/test_report_generator.py:31: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: tests/reporting/test_report_generator.py)\n    @dataclass\n\ntests/reporting/test_report_generator.py:48\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/reporting/test_report_generator.py:48: PytestCollectionWarning: cannot collect test class 'TestSuite' because it has a __init__ constructor (from: tests/reporting/test_report_generator.py)\n    @dataclass\n\ntests/reporting/test_report_generator.py:62\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/reporting/test_report_generator.py:62: PytestCollectionWarning: cannot collect test class 'TestReport' because it has a __init__ constructor (from: tests/reporting/test_report_generator.py)\n    @dataclass\n\ntests/security/test_security_framework.py:352\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/security/test_security_framework.py:352: PytestUnknownMarkWarning: Unknown pytest.mark.security - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.security\n\ntests/security/test_security_framework.py:506\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/security/test_security_framework.py:506: PytestUnknownMarkWarning: Unknown pytest.mark.security - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.security\n\ntests/unit/test_circuit_breaker.py:25\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:25: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:34\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:34: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:49\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:49: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:65\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:65: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:84\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:84: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:105\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:105: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:126\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:126: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:139\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:139: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:153\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:153: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:168\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:168: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:189\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:189: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:206\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:206: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_circuit_breaker.py:207\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:207: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/unit/test_circuit_breaker.py:228\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_circuit_breaker.py:228: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:56\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:56: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:68\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:68: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:79\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:91\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:91: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:106\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:106: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:130\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:130: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:158\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:158: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:178\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:178: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:191\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:191: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:203\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:203: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:229\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:229: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:249\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:249: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:268\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:268: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:286\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:286: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:300\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:300: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_config_loader.py:301\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:301: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/unit/test_config_loader.py:326\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_config_loader.py:326: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:25\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:25: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:38\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:49\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:49: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:61\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:61: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:83\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:83: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:119\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:119: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:137\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:137: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:153\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:153: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:169\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:169: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:185\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:185: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:212\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:212: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:247\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:247: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:283\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:283: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:298\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:298: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:330\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:330: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\ntests/unit/test_task_queue.py:331\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:331: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/unit/test_task_queue.py:371\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/unit/test_task_queue.py:371: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.unit\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/integration/test_orchestrator_workflow.py\nERROR tests/test_git_milestone_manager.py\nERROR tests/test_orchestrator.py\nERROR tests/test_orchestrator_integration.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!\n======================== 67 warnings, 4 errors in 3.27s ========================\n",
+      "stderr": "",
+      "coverage": null
+    },
+    {
+      "type": "integration_tests",
+      "duration": 0.29366397857666016,
+      "return_code": 2,
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.13.5, pytest-8.4.1, pluggy-1.6.0 -- /Users/bogdan/.local/share/mise/installs/python/3.13.5/bin/python\ncachedir: .pytest_cache\nrootdir: /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823\nconfigfile: pytest.ini\nplugins: anyio-4.9.0, asyncio-1.1.0, cov-6.2.1\nasyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 9 items / 1 error\n\n==================================== ERRORS ====================================\n_______ ERROR collecting tests/integration/test_orchestrator_workflow.py _______\nImportError while importing test module '/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_orchestrator_workflow.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/bogdan/.local/share/mise/installs/python/3.13.5/lib/python3.13/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/integration/test_orchestrator_workflow.py:19: in <module>\n    from orchestrator import LeanVibeOrchestrator\n.claude/orchestrator.py:15: in <module>\n    from state.trigger_manager import TriggerManager\nE   ModuleNotFoundError: No module named 'state.trigger_manager'\n------------------------------- Captured stdout --------------------------------\n2025-07-18 03:29:02 INFO     leanvibe.startup                                    Logging initialized with level INFO\n=============================== warnings summary ===============================\ntests/integration/test_system_integration.py:28\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:28: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_system_integration.py:138\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:138: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_system_integration.py:263\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:263: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\ntests/integration/test_system_integration.py:405\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/integration/test_system_integration.py:405: PytestUnknownMarkWarning: Unknown pytest.mark.integration - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.integration\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/integration/test_orchestrator_workflow.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n========================= 4 warnings, 1 error in 0.09s =========================\n",
+      "stderr": ""
+    },
+    {
+      "type": "performance_tests",
+      "duration": 0.32215118408203125,
+      "return_code": 1,
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.13.5, pytest-8.4.1, pluggy-1.6.0 -- /Users/bogdan/.local/share/mise/installs/python/3.13.5/bin/python\ncachedir: .pytest_cache\nrootdir: /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823\nconfigfile: pytest.ini\nplugins: anyio-4.9.0, asyncio-1.1.0, cov-6.2.1\nasyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 10 items\n\ntests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_state_manager_init_performance FAILED [ 10%]\ntests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_agent_state_crud_performance FAILED [ 20%]\ntests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_task_state_crud_performance FAILED [ 30%]\ntests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_bulk_operations_performance FAILED [ 40%]\ntests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_concurrent_operations_performance FAILED [ 50%]\ntests/performance/test_performance_benchmarks.py::TestTaskQueuePerformance::test_task_queue_operations_performance FAILED [ 60%]\ntests/performance/test_performance_benchmarks.py::TestTaskQueuePerformance::test_task_queue_concurrent_access FAILED [ 70%]\ntests/performance/test_performance_benchmarks.py::TestMemoryPerformance::test_memory_usage_under_load FAILED [ 80%]\ntests/performance/test_performance_benchmarks.py::TestMemoryPerformance::test_memory_cleanup_performance FAILED [ 90%]\ntests/performance/test_performance_benchmarks.py::TestSystemPerformance::test_end_to_end_performance FAILED [100%]\n\n=================================== FAILURES ===================================\n_______ TestStateManagerPerformance.test_state_manager_init_performance ________\ntests/performance/test_performance_benchmarks.py:74: in test_state_manager_init_performance\n    benchmark = PerformanceBenchmarks.benchmark_function(\ntests/performance/test_performance_benchmarks.py:33: in benchmark_function\n    result = func(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n________ TestStateManagerPerformance.test_agent_state_crud_performance _________\ntests/performance/test_performance_benchmarks.py:86: in test_agent_state_crud_performance\n    manager = StateManager(Path(temp_dir))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n_________ TestStateManagerPerformance.test_task_state_crud_performance _________\ntests/performance/test_performance_benchmarks.py:125: in test_task_state_crud_performance\n    manager = StateManager(Path(temp_dir))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n_________ TestStateManagerPerformance.test_bulk_operations_performance _________\ntests/performance/test_performance_benchmarks.py:155: in test_bulk_operations_performance\n    manager = StateManager(Path(temp_dir))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n______ TestStateManagerPerformance.test_concurrent_operations_performance ______\ntests/performance/test_performance_benchmarks.py:196: in test_concurrent_operations_performance\n    manager = StateManager(Path(temp_dir))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n_______ TestTaskQueuePerformance.test_task_queue_operations_performance ________\ntests/performance/test_performance_benchmarks.py:243: in test_task_queue_operations_performance\n    Task(\nE   TypeError: Task.__init__() missing 1 required positional argument: 'created_at'\n__________ TestTaskQueuePerformance.test_task_queue_concurrent_access __________\ntests/performance/test_performance_benchmarks.py:318: in test_task_queue_concurrent_access\n    await asyncio.gather(producer_task, consumer_task)\ntests/performance/test_performance_benchmarks.py:291: in producer\n    task = Task(\nE   TypeError: Task.__init__() missing 1 required positional argument: 'created_at'\n______________ TestMemoryPerformance.test_memory_usage_under_load ______________\ntests/performance/test_performance_benchmarks.py:343: in test_memory_usage_under_load\n    manager = StateManager(Path(temp_dir))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n____________ TestMemoryPerformance.test_memory_cleanup_performance _____________\ntests/performance/test_performance_benchmarks.py:385: in test_memory_cleanup_performance\n    manager = StateManager(Path(temp_dir))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n______________ TestSystemPerformance.test_end_to_end_performance _______________\ntests/performance/test_performance_benchmarks.py:432: in test_end_to_end_performance\n    manager = StateManager(Path(temp_dir))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nstate/state_manager.py:68: in __init__\n    self._initialize_database()\nstate/state_manager.py:72: in _initialize_database\n    with sqlite3.connect(self.db_path) as conn:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   sqlite3.OperationalError: unable to open database file\n=============================== warnings summary ===============================\ntests/performance/test_performance_benchmarks.py:67\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:67: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/performance/test_performance_benchmarks.py:232\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:232: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/performance/test_performance_benchmarks.py:329\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:329: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\ntests/performance/test_performance_benchmarks.py:424\n  /Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/performance-Jul-17-0823/tests/performance/test_performance_benchmarks.py:424: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    @pytest.mark.performance\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_state_manager_init_performance\nFAILED tests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_agent_state_crud_performance\nFAILED tests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_task_state_crud_performance\nFAILED tests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_bulk_operations_performance\nFAILED tests/performance/test_performance_benchmarks.py::TestStateManagerPerformance::test_concurrent_operations_performance\nFAILED tests/performance/test_performance_benchmarks.py::TestTaskQueuePerformance::test_task_queue_operations_performance\nFAILED tests/performance/test_performance_benchmarks.py::TestTaskQueuePerformance::test_task_queue_concurrent_access\nFAILED tests/performance/test_performance_benchmarks.py::TestMemoryPerformance::test_memory_usage_under_load\nFAILED tests/performance/test_performance_benchmarks.py::TestMemoryPerformance::test_memory_cleanup_performance\nFAILED tests/performance/test_performance_benchmarks.py::TestSystemPerformance::test_end_to_end_performance\n======================== 10 failed, 4 warnings in 0.12s ========================\n",
+      "stderr": ""
+    },
+    {
+      "type": "security_tests",
+      "duration": 0.279771089553833,
+      "return_code": 1,
+      "stdout": "",
+      "stderr": "[main]\tINFO\tprofile include tests: None\n[main]\tINFO\tprofile exclude tests: None\n[main]\tINFO\tcli include tests: None\n[main]\tINFO\tcli exclude tests: None\n[json]\tINFO\tJSON output written to file: security_report.json\n",
+      "security_report": {
+        "errors": [],
+        "generated_at": "2025-07-18T00:29:03Z",
+        "metrics": {
+          ".claude/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 1,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/agents/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/agents/base_agent.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 140,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/agents/claude_agent.py": {
+            "CONFIDENCE.HIGH": 1,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 1,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 361,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/config/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/config/config_loader.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 156,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/context/smart_context_manager.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 20,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/dashboard/unified_views.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 50,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/dev_tools/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/dev_tools/smart_test_enforcer.py": {
+            "CONFIDENCE.HIGH": 1,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 1,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 323,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/hooks/ensure_test.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 17,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/hooks/quality_gate.py": {
+            "CONFIDENCE.HIGH": 3,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 3,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 11,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/hooks/smart_context.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 27,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/hooks/swift_quality.py": {
+            "CONFIDENCE.HIGH": 3,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 3,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 12,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/intelligence/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/intelligence/confidence_tracker.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 1,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 1,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 287,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/intelligence/context_monitor.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 4,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 4,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 346,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/learning/confidence_optimizer.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 22,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/orchestrator.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 308,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/quality/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/quality/smart_quality_gate.py": {
+            "CONFIDENCE.HIGH": 6,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 6,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 350,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/scripts/compressor.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 16,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/scripts/health_check.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 14,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/scripts/logger.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 9,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/scripts/monitor.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 22,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/scripts/state_manager.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 62,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/state_manager.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 57,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/task_queue_module/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/task_queue_module/task_queue.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 315,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/testing/mock_cli/mock_claude.py": {
+            "CONFIDENCE.HIGH": 3,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 3,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 61,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/testing/mock_cli/mock_gemini.py": {
+            "CONFIDENCE.HIGH": 6,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 6,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 78,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/tests/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/tests/test_state_manager.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/utils/__init__.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/utils/logging_config.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 209,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          ".claude/xp/smart_xp.py": {
+            "CONFIDENCE.HIGH": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 21,
+            "nosec": 0,
+            "skipped_tests": 0
+          },
+          "_totals": {
+            "CONFIDENCE.HIGH": 23,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 5,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.HIGH": 0,
+            "SEVERITY.LOW": 23,
+            "SEVERITY.MEDIUM": 5,
+            "SEVERITY.UNDEFINED": 0,
+            "loc": 3295,
+            "nosec": 0,
+            "skipped_tests": 0
+          }
+        },
+        "results": [
+          {
+            "code": "9 from typing import Dict, Any, Optional, List\n10 import subprocess\n11 import signal\n",
+            "col_offset": 0,
+            "end_col_offset": 17,
+            "filename": ".claude/agents/claude_agent.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Consider possible security implications associated with the subprocess module.",
+            "line_number": 10,
+            "line_range": [
+              10
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+            "test_id": "B404",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "8 import asyncio\n9 import subprocess\n10 from pathlib import Path\n",
+            "col_offset": 0,
+            "end_col_offset": 17,
+            "filename": ".claude/dev_tools/smart_test_enforcer.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Consider possible security implications associated with the subprocess module.",
+            "line_number": 9,
+            "line_range": [
+              9
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+            "test_id": "B404",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "1 import subprocess\n2 import sys\n3 \n",
+            "col_offset": 0,
+            "end_col_offset": 17,
+            "filename": ".claude/hooks/quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Consider possible security implications associated with the subprocess module.",
+            "line_number": 1,
+            "line_range": [
+              1
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+            "test_id": "B404",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "6     try:\n7         subprocess.check_call([\"echo\", \"Tests pass\"])  # Stub pytest\n8         return True\n",
+            "col_offset": 8,
+            "end_col_offset": 53,
+            "filename": ".claude/hooks/quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Starting a process with a partial executable path",
+            "line_number": 7,
+            "line_range": [
+              7
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b607_start_process_with_partial_path.html",
+            "test_id": "B607",
+            "test_name": "start_process_with_partial_path"
+          },
+          {
+            "code": "6     try:\n7         subprocess.check_call([\"echo\", \"Tests pass\"])  # Stub pytest\n8         return True\n",
+            "col_offset": 8,
+            "end_col_offset": 53,
+            "filename": ".claude/hooks/quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "subprocess call - check for execution of untrusted input.",
+            "line_number": 7,
+            "line_range": [
+              7
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+            "test_id": "B603",
+            "test_name": "subprocess_without_shell_equals_true"
+          },
+          {
+            "code": "1 import sys\n2 import subprocess\n3 import json\n",
+            "col_offset": 0,
+            "end_col_offset": 17,
+            "filename": ".claude/hooks/swift_quality.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Consider possible security implications associated with the subprocess module.",
+            "line_number": 2,
+            "line_range": [
+              2
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+            "test_id": "B404",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "8     try:\n9         subprocess.check_call([\"echo\", \"Swift OK\"])  # Stub swiftlint\n10     except:\n",
+            "col_offset": 8,
+            "end_col_offset": 51,
+            "filename": ".claude/hooks/swift_quality.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Starting a process with a partial executable path",
+            "line_number": 9,
+            "line_range": [
+              9
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b607_start_process_with_partial_path.html",
+            "test_id": "B607",
+            "test_name": "start_process_with_partial_path"
+          },
+          {
+            "code": "8     try:\n9         subprocess.check_call([\"echo\", \"Swift OK\"])  # Stub swiftlint\n10     except:\n",
+            "col_offset": 8,
+            "end_col_offset": 51,
+            "filename": ".claude/hooks/swift_quality.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "subprocess call - check for execution of untrusted input.",
+            "line_number": 9,
+            "line_range": [
+              9
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+            "test_id": "B603",
+            "test_name": "subprocess_without_shell_equals_true"
+          },
+          {
+            "code": "316             cursor.execute(\n317                 \"\"\"\n318                 DELETE FROM decisions\n319                 WHERE timestamp < datetime('now', '-{} days')\n320                 \"\"\".format(days_to_keep)\n321             )\n",
+            "col_offset": 16,
+            "end_col_offset": 19,
+            "filename": ".claude/intelligence/confidence_tracker.py",
+            "issue_confidence": "MEDIUM",
+            "issue_cwe": {
+              "id": 89,
+              "link": "https://cwe.mitre.org/data/definitions/89.html"
+            },
+            "issue_severity": "MEDIUM",
+            "issue_text": "Possible SQL injection vector through string-based query construction.",
+            "line_number": 317,
+            "line_range": [
+              317,
+              318,
+              319,
+              320
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+            "test_id": "B608",
+            "test_name": "hardcoded_sql_expressions"
+          },
+          {
+            "code": "372                 cursor.execute(\n373                     \"\"\"\n374                     SELECT\n375                         COUNT(*) as total_records,\n376                         AVG(usage_percent) as avg_usage,\n377                         MAX(usage_percent) as peak_usage,\n378                         MIN(usage_percent) as min_usage,\n379                         MAX(timestamp) as last_update\n380                     FROM context_history\n381                     WHERE agent_id = ?\n382                     AND timestamp > datetime('now', '-{} hours')\n383                     \"\"\".format(hours),\n384                     (agent_id,)\n",
+            "col_offset": 20,
+            "end_col_offset": 23,
+            "filename": ".claude/intelligence/context_monitor.py",
+            "issue_confidence": "MEDIUM",
+            "issue_cwe": {
+              "id": 89,
+              "link": "https://cwe.mitre.org/data/definitions/89.html"
+            },
+            "issue_severity": "MEDIUM",
+            "issue_text": "Possible SQL injection vector through string-based query construction.",
+            "line_number": 373,
+            "line_range": [
+              373,
+              374,
+              375,
+              376,
+              377,
+              378,
+              379,
+              380,
+              381,
+              382,
+              383
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+            "test_id": "B608",
+            "test_name": "hardcoded_sql_expressions"
+          },
+          {
+            "code": "387                 cursor.execute(\n388                     \"\"\"\n389                     SELECT\n390                         COUNT(*) as total_records,\n391                         AVG(usage_percent) as avg_usage,\n392                         MAX(usage_percent) as peak_usage,\n393                         MIN(usage_percent) as min_usage,\n394                         MAX(timestamp) as last_update\n395                     FROM context_history\n396                     WHERE timestamp > datetime('now', '-{} hours')\n397                     \"\"\".format(hours)\n398                 )\n",
+            "col_offset": 20,
+            "end_col_offset": 23,
+            "filename": ".claude/intelligence/context_monitor.py",
+            "issue_confidence": "MEDIUM",
+            "issue_cwe": {
+              "id": 89,
+              "link": "https://cwe.mitre.org/data/definitions/89.html"
+            },
+            "issue_severity": "MEDIUM",
+            "issue_text": "Possible SQL injection vector through string-based query construction.",
+            "line_number": 388,
+            "line_range": [
+              388,
+              389,
+              390,
+              391,
+              392,
+              393,
+              394,
+              395,
+              396,
+              397
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+            "test_id": "B608",
+            "test_name": "hardcoded_sql_expressions"
+          },
+          {
+            "code": "426             cursor.execute(\n427                 \"\"\"\n428                 DELETE FROM context_history\n429                 WHERE timestamp < datetime('now', '-{} days')\n430                 \"\"\".format(days_to_keep)\n431             )\n",
+            "col_offset": 16,
+            "end_col_offset": 19,
+            "filename": ".claude/intelligence/context_monitor.py",
+            "issue_confidence": "MEDIUM",
+            "issue_cwe": {
+              "id": 89,
+              "link": "https://cwe.mitre.org/data/definitions/89.html"
+            },
+            "issue_severity": "MEDIUM",
+            "issue_text": "Possible SQL injection vector through string-based query construction.",
+            "line_number": 427,
+            "line_range": [
+              427,
+              428,
+              429,
+              430
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+            "test_id": "B608",
+            "test_name": "hardcoded_sql_expressions"
+          },
+          {
+            "code": "435             cursor.execute(\n436                 \"\"\"\n437                 DELETE FROM prediction_accuracy\n438                 WHERE timestamp < datetime('now', '-{} days')\n439                 \"\"\".format(days_to_keep)\n440             )\n",
+            "col_offset": 16,
+            "end_col_offset": 19,
+            "filename": ".claude/intelligence/context_monitor.py",
+            "issue_confidence": "MEDIUM",
+            "issue_cwe": {
+              "id": 89,
+              "link": "https://cwe.mitre.org/data/definitions/89.html"
+            },
+            "issue_severity": "MEDIUM",
+            "issue_text": "Possible SQL injection vector through string-based query construction.",
+            "line_number": 436,
+            "line_range": [
+              436,
+              437,
+              438,
+              439
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b608_hardcoded_sql_expressions.html",
+            "test_id": "B608",
+            "test_name": "hardcoded_sql_expressions"
+          },
+          {
+            "code": "8 import json\n9 import subprocess\n10 from datetime import datetime\n",
+            "col_offset": 0,
+            "end_col_offset": 17,
+            "filename": ".claude/quality/smart_quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Consider possible security implications associated with the subprocess module.",
+            "line_number": 9,
+            "line_range": [
+              9
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_imports.html#b404-import-subprocess",
+            "test_id": "B404",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "307         try:\n308             result = subprocess.run(\n309                 test_command,\n310                 capture_output=True,\n311                 timeout=timeout,\n312                 text=True\n313             )\n314             logger.debug(f\"Test command result: {result.returncode}\")\n",
+            "col_offset": 21,
+            "end_col_offset": 13,
+            "filename": ".claude/quality/smart_quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "subprocess call - check for execution of untrusted input.",
+            "line_number": 308,
+            "line_range": [
+              308,
+              309,
+              310,
+              311,
+              312,
+              313
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+            "test_id": "B603",
+            "test_name": "subprocess_without_shell_equals_true"
+          },
+          {
+            "code": "330         try:\n331             result = subprocess.run(coverage_command, capture_output=True, timeout=300)\n332 \n",
+            "col_offset": 21,
+            "end_col_offset": 87,
+            "filename": ".claude/quality/smart_quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "subprocess call - check for execution of untrusted input.",
+            "line_number": 331,
+            "line_range": [
+              331
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+            "test_id": "B603",
+            "test_name": "subprocess_without_shell_equals_true"
+          },
+          {
+            "code": "352         try:\n353             result = subprocess.run(lint_command, capture_output=True, timeout=120)\n354             logger.debug(f\"Lint command result: {result.returncode}\")\n",
+            "col_offset": 21,
+            "end_col_offset": 83,
+            "filename": ".claude/quality/smart_quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "subprocess call - check for execution of untrusted input.",
+            "line_number": 353,
+            "line_range": [
+              353
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+            "test_id": "B603",
+            "test_name": "subprocess_without_shell_equals_true"
+          },
+          {
+            "code": "369         try:\n370             result = subprocess.run(\n371                 security_command,\n372                 capture_output=True,\n373                 text=True,\n374                 timeout=180\n375             )\n376 \n",
+            "col_offset": 21,
+            "end_col_offset": 13,
+            "filename": ".claude/quality/smart_quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "subprocess call - check for execution of untrusted input.",
+            "line_number": 370,
+            "line_range": [
+              370,
+              371,
+              372,
+              373,
+              374,
+              375
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+            "test_id": "B603",
+            "test_name": "subprocess_without_shell_equals_true"
+          },
+          {
+            "code": "406         try:\n407             result = subprocess.run(\n408                 performance_command,\n409                 capture_output=True,\n410                 text=True,\n411                 timeout=600  # 10 minutes for benchmarks\n412             )\n413 \n",
+            "col_offset": 21,
+            "end_col_offset": 13,
+            "filename": ".claude/quality/smart_quality_gate.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 78,
+              "link": "https://cwe.mitre.org/data/definitions/78.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "subprocess call - check for execution of untrusted input.",
+            "line_number": 407,
+            "line_range": [
+              407,
+              408,
+              409,
+              410,
+              411,
+              412
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b603_subprocess_without_shell_equals_true.html",
+            "test_id": "B603",
+            "test_name": "subprocess_without_shell_equals_true"
+          },
+          {
+            "code": "16         \"response\": f\"Mock Claude response to: {prompt[:100]}...\",\n17         \"confidence\": random.uniform(0.7, 0.95),\n18         \"timestamp\": datetime.now().isoformat(),\n",
+            "col_offset": 22,
+            "end_col_offset": 47,
+            "filename": ".claude/testing/mock_cli/mock_claude.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 17,
+            "line_range": [
+              17
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "21             \"input_tokens\": len(prompt.split()),\n22             \"output_tokens\": random.randint(50, 200)\n23         }\n",
+            "col_offset": 29,
+            "end_col_offset": 52,
+            "filename": ".claude/testing/mock_cli/mock_claude.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 22,
+            "line_range": [
+              22
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "64     # Simulate random failures\n65     if random.random() < args.fail_rate:\n66         response = simulate_error_response(\"generic\")\n",
+            "col_offset": 7,
+            "end_col_offset": 22,
+            "filename": ".claude/testing/mock_cli/mock_claude.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 65,
+            "line_range": [
+              65
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "13     \"\"\"Simulate realistic CLI response time.\"\"\"\n14     time.sleep(random.uniform(0.3, 1.5))\n15 \n",
+            "col_offset": 15,
+            "end_col_offset": 39,
+            "filename": ".claude/testing/mock_cli/mock_gemini.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 14,
+            "line_range": [
+              14
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "35         \"status\": \"success\",\n36         \"review_type\": random.choice(review_types),\n37         \"feedback\": random.choice(feedback_examples),\n",
+            "col_offset": 23,
+            "end_col_offset": 50,
+            "filename": ".claude/testing/mock_cli/mock_gemini.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 36,
+            "line_range": [
+              36
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "36         \"review_type\": random.choice(review_types),\n37         \"feedback\": random.choice(feedback_examples),\n38         \"score\": random.uniform(7.0, 9.5),\n",
+            "col_offset": 20,
+            "end_col_offset": 52,
+            "filename": ".claude/testing/mock_cli/mock_gemini.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 37,
+            "line_range": [
+              37
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "37         \"feedback\": random.choice(feedback_examples),\n38         \"score\": random.uniform(7.0, 9.5),\n39         \"suggestions\": [\n",
+            "col_offset": 17,
+            "end_col_offset": 41,
+            "filename": ".claude/testing/mock_cli/mock_gemini.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 38,
+            "line_range": [
+              38
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "47             \"input_tokens\": len(prompt.split()),\n48             \"output_tokens\": random.randint(30, 150)\n49         }\n",
+            "col_offset": 29,
+            "end_col_offset": 52,
+            "filename": ".claude/testing/mock_cli/mock_gemini.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 48,
+            "line_range": [
+              48
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          },
+          {
+            "code": "83     # Simulate random failures\n84     if random.random() < args.fail_rate:\n85         response = simulate_error_response(\"generic\")\n",
+            "col_offset": 7,
+            "end_col_offset": 22,
+            "filename": ".claude/testing/mock_cli/mock_gemini.py",
+            "issue_confidence": "HIGH",
+            "issue_cwe": {
+              "id": 330,
+              "link": "https://cwe.mitre.org/data/definitions/330.html"
+            },
+            "issue_severity": "LOW",
+            "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
+            "line_number": 84,
+            "line_range": [
+              84
+            ],
+            "more_info": "https://bandit.readthedocs.io/en/1.8.6/blacklists/blacklist_calls.html#b311-random",
+            "test_id": "B311",
+            "test_name": "blacklist"
+          }
+        ]
+      }
+    }
+  ]
+}
