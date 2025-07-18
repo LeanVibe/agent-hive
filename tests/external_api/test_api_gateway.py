@@ -202,7 +202,7 @@ class TestApiGateway:
         # No API key provided
         response = await auth_gateway.handle_request(sample_request)
         assert response.status_code == 401
-        assert "Missing X-API-Key header" in response.body["error"]
+        assert "API key required" in response.body["error"]
 
         # Invalid API key
         sample_request.headers["X-API-Key"] = "invalid-key"
