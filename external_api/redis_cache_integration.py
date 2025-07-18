@@ -8,15 +8,13 @@ Coordinates with Infrastructure Agent's caching strategy for:
 - RBAC authorization results
 """
 
-import asyncio
 import json
 import logging
 import time
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Set, Union
+from datetime import datetime
+from typing import Dict, Any, Optional, List
 import hashlib
 import redis
-from dataclasses import asdict
 
 logger = logging.getLogger(__name__)
 

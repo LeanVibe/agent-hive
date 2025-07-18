@@ -2,10 +2,7 @@
 
 import asyncio
 import pytest
-import json
-import tempfile
 import os
-from datetime import datetime
 from pathlib import Path
 import sys
 
@@ -14,7 +11,6 @@ sys.path.append(str(Path(__file__).parent.parent / '.claude'))
 
 from agents.claude_agent import ClaudeAgent
 from agents.base_agent import Task, AgentStatus
-from config.config_loader import get_config
 from utils.logging_config import setup_logging
 
 # Initialize logging for tests

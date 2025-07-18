@@ -138,7 +138,7 @@ class PRCoordinationDriver:
 
     async def _register_coordination_agents(self) -> None:
         """Register agents with the cross-agent coordinator."""
-        from .cross_agent_protocols import AgentCapability, AgentRole
+        from .cross_agent_protocols import AgentCapability
 
         # Register orchestration agent (this agent)
         orchestration_capability = AgentCapability(

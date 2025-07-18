@@ -5,7 +5,6 @@ Ping all agents to resume work with clear instructions
 
 import subprocess
 import time
-from pathlib import Path
 
 def ping_agent(agent_name: str, window_name: str):
     """Send resume message to specific agent"""

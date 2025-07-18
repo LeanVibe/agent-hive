@@ -5,7 +5,6 @@ Advanced alerting with predictive capabilities, anomaly detection,
 and critical system condition monitoring for production environments.
 """
 
-import asyncio
 import logging
 import numpy as np
 import time
@@ -16,14 +15,13 @@ from enum import Enum
 import statistics
 import threading
 from collections import defaultdict, deque
-import json
 
 from prometheus_client import Counter, Histogram, Gauge
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 
-from monitoring_alerts import AlertManager, AlertLevel, Alert
-from business_metrics_monitor import BusinessMetricsMonitor, BusinessMetricType
+from monitoring_alerts import AlertManager
+from business_metrics_monitor import BusinessMetricsMonitor
 
 
 class AlertCategory(Enum):

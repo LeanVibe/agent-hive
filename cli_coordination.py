@@ -6,13 +6,11 @@ This module provides clean, focused coordination commands with reduced complexit
 and improved maintainability.
 """
 
-import asyncio
-import json
 import shutil
 import subprocess
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 
 
 class CoordinationCommand(ABC):

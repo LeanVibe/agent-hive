@@ -4,17 +4,13 @@ Tests for Database Manager - Consolidated database architecture
 
 import pytest
 import tempfile
-import json
 import sqlite3
 from pathlib import Path
-from unittest.mock import patch
 
 from external_api.database_manager import (
     AgentHiveDatabaseManager,
     MemorySnapshotManager,
-    SchemaMigration,
-    ContextSession,
-    MemorySnapshot
+    SchemaMigration
 )
 
 

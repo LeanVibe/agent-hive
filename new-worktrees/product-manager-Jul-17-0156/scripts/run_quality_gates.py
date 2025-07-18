@@ -9,9 +9,8 @@ and adherence to development standards.
 import subprocess
 import sys
 import json
-import os
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 class QualityGatesRunner:
     """Runs quality gates for new development work"""

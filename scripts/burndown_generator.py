@@ -7,15 +7,13 @@ This module generates burndown charts for sprint tracking and provides
 real-time progress visualization for XP methodology enforcement.
 """
 
-import json
 import sqlite3
 import sys
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from dataclasses import dataclass
-import os
 
 
 @dataclass
@@ -354,7 +352,7 @@ class BurndownGenerator:
         else:
             report += "✅ Sprint is on track with no significant risks identified\n"
 
-        report += f"""
+        report += """
 ## Recommendations
 """
 
@@ -396,7 +394,7 @@ class BurndownGenerator:
    - Plan for next sprint based on current velocity
 """
 
-        report += f"""
+        report += """
 ## Daily Progress Tracking
 """
 

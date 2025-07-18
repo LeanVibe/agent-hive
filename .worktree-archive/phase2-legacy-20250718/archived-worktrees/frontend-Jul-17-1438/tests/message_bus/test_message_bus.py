@@ -4,8 +4,6 @@ Tests for Redis-based Message Bus System
 
 import pytest
 import asyncio
-import json
-from datetime import datetime, timezone
 from unittest.mock import AsyncMock, Mock, patch
 
 from message_bus.message_bus import MessageBus, MessageBusConfig

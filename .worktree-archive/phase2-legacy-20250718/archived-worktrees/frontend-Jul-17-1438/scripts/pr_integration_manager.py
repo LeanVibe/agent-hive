@@ -8,11 +8,8 @@ import argparse
 import json
 import logging
 import subprocess
-import sys
-import time
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 import requests
 
 try:
@@ -167,7 +164,7 @@ class PRIntegrationManager:
                 data = {
                     'merge_method': merge_method,
                     'commit_title': f"Merge PR #{pr_number}",
-                    'commit_message': f"Automated merge via agent integration system"
+                    'commit_message': "Automated merge via agent integration system"
                 }
 
                 response = requests.put(url, headers=headers, json=data)

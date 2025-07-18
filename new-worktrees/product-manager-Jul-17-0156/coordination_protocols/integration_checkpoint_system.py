@@ -9,14 +9,12 @@ and integration milestones are achieved.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Set, Tuple
+from typing import Dict, List, Optional, Any, Set
 from dataclasses import dataclass, field
 from enum import Enum
-import json
-import uuid
 
-from .automated_coordination_orchestrator import CoordinationPhase, CoordinationStatus
-from .component_workflow import ComponentWorkflowManager, ComponentStatus
+from .automated_coordination_orchestrator import CoordinationPhase
+from .component_workflow import ComponentWorkflowManager
 from ..feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
 
 

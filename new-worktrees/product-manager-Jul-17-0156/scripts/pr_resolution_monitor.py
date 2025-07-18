@@ -9,9 +9,7 @@ sequential agent rebases and merges.
 import subprocess
 import json
 import time
-import sys
-from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 class PRResolutionMonitor:
     """Monitors and coordinates PR conflict resolution"""

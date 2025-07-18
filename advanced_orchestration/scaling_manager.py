@@ -4,9 +4,8 @@ Scaling Manager for automatic agent scaling based on demand and performance metr
 This module provides auto-scaling capabilities for the multi-agent system.
 """
 
-import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any, TYPE_CHECKING
 from dataclasses import dataclass
 from enum import Enum

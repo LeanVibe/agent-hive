@@ -19,8 +19,7 @@ import subprocess
 import argparse
 import logging
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from dataclasses import dataclass, field
 
 

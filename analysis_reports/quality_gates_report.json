@@ -3,35 +3,35 @@
   "overall_status": "FAIL",
   "quality_gates": {
     "mypy": {
-      "error_count": 1000,
+      "error_count": 1023,
       "errors": [
-        "tutorials/validate_tutorials.py:19:1: error: Cannot find implementation or library stub for module named \"framework.tutorial_manager\"  [import-not-found]",
-        "tutorials/validate_tutorials.py:20:1: error: Cannot find implementation or library stub for module named \"framework.validation\"  [import-not-found]",
-        "scripts/pr_resolution_monitor.py:42:17: error: Returning Any from function declared to return \"list[dict[Any, Any]]\"  [no-any-return]",
-        "scripts/pr_resolution_monitor.py:56:17: error: Returning Any from function declared to return \"bool\"  [no-any-return]",
-        "scripts/pr_resolution_monitor.py:79:5: error: Function is missing a return type annotation  [no-untyped-def]",
-        "scripts/pr_resolution_monitor.py:143:5: error: Function is missing a return type annotation  [no-untyped-def]",
-        "scripts/pr_resolution_monitor.py:183:40: error: Argument 1 to \"check_pr_mergeable\" of \"PRResolutionMonitor\" has incompatible type \"object\"; expected \"int\"  [arg-type]",
-        "scripts/pr_resolution_monitor.py:187:34: error: Argument 1 to \"merge_pr\" of \"PRResolutionMonitor\" has incompatible type \"object\"; expected \"int\"  [arg-type]",
-        "scripts/new_worktree_manager.py:36:88: error: Function \"builtins.any\" is not valid as a type  [valid-type]",
-        "scripts/new_worktree_manager.py:80:5: error: Function is missing a return type annotation  [no-untyped-def]"
+        "tutorials/run_tutorial.py:13:1: error: Cannot find implementation or library stub for module named \"framework.cli_interface\"  [import-not-found]",
+        "tutorials/run_tutorial.py:14:1: error: Cannot find implementation or library stub for module named \"framework.tutorial_manager\"  [import-not-found]",
+        "tutorials/run_tutorial.py:15:1: error: Cannot find implementation or library stub for module named \"framework.validation\"  [import-not-found]",
+        "tutorials/run_tutorial.py:85:1: error: Function is missing a return type annotation  [no-untyped-def]",
+        "tutorials/run_tutorial.py:85:71: error: Incompatible default for argument \"difficulty_filter\" (default has type \"None\", argument has type \"str\")  [assignment]",
+        "tutorials/run_tutorial.py:120:1: error: Function is missing a return type annotation  [no-untyped-def]",
+        "tutorials/run_tutorial.py:142:1: error: Function is missing a return type annotation  [no-untyped-def]",
+        "tutorials/framework/validation.py:207:43: error: Name \"Tutorial\" is not defined  [name-defined]",
+        "tutorials/framework/validation.py:242:23: error: Name \"TutorialMetadata\" is not defined  [name-defined]",
+        "tutorials/framework/validation.py:273:36: error: Name \"TutorialStep\" is not defined  [name-defined]"
       ],
       "passed": false,
       "exit_code": 1
     },
     "pylint": {
-      "average_score": 8.567499999999999,
+      "average_score": 8.935,
       "module_scores": [
-        9.19,
-        8.31,
-        8.4,
-        8.37
+        9.48,
+        8.85,
+        8.67,
+        8.74
       ],
       "passed": true,
       "recommendation": "Consider addressing pylint warnings"
     },
     "complexity": {
-      "high_complexity_count": 272,
+      "high_complexity_count": 276,
       "high_complexity_functions": [
         {
           "file": "test_coordination_basic.py",
@@ -68,14 +68,14 @@
     },
     "dead_code": {
       "passed": true,
-      "dead_code_count": 19,
-      "dead_code_percentage": 0.81,
+      "dead_code_count": 7,
+      "dead_code_percentage": 0.29,
       "recommendation": "Dead code levels acceptable"
     },
     "type_annotations": {
       "passed": false,
-      "annotation_errors": 1162,
-      "coverage_estimate": 50.34,
+      "annotation_errors": 1185,
+      "coverage_estimate": 50.42,
       "recommendation": "Add type annotations to improve coverage"
     }
   },

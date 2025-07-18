@@ -5,10 +5,7 @@ Tests for the Hook Manager and Real-Time Observability System
 Comprehensive test suite for the observability system components.
 """
 
-import asyncio
 import pytest
-import json
-import time
 from datetime import datetime
 from unittest.mock import Mock, patch, AsyncMock
 

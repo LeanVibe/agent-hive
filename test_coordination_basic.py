@@ -6,11 +6,10 @@ This script tests the basic functionality of coordination system components
 without requiring full integration with the advanced orchestration system.
 """
 
-import asyncio
 import logging
 import sys
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 # Set up logging

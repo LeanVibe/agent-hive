@@ -13,7 +13,7 @@ Usage:
 import argparse
 import re
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 class DocumentationFixer:
     """Automatic documentation issue fixer."""
@@ -225,9 +225,9 @@ def main():
         print(f"\n✅ Applied {len(fixes)} fixes:")
         for fix in fixes:
             print(f"   {fix}")
-        print(f"\n💡 Run validation again to verify fixes: python scripts/validate_documentation.py --all")
+        print("\n💡 Run validation again to verify fixes: python scripts/validate_documentation.py --all")
     else:
-        print(f"\n ℹ️ No fixes needed or applied.")
+        print("\n ℹ️ No fixes needed or applied.")
 
     return 0
 

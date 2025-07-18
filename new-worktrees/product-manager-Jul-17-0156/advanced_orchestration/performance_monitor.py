@@ -5,8 +5,6 @@ This module provides comprehensive performance monitoring, analytics, and optimi
 for the enhanced multi-agent coordination system.
 """
 
-import asyncio
-import json
 import logging
 import time
 from datetime import datetime, timedelta
@@ -17,7 +15,6 @@ import statistics
 import threading
 from collections import defaultdict, deque
 
-from .models import AgentSpecialization, WorkflowType, CoordinationMetrics
 
 
 class PerformanceMetricType(Enum):

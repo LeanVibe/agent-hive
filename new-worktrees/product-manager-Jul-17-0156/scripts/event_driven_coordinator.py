@@ -5,14 +5,12 @@ Real-time coordination system built on accountability infrastructure
 Monitors coordination_alerts.json and triggers intelligent responses
 """
 
-import os
 import json
 import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Set
-import time
+from typing import Dict, List, Any, Set
 import signal
 import sys
 

@@ -6,7 +6,6 @@ Validates coordination crisis prevention capabilities.
 
 import unittest
 import json
-import tempfile
 from datetime import datetime, timedelta
 from scripts.automated_accountability import (
     AutomatedAccountability, 

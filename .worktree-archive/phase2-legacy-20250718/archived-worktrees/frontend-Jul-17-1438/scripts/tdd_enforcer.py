@@ -13,9 +13,8 @@ import sqlite3
 import subprocess
 import sys
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from typing import Dict, List, Tuple
+from dataclasses import dataclass
 import re
 import ast
 
@@ -278,7 +277,7 @@ class TDDEnforcer:
                 violations.append({
                     'type': 'test_deletion',
                     'commit': commit['hash'],
-                    'description': f"Test files deleted without refactoring",
+                    'description': "Test files deleted without refactoring",
                     'severity': 'high',
                     'files': [f['path'] for f in deleted_tests]
                 })
@@ -497,7 +496,7 @@ class TDDEnforcer:
         if not metrics.violations:
             report += "✅ No TDD violations detected\n"
 
-        report += f"""
+        report += """
 ### 💡 Recommendations
 """
 

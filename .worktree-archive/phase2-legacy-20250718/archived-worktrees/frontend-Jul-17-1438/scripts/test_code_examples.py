@@ -11,15 +11,11 @@ Usage:
 """
 
 import argparse
-import asyncio
-import os
 import re
 import sys
-import tempfile
-import traceback
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 import subprocess
 
 @dataclass
@@ -239,7 +235,7 @@ except Exception as e:
         examples = self.extract_code_examples(file_path)
 
         if not examples:
-            print(f"    ℹ️  No testable examples found")
+            print("    ℹ️  No testable examples found")
             return results
 
         for example_id, code in examples:
@@ -305,7 +301,7 @@ except Exception as e:
         report.append("")
 
         # Summary
-        report.append(f"📊 TESTING SUMMARY:")
+        report.append("📊 TESTING SUMMARY:")
         report.append(f"   Total Examples Tested: {total_tests}")
         report.append(f"   ✅ Passed: {status_counts['pass']} ({pass_rate:.1f}%)")
         report.append(f"   ❌ Failed: {status_counts['fail']}")
@@ -398,7 +394,7 @@ def main():
         print(f"\n❌ Testing failed with {failed_tests} failing examples")
         sys.exit(1)
     else:
-        print(f"\n✅ All code examples tested successfully!")
+        print("\n✅ All code examples tested successfully!")
         sys.exit(0)
 
 if __name__ == "__main__":

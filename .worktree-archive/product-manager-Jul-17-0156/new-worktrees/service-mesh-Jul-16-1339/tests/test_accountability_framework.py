@@ -5,10 +5,8 @@ Test-Driven Development requirement for XP quality gate.
 """
 
 import pytest
-import asyncio
 import tempfile
 import json
-from datetime import datetime, timedelta
 from pathlib import Path
 
 # Import the module under test
@@ -16,7 +14,6 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from scripts.accountability_framework import (
     AccountabilityFramework,
-    TaskAssignment,
     TaskStatus,
     EscalationLevel,
     EvidenceRequirement

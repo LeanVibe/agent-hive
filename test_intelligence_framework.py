@@ -11,8 +11,7 @@ import sqlite3
 import tempfile
 import os
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
-import json
+from unittest.mock import Mock, AsyncMock
 
 # Import the modules to test
 from intelligence_framework import (
@@ -20,7 +19,7 @@ from intelligence_framework import (
     AgentIntelligence, IntelligenceLevel, DecisionType
 )
 from agent_coordination_protocols import (
-    AgentCoordinationProtocols, AgentMessage, MessageType, Priority,
+    AgentCoordinationProtocols, MessageType, Priority,
     CoordinationSession, CoordinationStrategy, AgentCapability
 )
 from intelligent_task_allocation import (
@@ -28,14 +27,13 @@ from intelligent_task_allocation import (
     AllocationStrategy, AgentPerformanceProfile
 )
 from performance_monitoring_optimization import (
-    PerformanceMonitoringOptimization, PerformanceMetric, PerformanceMetricType,
-    PerformanceThreshold, AlertLevel, OptimizationAction
+    PerformanceMonitoringOptimization, PerformanceMetricType,
+    AlertLevel
 )
 from advanced_orchestration.models import (
     ResourceRequirements, AgentInfo, AgentStatus, AgentRegistration,
-    AgentMetadata, CoordinatorConfig
+    AgentMetadata
 )
-from ml_enhancements.models import MLConfig
 
 
 class TestIntelligenceFramework:
@@ -844,7 +842,6 @@ class TestIntegration:
             assert decision.confidence > 0.0
 
             # Allocate task to agent (simulate agent allocation)
-            from advanced_orchestration.models import AgentInfo, AgentStatus, AgentRegistration
             from unittest.mock import Mock
 
             # Create mock agent

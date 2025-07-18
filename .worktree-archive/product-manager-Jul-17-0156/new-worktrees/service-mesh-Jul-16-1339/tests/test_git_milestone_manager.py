@@ -10,9 +10,8 @@ import pytest
 import tempfile
 import subprocess
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, AsyncMock
-from datetime import datetime, timedelta
-import json
+from unittest.mock import Mock, patch, AsyncMock
+from datetime import datetime
 import sys
 
 # Add the .claude directory to Python path

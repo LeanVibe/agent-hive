@@ -9,7 +9,7 @@ import pytest
 import asyncio
 import time
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import patch
 
 from advanced_orchestration.performance_monitor import (
     PerformanceMonitor, PerformanceMetric, PerformanceMetricType,

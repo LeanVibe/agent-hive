@@ -4,7 +4,6 @@ Agent Communicator - Drop-in replacement for tmux-based communication
 Provides simple interface for agents to send/receive messages via Redis message bus.
 """
 
-import asyncio
 import logging
 from typing import Optional, Callable, Dict, Any
 from contextlib import asynccontextmanager

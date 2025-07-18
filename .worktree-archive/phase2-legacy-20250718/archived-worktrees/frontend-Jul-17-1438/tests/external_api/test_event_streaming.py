@@ -3,11 +3,7 @@ Tests for EventStreaming component.
 """
 
 import pytest
-import asyncio
-import json
-import gzip
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
 
 pytestmark = pytest.mark.asyncio
 

@@ -12,10 +12,9 @@ import os
 import sqlite3
 import subprocess
 import sys
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from datetime import datetime
+from typing import Dict, List, Tuple
+from dataclasses import dataclass
 import xml.etree.ElementTree as ET
 
 
@@ -406,7 +405,7 @@ class TestCoverageEnforcer:
 
         # Add violations if any
         if violations:
-            report += f"""
+            report += """
 ## ⚠️ Quality Gate Violations
 """
             for i, violation in enumerate(violations, 1):
@@ -414,7 +413,7 @@ class TestCoverageEnforcer:
 
         # Add file-level details if requested
         if detailed and coverage_data.get('files'):
-            report += f"""
+            report += """
 ## 📁 File-Level Coverage
 """
 
@@ -490,7 +489,7 @@ class TestCoverageEnforcer:
         if not recommendations:
             recommendations.append("Coverage is meeting targets - continue current testing practices")
 
-        report_section = f"""
+        report_section = """
 ## 💡 Recommendations
 """
 
@@ -602,7 +601,7 @@ def main():
 
         if result['success']:
             data = result['coverage_data']
-            print(f"✅ Coverage analysis completed")
+            print("✅ Coverage analysis completed")
             print(f"Total Coverage: {data['total_coverage']:.1f}%")
             print(f"Line Coverage: {data['line_coverage']:.1f}%")
             print(f"Branch Coverage: {data['branch_coverage']:.1f}%")

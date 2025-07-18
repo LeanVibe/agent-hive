@@ -11,18 +11,16 @@ Tests cover:
 """
 
 import pytest
-import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import Mock, AsyncMock
 import redis
 
 from external_api.rbac_framework import (
     RBACManager, User, Role, Permission, ResourceType, ActionType,
     PermissionScope, AuthorizationEvaluator
 )
-from external_api.permission_manager import PermissionManager, PermissionCacheManager
-from external_api.rbac_middleware import RBACMiddleware, AuthorizationContext, ResourceMapper
-from external_api.models import ApiRequest, ApiResponse
+from external_api.permission_manager import PermissionManager
+from external_api.rbac_middleware import RBACMiddleware, ResourceMapper
 from external_api.auth_middleware import AuthenticationMiddleware, AuthResult
 
 

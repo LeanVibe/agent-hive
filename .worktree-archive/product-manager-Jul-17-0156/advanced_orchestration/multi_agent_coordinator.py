@@ -8,15 +8,13 @@ agents, including registration, task distribution, load balancing, and fault tol
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Any
 from collections import defaultdict
 import uuid
 
 from .models import (
     AgentInfo, AgentStatus, AgentRegistration, TaskAssignment, TaskStatus,
-    CoordinatorConfig, CoordinatorState, LoadBalancingStrategy, ScalingReason,
-    AgentRegistrationException, TaskDistributionException, ScalingException,
-    ResourceAllocation, ResourceUsage, LoadBalancingMetrics, ScalingMetrics
+    CoordinatorConfig, CoordinatorState, LoadBalancingStrategy, AgentRegistrationException, TaskDistributionException, ResourceUsage, LoadBalancingMetrics, ScalingMetrics
 )
 from .resource_manager import ResourceManager
 from .scaling_manager import ScalingManager

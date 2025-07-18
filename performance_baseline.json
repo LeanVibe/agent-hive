@@ -1,0 +1,94 @@
+{
+  "collection_time": 1.0910837650299072,
+  "system": {
+    "timestamp": "2025-07-18T18:35:21.363405",
+    "python_version": "3.13.5 (main, Jul 11 2025, 22:26:07) [Clang 20.1.4 ]",
+    "cpu_count": 16,
+    "cpu_percent": 6.4,
+    "memory_total": 51539607552,
+    "memory_available": 21450113024,
+    "memory_used": 24469684224,
+    "memory_percent": 58.4,
+    "disk_usage": 94.4,
+    "process_memory": 21086208
+  },
+  "databases": {},
+  "files": {
+    "python_files": 615,
+    "total_lines": 282004,
+    "largest_files": [
+      {
+        "file": "./performance_monitoring_optimization.py",
+        "size_bytes": 61564,
+        "lines": 1573
+      },
+      {
+        "file": "./new-worktrees/product-manager-Jul-17-0156/performance_monitoring_optimization.py",
+        "size_bytes": 61564,
+        "lines": 1573
+      },
+      {
+        "file": "./new-worktrees/product-manager-Jul-17-0156/new-worktrees/service-mesh-Jul-16-1339/performance_monitoring_optimization.py",
+        "size_bytes": 61564,
+        "lines": 1573
+      },
+      {
+        "file": "./new-worktrees/product-manager-Jul-17-0156/cli.py",
+        "size_bytes": 50466,
+        "lines": 1368
+      },
+      {
+        "file": "./new-worktrees/product-manager-Jul-17-0156/new-worktrees/service-mesh-Jul-16-1339/cli.py",
+        "size_bytes": 50466,
+        "lines": 1368
+      },
+      {
+        "file": "./dashboard/enhanced_server.py",
+        "size_bytes": 49568,
+        "lines": 1215
+      },
+      {
+        "file": "./new-worktrees/product-manager-Jul-17-0156/dashboard/enhanced_server.py",
+        "size_bytes": 49568,
+        "lines": 1215
+      },
+      {
+        "file": "./new-worktrees/product-manager-Jul-17-0156/new-worktrees/service-mesh-Jul-16-1339/dashboard/enhanced_server.py",
+        "size_bytes": 49568,
+        "lines": 1215
+      },
+      {
+        "file": "./intelligent_task_allocation.py",
+        "size_bytes": 49525,
+        "lines": 1332
+      },
+      {
+        "file": "./new-worktrees/product-manager-Jul-17-0156/intelligent_task_allocation.py",
+        "size_bytes": 49525,
+        "lines": 1332
+      }
+    ]
+  },
+  "imports": {
+    "json": {
+      "import_time": 1.9073486328125e-06,
+      "success": true
+    },
+    "sqlite3": {
+      "import_time": 9.5367431640625e-07,
+      "success": true
+    },
+    "psutil": {
+      "import_time": 9.5367431640625e-07,
+      "success": true
+    },
+    "pathlib": {
+      "import_time": 0.0,
+      "success": true
+    },
+    "typing": {
+      "import_time": 0.0,
+      "success": true
+    }
+  }
+}

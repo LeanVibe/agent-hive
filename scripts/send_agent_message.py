@@ -221,7 +221,7 @@ def main():
         sys.exit(0 if success else 1)
     else:
         parser.print_help()
-        print(f"\nExamples:")
+        print("\nExamples:")
         print(f"  python {sys.argv[0]} --ping-all")
         print(f"  python {sys.argv[0]} --agent documentation-agent --message 'Hello!'")
         print(f"  python {sys.argv[0]} --test documentation-agent")

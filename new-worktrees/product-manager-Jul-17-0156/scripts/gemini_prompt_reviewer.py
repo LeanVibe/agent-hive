@@ -8,9 +8,8 @@ analyze and suggest improvements for agent prompts.
 
 import subprocess
 import sys
-import json
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict
 
 # Add dashboard logging
 sys.path.append(str(Path(__file__).parent.parent))
@@ -130,7 +129,7 @@ def bulk_review_and_suggest():
         print("✅ No prompts need Gemini review")
         return
 
-    print(f"\n📊 REVIEW SUMMARY:")
+    print("\n📊 REVIEW SUMMARY:")
     print(f"Prompts reviewed: {len(results)}")
     successful_reviews = len([r for r in results if r['success']])
     print(f"Successful reviews: {successful_reviews}")
@@ -164,8 +163,8 @@ def bulk_review_and_suggest():
     except Exception as e:
         print(f"⚠️  Error generating PM suggestions: {e}")
 
-    print(f"\n🎉 Bulk review completed!")
-    print(f"Dashboard: http://localhost:8002")
+    print("\n🎉 Bulk review completed!")
+    print("Dashboard: http://localhost:8002")
 
 def main():
     """Main CLI interface"""

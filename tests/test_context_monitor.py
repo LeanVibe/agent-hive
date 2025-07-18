@@ -5,7 +5,6 @@ Tests extracted from hook_system.py to ensure functionality is preserved
 during refactoring process.
 """
 
-import json
 import pytest
 import sqlite3
 import sys

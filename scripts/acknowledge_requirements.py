@@ -8,7 +8,6 @@ All agents must acknowledge understanding of workflow rules before starting work
 
 import argparse
 import json
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -144,7 +143,7 @@ class RequirementsAcknowledgment:
         """
         if not self.check_acknowledgment(agent_name):
             print(f"❌ COMPLIANCE FAILURE: {agent_name} has not acknowledged requirements v{REQUIREMENTS_VERSION}")
-            print(f"🛡️ ACTION REQUIRED: Run acknowledgment before starting work")
+            print("🛡️ ACTION REQUIRED: Run acknowledgment before starting work")
             return False
         
         print(f"✅ COMPLIANCE VERIFIED: {agent_name} has acknowledged requirements v{REQUIREMENTS_VERSION}")

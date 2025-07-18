@@ -19,8 +19,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Any
-import ast
+from typing import List
 
 @dataclass
 class AccuracyResult:
@@ -466,7 +465,7 @@ class ImplementationVerifier:
         report.append("")
 
         # Summary
-        report.append(f"📊 ACCURACY SUMMARY:")
+        report.append("📊 ACCURACY SUMMARY:")
         report.append(f"   Total Claims Verified: {total_checks}")
         report.append(f"   ✅ Accurate: {status_counts['accurate']} ({status_counts['accurate']/total_checks*100:.1f}%)")
         report.append(f"   ⚠️ Partially Accurate: {status_counts['partially_accurate']}")
@@ -477,7 +476,7 @@ class ImplementationVerifier:
         report.append("")
 
         # Breakdown by category
-        report.append(f"📋 BREAKDOWN BY CATEGORY:")
+        report.append("📋 BREAKDOWN BY CATEGORY:")
         for category, counts in sorted(category_counts.items()):
             total_category = sum(counts.values())
             category_accuracy = ((counts["accurate"] + counts["partially_accurate"]) / total_category * 100) if total_category > 0 else 0
@@ -583,7 +582,7 @@ def main():
         print(f"\\n❌ Accuracy verification failed with {inaccurate_claims} inaccurate claims")
         sys.exit(1)
     else:
-        print(f"\\n✅ All verifiable claims are accurate!")
+        print("\\n✅ All verifiable claims are accurate!")
         sys.exit(0)
 
 if __name__ == "__main__":

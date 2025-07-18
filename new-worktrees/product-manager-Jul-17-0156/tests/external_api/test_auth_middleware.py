@@ -4,9 +4,8 @@ Tests for AuthenticationMiddleware component.
 
 import pytest
 import base64
-import time
 from datetime import datetime
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from external_api.auth_middleware import AuthenticationMiddleware, AuthMethod, Permission, AuthResult
 from external_api.models import ApiRequest

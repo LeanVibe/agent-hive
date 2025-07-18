@@ -7,25 +7,18 @@ and advanced security features for the Agent Hive platform.
 """
 
 import asyncio
-import hashlib
 import logging
-import secrets
-import time
 import uuid
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Tuple, Set
+from typing import Dict, Any, List, Optional, Tuple
 from enum import Enum
-from dataclasses import dataclass, asdict
-import json
-from pathlib import Path
+from dataclasses import dataclass
 
 from passlib.context import CryptContext
-from passlib.hash import bcrypt
 import jwt
-from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
-from external_api.auth_middleware import AuthenticationMiddleware, Permission, AuthResult
-from security.token_manager import SecureTokenManager, TokenType, TokenStatus
+from external_api.auth_middleware import Permission, AuthResult
+from security.token_manager import SecureTokenManager, TokenType
 from config.security_config import get_security_config, SecurityConfigManager
 
 

@@ -6,7 +6,6 @@ Prevents commits that would create oversized PRs
 
 import subprocess
 import sys
-from pathlib import Path
 
 def get_staged_changes():
     """Get number of staged changes"""

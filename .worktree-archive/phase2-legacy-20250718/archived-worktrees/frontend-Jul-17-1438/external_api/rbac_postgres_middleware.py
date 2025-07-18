@@ -6,20 +6,18 @@ authorization with Redis caching, comprehensive audit logging, and seamless
 coordination between database persistence and caching layers.
 """
 
-import asyncio
 import json
 import logging
 import time
 from datetime import datetime
-from typing import Dict, Any, Optional, List, Callable, Tuple
-from dataclasses import dataclass, asdict
+from typing import Dict, Any, Optional, List, Tuple
 from sqlalchemy.orm import sessionmaker
 import redis
 import hashlib
 
-from .models import ApiRequest, ApiResponse
+from .models import ApiRequest
 from .rbac_postgres_manager import PostgreSQLRBACManager
-from .rbac_framework import ResourceType, ActionType, PermissionScope
+from .rbac_framework import ResourceType, ActionType
 from .rbac_middleware import (
     AuthorizationContext, AuthorizationResult, ResourceMapper, 
     AuditLogger as BaseAuditLogger
@@ -29,7 +27,7 @@ from .auth_middleware import AuthResult, AuthenticationMiddleware
 # Import Security Agent's database models
 import sys
 sys.path.append('../security-Jul-17-0944')
-from external_api.database_models import User, Role, PermissionModel, AuditLog
+from external_api.database_models import User, AuditLog
 
 logger = logging.getLogger(__name__)
 

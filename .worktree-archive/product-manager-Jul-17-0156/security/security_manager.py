@@ -9,13 +9,11 @@ input sanitization, audit logging, and access control for production deployment.
 import re
 import logging
 import json
-import hashlib
 import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Set, Tuple
 from dataclasses import dataclass, asdict
 from enum import Enum
-from pathlib import Path
 import sqlite3
 import threading
 from contextlib import contextmanager

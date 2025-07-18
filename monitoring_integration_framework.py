@@ -9,19 +9,16 @@ Integrates all monitoring components into a unified system with:
 - API endpoints for monitoring dashboards
 """
 
-import asyncio
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-import json
 import threading
-from collections import defaultdict
 import psutil
 
 from business_metrics_monitor import BusinessMetricsMonitor, BusinessMetric, BusinessMetricType
-from proactive_alerting_system import ProactiveAlertingSystem, AlertSeverity, AlertCategory
+from proactive_alerting_system import ProactiveAlertingSystem, AlertSeverity
 from distributed_tracing_system import DistributedTracingSystem, WorkflowType
 from monitoring_core import SystemMonitor
 from monitoring_alerts import AlertManager

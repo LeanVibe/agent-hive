@@ -1,7 +1,6 @@
 
 import requests
 import json
-import time
 
 def validate_endpoints():
     base_url = "http://localhost:8000"

@@ -9,10 +9,9 @@ Provides tools to check agent status and resume inactive agents.
 import os
 import subprocess
 import json
-import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 import argparse
 
 
@@ -175,7 +174,7 @@ class AgentMonitor:
                 print(f"    Last activity: {info['last_activity']}")
             print(f"    Path: {info['path']}")
 
-        print(f"\n📊 Summary:")
+        print("\n📊 Summary:")
         print(f"  Total agents: {len(report)}")
         print(f"  Active: {len(active_agents)}")
         print(f"  Inactive: {len(inactive_agents)}")
@@ -227,9 +226,9 @@ class AgentMonitor:
         print(f"📁 Path: {agent_path}")
 
         # Change to agent directory and show instructions
-        print(f"\n📋 To resume this agent, run:")
+        print("\n📋 To resume this agent, run:")
         print(f"  cd {agent_path}")
-        print(f"  claude --resume")
+        print("  claude --resume")
 
         return True
 

@@ -11,7 +11,6 @@ Provides real-time monitoring of agent activities including:
 """
 
 import asyncio
-import json
 import logging
 import psutil
 import subprocess
@@ -20,7 +19,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 

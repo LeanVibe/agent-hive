@@ -6,7 +6,7 @@ integration with the Service Discovery system.
 """
 
 import logging
-from typing import Dict, Any, List
+from typing import List
 from abc import ABC, abstractmethod
 
 

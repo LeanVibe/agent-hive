@@ -6,9 +6,8 @@ Ensures tests exist without blocking development by generating them asynchronous
 """
 
 import asyncio
-import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from config.config_loader import get_config
 from utils.logging_config import get_logger

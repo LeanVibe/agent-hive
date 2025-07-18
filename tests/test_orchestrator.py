@@ -13,7 +13,7 @@ This test suite covers:
 
 import asyncio
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import Mock, patch
 from datetime import datetime
 import sys
 from pathlib import Path

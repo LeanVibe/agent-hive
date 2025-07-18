@@ -10,16 +10,11 @@ and ensures continuous improvement practices for XP methodology compliance.
 import json
 import os
 import sqlite3
-import subprocess
 import sys
-import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 import ast
-import hashlib
 
 
 @dataclass
@@ -914,7 +909,7 @@ def main():
         session = tracker.end_refactoring_session(session_id)
 
         if session:
-            print(f"✅ Refactoring session completed successfully")
+            print("✅ Refactoring session completed successfully")
 
     elif command == "analyze":
         if len(sys.argv) < 3:

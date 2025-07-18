@@ -9,7 +9,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict
 
 class PreventionSystemCoordinator:
     """Coordinates prevention system deployment across all agents"""
@@ -561,7 +561,7 @@ def main():
         
         # Generate report
         report = coordinator.generate_deployment_report()
-        print(f"\\n📊 Deployment Report:")
+        print("\\n📊 Deployment Report:")
         print(json.dumps(report, indent=2))
         
     elif command == "validate":

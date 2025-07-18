@@ -224,35 +224,3 @@ class TutorialManager:
 
         self.save_progress(user_id)
         return True
-<<<<<<< HEAD
-
-    def save_progress(self, user_id: str):
-||||||| 48e9100
-    
-    def save_progress(self, user_id: str):
-=======
-
-    def save_progress(self, user_id: str) -> None:
->>>>>>> new-work/performance-Jul-17-0823
-        """Save user progress to file."""
-        progress_dir = os.path.join(self.tutorial_path, "progress")
-        os.makedirs(progress_dir, exist_ok=True)
-
-        progress_file = os.path.join(progress_dir, f"{user_id}.json")
-
-        progress_data = {}
-        for tutorial_id, progress in self.user_progress.get(user_id, {}).items():
-            progress_data[tutorial_id] = {
-                "user_id": progress.user_id,
-                "tutorial_id": progress.tutorial_id,
-                "current_step": progress.current_step,
-                "status": progress.status.value,
-                "started_at": progress.started_at.isoformat(),
-                "completed_at": progress.completed_at.isoformat() if progress.completed_at else None,
-                "step_progress": {k: v.value for k, v in progress.step_progress.items()},
-                "hints_used": progress.hints_used,
-                "time_spent": progress.time_spent
-            }
-
-        with open(progress_file, 'w') as f:
-            json.dump(progress_data, f, indent=2)

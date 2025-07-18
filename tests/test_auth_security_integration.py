@@ -11,18 +11,17 @@ import asyncio
 import time
 import uuid
 from datetime import datetime, timedelta
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 # Import the security components
 from external_api.auth_middleware import (
     AuthenticationMiddleware, 
     AuthMethod, 
-    Permission, 
-    AuthResult
+    Permission
 )
 from external_api.api_gateway import ApiGateway
 from external_api.models import ApiRequest, ApiGatewayConfig
-from config.security_config import SecurityConfigManager, SecurityLevel, PasswordConfig
+from config.security_config import SecurityConfigManager, SecurityLevel
 from security.security_manager import SecurityManager, RiskLevel
 
 

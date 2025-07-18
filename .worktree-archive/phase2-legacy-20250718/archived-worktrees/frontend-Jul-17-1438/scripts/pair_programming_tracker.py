@@ -8,16 +8,12 @@ and ensures XP methodology compliance for collective code ownership.
 """
 
 import json
-import os
 import sqlite3
 import subprocess
 import sys
-import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 
 @dataclass
@@ -727,7 +723,7 @@ def main():
 
         session = tracker.end_pair_session(session_id, notes)
         if session:
-            print(f"Session ended successfully")
+            print("Session ended successfully")
 
     elif command == "active":
         with sqlite3.connect(tracker.db_path) as conn:

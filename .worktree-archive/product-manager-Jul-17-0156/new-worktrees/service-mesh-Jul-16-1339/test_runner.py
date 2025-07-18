@@ -9,10 +9,8 @@ performance benchmarking, and quality gate validation.
 import argparse
 import subprocess
 import sys
-import os
 import json
 import time
-from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 

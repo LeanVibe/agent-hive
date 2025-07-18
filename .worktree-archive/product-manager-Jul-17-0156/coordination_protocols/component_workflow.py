@@ -5,15 +5,12 @@ This module implements structured workflows for coordinating large PR breakdowns
 across multiple agents while maintaining quality gates and coordination protocols.
 """
 
-import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
-import json
 
-from ..feedback_loops import FeedbackSignal, FeedbackType, FeedbackPriority
 
 
 class ComponentStatus(Enum):

@@ -7,14 +7,11 @@ with hierarchical roles, granular permissions, and high-performance caching.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Set, Tuple
+from datetime import datetime
+from typing import Dict, Any, Optional, List
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import and_, or_, text
 import redis
-import hashlib
-import json
 
 # Import Security Agent's database models
 import sys
@@ -31,7 +28,7 @@ from .rbac_framework import (
     User as RBACUser,
     AuthorizationEvaluator
 )
-from .permission_manager import PermissionManager, PermissionCacheManager
+from .permission_manager import PermissionManager
 
 logger = logging.getLogger(__name__)
 

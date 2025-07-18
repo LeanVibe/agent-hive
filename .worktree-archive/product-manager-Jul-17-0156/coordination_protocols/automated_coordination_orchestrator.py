@@ -8,15 +8,14 @@ throughout the component development process.
 
 import asyncio
 import logging
-import json
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Set
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import uuid
 
 from .cross_agent_protocols import CrossAgentCoordinator, CoordinationMessage, CoordinationMessageType, MessagePriority, AgentRole
-from .component_workflow import ComponentWorkflowManager, ComponentStatus, ComponentPriority
+from .component_workflow import ComponentWorkflowManager
 from ..feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
 
 

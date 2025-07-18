@@ -5,14 +5,13 @@ Tests the complete integration between Service Discovery, API Gateway, and clien
 
 import pytest
 import asyncio
-import json
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
 from external_api.service_discovery import ServiceDiscovery, ServiceInstance, ServiceStatus
 from external_api.service_discovery_api import ServiceDiscoveryAPI, create_service_discovery_api
 from external_api.api_gateway import ApiGateway
-from external_api.models import ApiGatewayConfig, ApiRequest, ApiResponse
+from external_api.models import ApiGatewayConfig, ApiRequest
 from external_api.client_generators import ClientLibraryFactory, PythonClientGenerator, JavaScriptClientGenerator
 
 

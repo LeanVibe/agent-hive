@@ -9,7 +9,6 @@ Enhanced middleware that integrates with the RBAC framework to provide:
 - Comprehensive audit logging
 """
 
-import asyncio
 import json
 import logging
 import time
@@ -19,8 +18,8 @@ from dataclasses import dataclass
 from functools import wraps
 import redis
 
-from .models import ApiRequest, ApiResponse
-from .rbac_framework import RBACManager, ResourceType, ActionType, PermissionScope
+from .models import ApiRequest
+from .rbac_framework import RBACManager, ResourceType, ActionType
 from .permission_manager import PermissionManager
 from .auth_middleware import AuthResult, AuthenticationMiddleware
 

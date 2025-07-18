@@ -93,7 +93,7 @@ class PRComplianceValidator:
         
         total_lines = stats["total_lines"]
         
-        print(f"📊 PR STATISTICS:")
+        print("📊 PR STATISTICS:")
         print(f"   Files changed: {stats['files']}")
         print(f"   Insertions: {stats['insertions']}")
         print(f"   Deletions: {stats['deletions']}")
@@ -101,19 +101,19 @@ class PRComplianceValidator:
         print(f"   Limit: {self.max_lines}")
         
         if total_lines > self.max_lines:
-            print(f"\n🚨 PR SIZE VIOLATION DETECTED!")
+            print("\n🚨 PR SIZE VIOLATION DETECTED!")
             print(f"   Current: {total_lines} lines")
             print(f"   Limit: {self.max_lines} lines")
             print(f"   Violation: {total_lines - self.max_lines} lines over limit")
             print(f"   Ratio: {total_lines / self.max_lines:.1f}x over limit")
             
-            print(f"\n⚠️  REQUIRED ACTIONS:")
-            print(f"   1. STOP - Do not commit this PR")
-            print(f"   2. BREAK DOWN - Split into multiple PRs")
+            print("\n⚠️  REQUIRED ACTIONS:")
+            print("   1. STOP - Do not commit this PR")
+            print("   2. BREAK DOWN - Split into multiple PRs")
             print(f"   3. RESUBMIT - Each PR must be <{self.max_lines} lines")
-            print(f"   4. VALIDATE - Check each PR before commit")
+            print("   4. VALIDATE - Check each PR before commit")
             
-            print(f"\n📋 BREAKDOWN STRATEGY:")
+            print("\n📋 BREAKDOWN STRATEGY:")
             suggested_prs = (total_lines // self.max_lines) + 1
             print(f"   Suggested PRs: {suggested_prs}")
             print(f"   Target size: ~{total_lines // suggested_prs} lines per PR")
@@ -167,10 +167,10 @@ class PRComplianceValidator:
                     warnings.append(pattern)
             
             if warnings:
-                print(f"\n⚠️  POTENTIAL CONCERNS:")
+                print("\n⚠️  POTENTIAL CONCERNS:")
                 for warning in warnings:
                     print(f"   - {warning}")
-                print(f"   Review these changes carefully")
+                print("   Review these changes carefully")
             
             return True
             

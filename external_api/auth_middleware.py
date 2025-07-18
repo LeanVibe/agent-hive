@@ -1,16 +1,33 @@
 """
 Authentication Middleware for API Gateway
 
-Provides basic authentication mechanisms for external API access.
+Provides advanced authentication mechanisms including JWT tokens,
+OAuth 2.0, API key validation, and role-based access control.
 """
 
+import asyncio
+import hashlib
+import hmac
+import json
 import logging
-from typing import Dict, Any, Optional, List
+import time
+from datetime import datetime, timedelta
+from typing import Dict, Any, Optional, List, Callable, Tuple
 from enum import Enum
+import uuid
+from passlib.context import CryptContext
+from passlib.hash import bcrypt
+import jwt
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
-from .models import ApiRequest
+from .models import ApiRequest, ApiResponse
+from config.security_config import get_auth_config, get_security_config
+
 
 logger = logging.getLogger(__name__)
+
+# Password context for secure hashing - will be configured based on security settings
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class AuthMethod(Enum):
@@ -44,45 +61,22 @@ class AuthResult:
 
 
 class AuthenticationMiddleware:
-    """Basic authentication middleware."""
+    """
+    Advanced authentication middleware with multiple auth methods.
+
+    Supports API keys, JWT tokens, OAuth 2.0, request signing,
+    and role-based access control.
+    """
 
     def __init__(self, config: Dict[str, Any]):
-        """Initialize authentication middleware."""
+        """
+        Initialize authentication middleware.
+
+        Args:
+            config: Authentication configuration
+        """
         self.config = config
-        self.api_keys: Dict[str, Dict[str, Any]] = {}
-        logger.info("AuthenticationMiddleware initialized")
-
-    async def authenticate_request(self, request: ApiRequest) -> AuthResult:
-        """Authenticate an API request."""
-        # Basic API key authentication
-        api_key = request.headers.get("X-API-Key") or request.headers.get("Authorization", "").replace("Bearer ", "")
-        
-        if not api_key:
-            return AuthResult(success=False, error="API key required")
-        
-        # Security fix: Reject if no API keys are configured
-        if not self.api_keys:
-            logger.warning("No API keys configured - rejecting all requests")
-            return AuthResult(success=False, error="Authentication not configured")
-        
-        if api_key not in self.api_keys:
-            return AuthResult(success=False, error="Invalid API key")
-        
-        key_data = self.api_keys[api_key]
-        if not key_data.get("active", True):
-            return AuthResult(success=False, error="API key is inactive")
-        
-        return AuthResult(
-            success=True,
-            user_id=key_data.get("user_id"),
-            permissions=[Permission.READ, Permission.WRITE]
-        )
-
-    def register_api_key(self, api_key: str, user_id: str, active: bool = True):
-        """Register an API key."""
-        self.api_keys[api_key] = {
-            "user_id": user_id,
-            "active": active,
-            "permissions": ["read", "write"]
-        }
-        logger.info(f"Registered API key for user {user_id}")
+        self.enabled_methods = config.get("enabled_methods", [AuthMethod.API_KEY])
+        self.jwt_secret = config.get("jwt_secret", "default-secret")
+        self.jwt_algorithm = config.get("jwt_algorithm", "HS256")
+        self.token_expiry = config.get("token_expiry_hours", 24)
