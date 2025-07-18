@@ -11,13 +11,9 @@ Demonstrates the complete monitoring system with:
 
 import asyncio
 import logging
-import time
-from datetime import datetime, timedelta
 import random
 
 from monitoring_integration_framework import MonitoringIntegrationFramework
-from business_metrics_monitor import BusinessMetricType
-from distributed_tracing_system import WorkflowType
 
 
 async def main():
@@ -131,14 +127,14 @@ async def main():
         print(f"   Traces Completed: {framework_status['traces_completed']}")
         
         # Component health
-        print(f"\n🩺 Component Health:")
+        print("\n🩺 Component Health:")
         for component, healthy in framework_status["component_health"].items():
             status = "✅ Healthy" if healthy else "❌ Unhealthy"
             print(f"   {component}: {status}")
         
         # Business metrics
         business = dashboard["business_metrics"]
-        print(f"\n💼 Business Metrics:")
+        print("\n💼 Business Metrics:")
         print(f"   Active Tasks: {business.get('active_tasks', 0)}")
         print(f"   Active Conflicts: {business.get('active_conflicts', 0)}")
         print(f"   Hourly Throughput: {business.get('total_hourly_throughput', 0)}")
@@ -146,7 +142,7 @@ async def main():
         
         # Alerts
         alerts = dashboard["alerts"]
-        print(f"\n🚨 Alerts:")
+        print("\n🚨 Alerts:")
         print(f"   Active Alerts: {alerts['summary'].get('active_alerts_total', 0)}")
         print(f"   Critical: {alerts['summary'].get('active_by_level', {}).get('critical', 0)}")
         print(f"   Warning: {alerts['summary'].get('active_by_level', {}).get('warning', 0)}")
@@ -154,7 +150,7 @@ async def main():
         
         # Distributed tracing
         tracing = dashboard["distributed_tracing"]
-        print(f"\n🔍 Distributed Tracing:")
+        print("\n🔍 Distributed Tracing:")
         print(f"   Active Workflows: {tracing.get('active_workflows', 0)}")
         print(f"   Active Agents: {tracing.get('active_agents', 0)}")
         print(f"   Total Spans: {tracing.get('total_spans_tracked', 0)}")
@@ -162,24 +158,24 @@ async def main():
         
         # System health
         health = dashboard["system_health"]
-        print(f"\n💚 System Health:")
+        print("\n💚 System Health:")
         print(f"   Overall Score: {health.get('overall_score', 0):.2f}")
         print(f"   Status: {health.get('status', 'unknown')}")
         
         if health.get('recommendations'):
-            print(f"   Recommendations:")
+            print("   Recommendations:")
             for rec in health['recommendations'][:3]:
                 print(f"     • {rec}")
         
         # System metrics
         system = dashboard["system_metrics"]
-        print(f"\n💻 System Metrics:")
+        print("\n💻 System Metrics:")
         print(f"   CPU: {system.get('cpu_percent', 0):.1f}%")
         print(f"   Memory: {system.get('memory_percent', 0):.1f}%")
         print(f"   Disk: {system.get('disk_percent', 0):.1f}%")
         
         # Demonstrate agent performance
-        print(f"\n👤 Agent Performance:")
+        print("\n👤 Agent Performance:")
         for i in range(2, 5):
             agent_id = f"agent_{i}"
             perf = monitoring.get_agent_performance(agent_id)
@@ -194,20 +190,20 @@ async def main():
         # Show active predictive alerts
         predictive_alerts = monitoring.proactive_alerting.get_active_predictive_alerts()
         if predictive_alerts:
-            print(f"\n🔮 Predictive Alerts:")
+            print("\n🔮 Predictive Alerts:")
             for alert in predictive_alerts[:3]:  # Show top 3
                 print(f"   {alert.severity.value.upper()}: {alert.metric_name}")
                 print(f"     Current: {alert.current_value:.2f} → Predicted: {alert.predicted_value:.2f}")
                 print(f"     Confidence: {alert.confidence:.1%}")
                 print(f"     Recommendation: {alert.recommendation}")
         
-        print(f"\n🎉 Demo completed successfully!")
-        print(f"📊 Monitoring framework is production-ready with:")
-        print(f"   ✅ Agent-level business metrics")
-        print(f"   ✅ Proactive alerting with ML-based anomaly detection")
-        print(f"   ✅ Distributed tracing for end-to-end visibility")
-        print(f"   ✅ Integrated health monitoring")
-        print(f"   ✅ Real-time dashboards and APIs")
+        print("\n🎉 Demo completed successfully!")
+        print("📊 Monitoring framework is production-ready with:")
+        print("   ✅ Agent-level business metrics")
+        print("   ✅ Proactive alerting with ML-based anomaly detection")
+        print("   ✅ Distributed tracing for end-to-end visibility")
+        print("   ✅ Integrated health monitoring")
+        print("   ✅ Real-time dashboards and APIs")
         
     except Exception as e:
         logger.error(f"Demo failed: {e}")
@@ -215,9 +211,9 @@ async def main():
     
     finally:
         # Cleanup
-        print(f"\n🧹 Shutting down monitoring framework...")
+        print("\n🧹 Shutting down monitoring framework...")
         await monitoring.shutdown()
-        print(f"✅ Shutdown complete")
+        print("✅ Shutdown complete")
 
 
 if __name__ == "__main__":

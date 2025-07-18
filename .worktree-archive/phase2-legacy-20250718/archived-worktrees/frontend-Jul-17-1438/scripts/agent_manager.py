@@ -10,9 +10,9 @@ import os
 import subprocess
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 import argparse
 
 
@@ -265,7 +265,7 @@ class TmuxAgentManager:
         print(f"📁 Working directory: {agent['path']}")
         print(f"💬 Command: {claude_cmd}")
         if with_prompt:
-            print(f"🚀 Starting prompt sent")
+            print("🚀 Starting prompt sent")
 
         return True
 
@@ -337,7 +337,7 @@ class TmuxAgentManager:
                 print(f"❌ {agent_name} - NOT SPAWNED")
                 print(f"   📁 {info['path']}")
 
-        print(f"\n📊 Summary:")
+        print("\n📊 Summary:")
         print(f"  Total agents: {len(status)}")
         print(f"  Active windows: {active_count}")
         print(f"  Inactive/Missing: {inactive_count}")
@@ -356,7 +356,7 @@ class TmuxAgentManager:
             return
 
         print(f"🔗 Attaching to agent '{agent_name}'...")
-        print(f"💡 Press Ctrl+B then D to detach")
+        print("💡 Press Ctrl+B then D to detach")
 
         # Use os.system to replace current process with tmux attach
         os.system(f"tmux select-window -t {self.session_name}:{window_name} && tmux attach-session -t {self.session_name}")

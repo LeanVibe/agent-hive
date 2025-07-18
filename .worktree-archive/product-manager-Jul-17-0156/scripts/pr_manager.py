@@ -13,10 +13,9 @@ import sqlite3
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
 import re
 
 
@@ -562,7 +561,7 @@ class PRManager:
 
         # Add recommendations
         if review.recommendations:
-            report += f"""
+            report += """
 ### 💡 Recommendations
 """
             for i, rec in enumerate(review.recommendations, 1):

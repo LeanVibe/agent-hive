@@ -5,10 +5,9 @@ Automated enforcement of performance and code quality standards.
 """
 
 from datetime import datetime
-from pathlib import Path
+from typing import Dict, List, Any, Optional
 import json
 import os
-import subprocess
 import sys
 import time
 
@@ -206,16 +205,74 @@ class EnhancedQualityGatesSystem:
         self.results: Dict[str, Any] = {}
         self.setup_gates()
 
+    def load_config(self, config_path: str = "quality_gates_config.json") -> Dict[str, Any]:
+        """Load configuration from file."""
+        try:
+            if os.path.exists(config_path):
+                with open(config_path, 'r') as f:
+                    return json.load(f)
+            else:
+                # Return default configuration
+                return {
+                    "quality_gates": {
+                        "performance": {
+                            "memory_usage_threshold": 80.0,
+                            "cpu_usage_threshold": 90.0,
+                            "collection_time_threshold": 5.0,
+                            "critical": True,
+                            "enabled": True
+                        },
+                        "code_quality": {
+                            "mypy_errors_threshold": 10,
+                            "pylint_issues_multiplier": 10,
+                            "complexity_threshold": 10,
+                            "critical": True,
+                            "enabled": True
+                        },
+                        "security": {
+                            "bandit_issues_threshold": 0,
+                            "safety_issues_threshold": 0,
+                            "audit_issues_threshold": 0,
+                            "critical": True,
+                            "enabled": True
+                        }
+                    }
+                }
+        except Exception as e:
+            print(f"Warning: Could not load config from {config_path}: {e}")
+            return self.load_config()  # Return default
+
     def setup_gates(self):
-        """Setup quality gates with appropriate thresholds."""
+        """Setup quality gates with configuration-based thresholds."""
+        config = self.load_config()
+        gates_config = config.get("quality_gates", {})
+        
         # Performance gates
-        self.gates.append(PerformanceGate("Memory Usage", 80.0, critical=True))
-
+        perf_config = gates_config.get("performance", {})
+        if perf_config.get("enabled", True):
+            self.gates.append(PerformanceGate(
+                "Memory Usage", 
+                perf_config.get("memory_usage_threshold", 80.0),
+                critical=perf_config.get("critical", True)
+            ))
+        
         # Code quality gates
-        self.gates.append(CodeQualityGate("Code Quality", 10.0, critical=True))
-
+        quality_config = gates_config.get("code_quality", {})
+        if quality_config.get("enabled", True):
+            self.gates.append(CodeQualityGate(
+                "Code Quality", 
+                quality_config.get("mypy_errors_threshold", 10.0),
+                critical=quality_config.get("critical", True)
+            ))
+        
         # Security gates
-        self.gates.append(SecurityGate("Security", 0.0, critical=True))
+        security_config = gates_config.get("security", {})
+        if security_config.get("enabled", True):
+            self.gates.append(SecurityGate(
+                "Security", 
+                security_config.get("bandit_issues_threshold", 0.0),
+                critical=security_config.get("critical", True)
+            ))
 
     def run_all_gates(self) -> Dict[str, Any]:
         """Run all quality gates and return results."""
@@ -359,9 +416,9 @@ def main():
     with open('quality_gates_enhanced_report.txt', 'w') as f:
         f.write(report)
 
-    print(f"\n💾 Results saved to:")
-    print(f"   - quality_gates_enhanced.json (raw data)")
-    print(f"   - quality_gates_enhanced_report.txt (formatted report)")
+    print("\n💾 Results saved to:")
+    print("   - quality_gates_enhanced.json (raw data)")
+    print("   - quality_gates_enhanced_report.txt (formatted report)")
 
     # Enforce gates
     if system.enforce_gates():

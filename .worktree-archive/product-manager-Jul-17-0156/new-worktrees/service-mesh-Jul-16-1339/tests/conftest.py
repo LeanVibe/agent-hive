@@ -10,7 +10,7 @@ import asyncio
 import tempfile
 import shutil
 from pathlib import Path
-from typing import Dict, Any, AsyncGenerator
+from typing import Dict, Any
 from unittest.mock import AsyncMock, MagicMock
 from datetime import datetime
 

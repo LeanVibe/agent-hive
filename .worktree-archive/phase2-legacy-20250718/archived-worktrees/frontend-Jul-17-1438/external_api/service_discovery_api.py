@@ -10,12 +10,11 @@ import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 import uvicorn
 
-from .service_discovery import ServiceDiscovery, ServiceInstance, ServiceStatus
+from .service_discovery import ServiceDiscovery, ServiceInstance
 
 
 logger = logging.getLogger(__name__)

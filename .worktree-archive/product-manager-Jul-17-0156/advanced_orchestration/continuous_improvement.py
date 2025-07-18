@@ -8,23 +8,17 @@ enhance multi-agent collaboration efficiency.
 
 import asyncio
 import logging
-import json
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any, Set
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 from collections import defaultdict, deque
 import statistics
-import uuid
 import threading
 
 from .performance_monitor import PerformanceMonitor, PerformanceMetric, PerformanceMetricType
 from .analytics_dashboard import AnalyticsDashboard
-from .models import (
-    AgentSpecialization, WorkflowType, CoordinationMetrics,
-    AgentCapabilities, TaskDependency, DependencyType
-)
 
 
 class ImprovementType(Enum):
@@ -599,7 +593,7 @@ class ContinuousImprovementEngine:
                     id=f"coord_efficiency_{hash(combo)}",
                     type=ImprovementType.COORDINATION_EFFICIENCY,
                     priority=ImprovementPriority.MEDIUM,
-                    title=f"Improve agent combination efficiency",
+                    title="Improve agent combination efficiency",
                     description=f"Agent combination {combo} has low efficiency ({efficiency:.2f})",
                     current_state={"efficiency": efficiency},
                     target_state={"efficiency": 0.8},

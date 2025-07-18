@@ -2,7 +2,6 @@
 Integration tests for ML Enhancement components working together.
 """
 
-import json
 import pytest
 import tempfile
 from datetime import datetime
@@ -15,7 +14,6 @@ from ml_enhancements import (
     AdaptiveLearning,
     MLConfig
 )
-from advanced_orchestration import MultiAgentCoordinator
 
 
 class TestMLComponentsIntegration:

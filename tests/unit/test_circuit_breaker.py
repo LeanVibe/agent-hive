@@ -5,9 +5,7 @@ Tests the circuit breaker pattern implementation used for CLI resilience.
 """
 
 import pytest
-import asyncio
 import time
-from unittest.mock import AsyncMock
 
 # Import the component under test
 import sys

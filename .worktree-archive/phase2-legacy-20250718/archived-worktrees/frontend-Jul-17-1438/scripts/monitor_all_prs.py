@@ -12,7 +12,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 
 # Add dashboard logging
 sys.path.append(str(Path(__file__).parent.parent))
@@ -48,14 +48,14 @@ def check_pr_quality_gates(pr: Dict[str, Any]) -> bool:
     # Review check
     review_decision = pr.get('reviewDecision', '')
     if review_decision == 'APPROVED':
-        print(f"  ✅ Reviews: Approved")
+        print("  ✅ Reviews: Approved")
     else:
         print(f"  ❌ Reviews: {review_decision or 'Pending'}")
         return False
 
     # Mergeable check
     if pr.get('mergeable') == 'MERGEABLE':
-        print(f"  ✅ Mergeable: Yes")
+        print("  ✅ Mergeable: Yes")
     else:
         print(f"  ❌ Mergeable: {pr.get('mergeable', 'Unknown')}")
         return False
@@ -204,7 +204,7 @@ Great work on the component-based approach!"""
                     notify_agents_about_pr_status()
                     last_notification = current_time
 
-            print(f"⏳ Next check in 300 seconds...")
+            print("⏳ Next check in 300 seconds...")
             time.sleep(300)  # Check every 5 minutes
 
         except KeyboardInterrupt:

@@ -2,7 +2,6 @@
 Tests for enhanced coordination protocols.
 """
 
-import asyncio
 import pytest
 import pytest_asyncio
 from datetime import datetime, timedelta

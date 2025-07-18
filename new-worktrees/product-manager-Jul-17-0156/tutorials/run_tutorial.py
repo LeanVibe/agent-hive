@@ -7,9 +7,7 @@ with progress tracking, validation, and guided learning.
 """
 
 import sys
-import os
 import argparse
-import asyncio
 from pathlib import Path
 
 # Add the tutorial framework to the path
@@ -151,7 +149,7 @@ def validate_tutorials(manager: TutorialManager):
         # Validate steps
         for step in tutorial.steps:
             if not step.step_id:
-                print(f"  ❌ Step missing step_id")
+                print("  ❌ Step missing step_id")
                 all_valid = False
 
             if not step.instructions:

@@ -1,0 +1,44 @@
+{
+  "quality_gates": {
+    "performance": {
+      "memory_usage_threshold": 80.0,
+      "cpu_usage_threshold": 90.0,
+      "collection_time_threshold": 5.0,
+      "critical": true,
+      "enabled": true
+    },
+    "code_quality": {
+      "mypy_errors_threshold": 10,
+      "pylint_issues_multiplier": 10,
+      "complexity_threshold": 10,
+      "flake8_threshold": 50,
+      "critical": true,
+      "enabled": true
+    },
+    "security": {
+      "bandit_issues_threshold": 0,
+      "safety_issues_threshold": 0,
+      "audit_issues_threshold": 0,
+      "critical": true,
+      "enabled": true
+    },
+    "test_coverage": {
+      "coverage_threshold": 75.0,
+      "critical": false,
+      "enabled": false
+    }
+  },
+  "reporting": {
+    "output_format": "both",
+    "save_json": true,
+    "save_text": true,
+    "include_details": true
+  },
+  "remediation": {
+    "run_ruff_fix": true,
+    "run_manual_fixes": true,
+    "run_test_suite": true,
+    "max_files_manual": 50,
+    "timeout_seconds": 300
+  }
+}

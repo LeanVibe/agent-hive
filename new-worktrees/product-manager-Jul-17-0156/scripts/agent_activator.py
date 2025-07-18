@@ -6,13 +6,11 @@ Solves the issue of Claude Code sessions waiting for manual input.
 
 import argparse
 import asyncio
-import json
 import logging
 import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import List, Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -35,7 +33,7 @@ class AgentActivator:
 
         # Step 2: Check if Claude Code is responsive
         if not await self._check_claude_responsiveness(agent_id):
-            logger.warning(f"⚠️ Claude Code not responsive, restarting...")
+            logger.warning("⚠️ Claude Code not responsive, restarting...")
             if not await self._restart_claude_code(agent_id):
                 return False
 

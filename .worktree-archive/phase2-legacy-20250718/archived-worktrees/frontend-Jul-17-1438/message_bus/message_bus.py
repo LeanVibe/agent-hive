@@ -9,7 +9,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Callable, Any, Set
+from typing import Dict, List, Optional, Callable, Set
 from contextlib import asynccontextmanager
 
 try:
@@ -17,7 +17,7 @@ try:
 except ImportError:
     redis = None
 
-from .message_protocol import AgentMessage, MessageDeliveryStatus, MessagePriority
+from .message_protocol import AgentMessage, MessageDeliveryStatus
 
 
 logger = logging.getLogger(__name__)

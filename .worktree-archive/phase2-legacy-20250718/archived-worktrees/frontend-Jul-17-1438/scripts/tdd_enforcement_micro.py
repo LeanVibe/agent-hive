@@ -7,12 +7,9 @@ This micro-component handles ONLY Test-Driven Development (TDD) enforcement.
 Follows XP Small Releases principle: ≤400 lines, single responsibility.
 """
 
-import json
 import sqlite3
-import subprocess
-import os
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -319,7 +316,7 @@ def main():
         patterns = sys.argv[2:] if len(sys.argv) > 2 else None
         metric = tdd_enforcer.scan_tdd_compliance(patterns)
 
-        print(f"TDD Compliance Scan Results:")
+        print("TDD Compliance Scan Results:")
         print(f"  Total Files: {metric.total_files}")
         print(f"  Files with Tests: {metric.files_with_tests}")
         print(f"  Coverage: {metric.coverage_percentage:.1f}%")
@@ -361,7 +358,7 @@ def main():
         metric = tdd_enforcer.get_latest_tdd_metric()
 
         if metric:
-            print(f"Latest TDD Compliance Metric:")
+            print("Latest TDD Compliance Metric:")
             print(f"  Score: {metric.tdd_compliance_score:.1f}/100")
             print(f"  Coverage: {metric.coverage_percentage:.1f}%")
             print(f"  Files: {metric.files_with_tests}/{metric.total_files}")

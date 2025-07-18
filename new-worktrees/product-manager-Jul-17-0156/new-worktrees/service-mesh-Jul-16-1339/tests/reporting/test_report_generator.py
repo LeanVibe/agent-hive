@@ -20,12 +20,10 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
-from unittest.mock import Mock, patch
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
 
-from state.state_manager import StateManager, AgentState, TaskState
 
 
 @dataclass

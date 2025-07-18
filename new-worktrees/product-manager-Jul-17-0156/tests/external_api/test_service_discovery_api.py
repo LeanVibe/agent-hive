@@ -3,11 +3,9 @@ Tests for Service Discovery REST API.
 """
 
 import pytest
-import asyncio
-from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
-from external_api.service_discovery import ServiceDiscovery, ServiceInstance, ServiceStatus
+from external_api.service_discovery import ServiceDiscovery
 from external_api.service_discovery_api import ServiceDiscoveryAPI, create_service_discovery_api
 
 

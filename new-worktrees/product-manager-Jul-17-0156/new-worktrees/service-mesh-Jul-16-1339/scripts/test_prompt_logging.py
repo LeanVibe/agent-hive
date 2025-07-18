@@ -52,7 +52,7 @@ def test_prompt_logging():
 
     # Test statistics
     stats = prompt_logger.get_prompt_stats()
-    print(f"📊 Statistics:")
+    print("📊 Statistics:")
     print(f"  Total prompts: {stats['total_prompts']}")
     print(f"  Success rate: {stats['success_rate']:.1%}")
     print(f"  Needs review: {stats['needs_review']}")

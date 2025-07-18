@@ -7,11 +7,10 @@ Comprehensive test suite for the observability baseline metrics components.
 
 import pytest
 import json
-import time
 import tempfile
 import os
 from datetime import datetime, timedelta
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 import sqlite3
 
 from observability.baseline_metrics import (

@@ -9,14 +9,11 @@ Provides comprehensive validation for tutorial content including:
 """
 
 import subprocess
-import re
 import ast
 import time
-import asyncio
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from pathlib import Path
-import json
 import tempfile
 import os
 
@@ -141,7 +138,7 @@ class StepValidator:
                 else:
                     return ValidationResult(
                         success=False,
-                        message=f"Python code execution failed",
+                        message="Python code execution failed",
                         error=result.stderr,
                         execution_time=execution_time
                     )
@@ -441,7 +438,6 @@ class TutorialTestRunner:
 def run_validation_cli():
     """Run validation from command line."""
     import sys
-    from pathlib import Path
 
     # Add tutorial framework to path
     sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -464,7 +460,7 @@ def run_validation_cli():
     total_tutorials = len(reports)
     successful_tutorials = sum(1 for r in reports.values() if r.overall_success)
 
-    print(f"\n📊 Validation Summary:")
+    print("\n📊 Validation Summary:")
     print(f"Successful tutorials: {successful_tutorials}/{total_tutorials}")
 
     if total_tutorials > 0:

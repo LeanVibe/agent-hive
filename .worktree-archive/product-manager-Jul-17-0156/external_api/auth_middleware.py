@@ -5,18 +5,17 @@ Provides advanced authentication mechanisms including JWT tokens,
 OAuth 2.0, API key validation, and role-based access control.
 """
 
-import asyncio
 import hashlib
 import hmac
 import json
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, List
 from enum import Enum
 import uuid
 
-from .models import ApiRequest, ApiResponse
+from .models import ApiRequest
 
 
 logger = logging.getLogger(__name__)
@@ -501,7 +500,7 @@ class AuthenticationMiddleware:
         """Blacklist a JWT token."""
         if token in self.jwt_tokens:
             self.jwt_tokens[token]["blacklisted"] = True
-            logger.info(f"Blacklisted JWT token")
+            logger.info("Blacklisted JWT token")
             return True
         return False
 

@@ -7,12 +7,10 @@ This micro-component handles ONLY core sprint planning functionality.
 Follows XP Small Releases principle: ≤500 lines, single responsibility.
 """
 
-import json
-import os
 import sqlite3
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 
 @dataclass

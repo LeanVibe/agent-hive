@@ -8,21 +8,20 @@ all ML components, decision-making, and agent intelligence capabilities.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import json
 import sqlite3
-from pathlib import Path
 
 from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
 from advanced_orchestration.models import (
-    CoordinatorConfig, AgentInfo, TaskAssignment, CoordinatorState
+    CoordinatorConfig, AgentInfo, CoordinatorState
 )
 from ml_enhancements.adaptive_learning import AdaptiveLearning
 from ml_enhancements.predictive_analytics import PredictiveAnalytics
 from ml_enhancements.pattern_optimizer import PatternOptimizer
-from ml_enhancements.models import MLConfig, LearningMetrics, AnalyticsResult
+from ml_enhancements.models import MLConfig
 
 
 logger = logging.getLogger(__name__)

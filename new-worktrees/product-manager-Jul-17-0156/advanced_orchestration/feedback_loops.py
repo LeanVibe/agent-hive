@@ -8,7 +8,6 @@ data and coordination patterns.
 
 import asyncio
 import logging
-import json
 import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple, Any, Callable, Set
@@ -16,16 +15,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from collections import defaultdict, deque
 import statistics
-import uuid
-import threading
-from concurrent.futures import ThreadPoolExecutor
 
 from .performance_monitor import PerformanceMonitor, PerformanceMetric, PerformanceMetricType
 from .continuous_improvement import ContinuousImprovementEngine, ImprovementOpportunity
-from .models import (
-    AgentSpecialization, WorkflowType, CoordinationMetrics,
-    AgentCapabilities, TaskDependency, DependencyType
-)
 
 
 class FeedbackType(Enum):

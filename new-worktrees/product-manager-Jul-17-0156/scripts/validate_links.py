@@ -16,8 +16,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
-import urllib.parse
+from typing import Dict, List, Optional, Set
 
 @dataclass
 class LinkValidationResult:
@@ -407,7 +406,7 @@ class LinkValidator:
         report.append("")
 
         # Summary
-        report.append(f"📊 VALIDATION SUMMARY:")
+        report.append("📊 VALIDATION SUMMARY:")
         report.append(f"   Total Links Checked: {total_links}")
         report.append(f"   ✅ Valid: {status_counts['valid']} ({validity_rate:.1f}%)")
         report.append(f"   ❌ Broken: {status_counts['broken']}")
@@ -415,7 +414,7 @@ class LinkValidator:
         report.append("")
 
         # Breakdown by type
-        report.append(f"📋 BREAKDOWN BY LINK TYPE:")
+        report.append("📋 BREAKDOWN BY LINK TYPE:")
         for link_type, counts in sorted(type_counts.items()):
             total_type = sum(counts.values())
             type_validity = (counts["valid"] / total_type * 100) if total_type > 0 else 0
@@ -534,7 +533,7 @@ def main():
         print(f"\\n❌ Link validation failed with {broken_links} broken links")
         sys.exit(1)
     else:
-        print(f"\\n✅ All links validated successfully!")
+        print("\\n✅ All links validated successfully!")
         sys.exit(0)
 
 if __name__ == "__main__":

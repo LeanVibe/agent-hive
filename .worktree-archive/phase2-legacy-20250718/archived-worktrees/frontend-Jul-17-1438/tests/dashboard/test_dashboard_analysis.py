@@ -7,11 +7,9 @@ recommendations for Foundation Epic Phase 2.
 """
 
 import pytest
-import json
-import os
 from pathlib import Path
 from datetime import datetime
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 # Test data and fixtures
 DASHBOARD_ANALYSIS_PATH = Path(__file__).parent.parent.parent / "DASHBOARD_GAP_ANALYSIS.md"

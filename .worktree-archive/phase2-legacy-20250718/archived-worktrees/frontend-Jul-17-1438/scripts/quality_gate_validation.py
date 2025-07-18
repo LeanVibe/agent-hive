@@ -9,7 +9,7 @@ import logging
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import Dict
 import json
 
 logger = logging.getLogger(__name__)

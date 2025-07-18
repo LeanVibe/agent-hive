@@ -12,11 +12,10 @@ This script provides comprehensive security monitoring with:
 
 import json
 import subprocess
-import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 import logging
 
 # Configure logging
@@ -292,7 +291,6 @@ class SecurityMonitor:
 
         issues = []
         try:
-            import re
             for pattern in secret_patterns:
                 cmd = ['grep', '-r', '-n', '-i', pattern, '.', '--include=*.py']
                 result = subprocess.run(cmd, capture_output=True, text=True)

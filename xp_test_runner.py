@@ -95,7 +95,7 @@ def main():
             f.write("XP_TEST_RESULT=1\n")
             f.write("ACCOUNTABILITY_SYSTEM_OPERATIONAL=false\n")
 
-        print(f"\n❌ FOUNDATION EPIC PHASE 1: TESTS FAILED")
+        print("\n❌ FOUNDATION EPIC PHASE 1: TESTS FAILED")
         print("🚨 XP Quality Gate: BLOCKED")
 
         os.environ['TEST_RESULT'] = '1'

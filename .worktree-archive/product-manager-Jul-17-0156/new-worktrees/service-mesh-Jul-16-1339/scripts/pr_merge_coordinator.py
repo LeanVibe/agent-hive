@@ -12,7 +12,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, Any
 import argparse
 
 # Add dashboard logging
@@ -191,7 +191,7 @@ class PRMergeCoordinator:
 
         all_passed = all(checks)
 
-        print(f"\n📊 Quality Gate Summary:")
+        print("\n📊 Quality Gate Summary:")
         print(f"  Size Check: {'✅' if self.quality_gates['size_check'] else '❌'}")
         print(f"  Tests Check: {'✅' if self.quality_gates['tests_check'] else '❌'}")
         print(f"  Docs Check: {'✅' if self.quality_gates['docs_check'] else '❌'}")

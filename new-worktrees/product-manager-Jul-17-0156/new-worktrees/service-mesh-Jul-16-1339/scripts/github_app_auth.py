@@ -5,14 +5,13 @@ Provides secure authentication for agents to interact with GitHub API
 """
 
 import base64
-import json
 import subprocess
 import time
 import logging
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Dict
 import jwt
 import requests
 from cryptography.hazmat.primitives import serialization

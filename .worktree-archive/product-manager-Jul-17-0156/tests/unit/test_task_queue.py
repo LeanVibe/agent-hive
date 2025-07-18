@@ -6,8 +6,7 @@ Tests the priority-based task queue with dependency management.
 
 import pytest
 import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock
+from datetime import datetime
 
 # Import the component under test
 import sys
@@ -16,7 +15,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
 
-from task_queue_module.task_queue import TaskQueue, Task, TaskStatus
+from task_queue_module.task_queue import TaskQueue, Task
 
 
 class TestTaskQueue:

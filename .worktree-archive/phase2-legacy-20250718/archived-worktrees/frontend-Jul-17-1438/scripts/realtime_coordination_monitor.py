@@ -5,17 +5,14 @@ Monitors coordination_alerts.json for events and triggers appropriate responses
 Event-driven coordination system built on existing accountability infrastructure
 """
 
-import os
 import json
-import time
 import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, Any
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import subprocess
 
 logger = logging.getLogger(__name__)
 

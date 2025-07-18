@@ -1,7 +1,6 @@
 # .claude/agents/base_agent.py
 """BaseAgent abstract class for LeanVibe orchestration system."""
 
-import asyncio
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum

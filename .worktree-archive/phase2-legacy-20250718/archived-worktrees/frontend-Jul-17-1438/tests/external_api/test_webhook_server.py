@@ -4,16 +4,13 @@ Tests for WebhookServer component.
 
 import pytest
 import asyncio
-import json
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
 
 from external_api.webhook_server import WebhookServer
 from external_api.models import (
     WebhookConfig,
     WebhookEvent,
-    WebhookEventType,
-    EventPriority
+    WebhookEventType
 )
 
 

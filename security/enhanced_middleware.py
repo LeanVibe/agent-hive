@@ -7,23 +7,20 @@ request filtering, rate limiting, and security monitoring.
 """
 
 import asyncio
-import hashlib
-import hmac
 import ipaddress
 import json
 import logging
 import time
 import uuid
-from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Tuple, Set, Callable
+from datetime import datetime
+from typing import Dict, Any, List, Optional, Tuple
 from enum import Enum
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 import re
 from collections import defaultdict, deque
 
-from security.auth_service import AuthenticationService, User, UserSession
-from security.token_manager import SecureTokenManager
-from external_api.auth_middleware import AuthenticationMiddleware, Permission, AuthResult
+from security.auth_service import AuthenticationService
+from external_api.auth_middleware import Permission, AuthResult
 from external_api.models import ApiRequest, ApiResponse
 
 
@@ -429,7 +426,7 @@ class EnhancedSecurityMiddleware:
                 key = f"ip:{client_ip}"
             elif rate_limit.limit_type == RateLimitType.PER_USER:
                 # Would need user ID from auth context
-                key = f"user:unknown"  # Simplified for now
+                key = "user:unknown"  # Simplified for now
             elif rate_limit.limit_type == RateLimitType.PER_ENDPOINT:
                 key = f"endpoint:{request.path}"
             else:  # GLOBAL

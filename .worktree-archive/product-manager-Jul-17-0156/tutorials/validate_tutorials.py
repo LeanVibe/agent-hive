@@ -7,7 +7,6 @@ focusing on syntax, structure, and completeness.
 """
 
 import sys
-import os
 import json
 import ast
 from pathlib import Path
@@ -17,7 +16,6 @@ from typing import Dict, List, Any
 sys.path.insert(0, str(Path(__file__).parent))
 
 from framework.tutorial_manager import TutorialManager, Tutorial
-from framework.validation import ValidationResult
 
 def _looks_like_python_code(code: str) -> bool:
     """Heuristic to determine if code looks like Python."""
@@ -206,7 +204,7 @@ def main():
         all_results.append(results)
 
         if results['success']:
-            print(f"  ✅ Validation passed")
+            print("  ✅ Validation passed")
         else:
             print(f"  ❌ Validation failed ({len(results['issues'])} issues)")
             overall_success = False

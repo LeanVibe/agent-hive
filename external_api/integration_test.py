@@ -5,19 +5,11 @@ Tests the integration between Security Specialist's JWT authentication system
 and Infrastructure Agent's RBAC framework.
 """
 
-import asyncio
-import json
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
 
 from .auth_middleware import AuthenticationMiddleware, Permission
-from .database_models import (
-    User, Role, PermissionModel, ResourceType, ActionType, PermissionScope,
-    setup_default_rbac, sync_database_with_rbac_framework
-)
 from .redis_cache_integration import RedisCacheManager
-from ..config.security_config import get_auth_config
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

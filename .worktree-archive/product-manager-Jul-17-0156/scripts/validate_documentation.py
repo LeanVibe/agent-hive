@@ -13,19 +13,14 @@ Usage:
 """
 
 import argparse
-import asyncio
 import importlib
 import inspect
-import json
-import os
 import re
 import subprocess
 import sys
-import tempfile
-import traceback
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import List, Optional
 import yaml
 
 @dataclass
@@ -335,7 +330,7 @@ class DocumentationValidator:
                         section=f"Code Block {i+1}",
                         check_type="code_validation",
                         status="pass",
-                        message=f"✅ Python syntax valid"
+                        message="✅ Python syntax valid"
                     ))
                 except SyntaxError as e:
                     results.append(ValidationResult(
@@ -485,7 +480,7 @@ class DocumentationValidator:
         total_checks = len(self.results)
         pass_rate = (status_counts["pass"] / total_checks * 100) if total_checks > 0 else 0
 
-        report.append(f"📊 VALIDATION SUMMARY:")
+        report.append("📊 VALIDATION SUMMARY:")
         report.append(f"   Total Checks: {total_checks}")
         report.append(f"   ✅ Passed: {status_counts['pass']} ({pass_rate:.1f}%)")
         report.append(f"   ❌ Failed: {status_counts['fail']}")
@@ -582,7 +577,7 @@ def main():
         print(f"\n❌ Validation failed with {failed_checks} critical issues")
         sys.exit(1)
     else:
-        print(f"\n✅ Validation completed successfully!")
+        print("\n✅ Validation completed successfully!")
         sys.exit(0)
 
 if __name__ == "__main__":

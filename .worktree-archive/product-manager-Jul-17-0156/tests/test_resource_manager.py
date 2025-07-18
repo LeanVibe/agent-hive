@@ -11,8 +11,7 @@ This test suite covers:
 """
 
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
+from unittest.mock import Mock, patch
 import sys
 from pathlib import Path
 
@@ -22,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from advanced_orchestration.resource_manager import ResourceManager
 from advanced_orchestration.models import (
     ResourceLimits, ResourceRequirements, ResourceAllocation, ResourceUsage,
-    ResourceOptimization, ResourceAllocationException
+    ResourceAllocationException
 )
 
 

@@ -6,7 +6,6 @@ Validates compliance with <1000 line component requirements.
 
 import unittest
 import subprocess
-import tempfile
 import os
 from pathlib import Path
 

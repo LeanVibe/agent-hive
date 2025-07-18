@@ -4,7 +4,6 @@ Check agent progress and push status
 """
 
 import subprocess
-import sys
 from pathlib import Path
 
 def check_agent_progress():
@@ -77,7 +76,7 @@ def check_agent_progress():
                         if "ahead" in branch_line:
                             print(f"   📤 Status: {branch_line.strip()}")
                         elif "up to date" in branch_line or "origin" in branch_line:
-                            print(f"   ✅ Status: Up to date with remote")
+                            print("   ✅ Status: Up to date with remote")
                         else:
                             print(f"   📊 Status: {branch_line.strip()}")
                     else:
@@ -86,7 +85,7 @@ def check_agent_progress():
                 except Exception as e:
                     print(f"   ❌ Error checking status: {e}")
 
-    print(f"\n📊 Summary")
+    print("\n📊 Summary")
     print("✅ All agents have been pinged to resume work")
     print("📤 Agents instructed to push after each commit")
     print("🔄 Agents told to work continuously unless blocked")

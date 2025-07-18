@@ -17,7 +17,6 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -29,7 +28,7 @@ except ImportError:
     # Fallback for direct execution
     import sys
     sys.path.append('.')
-    from prompt_logger import prompt_logger, PromptLog
+    from prompt_logger import prompt_logger
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

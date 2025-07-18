@@ -5,15 +5,11 @@ Provides end-to-end visibility into agent coordination, task execution,
 and cross-service interactions with comprehensive trace correlation.
 """
 
-import asyncio
 import logging
-import time
-import uuid
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Callable, Union
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
-import json
 import threading
 from collections import defaultdict
 from contextlib import contextmanager
@@ -22,12 +18,9 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
-from opentelemetry.semconv.trace import SpanAttributes
 from opentelemetry.trace import Status, StatusCode
-from opentelemetry.propagate import extract, inject
-from opentelemetry.baggage import get_baggage, set_baggage
+from opentelemetry.baggage import get_baggage
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 

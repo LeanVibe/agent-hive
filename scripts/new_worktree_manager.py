@@ -11,7 +11,7 @@ import sys
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 from datetime import datetime
 
 class NewWorktreeManager:
@@ -59,7 +59,7 @@ class NewWorktreeManager:
             # Setup pre-commit hooks
             self._setup_pre_commit_hooks(worktree_path)
 
-            print(f"✅ New worktree created successfully!")
+            print("✅ New worktree created successfully!")
 
             return {
                 "success": True,
@@ -339,7 +339,7 @@ def main():
         result = manager.create_new_worktree(agent_name, task_description)
 
         if result["success"]:
-            print(f"🎉 New worktree created successfully!")
+            print("🎉 New worktree created successfully!")
             print(f"📁 Path: {result['worktree_path']}")
             print(f"🌿 Branch: {result['branch_name']}")
             print(f"🔒 Quality gates: {result['quality_gates']['max_pr_size']} line limit")

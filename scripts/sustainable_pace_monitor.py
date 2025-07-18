@@ -8,15 +8,12 @@ to prevent burnout and maintain XP methodology compliance.
 """
 
 import json
-import os
 import sqlite3
 import subprocess
 import sys
-import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from typing import Dict, List, Tuple
+from dataclasses import dataclass
 import re
 import statistics
 
@@ -1026,7 +1023,7 @@ def main():
         print(f"  Risk Level: {assessment['risk_level'].upper()}")
         print(f"  Risk Score: {assessment['risk_score']}/100")
         print(f"  Risk Factors: {', '.join(assessment['risk_factors'])}")
-        print(f"  Recommendations:")
+        print("  Recommendations:")
         for rec in assessment['recommendations']:
             print(f"    - {rec}")
 

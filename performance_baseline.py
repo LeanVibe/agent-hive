@@ -5,7 +5,6 @@ Establishes baseline performance metrics for the Agent Hive system.
 """
 
 from datetime import datetime
-from pathlib import Path
 import json
 import os
 import sys
@@ -179,7 +178,7 @@ class PerformanceBaseline:
 
         # System metrics
         if "error" not in system_metrics:
-            report.append(f"🖥️  System Information:")
+            report.append("🖥️  System Information:")
             report.append(f"   CPU Cores: {system_metrics['cpu_count']}")
             report.append(f"   CPU Usage: {system_metrics['cpu_percent']:.1f}%")
             report.append(f"   Memory: {system_metrics['memory_used'] / (1024**3):.1f}GB / {system_metrics['memory_total'] / (1024**3):.1f}GB ({system_metrics['memory_percent']:.1f}%)")
@@ -193,15 +192,15 @@ class PerformanceBaseline:
                 report.append(f"   {db_name}: {db_info['size_kb']:.1f}KB ({len(db_info['tables'])} tables)")
 
         # File metrics
-        report.append(f"\n📁 Code Files:")
+        report.append("\n📁 Code Files:")
         report.append(f"   Python Files: {file_metrics['python_files']}")
         report.append(f"   Total Lines: {file_metrics['total_lines']:,}")
-        report.append(f"   Largest Files:")
+        report.append("   Largest Files:")
         for file_info in file_metrics['largest_files'][:5]:
             report.append(f"      {file_info['file']}: {file_info['lines']} lines, {file_info['size_bytes']/1024:.1f}KB")
 
         # Import performance
-        report.append(f"\n⚡ Import Performance:")
+        report.append("\n⚡ Import Performance:")
         for module, metrics in import_metrics.items():
             if metrics['success']:
                 report.append(f"   {module}: {metrics['import_time']*1000:.1f}ms")
@@ -224,9 +223,9 @@ def main():
     with open('performance_baseline_report.txt', 'w') as f:
         f.write(report)
 
-    print(f"\n💾 Results saved to:")
-    print(f"   - performance_baseline.json (raw data)")
-    print(f"   - performance_baseline_report.txt (formatted report)")
+    print("\n💾 Results saved to:")
+    print("   - performance_baseline.json (raw data)")
+    print("   - performance_baseline_report.txt (formatted report)")
 
 
 if __name__ == "__main__":

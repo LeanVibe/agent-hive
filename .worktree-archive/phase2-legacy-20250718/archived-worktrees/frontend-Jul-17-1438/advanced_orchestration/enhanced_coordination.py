@@ -13,23 +13,20 @@ MultiAgentCoordinator and WorkflowCoordinator to implement:
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any, Set
+from typing import Dict, List, Optional, Tuple, Any
 from collections import defaultdict, deque
-import json
-import uuid
 import statistics
 
 from .models import (
-    AgentInfo, AgentStatus, TaskStatus, TaskPriority, EnhancedTaskAssignment,
+    AgentStatus, EnhancedTaskAssignment,
     WorkflowDefinition, WorkflowState, CoordinationMetrics, IntelligentRouting,
-    QualityGate, TaskDependency, DependencyType, AgentSpecialization,
-    AgentCapabilities, LoadBalancingStrategy, CoordinatorConfig,
-    TaskDistributionException, CoordinatorException
+    DependencyType, CoordinatorConfig,
+    CoordinatorException
 )
 from .multi_agent_coordinator import MultiAgentCoordinator
 from .workflow_coordinator import WorkflowCoordinator
-from .performance_monitor import PerformanceMonitor, PerformanceMetric, PerformanceMetricType
-from .analytics_dashboard import AnalyticsDashboard, DashboardView
+from .performance_monitor import PerformanceMonitor
+from .analytics_dashboard import AnalyticsDashboard
 from .continuous_improvement import ContinuousImprovementEngine
 from .feedback_loops import RealTimeFeedbackEngine
 
