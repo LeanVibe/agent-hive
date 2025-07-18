@@ -237,8 +237,16 @@ class ApiGateway:
         Returns:
             Response from the service
         """
+        # Input validation
+        if not service_name or not service_name.strip():
+            return {
+                "status_code": 400,
+                "body": {"error": "Service name is required"}
+            }
+        
         instance = await self.get_service_instance(service_name)
         if not instance:
+            logger.warning(f"No healthy instances available for service: {service_name}")
             return {
                 "status_code": 503,
                 "body": {"error": f"Service {service_name} not available"}

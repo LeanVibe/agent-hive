@@ -60,6 +60,11 @@ class AuthenticationMiddleware:
         if not api_key:
             return AuthResult(success=False, error="API key required")
         
+        # Security fix: Reject if no API keys are configured
+        if not self.api_keys:
+            logger.warning("No API keys configured - rejecting all requests")
+            return AuthResult(success=False, error="Authentication not configured")
+        
         if api_key not in self.api_keys:
             return AuthResult(success=False, error="Invalid API key")
         
