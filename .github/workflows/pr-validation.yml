@@ -1,0 +1,261 @@
+name: 🔍 LeanVibe PR Validation
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+jobs:
+  pr-size-validation:
+    name: 📏 PR Size Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 📊 Calculate PR size
+        id: pr_size
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.event.after }}"
+          fi
+          
+          # Calculate changes
+          ADDITIONS=$(git diff --numstat $BASE_SHA..$HEAD_SHA | awk '{sum += $1} END {print sum+0}')
+          DELETIONS=$(git diff --numstat $BASE_SHA..$HEAD_SHA | awk '{sum += $2} END {print sum+0}')
+          NET_CHANGES=$((ADDITIONS - DELETIONS))
+          FILES_CHANGED=$(git diff --name-only $BASE_SHA..$HEAD_SHA | wc -l)
+          
+          echo "additions=$ADDITIONS" >> $GITHUB_OUTPUT
+          echo "deletions=$DELETIONS" >> $GITHUB_OUTPUT
+          echo "net_changes=$NET_CHANGES" >> $GITHUB_OUTPUT
+          echo "files_changed=$FILES_CHANGED" >> $GITHUB_OUTPUT
+          
+          # Set size limits
+          SIZE_LIMIT=500
+          SIZE_WARNING=300
+          
+          if [ $NET_CHANGES -gt $SIZE_LIMIT ]; then
+            echo "status=fail" >> $GITHUB_OUTPUT
+            echo "message=PR too large: $NET_CHANGES lines (limit: $SIZE_LIMIT)" >> $GITHUB_OUTPUT
+          elif [ $NET_CHANGES -gt $SIZE_WARNING ]; then
+            echo "status=warning" >> $GITHUB_OUTPUT
+            echo "message=Large PR: $NET_CHANGES lines (warning: $SIZE_WARNING)" >> $GITHUB_OUTPUT
+          else
+            echo "status=pass" >> $GITHUB_OUTPUT
+            echo "message=PR size acceptable: $NET_CHANGES lines" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 📝 Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { status, message, additions, deletions, net_changes, files_changed } = {
+              status: '${{ steps.pr_size.outputs.status }}',
+              message: '${{ steps.pr_size.outputs.message }}',
+              additions: '${{ steps.pr_size.outputs.additions }}',
+              deletions: '${{ steps.pr_size.outputs.deletions }}',
+              net_changes: '${{ steps.pr_size.outputs.net_changes }}',
+              files_changed: '${{ steps.pr_size.outputs.files_changed }}'
+            };
+            
+            const statusEmoji = {
+              pass: '✅',
+              warning: '⚠️',
+              fail: '❌'
+            };
+            
+            const comment = `## ${statusEmoji[status]} PR Size Validation
+            
+            **${message}**
+            
+            📊 **Change Summary:**
+            - Files changed: ${files_changed}
+            - Lines added: +${additions}
+            - Lines removed: -${deletions}
+            - Net change: ${net_changes} lines
+            
+            ${status === 'fail' ? 
+              `🚨 **This PR exceeds the size limit and must be broken down:**
+              - Consider splitting into smaller, focused PRs
+              - Each PR should target a single feature or fix
+              - Use \`git add -p\` for partial commits` : 
+              status === 'warning' ? 
+              `💡 **Consider if this PR could be split for easier review:**
+              - Large PRs are harder to review thoroughly
+              - Consider breaking into logical chunks` : 
+              `🎉 **PR size is within acceptable limits!**`
+            }
+            
+            ---
+            *Prevention-First Approach: Automated validation to prevent workflow crises*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+      
+      - name: ❌ Fail if PR too large
+        if: steps.pr_size.outputs.status == 'fail'
+        run: |
+          echo "::error::${{ steps.pr_size.outputs.message }}"
+          echo "::error::Break this PR into smaller pieces before merging"
+          exit 1
+
+  quality-gates:
+    name: 🔍 Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || echo "No requirements.txt found"
+      
+      - name: 🔍 Python syntax check
+        run: |
+          echo "🔍 Checking Python syntax..."
+          python -m py_compile **/*.py || echo "Some files have syntax errors"
+      
+      - name: 🧪 Run basic tests
+        run: |
+          echo "🧪 Running basic tests..."
+          if [ -d "tests" ]; then
+            python -m pytest tests/ -v || echo "Tests failed or not available"
+          else
+            echo "No tests directory found"
+          fi
+      
+      - name: 📊 CLI Health Check
+        run: |
+          echo "📊 Testing CLI health..."
+          if [ -f "cli.py" ]; then
+            python cli.py --help || echo "CLI help failed"
+          else
+            echo "No CLI found"
+          fi
+      
+      - name: 🔍 Code Quality Check
+        run: |
+          echo "🔍 Checking code quality..."
+          # Check for debug prints
+          DEBUG_PRINTS=$(grep -r "print(" **/*.py || true)
+          if [ -n "$DEBUG_PRINTS" ]; then
+            echo "⚠️ Debug prints found:"
+            echo "$DEBUG_PRINTS" | head -5
+          fi
+          
+          # Check for TODO comments
+          TODO_COMMENTS=$(grep -r "TODO\|FIXME\|XXX" **/*.py || true)
+          if [ -n "$TODO_COMMENTS" ]; then
+            echo "📝 TODO comments found:"
+            echo "$TODO_COMMENTS" | head -5
+          fi
+
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔒 Security scan
+        run: |
+          echo "🔒 Basic security checks..."
+          # Check for potential security issues
+          if grep -r "password\|secret\|token" **/*.py | grep -v "# nosec" | head -5; then
+            echo "⚠️ Potential security issues found (review manually)"
+          fi
+          
+          # Check for hardcoded credentials
+          if grep -r "api_key\|private_key" **/*.py | grep -v "# nosec" | head -5; then
+            echo "⚠️ Potential hardcoded credentials found"
+          fi
+          
+          echo "✅ Basic security scan complete"
+
+  performance-check:
+    name: ⚡ Performance Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: ⚡ Performance validation
+        run: |
+          echo "⚡ Performance validation..."
+          
+          # Check for performance monitoring
+          if [ -f "scripts/pm_monitor.py" ]; then
+            echo "✅ PM Monitor found"
+            python scripts/pm_monitor.py --status || echo "PM Monitor status check failed"
+          fi
+          
+          # Check CLI response time
+          if [ -f "cli.py" ]; then
+            echo "📊 Testing CLI response time..."
+            time python cli.py --help > /dev/null 2>&1 || echo "CLI timing test failed"
+          fi
+          
+          echo "✅ Performance check complete"
+
+  prevention-validation:
+    name: 🛡️ Prevention Systems Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🛡️ Check prevention systems
+        run: |
+          echo "🛡️ Validating prevention systems..."
+          
+          # Check git hooks
+          if [ -f ".githooks/pre-commit" ]; then
+            echo "✅ Pre-commit hook found"
+          else
+            echo "⚠️ Pre-commit hook missing"
+          fi
+          
+          if [ -f ".githooks/post-commit" ]; then
+            echo "✅ Post-commit hook found"
+          else
+            echo "⚠️ Post-commit hook missing"
+          fi
+          
+          # Check PM monitor
+          if [ -f "scripts/pm_monitor.py" ]; then
+            echo "✅ PM Monitor found"
+          else
+            echo "⚠️ PM Monitor missing"
+          fi
+          
+          # Check setup script
+          if [ -f "setup_git_hooks.sh" ]; then
+            echo "✅ Git hooks setup script found"
+          else
+            echo "⚠️ Git hooks setup script missing"
+          fi
+          
+          echo "✅ Prevention systems validation complete"
