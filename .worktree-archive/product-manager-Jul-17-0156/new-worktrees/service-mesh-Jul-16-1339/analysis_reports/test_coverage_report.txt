@@ -1,0 +1,6 @@
+2025-07-15 09:53:32 INFO     leanvibe.startup                                    Logging initialized with level INFO
+ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]
+__main__.py: error: unrecognized arguments: --cov=. --cov-report=json --cov-report=term-missing
+  inifile: /Users/bogdan/work/leanvibe-dev/agent-hive/pytest.ini
+  rootdir: /Users/bogdan/work/leanvibe-dev/agent-hive
+

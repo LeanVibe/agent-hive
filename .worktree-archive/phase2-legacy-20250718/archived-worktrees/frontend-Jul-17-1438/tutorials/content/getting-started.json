@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "tutorial_id": "getting-started",
+    "title": "Getting Started with LeanVibe Agent Hive",
+    "description": "Learn the basics of LeanVibe Agent Hive, including installation, basic concepts, and creating your first agent workflow.",
+    "difficulty": "beginner",
+    "estimated_time": 30,
+    "prerequisites": ["Basic Python knowledge", "Command line familiarity"],
+    "learning_objectives": [
+      "Understand LeanVibe Agent Hive architecture",
+      "Install and configure the system",
+      "Create your first multi-agent workflow",
+      "Monitor and debug agent interactions"
+    ],
+    "tags": ["basics", "installation", "first-steps"],
+    "version": "1.0",
+    "author": "LeanVibe Team"
+  },
+  "steps": [
+    {
+      "step_id": "installation",
+      "title": "Installation and Setup",
+      "description": "Install LeanVibe Agent Hive and verify the installation.",
+      "instructions": [
+        "Clone the repository: git clone https://github.com/leanvibe/agent-hive.git",
+        "Navigate to the project directory: cd agent-hive",
+        "Install dependencies: uv sync",
+        "Verify installation: python cli.py --help"
+      ],
+      "code_examples": [
+        "git clone https://github.com/leanvibe/agent-hive.git\ncd agent-hive\nuv sync\npython cli.py --help"
+      ],
+      "validation_command": "python cli.py --help",
+      "expected_output": "LeanVibe Agent Hive",
+      "hints": [
+        "Make sure you have Python 3.12+ installed",
+        "Install UV first: curl -LsSf https://astral.sh/uv/install.sh | sh",
+        "If you get permission errors, check your Python environment"
+      ],
+      "estimated_time": 10
+    },
+    {
+      "step_id": "basic-concepts",
+      "title": "Understanding Basic Concepts",
+      "description": "Learn about agents, coordinators, and the basic architecture.",
+      "instructions": [
+        "Read about the MultiAgentCoordinator in the API documentation",
+        "Understand the concept of agent registration and task assignment",
+        "Learn about resource management and scaling",
+        "Explore the CLI commands available"
+      ],
+      "code_examples": [
+        "from advanced_orchestration import MultiAgentCoordinator\nfrom advanced_orchestration.models import CoordinatorConfig\n\n# Create coordinator\nconfig = CoordinatorConfig()\ncoordinator = MultiAgentCoordinator(config)\nprint('Coordinator created successfully!')"
+      ],
+      "validation_command": "python -c \"from advanced_orchestration import MultiAgentCoordinator; print('Import successful')\"",
+      "expected_output": "Import successful",
+      "hints": [
+        "Check the API_REFERENCE.md for detailed documentation",
+        "The coordinator is the central component that manages all agents",
+        "Each agent has specific capabilities and resource requirements"
+      ],
+      "estimated_time": 15
+    },
+    {
+      "step_id": "first-workflow",
+      "title": "Create Your First Workflow",
+      "description": "Set up a simple multi-agent workflow with task assignment.",
+      "instructions": [
+        "Create a simple Python script that initializes the coordinator",
+        "Register mock agents with different capabilities",
+        "Create and assign tasks to agents",
+        "Monitor the workflow execution"
+      ],
+      "code_examples": [
+        "# first_workflow.py\nimport asyncio\nfrom advanced_orchestration import MultiAgentCoordinator\nfrom advanced_orchestration.models import CoordinatorConfig\n\nasync def main():\n    # Initialize coordinator\n    config = CoordinatorConfig()\n    coordinator = MultiAgentCoordinator(config)\n    \n    print('🚀 First workflow created!')\n    print('Coordinator initialized with default configuration')\n    \n    # Add your agent registration and task assignment here\n    \nif __name__ == '__main__':\n    asyncio.run(main())"
+      ],
+      "validation_command": "python first_workflow.py",
+      "expected_output": "🚀 First workflow created!",
+      "hints": [
+        "Create the file first_workflow.py in your project directory",
+        "Use async/await for all coordinator operations",
+        "Start simple with just the coordinator initialization"
+      ],
+      "estimated_time": 5
+    }
+  ]
+}

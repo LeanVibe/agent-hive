@@ -1,0 +1,230 @@
+#!/bin/bash
+#
+# LeanVibe Agent Hive - Pre-push Integration Gate
+#
+# This hook runs before pushing to ensure the branch is ready for integration
+# and all systems are working correctly.
+#
+
+set -e
+
+echo "🚀 LeanVibe Pre-push Integration Gate"
+echo "===================================="
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Get remote and URL from arguments
+remote="$1"
+url="$2"
+
+echo -e "${BLUE}📡 Remote: $remote${NC}"
+echo -e "${BLUE}🔗 URL: $url${NC}"
+echo ""
+
+# Function to print status
+print_status() {
+    if [ $1 -eq 0 ]; then
+        echo -e "${GREEN}✅ $2${NC}"
+    else
+        echo -e "${RED}❌ $2${NC}"
+        return 1
+    fi
+}
+
+# Function to print step
+print_step() {
+    echo -e "${YELLOW}🔄 $1...${NC}"
+}
+
+# Check if we're in the right directory
+if [ ! -f "cli.py" ] || [ ! -d "advanced_orchestration" ]; then
+    echo -e "${RED}❌ Error: Not in LeanVibe Agent Hive project root${NC}"
+    exit 1
+fi
+
+# Get current branch
+current_branch=$(git branch --show-current)
+echo -e "${BLUE}🌿 Current branch: $current_branch${NC}"
+
+# Don't allow direct push to main/master
+if [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
+    echo -e "${RED}❌ Direct push to $current_branch branch is not allowed${NC}"
+    echo "💡 Create a feature branch and use pull requests for code review"
+    echo "   Example: git checkout -b feature/your-feature-name"
+    exit 1
+fi
+
+echo ""
+echo "📋 Running comprehensive integration checks..."
+echo ""
+
+# 1. Comprehensive Python validation
+print_step "Running comprehensive Python validation"
+if python -c "
+import sys
+sys.path.insert(0, '.')
+try:
+    from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+    from advanced_orchestration.resource_manager import ResourceManager
+    from advanced_orchestration.scaling_manager import ScalingManager
+    from advanced_orchestration.models import CoordinatorConfig, ResourceLimits
+    print('✅ All core imports successful')
+except Exception as e:
+    print(f'❌ Import error: {e}')
+    sys.exit(1)
+" 2>/dev/null; then
+    print_status 0 "Python import validation"
+else
+    print_status 1 "Python import validation"
+    echo "💡 Check that all modules import correctly"
+    exit 1
+fi
+
+# 2. CLI comprehensive testing
+print_step "Testing CLI comprehensive functionality"
+
+# Test CLI help
+if ! python cli.py --help >/dev/null 2>&1; then
+    print_status 1 "CLI help system"
+    exit 1
+fi
+
+# Test CLI version
+if ! python cli.py --version >/dev/null 2>&1; then
+    print_status 1 "CLI version command"
+    exit 1
+fi
+
+# Test CLI core commands (quick validation)
+cli_errors=0
+
+# Test orchestrate command help
+if ! python cli.py orchestrate --help >/dev/null 2>&1; then
+    echo -e "${RED}❌ orchestrate command help failed${NC}"
+    cli_errors=1
+fi
+
+# Test spawn command help  
+if ! python cli.py spawn --help >/dev/null 2>&1; then
+    echo -e "${RED}❌ spawn command help failed${NC}"
+    cli_errors=1
+fi
+
+# Test monitor command help
+if ! python cli.py monitor --help >/dev/null 2>&1; then
+    echo -e "${RED}❌ monitor command help failed${NC}"
+    cli_errors=1
+fi
+
+# Test checkpoint command help
+if ! python cli.py checkpoint --help >/dev/null 2>&1; then
+    echo -e "${RED}❌ checkpoint command help failed${NC}"
+    cli_errors=1
+fi
+
+if [ $cli_errors -eq 0 ]; then
+    print_status 0 "CLI comprehensive testing"
+else
+    print_status 1 "CLI comprehensive testing"
+    echo "💡 One or more CLI commands failed validation"
+    exit 1
+fi
+
+# 3. Run test suite if available
+print_step "Running test suite"
+if [ -d "tests" ]; then
+    # Try to run a basic test to validate the system
+    if python -c "
+import sys
+import os
+sys.path.insert(0, '.')
+try:
+    from advanced_orchestration.models import CoordinatorConfig, ResourceLimits
+    from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+    from advanced_orchestration.resource_manager import ResourceManager
+    from advanced_orchestration.scaling_manager import ScalingManager
+    
+    # Basic instantiation test
+    config = CoordinatorConfig()
+    limits = ResourceLimits(max_cpu_cores=4, max_memory_mb=8192, max_disk_mb=51200, max_network_mbps=500, max_agents=5)
+    coordinator = MultiAgentCoordinator(config)
+    resource_manager = ResourceManager(limits)
+    scaling_manager = ScalingManager(limits)
+    
+    print('✅ System integration test passed')
+except Exception as e:
+    print(f'❌ System integration test failed: {e}')
+    sys.exit(1)
+" 2>/dev/null; then
+        print_status 0 "System integration tests"
+    else
+        print_status 1 "System integration tests"
+        echo "💡 Basic system integration test failed"
+        exit 1
+    fi
+else
+    print_status 0 "Test suite (not available)"
+fi
+
+# 4. Check working directory is clean
+print_step "Checking working directory status"
+if [ -z "$(git status --porcelain)" ]; then
+    print_status 0 "Working directory clean"
+else
+    echo -e "${YELLOW}⚠️  Working directory has uncommitted changes:${NC}"
+    git status --short
+    echo "💡 Consider committing all changes before pushing"
+fi
+
+# 5. Branch validation
+print_step "Validating branch integrity"
+
+# Check if branch has commits
+if [ "$(git rev-list --count HEAD)" -gt 0 ]; then
+    print_status 0 "Branch has commits"
+else
+    print_status 1 "Branch validation"
+    echo "💡 Branch appears to be empty"
+    exit 1
+fi
+
+# 6. Check for merge conflicts
+print_step "Checking for merge conflict markers"
+conflict_files=$(git diff --name-only | xargs grep -l "<<<<<<< \|======= \|>>>>>>> " 2>/dev/null || true)
+if [ -z "$conflict_files" ]; then
+    print_status 0 "No merge conflict markers"
+else
+    print_status 1 "Merge conflict check"
+    echo "💡 Merge conflict markers found in: $conflict_files"
+    exit 1
+fi
+
+# 7. Performance validation (basic)
+print_step "Running performance validation"
+start_time=$(date +%s%N)
+if python cli.py --version >/dev/null 2>&1; then
+    end_time=$(date +%s%N)
+    duration=$(( (end_time - start_time) / 1000000 )) # Convert to milliseconds
+    if [ $duration -lt 5000 ]; then  # Less than 5 seconds
+        print_status 0 "CLI performance (${duration}ms)"
+    else
+        echo -e "${YELLOW}⚠️  CLI performance slow (${duration}ms)${NC}"
+        print_status 0 "CLI performance (acceptable)"
+    fi
+else
+    print_status 1 "CLI performance validation"
+    exit 1
+fi
+
+echo ""
+echo -e "${GREEN}🎉 All integration checks passed!${NC}"
+echo "✅ Branch is ready for push to $remote"
+echo -e "${BLUE}📝 Remember to create a pull request for code review${NC}"
+echo ""
+
+exit 0

@@ -1,0 +1,18 @@
+{
+  "name": "test-checkpoint",
+  "timestamp": "2025-07-15T00:29:39.141166",
+  "config": "CoordinatorConfig(max_agents=10, min_agents=2, health_check_interval=30.0, load_balance_interval=60.0, task_timeout=300.0, agent_startup_timeout=60.0, failure_threshold=3, scaling_check_interval=120.0, load_balancing_strategy=<LoadBalancingStrategy.RESOURCE_BASED: 'resource_based'>, enable_auto_scaling=True, resource_limits=ResourceLimits(max_cpu_cores=8, max_memory_mb=8192, max_disk_mb=10240, max_network_mbps=1000, max_agents=10))",
+  "resource_limits": {
+    "max_cpu_cores": 8,
+    "max_memory_mb": 16384,
+    "max_disk_mb": 102400,
+    "max_network_mbps": 1000,
+    "max_agents": 10
+  },
+  "system_state": "initialized",
+  "components": {
+    "coordinator": "ready",
+    "resource_manager": "ready",
+    "scaling_manager": "ready"
+  }
+}

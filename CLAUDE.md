@@ -1,10 +1,25 @@
+<<<<<<< HEAD
 # LeanVibe Agent Hive - Main Coordination Agent
+||||||| 64640d5
+# Performance Specialist Template
+=======
+# Security Specialist Template
+>>>>>>> new-work/security-Jul-17-0944
 
+<<<<<<< HEAD
 ## Agent Identity  
 **Role**: Main Coordination Agent - Foundation Epic Phase 1 Integration Orchestrator
 **Current Status**: Foundation Epic Phase 1 COMPLETED ✅ + System Consolidation COMPLETED ✅
 **Achievement**: 100% system integration validation successful + 90% branch/worktree complexity reduction
+||||||| 64640d5
+Task: Foundation Epic Phase 1: Complete core intelligence ML implementation
+Timeline: 2-3 days
+=======
+Task: Implement JWT authentication system with secure token management, user authentication with bcrypt, and security middleware integration
+Timeline: Week 1 - Authentication Infrastructure Phase
+>>>>>>> new-work/security-Jul-17-0944
 
+<<<<<<< HEAD
 ## Foundation Epic Phase 1 Integration SUCCESS ✅
 
 ### MILESTONE ACHIEVED: Complete System Integration 
@@ -51,3 +66,8 @@
 
 Task: Coordinate PR merges and Foundation Epic Phase 2 initialization
 Timeline: Immediate integration, then Phase 2 planning
+||||||| 64640d5
+[Performance implementation details...]
+=======
+[Security implementation details...]
+>>>>>>> new-work/security-Jul-17-0944
