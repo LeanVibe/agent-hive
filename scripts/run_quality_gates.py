@@ -46,7 +46,7 @@ class QualityGatesRunner:
 
     def run_all_gates(self) -> Dict[str, Any]:
         """Run all quality gates"""
-        results = {
+        results: Dict[str, Any] = {
             "success": True,
             "checks": {},
             "warnings": [],
@@ -428,7 +428,7 @@ class QualityGatesRunner:
                 "details": str(e)
             }
 
-    def print_results(self, results: Dict[str, Any]):
+    def print_results(self, results: Dict[str, Any]) -> None:
         """Print quality gates results"""
         print("\n" + "=" * 50)
         print("📊 QUALITY GATES RESULTS")
