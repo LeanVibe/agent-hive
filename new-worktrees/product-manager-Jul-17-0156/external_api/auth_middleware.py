@@ -69,7 +69,9 @@ class AuthenticationMiddleware:
         """
         self.config = config
         self.enabled_methods = config.get("enabled_methods", [AuthMethod.API_KEY])
-        self.jwt_secret = config.get("jwt_secret", "default-secret")
+        self.jwt_secret = config.get("jwt_secret")
+        if not self.jwt_secret:
+            raise ValueError("JWT secret must be provided via config - never use default secrets")
         self.jwt_algorithm = config.get("jwt_algorithm", "HS256")
         self.token_expiry = config.get("token_expiry_hours", 24)
 

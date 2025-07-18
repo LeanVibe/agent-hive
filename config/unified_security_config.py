@@ -25,7 +25,7 @@ class SecurityProfile(Enum):
 @dataclass
 class JWTConfig:
     """JWT token configuration."""
-    secret: str = field(default_factory=lambda: os.getenv("JWT_SECRET", "dev-secret-change-in-production"))
+    secret: str = field(default_factory=lambda: os.getenv("JWT_SECRET"))
     algorithm: str = "HS256"
     expiry_hours: int = 24
     refresh_expiry_hours: int = 168  # 7 days

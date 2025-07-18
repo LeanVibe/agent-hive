@@ -458,6 +458,13 @@ class AgentHiveDatabaseManager:
 
         params.append(task_id)
 
+        # SECURITY FIX: Validate updates list to prevent SQL injection
+        safe_columns = ['status', 'confidence_score', 'completed_at', 'error_message']
+        for update in updates:
+            column_name = update.split('=')[0].strip()
+            if column_name not in safe_columns:
+                raise ValueError(f"Column '{column_name}' not in allowed list for task updates")
+        
         self.db.execute(f"""
             UPDATE tasks SET {', '.join(updates)} WHERE task_id = ?
         """, params)
@@ -488,7 +495,8 @@ class AgentHiveDatabaseManager:
                  'performance_metrics', 'configurations', 'events']
 
         for table in tables:
-            cursor = self.db.execute(f"SELECT COUNT(*) FROM {table}")
+            # SECURITY FIX: Use identifier quoting to prevent SQL injection
+            cursor = self.db.execute(f"SELECT COUNT(*) FROM `{table}`")
             stats[f"{table}_count"] = cursor.fetchone()[0]
 
         # Database size
