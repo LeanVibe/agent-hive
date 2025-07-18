@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: leanvibe-agent-hive-base
+  annotations:
+    config.kubernetes.io/local-config: "true"
+
+namespace: leanvibe-agent-hive
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - rbac.yaml
+  - pvc.yaml
+  - agent-hive-deployment.yaml
+  - agent-hive-service.yaml
+  - postgres-statefulset.yaml
+  - redis-deployment.yaml
+  - prometheus-deployment.yaml
+  - grafana-deployment.yaml
+  - ingress.yaml
+  - hpa.yaml
+
+commonLabels:
+  app.kubernetes.io/instance: leanvibe-agent-hive
+  app.kubernetes.io/part-of: leanvibe-system
+  app.kubernetes.io/managed-by: kustomize
+
+images:
+  - name: leanvibe-agent-hive
+    newTag: "1.0.0"
+
+configMapGenerator:
+  - name: deployment-info
+    literals:
+      - deployment.timestamp=$(date +%Y%m%d-%H%M%S)
+      - deployment.version=1.0.0
+      - deployment.environment=base
+
+generatorOptions:
+  disableNameSuffixHash: false
+  labels:
+    app.kubernetes.io/managed-by: kustomize

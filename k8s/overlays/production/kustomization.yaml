@@ -1,0 +1,51 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: leanvibe-agent-hive-production
+
+namespace: leanvibe-agent-hive
+
+namePrefix: prod-
+
+bases:
+  - ../../base
+
+commonLabels:
+  environment: production
+  tier: prod
+
+patchesStrategicMerge:
+  - agent-hive-deployment-patch.yaml
+  - configmap-patch.yaml
+  - postgres-statefulset-patch.yaml
+  - resource-limits-patch.yaml
+
+images:
+  - name: leanvibe-agent-hive
+    newTag: "1.0.0"
+
+configMapGenerator:
+  - name: deployment-info
+    behavior: merge
+    literals:
+      - deployment.environment=production
+      - deployment.tier=prod
+      - debug.enabled=false
+      - monitoring.enabled=true
+
+replicas:
+  - name: agent-hive
+    count: 3
+  - name: postgres
+    count: 1
+  - name: redis
+    count: 1
+  - name: prometheus
+    count: 1
+  - name: grafana
+    count: 1
+
+resources:
+  - pod-security-policy.yaml
+  - monitoring-service-monitor.yaml

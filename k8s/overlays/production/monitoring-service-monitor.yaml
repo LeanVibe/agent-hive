@@ -1,0 +1,64 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: agent-hive-monitor
+  namespace: leanvibe-agent-hive
+  labels:
+    app.kubernetes.io/name: leanvibe-agent-hive
+    app.kubernetes.io/component: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: leanvibe-agent-hive
+      app.kubernetes.io/component: api
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+  - port: webhook
+    path: /metrics
+    interval: 60s
+    scrapeTimeout: 10s
+  - port: gateway
+    path: /metrics
+    interval: 60s
+    scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postgres-monitor
+  namespace: leanvibe-agent-hive
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+      app.kubernetes.io/component: database
+  endpoints:
+  - port: postgres
+    path: /metrics
+    interval: 60s
+    scrapeTimeout: 10s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: redis-monitor
+  namespace: leanvibe-agent-hive
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: cache
+  endpoints:
+  - port: redis
+    path: /metrics
+    interval: 60s
+    scrapeTimeout: 10s
