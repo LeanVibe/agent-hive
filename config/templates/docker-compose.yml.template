@@ -1,0 +1,123 @@
+# Docker Compose Template for {{ENVIRONMENT}}
+# Auto-generated configuration - do not edit manually
+
+version: '3.8'
+
+services:
+  agent-hive:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: {{DOCKER_TARGET}}
+    container_name: leanvibe-agent-hive-{{ENVIRONMENT}}
+    restart: unless-stopped
+    ports:
+      - "{{SERVER_MAIN_PORT}}:8000"
+      - "{{SERVER_WEBHOOK_PORT}}:8080"
+      - "{{SERVER_GATEWAY_PORT}}:8081"
+    environment:
+      - LEANVIBE_ENVIRONMENT={{ENVIRONMENT}}
+      - LEANVIBE_LOG_LEVEL={{LOG_LEVEL}}
+      - LEANVIBE_DEBUG_MODE={{DEBUG_MODE}}
+      - LEANVIBE_REDIS_URL=redis://redis:6379/{{REDIS_DB}}
+      - LEANVIBE_POSTGRES_URL=postgresql://postgres:{{DB_PASSWORD}}@postgres:5432/{{DB_NAME}}
+      - WORKERS={{SERVER_WORKERS}}
+      - MAX_CONNECTIONS={{SERVER_MAX_CONNECTIONS}}
+    volumes:
+      - agent-hive-data-{{ENVIRONMENT}}:/app/data
+      - agent-hive-logs-{{ENVIRONMENT}}:/app/logs
+      {{#if DEVELOPMENT}}
+      - .:/app
+      {{/if}}
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - agent-hive-network-{{ENVIRONMENT}}
+    {{#if RESOURCES}}
+    deploy:
+      resources:
+        limits:
+          cpus: '{{RESOURCES_CPU_LIMIT}}'
+          memory: {{RESOURCES_MEMORY_LIMIT}}
+        reservations:
+          cpus: '{{RESOURCES_CPU_REQUEST}}'
+          memory: {{RESOURCES_MEMORY_REQUEST}}
+    {{/if}}
+
+  redis:
+    image: redis:7-alpine
+    container_name: leanvibe-redis-{{ENVIRONMENT}}
+    restart: unless-stopped
+    {{#unless DEVELOPMENT}}
+    ports:
+      - "{{REDIS_PORT}}:6379"
+    {{/unless}}
+    volumes:
+      - redis-data-{{ENVIRONMENT}}:/data
+    command: redis-server --appendonly yes --maxmemory {{REDIS_MAX_MEMORY}} --maxmemory-policy allkeys-lru
+    networks:
+      - agent-hive-network-{{ENVIRONMENT}}
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: leanvibe-postgres-{{ENVIRONMENT}}
+    restart: unless-stopped
+    {{#unless DEVELOPMENT}}
+    ports:
+      - "{{POSTGRES_PORT}}:5432"
+    {{/unless}}
+    environment:
+      - POSTGRES_DB={{DB_NAME}}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD={{DB_PASSWORD}}
+    volumes:
+      - postgres-data-{{ENVIRONMENT}}:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - agent-hive-network-{{ENVIRONMENT}}
+
+  {{#if MONITORING}}
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: leanvibe-prometheus-{{ENVIRONMENT}}
+    restart: unless-stopped
+    ports:
+      - "{{PROMETHEUS_PORT}}:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.{{ENVIRONMENT}}.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data-{{ENVIRONMENT}}:/prometheus
+    networks:
+      - agent-hive-network-{{ENVIRONMENT}}
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: leanvibe-grafana-{{ENVIRONMENT}}
+    restart: unless-stopped
+    ports:
+      - "{{GRAFANA_PORT}}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD={{GRAFANA_PASSWORD}}
+    volumes:
+      - grafana-data-{{ENVIRONMENT}}:/var/lib/grafana
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning
+      - ./infrastructure/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - agent-hive-network-{{ENVIRONMENT}}
+  {{/if}}
+
+volumes:
+  agent-hive-data-{{ENVIRONMENT}}:
+  agent-hive-logs-{{ENVIRONMENT}}:
+  redis-data-{{ENVIRONMENT}}:
+  postgres-data-{{ENVIRONMENT}}:
+  {{#if MONITORING}}
+  prometheus-data-{{ENVIRONMENT}}:
+  grafana-data-{{ENVIRONMENT}}:
+  {{/if}}
+
+networks:
+  agent-hive-network-{{ENVIRONMENT}}:
+    driver: bridge

@@ -1,0 +1,138 @@
+# LeanVibe Agent Hive - Base Configuration
+# Common settings shared across all environments
+
+# Application Information
+app:
+  name: "leanvibe-agent-hive"
+  version: "1.0.0"
+  description: "AI orchestration system for autonomous development"
+  
+# Server Configuration
+server:
+  host: "0.0.0.0"
+  ports:
+    main: 8000
+    webhook: 8080
+    gateway: 8081
+  workers: 4
+  max_connections: 100
+  timeout: 60
+  keepalive: 65
+
+# Database Configuration
+database:
+  type: "postgresql"
+  host: "postgres-service"
+  port: 5432
+  name: "agent_hive"
+  pool_size: 20
+  max_overflow: 30
+  pool_timeout: 30
+  pool_recycle: 3600
+  echo: false
+
+# Cache Configuration
+cache:
+  type: "redis"
+  host: "redis-service"
+  port: 6379
+  db: 0
+  max_connections: 50
+  retry_on_timeout: true
+  decode_responses: true
+
+# Security Configuration
+security:
+  jwt:
+    algorithm: "HS256"
+    expire_minutes: 1440  # 24 hours
+  cors:
+    allow_credentials: true
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers: ["*"]
+    max_age: 86400
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst_size: 200
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  handlers:
+    - type: "console"
+      level: "INFO"
+    - type: "file"
+      level: "INFO"
+      filename: "/app/logs/app.log"
+      max_bytes: 10485760  # 10MB
+      backup_count: 5
+  loggers:
+    uvicorn:
+      level: "INFO"
+    sqlalchemy:
+      level: "WARNING"
+    redis:
+      level: "WARNING"
+
+# Monitoring Configuration
+monitoring:
+  metrics:
+    enabled: true
+    path: "/metrics"
+    include_in_schema: false
+  health_check:
+    enabled: true
+    path: "/health"
+    include_in_schema: true
+  tracing:
+    enabled: true
+    service_name: "leanvibe-agent-hive"
+    jaeger_endpoint: "http://jaeger-service:14268/api/traces"
+
+# Agent Coordination Configuration
+agent_coordination:
+  max_agents: 10
+  task_timeout: 3600  # 1 hour
+  heartbeat_interval: 30
+  load_balancing_strategy: "least_loaded"
+  auto_scaling:
+    enabled: true
+    min_agents: 2
+    max_agents: 10
+    scale_up_threshold: 0.8
+    scale_down_threshold: 0.3
+    cooldown_period: 300
+
+# Task Queue Configuration
+task_queue:
+  max_queue_size: 1000
+  default_priority: 5
+  retry_attempts: 3
+  retry_delay: 60
+  dead_letter_queue_enabled: true
+
+# File Storage Configuration
+storage:
+  type: "local"
+  base_path: "/app/data"
+  max_file_size: 104857600  # 100MB
+  allowed_extensions: [".json", ".yaml", ".yml", ".txt", ".log"]
+
+# API Configuration
+api:
+  title: "LeanVibe Agent Hive API"
+  description: "AI orchestration system for autonomous development"
+  version: "1.0.0"
+  docs_url: "/docs"
+  redoc_url: "/redoc"
+  include_in_schema: true
+
+# Feature Flags
+features:
+  external_api_integration: true
+  advanced_monitoring: true
+  auto_scaling: true
+  distributed_tracing: true
+  performance_optimization: true
