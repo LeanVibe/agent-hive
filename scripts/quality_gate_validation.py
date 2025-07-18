@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 """
-CANONICAL: This is the canonical script for validating quality gates during PR integration. Use this for all PR-related quality validation workflows.
-
 Quality Gate Validation Script
 Runs comprehensive quality checks for PR integration
 """
@@ -15,7 +13,6 @@ from typing import List, Tuple, Dict
 import json
 
 logger = logging.getLogger(__name__)
-
 
 class QualityGateValidator:
     """Validates code quality gates for PR integration."""
@@ -32,10 +29,10 @@ class QualityGateValidator:
         try:
             # Check only key Python files to avoid timeout
             key_files = [
-                "scripts/github_app_auth.py",
-                "scripts/pr_integration_manager.py",
-                "scripts/quality_gate_validation.py",
-                "scripts/context_memory_manager.py",
+                'scripts/github_app_auth.py',
+                'scripts/pr_integration_manager.py',
+                'scripts/quality_gate_validation.py',
+                'scripts/context_memory_manager.py'
             ]
 
             failed_files = []
@@ -45,16 +42,13 @@ class QualityGateValidator:
                     continue
 
                 result = subprocess.run(
-                    [sys.executable, "-m", "py_compile", str(py_file)],
-                    capture_output=True,
-                    text=True,
+                    [sys.executable, '-m', 'py_compile', str(py_file)],
+                    capture_output=True, text=True
                 )
 
                 if result.returncode != 0:
                     failed_files.append(str(py_file))
-                    self.issues.append(
-                        f"Syntax error in {py_file}: {result.stderr.strip()}"
-                    )
+                    self.issues.append(f"Syntax error in {py_file}: {result.stderr.strip()}")
 
             if failed_files:
                 logger.error(f"❌ Syntax check failed for {len(failed_files)} files")
@@ -73,7 +67,7 @@ class QualityGateValidator:
 
         try:
             # Check if pytest is available and there are tests
-            test_dirs = ["tests", "test"]
+            test_dirs = ['tests', 'test']
             test_files = []
 
             for test_dir in test_dirs:
@@ -91,10 +85,8 @@ class QualityGateValidator:
 
             # Try to run pytest
             result = subprocess.run(
-                [sys.executable, "-m", "pytest", "--tb=short", "-v"],
-                capture_output=True,
-                text=True,
-                timeout=300,
+                [sys.executable, '-m', 'pytest', '--tb=short', '-v'],
+                capture_output=True, text=True, timeout=300
             )
 
             if result.returncode == 0:
@@ -102,7 +94,7 @@ class QualityGateValidator:
                 return True
             else:
                 # Check if it's a module not found error
-                if "No module named" in result.stderr:
+                if 'No module named' in result.stderr:
                     logger.warning("⚠️ pytest not available - skipping tests")
                     return True
                 else:
@@ -130,28 +122,23 @@ class QualityGateValidator:
 
             for py_file in python_files:
                 # Skip certain directories and files
-                if any(
-                    skip in str(py_file)
-                    for skip in ["__pycache__", ".git", "build", "dist"]
-                ):
+                if any(skip in str(py_file) for skip in ['__pycache__', '.git', 'build', 'dist']):
                     continue
 
                 # Try to compile the file (checks imports and syntax)
                 try:
-                    with open(py_file, "r", encoding="utf-8") as f:
-                        compile(f.read(), str(py_file), "exec")
+                    with open(py_file, 'r', encoding='utf-8') as f:
+                        compile(f.read(), str(py_file), 'exec')
                 except SyntaxError as e:
                     failed_imports.append(f"{py_file}: Syntax error - {e}")
                 except Exception as e:
                     # Some import errors are OK (optional dependencies)
-                    if "No module named" not in str(e):
+                    if 'No module named' not in str(e):
                         failed_imports.append(f"{py_file}: {e}")
 
             if failed_imports:
                 # Only fail on critical import issues
-                critical_failures = [
-                    f for f in failed_imports if "No module named" not in f
-                ]
+                critical_failures = [f for f in failed_imports if 'No module named' not in f]
                 if critical_failures:
                     for failure in critical_failures:
                         self.issues.append(f"Import validation failed: {failure}")
@@ -174,7 +161,7 @@ class QualityGateValidator:
 
         try:
             # Check for essential files
-            essential_files = ["README.md", "CLAUDE.md"]
+            essential_files = ['README.md', 'CLAUDE.md']
             missing_files = []
 
             for file_name in essential_files:
@@ -197,43 +184,117 @@ class QualityGateValidator:
             self.warnings.append(f"Structure check error: {e}")
             return True
 
+    def check_pr_size_limit(self) -> bool:
+        """Check if PR size is within 500 line limit."""
+        logger.info("📏 Checking PR size limit (<500 lines)...")
+
+        try:
+            # Get git diff statistics
+            result = subprocess.run(
+                ['git', 'diff', '--stat', 'origin/main'],
+                capture_output=True, text=True
+            )
+
+            if result.returncode != 0:
+                self.warnings.append("Unable to check PR size - not in git repository or no main branch")
+                return True
+
+            # Parse git diff output to count total lines
+            lines = result.stdout.strip().split('\n')
+            total_lines = 0
+            
+            for line in lines:
+                if 'insertions' in line or 'deletions' in line:
+                    # Extract numbers from lines like " 5 files changed, 123 insertions(+), 45 deletions(-)"
+                    parts = line.split(',')
+                    for part in parts:
+                        if 'insertion' in part:
+                            numbers = [int(s) for s in part.split() if s.isdigit()]
+                            if numbers:
+                                total_lines += numbers[0]
+                        elif 'deletion' in part:
+                            numbers = [int(s) for s in part.split() if s.isdigit()]
+                            if numbers:
+                                total_lines += numbers[0]
+
+            if total_lines > 500:
+                self.issues.append(f"PR exceeds 500 line limit: {total_lines} lines changed")
+                logger.error(f"❌ PR size limit exceeded: {total_lines} lines")
+                return False
+            else:
+                logger.info(f"✅ PR size within limit: {total_lines} lines")
+                return True
+
+        except Exception as e:
+            self.warnings.append(f"PR size check error: {e}")
+            return True
+
     def run_security_check(self) -> bool:
-        """Run basic security checks."""
-        logger.info("🔒 Running security checks...")
+        """Run enhanced security checks for critical vulnerabilities."""
+        logger.info("🔒 Running enhanced security checks...")
 
         try:
             # Check for common security issues in Python files
             python_files = list(self.project_root.rglob("*.py"))
-            security_issues = []
+            critical_security_issues = []
+            security_warnings = []
 
-            dangerous_patterns = [
-                ("eval(", "Use of eval() can be dangerous"),
-                ("exec(", "Use of exec() can be dangerous"),
-                ("os.system(", "Use of os.system() can be dangerous"),
-                ("subprocess.call(", "Consider using subprocess.run() instead"),
-                ("shell=True", "Avoid shell=True in subprocess calls when possible"),
+            # Critical security patterns that should fail the build
+            critical_patterns = [
+                ('eval(', 'CRITICAL: Use of eval() detected'),
+                ('exec(', 'CRITICAL: Use of exec() detected'),
+                ('os.system(', 'CRITICAL: Use of os.system() detected'),
+                ('__import__', 'CRITICAL: Dynamic import detected'),
+            ]
+
+            # Warning patterns
+            warning_patterns = [
+                ('input(', 'Be cautious with input() in production'),
+                ('subprocess.call(', 'Consider using subprocess.run() instead'),
+                ('shell=True', 'Avoid shell=True in subprocess calls when possible'),
+                ('pickle.load', 'Be cautious with pickle.load()'),
+                ('yaml.load', 'Use yaml.safe_load() instead of yaml.load()'),
             ]
 
             for py_file in python_files:
                 try:
-                    with open(py_file, "r", encoding="utf-8") as f:
+                    with open(py_file, 'r', encoding='utf-8') as f:
                         content = f.read()
 
-                        for pattern, message in dangerous_patterns:
+                        # Check critical patterns
+                        for pattern, message in critical_patterns:
                             if pattern in content:
-                                # Count occurrences
                                 count = content.count(pattern)
-                                security_issues.append(
-                                    f"{py_file}: {message} ({count} occurrence{'s' if count > 1 else ''})"
-                                )
+                                if 'CRITICAL:' in message:
+                                    critical_security_issues.append(f"{py_file}: {message} ({count} occurrence{'s' if count > 1 else ''})")
+                                else:
+                                    security_warnings.append(f"{py_file}: {message} ({count} occurrence{'s' if count > 1 else ''})")
+
+                        # Check warning patterns
+                        for pattern, message in warning_patterns:
+                            if pattern in content:
+                                count = content.count(pattern)
+                                security_warnings.append(f"{py_file}: {message} ({count} occurrence{'s' if count > 1 else ''})")
+
                 except Exception:
                     continue
 
-            if security_issues:
-                for issue in security_issues:
-                    self.warnings.append(f"Security consideration: {issue}")
+            # Handle critical issues
+            if critical_security_issues:
+                for issue in critical_security_issues:
+                    self.issues.append(f"CRITICAL SECURITY: {issue}")
+                logger.error(f"❌ {len(critical_security_issues)} critical security issues found")
+                
+            # Handle warnings
+            if security_warnings:
+                for warning in security_warnings:
+                    self.warnings.append(f"Security consideration: {warning}")
 
-            logger.info("✅ Security check completed")
+            # Fail if critical issues found
+            if critical_security_issues:
+                return False
+
+            logger.info("✅ Security check completed - no critical vulnerabilities")
             return True
 
         except Exception as e:
@@ -243,15 +304,13 @@ class QualityGateValidator:
     def generate_report(self) -> Dict:
         """Generate quality gate report."""
         return {
-            "timestamp": str(
-                subprocess.run(["date"], capture_output=True, text=True).stdout.strip()
-            ),
+            "timestamp": str(subprocess.run(['date'], capture_output=True, text=True).stdout.strip()),
             "project_root": str(self.project_root),
             "issues": self.issues,
             "warnings": self.warnings,
             "quality_gate_passed": len(self.issues) == 0,
             "total_issues": len(self.issues),
-            "total_warnings": len(self.warnings),
+            "total_warnings": len(self.warnings)
         }
 
     def run_all_checks(self) -> bool:
@@ -260,6 +319,7 @@ class QualityGateValidator:
 
         checks = [
             ("File Structure", self.check_file_structure),
+            ("PR Size Limit", self.check_pr_size_limit),
             ("Python Syntax", self.run_syntax_check),
             ("Import Validation", self.run_import_validation),
             ("Basic Tests", self.run_basic_tests),
@@ -287,7 +347,7 @@ class QualityGateValidator:
 
         # Save report
         report_file = self.project_root / "quality_gate_report.json"
-        with open(report_file, "w") as f:
+        with open(report_file, 'w') as f:
             json.dump(report, f, indent=2)
 
         logger.info(f"📊 Quality gate report saved to {report_file}")
@@ -306,22 +366,20 @@ class QualityGateValidator:
 
         return all_passed
 
-
 def main():
     """Main CLI interface."""
     parser = argparse.ArgumentParser(description="Quality Gate Validator")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
-    parser.add_argument(
-        "--report-only",
-        action="store_true",
-        help="Generate report without enforcing gates",
-    )
+    parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
+    parser.add_argument('--report-only', action='store_true', help='Generate report without enforcing gates')
 
     args = parser.parse_args()
 
     # Setup logging
     level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(level=level, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
 
     try:
         validator = QualityGateValidator()
@@ -336,7 +394,6 @@ def main():
     except Exception as e:
         logger.error(f"❌ Quality gate validation failed: {e}")
         return 1
-
 
 if __name__ == "__main__":
     exit(main())

@@ -1,98 +1,40 @@
 {
-  "session_timestamp": "2025-07-17T13:45:00Z",
   "consolidation_level": "critical",
-  "main_agent_role": "strategic_coordination_and_delegation",
-  "current_branch": "integration/phase3-advanced-features",
-  "phase_status": {
-    "phase_1_complete": {
-      "worktrees_integrated": 4,
-      "total_worktrees": 18,
-      "completion_percentage": 22,
-      "integrated_worktrees": [
-        "infrastructure-Jul-17-0945",
-        "infrastructure-Jul-17-0946", 
-        "integration-specialist-Jul-17-0946",
-        "monitoring-Jul-17-0946"
-      ],
-      "pr_created": "PR #79 - API Gateway foundation repair"
+  "timestamp": "2025-07-16T12:31:08.712492",
+  "state": {
+    "timestamp": "2025-07-16T12:31:08.712492",
+    "agent_status": {
+      "raw_output": "\ud83e\udd16 AGENT STATUS REPORT\n==================================================\nTimestamp: 2025-07-16 12:31:08\n\n\u26a0\ufe0f TMUX_ONLY (4 agents):\n  frontend-Jul-16-1222:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n  integration-specialist-Jul-16-1220:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n  pm-agent-new:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n  service-mesh-Jul-16-1221:\n    Tmux: \ud83d\udfe2 | Worktree: \u274c\n\n"
     },
-    "current_priority": {
-      "critical_blocker": "service-mesh-Jul-16-1221 missing state module",
-      "pm_agent_status": "actively investigating",
-      "next_phase": "test infrastructure assessment"
-    }
-  },
-  "strategic_guidance": {
-    "source": "gemini_cli_analysis",
-    "key_insights": [
-      "prioritize_test_infrastructure_for_compound_benefits",
-      "only_33_percent_worktrees_truly_ready",
-      "evidence_based_assessment_over_claimed_completion",
-      "80_20_resource_allocation_fix_vs_new"
-    ],
-    "resource_allocation": {
-      "fixing_existing": 80,
-      "new_features": 20
-    }
-  },
-  "active_agents": {
-    "pm_agent": {
-      "id": "integration-specialist-Jul-17-1331",
-      "status": "active",
-      "current_task": "service_mesh_state_module_investigation",
-      "authority_level": "full_technical_delegation"
+    "project_status": {
+      "uncommitted_changes": "M CLAUDE.md",
+      "recent_commits": "7154add Merge remote PR integrations with local workflow improvements\n0be97ad feat: Frontend Dashboard Integration Repair - Real /api/metrics endpoints and WebSocket broadcasting (#44)\n1b3973c feat: service-mesh - Production ready implementation (#42)\n21e9f77 feat: Complete workflow infrastructure - resolve PM agent access constraints\n712205e feat: Add custom Claude commands /sleep and /wake for manual memory management\nc1b67ce feat: Complete Gemini-recommended reliability improvements\n87db249 fix: Agent communication system - eliminate manual Enter requirement\n403c47f feat: Enhanced Agent Coordination System - solve idle agent problem\n5145f9b feat: Critical workflow improvements - evidence-based validation and complete Git workflow\nb937c4f feat: Add Monitoring System component (#38)",
+      "open_prs": [
+        {
+          "headRefName": "feature/integration-merge-workflow-improvements",
+          "number": 46,
+          "title": "feat: Integration workflow improvements and branch sync"
+        },
+        {
+          "headRefName": "new-work/integration-specialist-Jul-16-0207",
+          "number": 43,
+          "title": "feat: integration-specialist - Production ready implementation"
+        }
+      ]
     },
-    "dev_agents": {
-      "infrastructure": "infrastructure-Jul-17-1349",
-      "performance": "performance-Jul-17-1349", 
-      "monitoring": "monitoring-Jul-17-1349",
-      "integration": "integration-specialist-Jul-17-1349"
-    }
+    "active_work": {
+      "worktrees": [
+        "new-worktrees/integration-specialist-Jul-16-0207",
+        "new-worktrees/service-mesh-Jul-16-0207",
+        "new-worktrees/frontend-Jul-16-0208"
+      ]
+    },
+    "critical_insights": []
   },
-  "github_coordination": {
-    "updated_issues": [76, 80],
-    "created_prs": [79],
-    "main_agent_responsibilities": [
-      "monitor_pm_progress",
-      "update_github_issues", 
-      "strategic_escalation_only",
-      "evidence_based_progress_tracking"
-    ]
-  },
-  "worktree_assessment": {
-    "ready_for_integration": [
-      "frontend-Jul-17-0824",
-      "integration-specialist-Jul-17-0824",
-      "performance-Jul-17-0823", 
-      "pm-agent-new"
-    ],
-    "needs_major_work": [
-      "performance-Jul-16-1301",
-      "security-Jul-17-0944",
-      "monitoring-Jul-17-0824",
-      "service-mesh-Jul-16-1221"
-    ]
-  },
-  "critical_tools": {
-    "agent_communication": "scripts/fixed_agent_communication.py",
-    "agent_status": "scripts/check_agent_status.py",
-    "gemini_cli": "gemini -p",
-    "quality_gates": ["pytest", "python -m py_compile", "git push"]
-  },
-  "wake_protocol_steps": [
-    "read_essential_workflow_knowledge",
-    "check_pm_agent_status", 
-    "verify_current_git_state",
-    "review_open_github_issues",
-    "send_pm_status_check",
-    "update_todos_based_on_progress"
-  ],
-  "success_metrics": {
-    "phase_1_achievements": [
-      "4_worktrees_integrated",
-      "pr_created_with_95_5_percent_test_success",
-      "strategic_plan_validated_by_gemini",
-      "pm_agent_actively_executing_plan"
-    ]
-  }
+  "wake_instructions": [
+    "Read .claude/memory/ESSENTIAL_WORKFLOW_KNOWLEDGE.md immediately",
+    "Check agent status with scripts/check_agent_status.py",
+    "Verify current work with git status and PR status",
+    "Resume coordination using proper communication scripts"
+  ]
 }
