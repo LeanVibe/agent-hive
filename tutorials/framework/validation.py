@@ -62,12 +62,9 @@ class StepValidator:
         start_time = time.time()
 
         try:
-            # SECURITY FIX: Use list instead of shell=True to prevent command injection
-            # Split command into list format to avoid shell injection
-            import shlex
-            command_list = shlex.split(command)
             result = subprocess.run(
-                command_list,
+                command,
+                shell=True,
                 capture_output=True,
                 text=True,
                 timeout=self.timeout
