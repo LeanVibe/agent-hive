@@ -9983,3 +9983,13 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-18 08:16:33 INFO     advanced_orchestration.multi_agent_coordinator                                Task 2393605b-6e85-4291-9b0f-e30aa66700bd reassigned from failed agent agent-1
 2025-07-18 08:16:33 INFO     advanced_orchestration.multi_agent_coordinator                                Task c614b19f-1c94-4833-a761-6b7d33199fe3 reassigned from failed agent agent-1
 >>>>>>> new-work/performance-Jul-17-0823
+2025-07-18 18:16:38 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:16:39 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 18:16:39 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-18 18:47:43 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:47:47 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:47:48 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 18:47:48 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-18 18:54:37 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:54:38 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 18:54:38 INFO     personas.persona_manager                                Loaded 5 personas
