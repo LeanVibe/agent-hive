@@ -33,29 +33,9 @@ class ApiGateway:
     Provides authentication, rate limiting, request validation,
     and response formatting for the orchestration system.
     """
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
-    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
-||||||| 64640d5
-    
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/frontend-Jul-17-0824
-    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
-=======
-    
     def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None,
                  auth_middleware: Optional[AuthenticationMiddleware] = None):
->>>>>>> new-work/security-Jul-17-0944
         """
         Initialize API gateway.
 
@@ -74,13 +54,6 @@ class ApiGateway:
         self.api_keys: Dict[str, Dict[str, Any]] = {}
         self.server_started = False
         self._request_count = 0
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-||||||| 64640d5
-        
-=======
         self.security_headers = {
             "X-Content-Type-Options": "nosniff",
             "X-Frame-Options": "DENY",
@@ -97,42 +70,13 @@ class ApiGateway:
             "/api/v1/admin",
             "/api/v1/configuration"
         }
-        
->>>>>>> new-work/security-Jul-17-0944
-||||||| 48e9100
-        
-=======
 
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-        
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
         if service_discovery:
             logger.info("Service discovery integration enabled")
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-||||||| 64640d5
-    
-=======
         if auth_middleware:
             logger.info("Authentication middleware integrated")
-    
->>>>>>> new-work/security-Jul-17-0944
-||||||| 48e9100
-    
-=======
 
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
     async def start_server(self) -> None:
         """Start the API gateway server."""
         if self.server_started:
@@ -491,42 +435,40 @@ class ApiGateway:
             )
 
     async def _authenticate_request(self, request: ApiRequest) -> Dict[str, Any]:
-        """
-        Authenticate API request using API key.
-
-        Args:
-            request: API request to authenticate
-
-        Returns:
-            Authentication result
-        """
-        api_key = request.headers.get(self.config.api_key_header)
-
-        if not api_key:
+        """Authenticate request using integrated auth middleware."""
+        if not self.auth_middleware:
+            # Fallback to basic API key authentication
+            return await self._basic_auth_check(request)
+        
+        try:
+            auth_result = await self.auth_middleware.authenticate_request(request)
+            
+            if auth_result.success:
+                # Store auth info in request context for later use
+                request.auth_context = {
+                    "user_id": auth_result.user_id,
+                    "permissions": auth_result.permissions,
+                    "metadata": auth_result.metadata
+                }
+                return {
+                    "success": True,
+                    "message": "Authentication successful",
+                    "user_id": auth_result.user_id,
+                    "permissions": [p.value for p in auth_result.permissions] if auth_result.permissions else []
+                }
+            else:
+                logger.warning(f"Authentication failed for request {request.request_id}: {auth_result.error}")
+                return {
+                    "success": False,
+                    "message": auth_result.error or "Authentication failed"
+                }
+                
+        except Exception as e:
+            logger.error(f"Authentication error for request {request.request_id}: {e}")
             return {
                 "success": False,
-                "message": f"Missing {self.config.api_key_header} header"
+                "message": "Authentication service error"
             }
-
-        if api_key not in self.api_keys:
-            return {
-                "success": False,
-                "message": "Invalid API key"
-            }
-
-        # Check if API key is active
-        key_data = self.api_keys[api_key]
-        if key_data.get("active", True) is False:
-            return {
-                "success": False,
-                "message": "API key is inactive"
-            }
-
-        return {
-            "success": True,
-            "message": "Authentication successful",
-            "key_data": key_data
-        }
 
     async def _check_rate_limit(self, request: ApiRequest) -> Dict[str, Any]:
         """
@@ -625,26 +567,7 @@ class ApiGateway:
             })
 
         return headers
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
-    def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
-||||||| 64640d5
-    
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/frontend-Jul-17-0824
-    def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
-=======
-    
     def _requires_authentication(self, path: str) -> bool:
         """Check if path requires authentication."""
         # Remove API prefix for comparison
@@ -661,42 +584,6 @@ class ApiGateway:
     def _get_security_headers(self) -> Dict[str, str]:
         """Get security headers for response."""
         return self.security_headers.copy()
-    
-    async def _authenticate_request(self, request: ApiRequest) -> Dict[str, Any]:
-        """Authenticate request using integrated auth middleware."""
-        if not self.auth_middleware:
-            # Fallback to basic API key authentication
-            return await self._basic_auth_check(request)
-        
-        try:
-            auth_result = await self.auth_middleware.authenticate_request(request)
-            
-            if auth_result.success:
-                # Store auth info in request context for later use
-                request.auth_context = {
-                    "user_id": auth_result.user_id,
-                    "permissions": auth_result.permissions,
-                    "metadata": auth_result.metadata
-                }
-                return {
-                    "success": True,
-                    "message": "Authentication successful",
-                    "user_id": auth_result.user_id,
-                    "permissions": [p.value for p in auth_result.permissions] if auth_result.permissions else []
-                }
-            else:
-                logger.warning(f"Authentication failed for request {request.request_id}: {auth_result.error}")
-                return {
-                    "success": False,
-                    "message": auth_result.error or "Authentication failed"
-                }
-                
-        except Exception as e:
-            logger.error(f"Authentication error for request {request.request_id}: {e}")
-            return {
-                "success": False,
-                "message": "Authentication service error"
-            }
     
     async def _basic_auth_check(self, request: ApiRequest) -> Dict[str, Any]:
         """Basic API key authentication fallback."""
@@ -730,7 +617,6 @@ class ApiGateway:
     
     def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float, 
                               extra_headers: Optional[Dict[str, str]] = None) -> ApiResponse:
->>>>>>> new-work/security-Jul-17-0944
         """Create error response."""
         headers = self._get_response_headers()
         if extra_headers:

@@ -1,25 +1,7 @@
 {
-<<<<<<< HEAD
-  "agent_name": "security",
-||||||| 48e9100
-  "agent_name": "performance",
-=======
-  "agent_name": "frontend",
->>>>>>> new-work/frontend-Jul-17-0824
+  "agent_name": "service-mesh",
   "task_description": "main",
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "created_at": "2025-07-17T09:44:50.850335",
-||||||| 48e9100
-  "created_at": "2025-07-16T13:39:11.242371",
-=======
-  "created_at": "2025-07-17T08:24:49.657566",
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-  "created_at": "2025-07-16T13:39:11.242371",
-=======
-  "created_at": "2025-07-17T08:23:44.262711",
->>>>>>> new-work/performance-Jul-17-0823
+  "created_at": "2025-07-18T18:31:10.110271",
   "quality_gates": {
     "max_pr_size": 500,
     "required_tests": true,

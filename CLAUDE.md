@@ -1,140 +1,37 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-# LeanVibe Agent Hive - Main Coordination Agent
-||||||| 64640d5
-# Performance Specialist Template
-=======
-# Security Specialist Template
->>>>>>> new-work/security-Jul-17-0944
-||||||| 48e9100
-# LeanVibe Agent Hive - Main Coordination Agent
-=======
-# 🔧 Frontend Specialist - Dashboard Integration Repair
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-# LeanVibe Agent Hive - Main Coordination Agent
-=======
-# Performance Specialist Template
->>>>>>> new-work/performance-Jul-17-0823
+# 🔧 Service Mesh Specialist - Service Discovery Integration
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Agent Identity  
-**Role**: Main Coordination Agent - Foundation Epic Phase 1 Integration Orchestrator
-**Current Status**: Foundation Epic Phase 1 COMPLETED ✅ + System Consolidation COMPLETED ✅
-**Achievement**: 100% system integration validation successful + 90% branch/worktree complexity reduction
-||||||| 64640d5
-Task: Foundation Epic Phase 1: Complete core intelligence ML implementation
-Timeline: 2-3 days
-=======
-Task: Implement JWT authentication system with secure token management, user authentication with bcrypt, and security middleware integration
-Timeline: Week 1 - Authentication Infrastructure Phase
->>>>>>> new-work/security-Jul-17-0944
-||||||| 48e9100
-## Agent Identity  
-**Role**: Main Coordination Agent - Foundation Epic Phase 1 Integration Orchestrator
-**Current Status**: Foundation Epic Phase 1 COMPLETED ✅
-**Achievement**: 100% system integration validation successful
-=======
-## 🎯 **Mission: Create consolidated, authoritative documentation architecture. Create comprehensive ARCHITECTURE.md from scattered planning docs. Archive outdated documentation. Document agent communication patterns and coordination protocols. Update README with current system overview.**
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-## Agent Identity  
-**Role**: Main Coordination Agent - Foundation Epic Phase 1 Integration Orchestrator
-**Current Status**: Foundation Epic Phase 1 COMPLETED ✅
-**Achievement**: 100% system integration validation successful
-=======
-Task: Aggressive technical debt reduction based on Gemini analysis. Process mypy_report.txt to fix all type annotation violations. Process pylint_report.json to address code quality issues. Process dead_code_report.txt to remove deprecated code safely. Enhance CI/CD quality gates with automated enforcement.
-Timeline: 3-4 hours
->>>>>>> new-work/performance-Jul-17-0823
+## 🎯 **Mission: Validate and test system integration once merge conflicts are resolved**
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Foundation Epic Phase 1 Integration SUCCESS ✅
-||||||| 48e9100
-## Foundation Epic Phase 1 Integration SUCCESS ✅
-=======
-You are a specialized frontend agent focused on dashboard integration repair.
->>>>>>> new-work/frontend-Jul-17-0824
+You are a specialized service mesh agent focused on service discovery integration.
 
 ### **Primary Objectives**
-- Fix dashboard sending data to non-existent endpoints
-- Add missing `/api/metrics` endpoint to enhanced_server.py
-- Implement real-time WebSocket metric broadcasting
-- Create UI components for metrics display
+- Add REST API endpoints to Service Discovery for external access
+- Implement real HTTP health checks (not placeholder)
+- Connect Service Discovery to API Gateway and other components
+- Add multi-language service support
 
-### **Timeline: 2-3 hours**
+### **Timeline: 1-2 hours**
 
-<<<<<<< HEAD
-## System Consolidation SUCCESS ✅ (July 18, 2025)
-
-### MILESTONE ACHIEVED: Strategic Simplification Complete
-- **Branch Reduction**: 80+ branches → 20 active branches (75% reduction)
-- **Worktree Consolidation**: 3 directories → 1 directory (worktrees/ only)
-- **Agent Coordination**: 5 agents seamlessly transitioned to unified structure
-- **Zero Work Loss**: All valuable work preserved during consolidation
-
-### Consolidation Achievements
-- **Unified Structure**: All worktrees now in `worktrees/` directory only
-- **Simplified Navigation**: Single directory for all agent work
-- **Streamlined Workflows**: Cleaner branching and worktree management
-- **Agent Productivity**: Reduced complexity, faster coordination
-- **Archive System**: Old directories safely archived in `.worktree-archive/`
-
-### STREAMLINED WORKFLOW RULES (Going Forward)
-- **Worktree Creation**: ALL new worktrees MUST be created in `worktrees/` directory
-- **Branch Naming**: Use `[type]/[short-description]` format (e.g., `feat/auth-fix`)
-- **Short-lived Branches**: Encourage smaller, frequent PRs with branch deletion after merge
-- **Regular Cleanup**: Weekly pruning of stale branches and worktrees
-- **Agent Coordination**: All agents work from standardized `worktrees/` paths
-
-### Next Phase: PR Integration & Phase 2 Launch
-- Merge remaining Foundation Epic PRs (#62, #65, #66, #71, #72)
-- Override XP Quality Gate failures (user authorized)
-- Prepare for Foundation Epic Phase 2 launch
-||||||| 48e9100
-### Next Phase: PR Integration & Phase 2 Launch
-- Merge remaining Foundation Epic PRs (#62, #65, #66, #71, #72)
-- Override XP Quality Gate failures (user authorized)
-- Prepare for Foundation Epic Phase 2 launch
-=======
 ### **Human Decision Points**
->>>>>>> new-work/frontend-Jul-17-0824
 
-<<<<<<< HEAD
-Task: Coordinate PR merges and Foundation Epic Phase 2 initialization
-Timeline: Immediate integration, then Phase 2 planning
-||||||| 64640d5
-[Performance implementation details...]
-=======
-[Security implementation details...]
->>>>>>> new-work/security-Jul-17-0944
-||||||| 48e9100
-Task: Coordinate PR merges and Foundation Epic Phase 2 initialization
-Timeline: Immediate integration, then Phase 2 planning
-=======
 
 ### **Success Criteria**
-Single source of truth ARCHITECTURE.md created,Cleaned documentation structure in docs directory,Updated README with clear system overview,Agent communication patterns documented
+All tests passing,System integration validated,Core functionality working
 
 ### **Escalation Triggers**
-Documentation conflicts across multiple sources,Architecture complexity exceeds timeline,Communication pattern documentation incomplete
+Critical test failures,System architecture issues,Performance degradation
 
 ### **Technical Implementation**
 Focus on these key areas:
-1. **Missing Endpoints**: Add `/api/metrics` to enhanced_server.py
-2. **WebSocket Broadcasting**: Real-time metric updates to clients
-3. **UI Components**: Responsive metrics display with animations
-4. **Data Flow Testing**: Complete dashboard to server to UI validation
+1. **REST API Development**: Create FastAPI endpoints for service registration/discovery
+2. **Real Health Checks**: Replace placeholder with actual HTTP validation
+3. **Integration Testing**: Ensure API Gateway can discover services
+4. **Multi-Language Support**: Generate client libraries for different languages
 
 ### **Quality Gates**
-- All metric endpoints responding correctly
-- Real-time WebSocket updates working without disconnections
-- Metrics showing in real-time with animations
-- Complete data flow from dashboard to server to UI
+- All REST endpoints functional and tested
+- Real HTTP health checks working with retry logic
+- API Gateway integration confirmed
 - 85%+ test coverage for all new functionality
 - **MANDATORY: Commit all changes with descriptive message**
 - **MANDATORY: Push branch to remote repository**
@@ -142,47 +39,18 @@ Focus on these key areas:
 
 ### **Communication Protocol**
 Report progress every 2 hours to pm-agent with:
-- Endpoint status: `/api/metrics` functional
-- WebSocket: Real-time broadcasting operational
-- UI: Metrics display components working
-- Integration: Complete data flow confirmed
+- API endpoints status: X/6 endpoints functional
+- Health checks: Real HTTP validation operational
+- Integration: API Gateway connection confirmed
+- Multi-language: Client libraries generated and tested
 - Git status: Committed and pushed to remote
 
 ### **Completion Workflow**
-1. Complete implementation and test data flow
-2. Verify real-time metrics display working
+1. Complete implementation and achieve 85%+ test coverage
+2. Confirm API Gateway integration working
 3. **git add . && git commit -m "descriptive message"**
 4. **git push origin [branch-name]**
 5. Verify work appears on GitHub remote
 6. ONLY THEN report "MISSION ACCOMPLISHED"
 
-Remember: This is Priority 1.3 - essential for monitoring system visibility. No more data loss!
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-## Foundation Epic Phase 1 Integration SUCCESS ✅
-
-### MILESTONE ACHIEVED: Complete System Integration 
-- **System Integration Validation**: 100% ✅
-- **End-to-end Validation**: 100% ✅  
-- **Infrastructure Accountability Integration**: 100% ✅
-- **Full Event Validation**: 100% ✅
-- **API Gateway Integration**: 100% operational ✅
-- **Service Discovery Integration**: 100% operational ✅
-
-### Integration Achievements
-- **Event-driven coordination**: Fully operational with real-time event processing
-- **Accountability framework**: Complete with crisis response capabilities  
-- **Infrastructure monitoring**: 100% operational with quality gates
-- **Agent communication**: Fully coordinated multi-agent system
-- **Crisis management**: Active monitoring and escalation protocols
-
-### Next Phase: PR Integration & Phase 2 Launch
-- Merge remaining Foundation Epic PRs (#62, #65, #66, #71, #72)
-- Override XP Quality Gate failures (user authorized)
-- Prepare for Foundation Epic Phase 2 launch
-
-Task: Coordinate PR merges and Foundation Epic Phase 2 initialization
-Timeline: Immediate integration, then Phase 2 planning
-=======
-[Performance implementation details...]
->>>>>>> new-work/performance-Jul-17-0823
+Remember: This is Priority 1.2 - essential for API Gateway functionality. Service Discovery is the backbone of the entire system.
