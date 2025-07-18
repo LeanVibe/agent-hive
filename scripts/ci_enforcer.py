@@ -10,13 +10,12 @@ CI/CD pipeline health for XP methodology compliance.
 import json
 import os
 import sqlite3
-import subprocess
 import sys
 import time
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from typing import Dict, Optional
+
 import yaml
 
 
@@ -193,7 +192,8 @@ class CIEnforcer:
         """Validate CI pipeline configuration for XP compliance."""
         try:
             with open(config_file, 'r') as f:
-                if config_file.endswith('.yml') or config_file.endswith('.yaml'):
+                if config_file.endswith(
+                        '.yml') or config_file.endswith('.yaml'):
                     config = yaml.safe_load(f)
                 else:
                     config = json.load(f)
@@ -223,7 +223,8 @@ class CIEnforcer:
                 compliance_score += 15
             else:
                 violations.append("Missing code quality gates")
-                recommendations.append("Add linting, formatting, and quality checks")
+                recommendations.append(
+                    "Add linting, formatting, and quality checks")
 
             # 4. Security scanning (10 points)
             if self.has_security_scanning(config):
@@ -237,7 +238,8 @@ class CIEnforcer:
                 compliance_score += 15
             else:
                 violations.append("Pipeline too slow for fast feedback")
-                recommendations.append("Optimize pipeline for <10 minute execution")
+                recommendations.append(
+                    "Optimize pipeline for <10 minute execution")
 
             # 6. Continuous deployment (10 points)
             if self.has_continuous_deployment(config):
@@ -269,34 +271,40 @@ class CIEnforcer:
         except Exception as e:
             return {
                 'compliance_score': 0.0,
-                'violations': [f"Invalid configuration: {e}"],
+                'violations': [
+                    f"Invalid configuration: {e}"],
                 'recommendations': ["Fix configuration file format and syntax"],
-                'xp_compliant': False
-            }
+                'xp_compliant': False}
 
     def has_automated_tests(self, config: Dict) -> bool:
         """Check if pipeline has automated test execution."""
         config_str = json.dumps(config).lower()
-        test_indicators = ['pytest', 'test', 'npm test', 'jest', 'mocha', 'unittest']
+        test_indicators = ['pytest', 'test',
+                           'npm test', 'jest', 'mocha', 'unittest']
         return any(indicator in config_str for indicator in test_indicators)
 
     def has_coverage_enforcement(self, config: Dict) -> bool:
         """Check if pipeline enforces test coverage."""
         config_str = json.dumps(config).lower()
-        coverage_indicators = ['coverage', 'cov', '--cov', 'codecov', 'coveralls']
-        return any(indicator in config_str for indicator in coverage_indicators)
+        coverage_indicators = ['coverage', 'cov',
+                               '--cov', 'codecov', 'coveralls']
+        return any(
+            indicator in config_str for indicator in coverage_indicators)
 
     def has_quality_gates(self, config: Dict) -> bool:
         """Check if pipeline has code quality gates."""
         config_str = json.dumps(config).lower()
-        quality_indicators = ['lint', 'flake8', 'eslint', 'black', 'prettier', 'quality']
+        quality_indicators = ['lint', 'flake8',
+                              'eslint', 'black', 'prettier', 'quality']
         return any(indicator in config_str for indicator in quality_indicators)
 
     def has_security_scanning(self, config: Dict) -> bool:
         """Check if pipeline includes security scanning."""
         config_str = json.dumps(config).lower()
-        security_indicators = ['bandit', 'safety', 'snyk', 'security', 'vulnerabilit']
-        return any(indicator in config_str for indicator in security_indicators)
+        security_indicators = ['bandit', 'safety',
+                               'snyk', 'security', 'vulnerabilit']
+        return any(
+            indicator in config_str for indicator in security_indicators)
 
     def has_fast_feedback(self, config: Dict) -> bool:
         """Check if pipeline is optimized for fast feedback."""
@@ -305,7 +313,11 @@ class CIEnforcer:
         if 'timeout' in config_str:
             return True
         # Check for parallel execution or caching
-        if any(indicator in config_str for indicator in ['parallel', 'cache', 'matrix']):
+        if any(
+            indicator in config_str for indicator in [
+                'parallel',
+                'cache',
+                'matrix']):
             return True
         return False
 
@@ -320,15 +332,20 @@ class CIEnforcer:
         config_str = json.dumps(config).lower()
         # This is more about GitHub settings, but we can check for PR triggers
         protection_indicators = ['pull_request', 'push:', 'main', 'master']
-        return any(indicator in config_str for indicator in protection_indicators)
+        return any(
+            indicator in config_str for indicator in protection_indicators)
 
     def has_parallel_execution(self, config: Dict) -> bool:
         """Check if pipeline uses parallel execution."""
         config_str = json.dumps(config).lower()
         parallel_indicators = ['matrix', 'parallel', 'strategy', 'needs:']
-        return any(indicator in config_str for indicator in parallel_indicators)
+        return any(
+            indicator in config_str for indicator in parallel_indicators)
 
-    def simulate_ci_job(self, branch: str = "main", commit_sha: str = None) -> CIJob:
+    def simulate_ci_job(
+            self,
+            branch: str = "main",
+            commit_sha: str = None) -> CIJob:
         """Simulate a CI job execution for testing purposes."""
         if not commit_sha:
             commit_sha = "abc123def456"
@@ -376,7 +393,8 @@ class CIEnforcer:
     def save_ci_job(self, job: CIJob):
         """Save CI job to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO ci_jobs
                 (job_id, job_name, workflow_name, branch, commit_sha, status,
                  started_at, completed_at, duration_seconds, tests_passed,
@@ -385,15 +403,27 @@ class CIEnforcer:
                  test_failures, coverage_percentage, security_issues,
                  performance_regressions)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                job.job_id, job.job_name, job.workflow_name, job.branch,
-                job.commit_sha, job.status, job.started_at, job.completed_at,
-                job.duration_seconds, job.tests_passed, job.coverage_threshold_met,
-                job.quality_gates_passed, job.deployment_ready,
-                job.test_execution_time, job.build_time, job.total_pipeline_time,
-                job.test_failures, job.coverage_percentage, job.security_issues,
-                job.performance_regressions
-            ))
+            """,
+                (job.job_id,
+                 job.job_name,
+                 job.workflow_name,
+                 job.branch,
+                 job.commit_sha,
+                 job.status,
+                 job.started_at,
+                 job.completed_at,
+                 job.duration_seconds,
+                 job.tests_passed,
+                 job.coverage_threshold_met,
+                 job.quality_gates_passed,
+                 job.deployment_ready,
+                 job.test_execution_time,
+                 job.build_time,
+                 job.total_pipeline_time,
+                 job.test_failures,
+                 job.coverage_percentage,
+                 job.security_issues,
+                 job.performance_regressions))
             conn.commit()
 
     def calculate_ci_metrics(self, days: int = 7) -> CIMetrics:
@@ -445,7 +475,8 @@ class CIEnforcer:
             deployment_success_rate = quality_data[2] if quality_data[2] else 0.0
 
         # Calculate additional XP metrics
-        build_success_rate = (successful_builds / total_builds * 100) if total_builds > 0 else 0
+        build_success_rate = (successful_builds / total_builds *
+                              100) if total_builds > 0 else 0
 
         # XP specific calculations
         small_commits_rate = 85.0  # Placeholder - would analyze actual commit sizes
@@ -458,7 +489,9 @@ class CIEnforcer:
         velocity_trend = "stable"
 
         return CIMetrics(
-            period_id=f"ci-metrics-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}",
+            period_id=f"ci-metrics-{
+    start_date.strftime('%Y%m%d')}-{
+        end_date.strftime('%Y%m%d')}",
             start_date=start_date.strftime('%Y-%m-%d'),
             end_date=end_date.strftime('%Y-%m-%d'),
             total_builds=total_builds,
@@ -527,14 +560,15 @@ class CIEnforcer:
 """
 
             if config_analysis['violations']:
-                report += f"""
+                report += """
 #### ⚠️ Configuration Violations
 """
-                for i, violation in enumerate(config_analysis['violations'], 1):
+                for i, violation in enumerate(
+                        config_analysis['violations'], 1):
                     report += f"{i}. {violation}\n"
 
             if config_analysis['recommendations']:
-                report += f"""
+                report += """
 #### 💡 Improvement Recommendations
 """
                 for i, rec in enumerate(config_analysis['recommendations'], 1):
@@ -565,19 +599,24 @@ class CIEnforcer:
         recommendations = []
 
         if metrics.build_success_rate < 90:
-            recommendations.append("Improve build stability - success rate below 90%")
+            recommendations.append(
+                "Improve build stability - success rate below 90%")
 
         if metrics.avg_pipeline_time_minutes > self.targets['pipeline_time_max_minutes']:
-            recommendations.append("Optimize pipeline speed - exceeds 15-minute target for fast feedback")
+            recommendations.append(
+                "Optimize pipeline speed - exceeds 15-minute target for fast feedback")
 
         if metrics.frequent_integration_rate < 2:
-            recommendations.append("Increase integration frequency - aim for multiple integrations per day")
+            recommendations.append(
+                "Increase integration frequency - aim for multiple integrations per day")
 
         if metrics.test_pass_rate < 95:
-            recommendations.append("Focus on test reliability - test pass rate below 95%")
+            recommendations.append(
+                "Focus on test reliability - test pass rate below 95%")
 
         if not recommendations:
-            recommendations.append("CI/CD pipeline meets XP methodology standards")
+            recommendations.append(
+                "CI/CD pipeline meets XP methodology standards")
 
         for i, rec in enumerate(recommendations, 1):
             report += f"{i}. {rec}\n"
@@ -603,7 +642,8 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python ci_enforcer.py <command> [options]")
         print("Commands:")
-        print("  validate <config_file>   - Validate pipeline configuration for XP compliance")
+        print(
+            "  validate <config_file>   - Validate pipeline configuration for XP compliance")
         print("  simulate [branch]        - Simulate CI job execution")
         print("  report [days]            - Generate CI/CD report")
         print("  metrics [days]           - Show CI metrics")
@@ -629,7 +669,8 @@ def main():
 
         print(f"Pipeline Configuration Analysis: {config_file}")
         print(f"XP Compliance Score: {analysis['compliance_score']:.1f}/100")
-        print(f"XP Compliant: {'✅ Yes' if analysis['xp_compliant'] else '❌ No'}")
+        print(
+            f"XP Compliant: {'✅ Yes' if analysis['xp_compliant'] else '❌ No'}")
 
         if analysis['violations']:
             print(f"\nViolations ({len(analysis['violations'])}):")
@@ -673,8 +714,12 @@ def main():
         print(f"CI/CD Metrics ({days} days):")
         print(f"  Total Builds: {metrics.total_builds}")
         print(f"  Success Rate: {metrics.build_success_rate:.1f}%")
-        print(f"  Average Build Time: {metrics.avg_build_time_minutes:.1f} minutes")
-        print(f"  Integration Frequency: {metrics.frequent_integration_rate:.1f} builds/day")
+        print(
+            f"  Average Build Time: {
+                metrics.avg_build_time_minutes:.1f} minutes")
+        print(
+            f"  Integration Frequency: {
+                metrics.frequent_integration_rate:.1f} builds/day")
         print(f"  Fast Feedback Rate: {metrics.fast_feedback_rate:.1f}%")
 
     elif command == "check-pipeline":
@@ -683,8 +728,11 @@ def main():
         if os.path.exists(pipeline_file):
             analysis = enforcer.validate_pipeline_config(pipeline_file)
             print(f"✅ Pipeline configuration found: {pipeline_file}")
-            print(f"XP Compliance Score: {analysis['compliance_score']:.1f}/100")
-            print(f"XP Compliant: {'✅ Yes' if analysis['xp_compliant'] else '❌ No'}")
+            print(
+                f"XP Compliance Score: {analysis['compliance_score']:.1f}/100")
+            print(
+                f"XP Compliant: {
+                    '✅ Yes' if analysis['xp_compliant'] else '❌ No'}")
         else:
             print(f"❌ No XP CI pipeline found at: {pipeline_file}")
             print("💡 Use the GitHub workflow provided by the PM/XP agent")
@@ -694,7 +742,9 @@ def main():
         print("CI/CD Quality Targets:")
         print(f"  Max Build Time: {targets['build_time_max_minutes']} minutes")
         print(f"  Max Test Time: {targets['test_time_max_minutes']} minutes")
-        print(f"  Max Pipeline Time: {targets['pipeline_time_max_minutes']} minutes")
+        print(
+            f"  Max Pipeline Time: {
+                targets['pipeline_time_max_minutes']} minutes")
         print(f"  Min Success Rate: {targets['success_rate_minimum']}%")
         print(f"  Min Coverage: {targets['coverage_minimum']}%")
         print(f"  Max Files per Commit: {targets['max_files_per_commit']}")

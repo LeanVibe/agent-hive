@@ -6,13 +6,11 @@ Provides intelligent filtering and prioritization of agent updates to reduce
 noise and deliver relevant insights to humans.
 """
 
-import asyncio
 import json
-import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 
 class Priority(Enum):
@@ -98,7 +96,7 @@ class NotificationEngine:
         for past_event in self.notification_history:
             if (past_event.timestamp > recent_threshold and
                 past_event.agent_id == event.agent_id and
-                past_event.event_type == event.event_type):
+                    past_event.event_type == event.event_type):
                 return True
 
         return False
@@ -112,7 +110,8 @@ class NotificationEngine:
         """Process a notification event and return formatted message if should notify."""
         # Set priority if not already set
         if event.priority is None:
-            event.priority = self.priority_rules.get(event.event_type, Priority.MEDIUM)
+            event.priority = self.priority_rules.get(
+                event.event_type, Priority.MEDIUM)
 
         # Add to history
         self.notification_history.append(event)
@@ -151,15 +150,15 @@ class InsightGenerator:
             'resource_optimization': self._generate_resource_optimization
         }
 
-    def generate_executive_summary(self, agent_data: List[Dict]) -> Dict[str, Any]:
+    def generate_executive_summary(
+            self, agent_data: List[Dict]) -> Dict[str, Any]:
         """Generate executive summary from agent data."""
         summary = {
             'key_achievements': self._extract_achievements(agent_data),
             'business_impact': self._calculate_business_impact(agent_data),
             'risk_assessment': self._assess_risks(agent_data),
             'action_items': self._identify_action_items(agent_data),
-            'strategic_recommendations': self._generate_strategic_recommendations(agent_data)
-        }
+            'strategic_recommendations': self._generate_strategic_recommendations(agent_data)}
 
         return summary
 
@@ -172,11 +171,13 @@ class InsightGenerator:
                 achievements.append(f"{agent['name']} reached 80% completion")
 
             if agent.get('business_impact'):
-                achievements.append(f"{agent['name']}: {agent['business_impact']}")
+                achievements.append(
+                    f"{agent['name']}: {agent['business_impact']}")
 
         return achievements
 
-    def _calculate_business_impact(self, agent_data: List[Dict]) -> Dict[str, str]:
+    def _calculate_business_impact(
+            self, agent_data: List[Dict]) -> Dict[str, str]:
         """Calculate business impact metrics."""
         impact = {
             'development_velocity': '+4x parallel work capability',
@@ -204,10 +205,13 @@ class InsightGenerator:
         }
 
         # Check for blocked agents
-        blocked_agents = [agent for agent in agent_data if 'blocked' in agent.get('status', '').lower()]
+        blocked_agents = [
+            agent for agent in agent_data if 'blocked' in agent.get(
+                'status', '').lower()]
         if blocked_agents:
             risks['overall_risk'] = 'Medium'
-            risks['critical_blockers'] = f'{len(blocked_agents)} agent(s) blocked'
+            risks['critical_blockers'] = f'{
+                len(blocked_agents)} agent(s) blocked'
 
         return risks
 
@@ -227,23 +231,32 @@ class InsightGenerator:
 
         return action_items
 
-    def _generate_strategic_recommendations(self, agent_data: List[Dict]) -> List[str]:
+    def _generate_strategic_recommendations(
+            self, agent_data: List[Dict]) -> List[str]:
         """Generate strategic recommendations."""
         recommendations = []
 
         # Check if agents are ahead of schedule
-        ahead_agents = [agent for agent in agent_data if agent.get('progress', 0) > 85]
+        ahead_agents = [
+            agent for agent in agent_data if agent.get('progress', 0) > 85]
         if ahead_agents:
-            recommendations.append(f"{len(ahead_agents)} agent(s) ahead of schedule - consider additional tasks")
+            recommendations.append(
+                f"{len(ahead_agents)} agent(s) ahead of schedule - consider additional tasks")
 
         # Check for scaling opportunities
-        if len(agent_data) >= 2 and all(agent.get('progress', 0) > 60 for agent in agent_data):
-            recommendations.append("Consider scaling to 4-5 agents for next sprint")
+        if len(agent_data) >= 2 and all(
+            agent.get(
+                'progress',
+                0) > 60 for agent in agent_data):
+            recommendations.append(
+                "Consider scaling to 4-5 agents for next sprint")
 
         # Check for production readiness
-        complete_agents = [agent for agent in agent_data if agent.get('progress', 0) >= 100]
+        complete_agents = [
+            agent for agent in agent_data if agent.get('progress', 0) >= 100]
         if complete_agents:
-            recommendations.append(f"{len(complete_agents)} agent(s) ready for production deployment")
+            recommendations.append(
+                f"{len(complete_agents)} agent(s) ready for production deployment")
 
         return recommendations
 
@@ -273,7 +286,11 @@ class InsightGenerator:
         """Assess risk level for agent."""
         risk_factors = []
 
-        if agent_data.get('progress', 0) < 50 and 'blocked' in agent_data.get('status', '').lower():
+        if agent_data.get(
+                'progress',
+                0) < 50 and 'blocked' in agent_data.get(
+                'status',
+                '').lower():
             risk_factors.append("blocked_with_low_progress")
 
         if len(risk_factors) > 0:

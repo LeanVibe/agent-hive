@@ -5,24 +5,20 @@ This module provides comprehensive integration tests to ensure all system
 components work together correctly and maintain proper interfaces.
 """
 
-import pytest
 import asyncio
-import tempfile
-import json
-import time
 import sys
-from pathlib import Path
-from unittest.mock import Mock, patch, AsyncMock
+import tempfile
+import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from pathlib import Path
+
+import pytest
+from task_queue_module.task_queue import Task, TaskQueue
+
+from state.state_manager import AgentState, StateManager, TaskState
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
-
-from state.state_manager import StateManager, AgentState, TaskState, SystemState
-from task_queue_module.task_queue import TaskQueue, Task
-from agents.base_agent import BaseAgent, AgentStatus, AgentInfo
-from config.config_loader import ConfigLoader
 
 
 @pytest.mark.integration
@@ -58,14 +54,16 @@ class TestStateManagerIntegration:
                 state_manager.update_task_state(task_state)
 
             # Verify state persistence
-            retrieved_agent = state_manager.get_agent_state("integration-agent")
+            retrieved_agent = state_manager.get_agent_state(
+                "integration-agent")
             assert retrieved_agent is not None
             assert retrieved_agent.agent_id == "integration-agent"
             assert retrieved_agent.status == "idle"
 
             # Verify task states
             for i, task_state in enumerate(task_states):
-                retrieved_task = state_manager.get_task_state(f"integration-task-{i}")
+                retrieved_task = state_manager.get_task_state(
+                    f"integration-task-{i}")
                 assert retrieved_task is not None
                 assert retrieved_task.task_id == f"integration-task-{i}"
                 assert retrieved_task.status == "pending"
@@ -75,7 +73,8 @@ class TestStateManagerIntegration:
             system_state = state_manager.get_system_state()
             assert system_state.active_agents >= 0
             assert system_state.completed_tasks >= 0
-            assert system_state.system_health in ["healthy", "degraded", "unhealthy"]
+            assert system_state.system_health in [
+                "healthy", "degraded", "unhealthy"]
 
     def test_state_manager_checkpoint_integration(self):
         """Test StateManager checkpoint functionality."""
@@ -102,7 +101,8 @@ class TestStateManagerIntegration:
             assert saved_checkpoint["metrics"] == metrics
 
             # Verify timestamp is reasonable
-            checkpoint_time = datetime.fromisoformat(saved_checkpoint["timestamp"])
+            checkpoint_time = datetime.fromisoformat(
+                saved_checkpoint["timestamp"])
             time_diff = datetime.now() - checkpoint_time
             assert time_diff < timedelta(seconds=10)  # Should be recent
 
@@ -123,7 +123,8 @@ class TestStateManagerIntegration:
 
             # Verify both exist
             assert state_manager.get_checkpoint(old_checkpoint_id) is not None
-            assert state_manager.get_checkpoint(recent_checkpoint_id) is not None
+            assert state_manager.get_checkpoint(
+                recent_checkpoint_id) is not None
 
             # Cleanup with 0 days retention (should remove all)
             state_manager.cleanup_old_data(0)
@@ -202,7 +203,8 @@ class TestTaskQueueIntegration:
             assert len(processed_tasks) == 5
 
             # Verify state consistency
-            final_agent_state = state_manager.get_agent_state("queue-integration-agent")
+            final_agent_state = state_manager.get_agent_state(
+                "queue-integration-agent")
             assert final_agent_state is not None
 
             # Verify task states
@@ -315,7 +317,8 @@ class TestAgentStateIntegration:
                 state_manager.update_agent_state(agent_state)
 
             # Verify final state
-            final_agent_state = state_manager.get_agent_state("lifecycle-agent")
+            final_agent_state = state_manager.get_agent_state(
+                "lifecycle-agent")
             assert final_agent_state is not None
             assert final_agent_state.status == "idle"
             assert final_agent_state.current_task_id is None
@@ -323,7 +326,8 @@ class TestAgentStateIntegration:
 
             # Verify all tasks were completed
             for task_state in task_states:
-                final_task_state = state_manager.get_task_state(task_state.task_id)
+                final_task_state = state_manager.get_task_state(
+                    task_state.task_id)
                 assert final_task_state is not None
                 assert final_task_state.status == "completed"
                 assert final_task_state.completed_at is not None
@@ -354,13 +358,15 @@ class TestAgentStateIntegration:
             # Assign tasks to specific agents
             task_assignments = [
                 {"task_id": "python-task", "agent_id": "agent-1", "type": "python"},
-                {"task_id": "frontend-task", "agent_id": "agent-2", "type": "javascript"},
+                {"task_id": "frontend-task",
+                    "agent_id": "agent-2", "type": "javascript"},
                 {"task_id": "database-task", "agent_id": "agent-3", "type": "database"}
             ]
 
             for assignment in task_assignments:
                 # Update agent state
-                agent_state = state_manager.get_agent_state(assignment["agent_id"])
+                agent_state = state_manager.get_agent_state(
+                    assignment["agent_id"])
                 agent_state.status = "busy"
                 agent_state.current_task_id = assignment["task_id"]
                 state_manager.update_agent_state(agent_state)
@@ -377,20 +383,23 @@ class TestAgentStateIntegration:
 
             # Verify all agents are busy
             for agent in agents:
-                current_agent_state = state_manager.get_agent_state(agent.agent_id)
+                current_agent_state = state_manager.get_agent_state(
+                    agent.agent_id)
                 assert current_agent_state.status == "busy"
                 assert current_agent_state.current_task_id is not None
 
             # Complete all tasks
             for assignment in task_assignments:
                 # Complete task
-                task_state = state_manager.get_task_state(assignment["task_id"])
+                task_state = state_manager.get_task_state(
+                    assignment["task_id"])
                 task_state.status = "completed"
                 task_state.completed_at = datetime.now()
                 state_manager.update_task_state(task_state)
 
                 # Free agent
-                agent_state = state_manager.get_agent_state(assignment["agent_id"])
+                agent_state = state_manager.get_agent_state(
+                    assignment["agent_id"])
                 agent_state.status = "idle"
                 agent_state.current_task_id = None
                 state_manager.update_agent_state(agent_state)
@@ -399,7 +408,8 @@ class TestAgentStateIntegration:
             system_state = state_manager.get_system_state()
             assert system_state.active_agents >= 0
             assert system_state.completed_tasks >= 0
-            assert system_state.system_health in ["healthy", "degraded", "unhealthy"]
+            assert system_state.system_health in [
+                "healthy", "degraded", "unhealthy"]
 
 
 @pytest.mark.integration
@@ -442,7 +452,8 @@ class TestSystemHealthIntegration:
             # System health should be evaluated based on failure rate
             # (This depends on the specific health calculation logic)
             health_with_failures = state_manager.get_system_state()
-            assert health_with_failures.system_health in ["healthy", "degraded", "unhealthy"]
+            assert health_with_failures.system_health in [
+                "healthy", "degraded", "unhealthy"]
             assert health_with_failures.completed_tasks >= 10
             assert health_with_failures.failed_tasks >= 2
 
@@ -486,9 +497,11 @@ class TestSystemHealthIntegration:
             state_manager.update_task_state(task_state)
 
             # Verify recovery
-            final_agent_state = state_manager.get_agent_state("error-recovery-agent")
+            final_agent_state = state_manager.get_agent_state(
+                "error-recovery-agent")
             assert final_agent_state.status == "idle"
 
-            final_task_state = state_manager.get_task_state("error-recovery-task")
+            final_task_state = state_manager.get_task_state(
+                "error-recovery-task")
             assert final_task_state.status == "completed"
             assert final_task_state.metadata["retry_count"] == 1

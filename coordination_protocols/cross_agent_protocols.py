@@ -6,15 +6,20 @@ agents to ensure synchronized development workflows and quality maintenance.
 """
 
 import asyncio
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, field
-from enum import Enum
 import json
+import logging
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
-from ..feedback_loops import FeedbackSignal, FeedbackType, FeedbackPriority, RealTimeFeedbackEngine
+from ..feedback_loops import (
+    FeedbackPriority,
+    FeedbackSignal,
+    FeedbackType,
+    RealTimeFeedbackEngine,
+)
 
 
 class AgentRole(Enum):
@@ -104,7 +109,9 @@ class AgentCapability:
 class CrossAgentCoordinator:
     """Coordinator for cross-agent communication and workflows."""
 
-    def __init__(self, feedback_engine: Optional[RealTimeFeedbackEngine] = None):
+    def __init__(
+            self,
+            feedback_engine: Optional[RealTimeFeedbackEngine] = None):
         self.logger = logging.getLogger(__name__)
         self.feedback_engine = feedback_engine
 
@@ -156,8 +163,7 @@ class CrossAgentCoordinator:
             CoordinationMessageType.ESCALATION: self._handle_escalation,
             CoordinationMessageType.COMPLETION_NOTIFICATION: self._handle_completion_notification,
             CoordinationMessageType.COORDINATION_ALERT: self._handle_coordination_alert,
-            CoordinationMessageType.WORKFLOW_SYNC: self._handle_workflow_sync
-        }
+            CoordinationMessageType.WORKFLOW_SYNC: self._handle_workflow_sync}
 
     def _initialize_coordination_protocols(self) -> None:
         """Initialize standard coordination protocols."""
@@ -167,13 +173,19 @@ class CrossAgentCoordinator:
             id="pr_breakdown",
             name="PR Breakdown Coordination Protocol",
             description="Protocol for coordinating large PR breakdowns across agents",
-            participating_agents=[AgentRole.ORCHESTRATOR, AgentRole.INTEGRATION, AgentRole.QUALITY],
+            participating_agents=[AgentRole.ORCHESTRATOR,
+                                  AgentRole.INTEGRATION, AgentRole.QUALITY],
             message_flow=[
-                {"step": 1, "sender": "orchestrator", "recipient": "integration", "type": "task_assignment"},
-                {"step": 2, "sender": "integration", "recipient": "orchestrator", "type": "status_update"},
-                {"step": 3, "sender": "orchestrator", "recipient": "quality", "type": "quality_gate_request"},
-                {"step": 4, "sender": "quality", "recipient": "orchestrator", "type": "quality_gate_response"},
-                {"step": 5, "sender": "orchestrator", "recipient": "integration", "type": "completion_notification"}
+                {"step": 1, "sender": "orchestrator",
+                    "recipient": "integration", "type": "task_assignment"},
+                {"step": 2, "sender": "integration",
+                    "recipient": "orchestrator", "type": "status_update"},
+                {"step": 3, "sender": "orchestrator",
+                    "recipient": "quality", "type": "quality_gate_request"},
+                {"step": 4, "sender": "quality", "recipient": "orchestrator",
+                    "type": "quality_gate_response"},
+                {"step": 5, "sender": "orchestrator", "recipient": "integration",
+                    "type": "completion_notification"}
             ],
             quality_gates=["code_quality", "test_coverage", "documentation"],
             success_criteria=[
@@ -207,14 +219,20 @@ class CrossAgentCoordinator:
             id="quality_gate",
             name="Quality Gate Validation Protocol",
             description="Protocol for coordinating quality gate validations",
-            participating_agents=[AgentRole.ORCHESTRATOR, AgentRole.QUALITY, AgentRole.INTEGRATION],
+            participating_agents=[AgentRole.ORCHESTRATOR,
+                                  AgentRole.QUALITY, AgentRole.INTEGRATION],
             message_flow=[
-                {"step": 1, "sender": "orchestrator", "recipient": "quality", "type": "quality_gate_request"},
-                {"step": 2, "sender": "quality", "recipient": "integration", "type": "dependency_notification"},
-                {"step": 3, "sender": "integration", "recipient": "quality", "type": "status_update"},
-                {"step": 4, "sender": "quality", "recipient": "orchestrator", "type": "quality_gate_response"}
+                {"step": 1, "sender": "orchestrator",
+                    "recipient": "quality", "type": "quality_gate_request"},
+                {"step": 2, "sender": "quality", "recipient": "integration",
+                    "type": "dependency_notification"},
+                {"step": 3, "sender": "integration",
+                    "recipient": "quality", "type": "status_update"},
+                {"step": 4, "sender": "quality", "recipient": "orchestrator",
+                    "type": "quality_gate_response"}
             ],
-            quality_gates=["automated_tests", "manual_review", "integration_tests"],
+            quality_gates=["automated_tests",
+                           "manual_review", "integration_tests"],
             success_criteria=[
                 "All automated tests pass",
                 "Manual review approved",
@@ -239,7 +257,10 @@ class CrossAgentCoordinator:
 
         self.active_protocols[quality_gate_protocol.id] = quality_gate_protocol
 
-    def register_agent(self, agent_role: AgentRole, capability: AgentCapability) -> None:
+    def register_agent(
+            self,
+            agent_role: AgentRole,
+            capability: AgentCapability) -> None:
         """Register an agent with the coordination system."""
         self.registered_agents[agent_role] = capability
         self.agent_status[agent_role] = {
@@ -250,7 +271,10 @@ class CrossAgentCoordinator:
         }
         self.agent_workloads[agent_role] = 0
 
-        self.logger.info(f"Registered agent: {agent_role.value} with capacity {capability.capacity}")
+        self.logger.info(
+            f"Registered agent: {
+                agent_role.value} with capacity {
+                capability.capacity}")
 
     async def send_message(self, message: CoordinationMessage) -> bool:
         """Send a coordination message to an agent."""
@@ -285,7 +309,8 @@ class CrossAgentCoordinator:
         # Generate feedback signal if feedback engine available
         if self.feedback_engine:
             feedback_signal = FeedbackSignal(
-                id=f"coordination_message_{message.id}",
+                id=f"coordination_message_{
+                    message.id}",
                 type=FeedbackType.COORDINATION_FEEDBACK,
                 priority=FeedbackPriority.MEDIUM,
                 source=message.sender.value,
@@ -293,14 +318,13 @@ class CrossAgentCoordinator:
                 data={
                     "message_type": message.type.value,
                     "recipient": message.recipient.value,
-                    "coordination_efficiency": self._calculate_coordination_efficiency()
-                }
-            )
+                    "coordination_efficiency": self._calculate_coordination_efficiency()})
             await self.feedback_engine.submit_feedback(feedback_signal)
 
         return True
 
-    async def start_protocol(self, protocol_id: str, context: Dict[str, Any]) -> str:
+    async def start_protocol(self, protocol_id: str,
+                             context: Dict[str, Any]) -> str:
         """Start a coordination protocol instance."""
         if protocol_id not in self.active_protocols:
             raise ValueError(f"Unknown protocol: {protocol_id}")
@@ -316,11 +340,12 @@ class CrossAgentCoordinator:
             "status": "initiated",
             "current_step": 0,
             "started_at": datetime.now(),
-            "participants": {role: "pending" for role in protocol.participating_agents},
+            "participants": {
+                role: "pending" for role in protocol.participating_agents},
             "messages": [],
-            "quality_gates": {gate: "pending" for gate in protocol.quality_gates},
-            "escalations": []
-        }
+            "quality_gates": {
+                gate: "pending" for gate in protocol.quality_gates},
+            "escalations": []}
 
         self.protocol_instances[instance_id] = instance
 
@@ -363,7 +388,8 @@ class CrossAgentCoordinator:
             },
             correlation_id=instance_id,
             requires_response=True,
-            response_timeout=timedelta(seconds=protocol.timeout_handling.get(message_spec["type"], 3600))
+            response_timeout=timedelta(
+                seconds=protocol.timeout_handling.get(message_spec["type"], 3600))
         )
 
         # Send message
@@ -374,12 +400,14 @@ class CrossAgentCoordinator:
             instance["current_step"] += 1
 
             # Set timeout for response
-            asyncio.create_task(self._handle_protocol_timeout(instance_id, message.id))
+            asyncio.create_task(
+                self._handle_protocol_timeout(instance_id, message.id))
         else:
             # Handle send failure
             await self._handle_protocol_failure(instance_id, f"Failed to send message at step {current_step}")
 
-    async def _handle_protocol_timeout(self, instance_id: str, message_id: str) -> None:
+    async def _handle_protocol_timeout(
+            self, instance_id: str, message_id: str) -> None:
         """Handle protocol message timeout."""
         instance = self.protocol_instances.get(instance_id)
         if not instance or instance["status"] != "active":
@@ -407,7 +435,8 @@ class CrossAgentCoordinator:
         # Mark instance as failed
         await self._handle_protocol_failure(instance_id, f"Timeout waiting for response to {message_id}")
 
-    async def _handle_protocol_failure(self, instance_id: str, reason: str) -> None:
+    async def _handle_protocol_failure(
+            self, instance_id: str, reason: str) -> None:
         """Handle protocol instance failure."""
         instance = self.protocol_instances[instance_id]
         instance["status"] = "failed"
@@ -433,9 +462,14 @@ class CrossAgentCoordinator:
             )
             await self.send_message(failure_message)
 
-        self.logger.error(f"Protocol instance failed: {instance_id} - {reason}")
+        self.logger.error(
+            f"Protocol instance failed: {instance_id} - {reason}")
 
-    async def _execute_escalation(self, instance_id: str, escalation_procedure: str, context: str) -> None:
+    async def _execute_escalation(
+            self,
+            instance_id: str,
+            escalation_procedure: str,
+            context: str) -> None:
         """Execute escalation procedure."""
         instance = self.protocol_instances[instance_id]
 
@@ -482,7 +516,8 @@ class CrossAgentCoordinator:
                 )
                 await self.send_message(alert_message)
 
-        self.logger.warning(f"Escalation executed: {escalation_procedure} for {instance_id}")
+        self.logger.warning(
+            f"Escalation executed: {escalation_procedure} for {instance_id}")
 
     def _is_agent_available(self, agent_role: AgentRole) -> bool:
         """Check if an agent is available for coordination."""
@@ -514,7 +549,10 @@ class CrossAgentCoordinator:
             return 1.0
 
         # Calculate based on response times and success rates
-        recent_messages = [m for m in self.message_history if m.timestamp > datetime.now() - timedelta(hours=1)]
+        recent_messages = [
+            m for m in self.message_history if m.timestamp > datetime.now() -
+            timedelta(
+                hours=1)]
 
         if not recent_messages:
             return 1.0
@@ -526,10 +564,12 @@ class CrossAgentCoordinator:
                 # This would need to be tracked properly
                 response_times.append(1.0)  # Placeholder
 
-        avg_response_efficiency = sum(response_times) / len(response_times) if response_times else 1.0
+        avg_response_efficiency = sum(response_times) / \
+            len(response_times) if response_times else 1.0
 
         # Calculate delivery success rate
-        delivery_success = len([m for m in recent_messages if m.delivered]) / len(recent_messages)
+        delivery_success = len(
+            [m for m in recent_messages if m.delivered]) / len(recent_messages)
 
         # Overall efficiency
         efficiency = (avg_response_efficiency + delivery_success) / 2
@@ -537,7 +577,8 @@ class CrossAgentCoordinator:
         return min(1.0, max(0.0, efficiency))
 
     # Message handlers
-    async def _handle_task_assignment(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_task_assignment(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle task assignment message."""
         self.logger.info(f"Handling task assignment: {message.subject}")
 
@@ -550,10 +591,13 @@ class CrossAgentCoordinator:
         return {
             "status": "accepted",
             "assigned_to": message.recipient.value,
-            "estimated_completion": (datetime.now() + timedelta(hours=2)).isoformat()
-        }
+            "estimated_completion": (
+                datetime.now() +
+                timedelta(
+                    hours=2)).isoformat()}
 
-    async def _handle_status_update(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_status_update(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle status update message."""
         self.logger.info(f"Handling status update: {message.subject}")
 
@@ -565,7 +609,8 @@ class CrossAgentCoordinator:
 
         return {"status": "acknowledged"}
 
-    async def _handle_quality_gate_request(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_quality_gate_request(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle quality gate request message."""
         self.logger.info(f"Handling quality gate request: {message.subject}")
 
@@ -576,17 +621,20 @@ class CrossAgentCoordinator:
         return {
             "status": "initiated",
             "gate_type": gate_type,
-            "estimated_completion": (datetime.now() + timedelta(hours=1)).isoformat()
-        }
+            "estimated_completion": (
+                datetime.now() +
+                timedelta(
+                    hours=1)).isoformat()}
 
-    async def _handle_quality_gate_response(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_quality_gate_response(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle quality gate response message."""
         self.logger.info(f"Handling quality gate response: {message.subject}")
 
         gate_result = message.content.get("result", "unknown")
 
         # Update protocol instance if applicable
-        protocol_id = message.content.get("protocol_id")
+        message.content.get("protocol_id")
         instance_id = message.content.get("instance_id")
 
         if instance_id and instance_id in self.protocol_instances:
@@ -600,15 +648,18 @@ class CrossAgentCoordinator:
 
         return {"status": "processed", "result": gate_result}
 
-    async def _handle_dependency_notification(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_dependency_notification(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle dependency notification message."""
-        self.logger.info(f"Handling dependency notification: {message.subject}")
+        self.logger.info(
+            f"Handling dependency notification: {message.subject}")
 
         dependency_info = message.content.get("dependency", {})
 
         return {"status": "acknowledged", "dependency": dependency_info}
 
-    async def _handle_resource_request(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_resource_request(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle resource request message."""
         self.logger.info(f"Handling resource request: {message.subject}")
 
@@ -625,7 +676,8 @@ class CrossAgentCoordinator:
             "allocation_id": f"alloc_{uuid.uuid4().hex[:8]}"
         }
 
-    async def _handle_resource_allocation(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_resource_allocation(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle resource allocation message."""
         self.logger.info(f"Handling resource allocation: {message.subject}")
 
@@ -633,7 +685,8 @@ class CrossAgentCoordinator:
 
         return {"status": "acknowledged", "allocation_id": allocation_id}
 
-    async def _handle_escalation(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_escalation(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle escalation message."""
         self.logger.warning(f"Handling escalation: {message.subject}")
 
@@ -645,21 +698,26 @@ class CrossAgentCoordinator:
             "escalation_id": f"esc_{uuid.uuid4().hex[:8]}"
         }
 
-    async def _handle_completion_notification(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_completion_notification(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle completion notification message."""
-        self.logger.info(f"Handling completion notification: {message.subject}")
+        self.logger.info(
+            f"Handling completion notification: {message.subject}")
 
         # Update agent workload
         if message.sender in self.agent_workloads:
-            self.agent_workloads[message.sender] = max(0, self.agent_workloads[message.sender] - 1)
+            self.agent_workloads[message.sender] = max(
+                0, self.agent_workloads[message.sender] - 1)
 
         # Update agent status
         if message.sender in self.agent_status:
-            self.agent_status[message.sender]["current_tasks"] = max(0, self.agent_status[message.sender]["current_tasks"] - 1)
+            self.agent_status[message.sender]["current_tasks"] = max(
+                0, self.agent_status[message.sender]["current_tasks"] - 1)
 
         return {"status": "acknowledged"}
 
-    async def _handle_coordination_alert(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_coordination_alert(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle coordination alert message."""
         self.logger.warning(f"Handling coordination alert: {message.subject}")
 
@@ -671,7 +729,8 @@ class CrossAgentCoordinator:
             "response_actions": ["acknowledged", "monitoring"]
         }
 
-    async def _handle_workflow_sync(self, message: CoordinationMessage) -> Dict[str, Any]:
+    async def _handle_workflow_sync(
+            self, message: CoordinationMessage) -> Dict[str, Any]:
         """Handle workflow synchronization message."""
         self.logger.info(f"Handling workflow sync: {message.subject}")
 

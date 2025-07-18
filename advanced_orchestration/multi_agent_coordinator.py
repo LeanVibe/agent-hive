@@ -7,16 +7,25 @@ agents, including registration, task distribution, load balancing, and fault tol
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any
-from collections import defaultdict
 import uuid
+from collections import defaultdict
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 from .models import (
-    AgentInfo, AgentStatus, AgentRegistration, TaskAssignment, TaskStatus,
-    CoordinatorConfig, CoordinatorState, LoadBalancingStrategy, ScalingReason,
-    AgentRegistrationException, TaskDistributionException, ScalingException,
-    ResourceAllocation, ResourceUsage, LoadBalancingMetrics, ScalingMetrics
+    AgentInfo,
+    AgentRegistration,
+    AgentRegistrationException,
+    AgentStatus,
+    CoordinatorConfig,
+    CoordinatorState,
+    LoadBalancingMetrics,
+    LoadBalancingStrategy,
+    ResourceUsage,
+    ScalingMetrics,
+    TaskAssignment,
+    TaskDistributionException,
+    TaskStatus,
 )
 from .resource_manager import ResourceManager
 from .scaling_manager import ScalingManager
@@ -74,7 +83,8 @@ class MultiAgentCoordinator:
             'load_balancing_events': 0
         }
 
-        self.logger.info(f"MultiAgentCoordinator initialized with config: {config}")
+        self.logger.info(
+            f"MultiAgentCoordinator initialized with config: {config}")
 
     async def start(self) -> None:
         """Start the coordinator and begin monitoring."""
@@ -109,11 +119,13 @@ class MultiAgentCoordinator:
 
             # Check if agent already exists
             if agent_id in self.agents:
-                raise AgentRegistrationException(f"Agent {agent_id} already registered")
+                raise AgentRegistrationException(
+                    f"Agent {agent_id} already registered")
 
             # Check if we've reached the maximum number of agents
             if len(self.agents) >= self.config.max_agents:
-                raise AgentRegistrationException(f"Maximum number of agents ({self.config.max_agents}) reached")
+                raise AgentRegistrationException(
+                    f"Maximum number of agents ({self.config.max_agents}) reached")
 
             # Allocate resources
             allocation = await self.resource_manager.allocate_resources(
@@ -139,7 +151,8 @@ class MultiAgentCoordinator:
             return True
 
         except Exception as e:
-            self.logger.error(f"Failed to register agent {registration.agent_id}: {e}")
+            self.logger.error(
+                f"Failed to register agent {registration.agent_id}: {e}")
             raise AgentRegistrationException(f"Registration failed: {e}")
 
     async def unregister_agent(self, agent_id: str) -> bool:
@@ -154,10 +167,11 @@ class MultiAgentCoordinator:
         """
         try:
             if agent_id not in self.agents:
-                self.logger.warning(f"Agent {agent_id} not found for unregistration")
+                self.logger.warning(
+                    f"Agent {agent_id} not found for unregistration")
                 return False
 
-            agent_info = self.agents[agent_id]
+            self.agents[agent_id]
 
             # Reassign active tasks
             await self._reassign_agent_tasks(agent_id)
@@ -177,7 +191,8 @@ class MultiAgentCoordinator:
             self.logger.error(f"Failed to unregister agent {agent_id}: {e}")
             return False
 
-    async def distribute_task(self, task_data: Dict[str, Any], priority: int = 5) -> Optional[TaskAssignment]:
+    async def distribute_task(
+            self, task_data: Dict[str, Any], priority: int = 5) -> Optional[TaskAssignment]:
         """
         Distribute a task to the most suitable agent.
 
@@ -204,7 +219,8 @@ class MultiAgentCoordinator:
                     status=TaskStatus.PENDING
                 )
                 self.pending_tasks.append(task_assignment)
-                self.logger.info(f"Task {task_assignment.task_id} added to pending queue")
+                self.logger.info(
+                    f"Task {task_assignment.task_id} added to pending queue")
                 return task_assignment
 
             # Create task assignment
@@ -220,7 +236,8 @@ class MultiAgentCoordinator:
             self.agents[agent_id].active_tasks += 1
             self.assigned_tasks[task_assignment.task_id] = task_assignment
 
-            self.logger.info(f"Task {task_assignment.task_id} assigned to agent {agent_id}")
+            self.logger.info(
+                f"Task {task_assignment.task_id} assigned to agent {agent_id}")
             return task_assignment
 
         except Exception as e:
@@ -240,7 +257,8 @@ class MultiAgentCoordinator:
         """
         try:
             if task_id not in self.assigned_tasks:
-                self.logger.warning(f"Task {task_id} not found in assigned tasks")
+                self.logger.warning(
+                    f"Task {task_id} not found in assigned tasks")
                 return False
 
             task_assignment = self.assigned_tasks[task_id]
@@ -265,7 +283,9 @@ class MultiAgentCoordinator:
             else:
                 self.performance_metrics['tasks_failed'] += 1
 
-            self.logger.info(f"Task {task_id} completed {'successfully' if success else 'with failure'}")
+            self.logger.info(
+                f"Task {task_id} completed {
+                    'successfully' if success else 'with failure'}")
             return True
 
         except Exception as e:
@@ -351,15 +371,18 @@ class MultiAgentCoordinator:
 
             # Check if agent should be removed
             if agent_info.error_count >= self.config.failure_threshold:
-                self.logger.warning(f"Agent {agent_id} exceeded failure threshold, removing")
+                self.logger.warning(
+                    f"Agent {agent_id} exceeded failure threshold, removing")
                 await self.unregister_agent(agent_id)
 
             self.performance_metrics['agent_failures'] += 1
 
         except Exception as e:
-            self.logger.error(f"Failed to handle agent failure for {agent_id}: {e}")
+            self.logger.error(
+                f"Failed to handle agent failure for {agent_id}: {e}")
 
-    async def _select_agent_for_task(self, task_data: Dict[str, Any], priority: int) -> Optional[str]:
+    async def _select_agent_for_task(
+            self, task_data: Dict[str, Any], priority: int) -> Optional[str]:
         """
         Select the best agent for a task based on the load balancing strategy.
 
@@ -458,7 +481,8 @@ class MultiAgentCoordinator:
             # Add back to pending tasks
             self.pending_tasks.append(task)
 
-            self.logger.info(f"Task {task.task_id} reassigned from failed agent {agent_id}")
+            self.logger.info(
+                f"Task {task.task_id} reassigned from failed agent {agent_id}")
 
     async def _process_pending_tasks(self) -> None:
         """Process pending tasks and assign them to available agents."""
@@ -497,7 +521,8 @@ class MultiAgentCoordinator:
         for agent_id, agent_info in self.agents.items():
             # Calculate performance score
             if agent_info.error_count > 0:
-                error_rate = agent_info.error_count / max(1, len(self.task_history))
+                error_rate = agent_info.error_count / \
+                    max(1, len(self.task_history))
                 weight = max(0.1, 1.0 - error_rate)
             else:
                 weight = 1.0
@@ -506,7 +531,8 @@ class MultiAgentCoordinator:
 
     async def _calculate_scaling_metrics(self) -> ScalingMetrics:
         """Calculate scaling metrics."""
-        current_agents = len([a for a in self.agents.values() if a.status == AgentStatus.HEALTHY])
+        current_agents = len([a for a in self.agents.values()
+                             if a.status == AgentStatus.HEALTHY])
         queue_depth = len(self.pending_tasks)
 
         # Calculate average response time
@@ -564,7 +590,8 @@ class MultiAgentCoordinator:
         task_counts = [agent.active_tasks for agent in self.agents.values()]
         if task_counts:
             mean_tasks = sum(task_counts) / len(task_counts)
-            variance = sum((count - mean_tasks) ** 2 for count in task_counts) / len(task_counts)
+            variance = sum((count - mean_tasks) **
+                           2 for count in task_counts) / len(task_counts)
         else:
             variance = 0.0
 
@@ -572,16 +599,18 @@ class MultiAgentCoordinator:
         agent_utilization = {}
         for agent_id, agent_info in self.agents.items():
             if agent_info.resource_allocation:
-                allocation = agent_info.resource_allocation
+                agent_info.resource_allocation
                 if agent_info.current_usage:
                     usage = agent_info.current_usage
-                    utilization = (usage.cpu_percent + usage.memory_percent) / 2.0
+                    utilization = (usage.cpu_percent +
+                                   usage.memory_percent) / 2.0
                 else:
                     utilization = 0.0
                 agent_utilization[agent_id] = utilization
 
         # Calculate task completion rate
-        completed_tasks = len([t for t in self.task_history if t.status == TaskStatus.COMPLETED])
+        completed_tasks = len(
+            [t for t in self.task_history if t.status == TaskStatus.COMPLETED])
         total_tasks = len(self.task_history)
         completion_rate = completed_tasks / max(1, total_tasks)
 
@@ -590,7 +619,8 @@ class MultiAgentCoordinator:
             (datetime.now() - task.assignment_time).total_seconds()
             for task in self.pending_tasks
         ]
-        avg_wait_time = sum(pending_wait_times) / max(1, len(pending_wait_times))
+        avg_wait_time = sum(pending_wait_times) / \
+            max(1, len(pending_wait_times))
 
         # Calculate balancing effectiveness (inverse of variance)
         effectiveness = 1.0 / (1.0 + variance)
@@ -645,7 +675,10 @@ class MultiAgentCoordinator:
             except Exception as e:
                 self.logger.error(f"Scaling monitoring error: {e}")
 
-    async def update_agent_heartbeat(self, agent_id: str, usage: Optional[ResourceUsage] = None) -> bool:
+    async def update_agent_heartbeat(
+            self,
+            agent_id: str,
+            usage: Optional[ResourceUsage] = None) -> bool:
         """
         Update agent heartbeat and resource usage.
 

@@ -6,18 +6,17 @@ This script validates tutorial content without executing code examples,
 focusing on syntax, structure, and completeness.
 """
 
-import sys
-import os
-import json
 import ast
+import json
+import sys
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
+from framework.tutorial_manager import Tutorial, TutorialManager
 
 # Add framework to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from framework.tutorial_manager import TutorialManager, Tutorial
-from framework.validation import ValidationResult
 
 def _looks_like_python_code(code: str) -> bool:
     """Heuristic to determine if code looks like Python."""
@@ -55,6 +54,7 @@ def _looks_like_python_code(code: str) -> bool:
         return True
 
     return False
+
 
 def validate_tutorial_content(tutorial: Tutorial) -> Dict[str, Any]:
     """Validate tutorial content comprehensively."""
@@ -97,7 +97,8 @@ def validate_tutorial_content(tutorial: Tutorial) -> Dict[str, Any]:
     for step in tutorial.steps:
         # Check for duplicate step IDs
         if step.step_id in step_ids:
-            validation_results['issues'].append(f"Duplicate step_id: {step.step_id}")
+            validation_results['issues'].append(
+                f"Duplicate step_id: {step.step_id}")
             validation_results['success'] = False
         else:
             step_ids.add(step.step_id)
@@ -108,11 +109,13 @@ def validate_tutorial_content(tutorial: Tutorial) -> Dict[str, Any]:
             validation_results['success'] = False
 
         if not step.title:
-            validation_results['issues'].append(f"Step {step.step_id} missing title")
+            validation_results['issues'].append(
+                f"Step {step.step_id} missing title")
             validation_results['success'] = False
 
         if not step.instructions:
-            validation_results['issues'].append(f"Step {step.step_id} missing instructions")
+            validation_results['issues'].append(
+                f"Step {step.step_id} missing instructions")
             validation_results['success'] = False
 
         # Validate code examples syntax (without execution)
@@ -124,19 +127,23 @@ def validate_tutorial_content(tutorial: Tutorial) -> Dict[str, Any]:
                         ast.parse(code_example)
                     except SyntaxError as e:
                         validation_results['issues'].append(
-                            f"Step {step.step_id} code example {i+1} Python syntax error: {e}"
-                        )
+                            f"Step {
+                                step.step_id} code example {
+                                i + 1} Python syntax error: {e}")
                         validation_results['success'] = False
                     except Exception as e:
                         validation_results['warnings'].append(
-                            f"Step {step.step_id} code example {i+1} Python parsing warning: {e}"
-                        )
+                            f"Step {
+                                step.step_id} code example {
+                                i + 1} Python parsing warning: {e}")
                 else:
-                    # For non-Python code (shell commands, etc.), just check it's not empty
+                    # For non-Python code (shell commands, etc.), just check
+                    # it's not empty
                     if not code_example.strip():
                         validation_results['issues'].append(
-                            f"Step {step.step_id} code example {i+1} is empty"
-                        )
+                            f"Step {
+                                step.step_id} code example {
+                                i + 1} is empty")
                         validation_results['success'] = False
 
         # Validate dependencies
@@ -153,6 +160,7 @@ def validate_tutorial_content(tutorial: Tutorial) -> Dict[str, Any]:
         validation_results['success'] = False
 
     return validation_results
+
 
 def _has_circular_dependencies(steps: List) -> bool:
     """Check for circular dependencies in tutorial steps."""
@@ -184,6 +192,7 @@ def _has_circular_dependencies(steps: List) -> bool:
 
     return False
 
+
 def main():
     """Main validation function."""
     print("🚀 Starting comprehensive tutorial content validation...\n")
@@ -206,7 +215,7 @@ def main():
         all_results.append(results)
 
         if results['success']:
-            print(f"  ✅ Validation passed")
+            print("  ✅ Validation passed")
         else:
             print(f"  ❌ Validation failed ({len(results['issues'])} issues)")
             overall_success = False
@@ -229,7 +238,8 @@ def main():
     print(f"Total tutorials: {total_tutorials}")
     print(f"Successful tutorials: {successful_tutorials}")
     print(f"Failed tutorials: {total_tutorials - successful_tutorials}")
-    print(f"Overall success rate: {(successful_tutorials / total_tutorials) * 100:.1f}%")
+    print(
+        f"Overall success rate: {(successful_tutorials / total_tutorials) * 100:.1f}%")
 
     # Save detailed report
     report_path = "tutorial_content_validation_report.json"
@@ -244,6 +254,7 @@ def main():
     else:
         print("❌ Some tutorials have validation issues. Check the report for details.")
         return 1
+
 
 if __name__ == '__main__':
     sys.exit(main())

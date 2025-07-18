@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Dict
 
 import numpy as np
-
 from config.config_loader import get_config
 from utils.logging_config import get_logger
 
@@ -39,9 +38,12 @@ class ContextMonitor:
             self.db_path = Path(db_path)
 
         self.predictor = ContextGrowthPredictor(self.db_path)
-        logger.info(f"ContextMonitor initialized with database: {self.db_path}")
+        logger.info(
+    f"ContextMonitor initialized with database: {
+        self.db_path}")
 
-    def check_context(self, agent_id: str, current_usage: float, context: Dict = None) -> Dict:
+    def check_context(self, agent_id: str, current_usage: float,
+                      context: Dict = None) -> Dict:
         """Check context and predict future usage with intelligent recommendations.
 
         Args:
@@ -60,7 +62,8 @@ class ContextMonitor:
 
         # Predict growth
         predicted_growth = self.predictor.predict(agent_id, current_usage)
-        time_to_limit = self._estimate_time_to_limit(current_usage, predicted_growth)
+        time_to_limit = self._estimate_time_to_limit(
+            current_usage, predicted_growth)
 
         config = get_config()
         thresholds = config.get('intelligence.context.thresholds', {
@@ -83,17 +86,20 @@ class ContextMonitor:
         # Determine required action based on intelligent thresholds
         if time_to_limit < thresholds['immediate_action']:
             response["action_required"] = "immediate_summarize"
-            response["reason"] = f"Context will overflow within {time_to_limit*60:.0f} minutes"
+            response["reason"] = f"Context will overflow within {
+    time_to_limit*60:.0f} minutes"
             response["urgency"] = "critical"
 
         elif time_to_limit < thresholds['prepare_checkpoint']:
             response["action_required"] = "prepare_checkpoint"
-            response["reason"] = f"Context will overflow within {time_to_limit:.1f} hours"
+            response["reason"] = f"Context will overflow within {
+    time_to_limit:.1f} hours"
             response["urgency"] = "high"
 
         elif current_usage > thresholds['monitor_closely']:
             response["action_required"] = "monitor_closely"
-            response["reason"] = f"Context usage above {thresholds['monitor_closely']*100:.0f}%"
+            response["reason"] = f"Context usage above {
+    thresholds['monitor_closely']*100:.0f}%"
             response["urgency"] = "medium"
 
         else:
@@ -110,7 +116,8 @@ class ContextMonitor:
 
         return response
 
-    def _estimate_time_to_limit(self, current: float, growth_rate: float) -> float:
+    def _estimate_time_to_limit(self, current: float,
+                                growth_rate: float) -> float:
         """Estimate hours until context limit reached with safety buffer.
 
         Args:
@@ -168,7 +175,8 @@ class ContextGrowthPredictor:
         """
         self.db_path = db_path
         self._init_db()
-        logger.debug(f"ContextGrowthPredictor initialized with database: {db_path}")
+        logger.debug(
+    f"ContextGrowthPredictor initialized with database: {db_path}")
 
     def _init_db(self):
         """Initialize context history database with proper schema."""
@@ -205,9 +213,11 @@ class ContextGrowthPredictor:
                     ON prediction_accuracy(agent_id);
             """)
 
-        logger.debug("Context history database schema initialized successfully")
+        logger.debug(
+            "Context history database schema initialized successfully")
 
-    def record_usage(self, agent_id: str, usage_percent: float, context: Dict = None) -> None:
+    def record_usage(self, agent_id: str, usage_percent: float,
+                     context: Dict = None) -> None:
         """Record current usage for future predictions.
 
         Args:
@@ -266,8 +276,10 @@ class ContextGrowthPredictor:
         if len(history) < 2:
             # Default conservative estimate
             config = get_config()
-            default_growth = config.get('intelligence.context.default_growth_rate', 0.1)
-            logger.debug(f"Insufficient history for {agent_id}, using default growth rate: {default_growth}")
+            default_growth = config.get(
+    'intelligence.context.default_growth_rate', 0.1)
+            logger.debug(
+    f"Insufficient history for {agent_id}, using default growth rate: {default_growth}")
             return default_growth
 
         # Calculate growth rates from historical data
@@ -278,9 +290,11 @@ class ContextGrowthPredictor:
 
             # Parse timestamps and calculate time difference
             if isinstance(prev_time, str):
-                prev_time = datetime.fromisoformat(prev_time.replace('Z', '+00:00'))
+                prev_time = datetime.fromisoformat(
+                    prev_time.replace('Z', '+00:00'))
             if isinstance(curr_time, str):
-                curr_time = datetime.fromisoformat(curr_time.replace('Z', '+00:00'))
+                curr_time = datetime.fromisoformat(
+                    curr_time.replace('Z', '+00:00'))
 
             time_diff_hours = (curr_time - prev_time).total_seconds() / 3600
             usage_diff = curr_usage - prev_usage
@@ -349,8 +363,10 @@ class ContextGrowthPredictor:
             avg_error = cursor.fetchone()[0] or 0.2
 
         # Calculate confidence based on data availability and accuracy
-        data_confidence = min(1.0, recent_count / 10.0)  # More data = higher confidence
-        accuracy_confidence = max(0.1, 1.0 - avg_error)  # Lower error = higher confidence
+        # More data = higher confidence
+        data_confidence = min(1.0, recent_count / 10.0)
+        # Lower error = higher confidence
+        accuracy_confidence = max(0.1, 1.0 - avg_error)
 
         return (data_confidence + accuracy_confidence) / 2
 
@@ -442,5 +458,6 @@ class ContextGrowthPredictor:
 
             total_deleted = deleted_history + deleted_accuracy
 
-        logger.info(f"Cleanup completed: deleted {deleted_history} history records and {deleted_accuracy} accuracy records")
+        logger.info(
+    f"Cleanup completed: deleted {deleted_history} history records and {deleted_accuracy} accuracy records")
         return total_deleted

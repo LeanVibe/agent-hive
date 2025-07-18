@@ -4,21 +4,22 @@ Integration tests for Orchestrator workflow.
 Tests the main orchestrator workflow with mock agents (happy path scenarios).
 """
 
-import pytest
 import asyncio
-from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the components under test
 import sys
+from datetime import datetime
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+from agents.base_agent import AgentStatus
+from orchestrator import LeanVibeOrchestrator
+from task_queue_module.task_queue import Task
+
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
-
-from orchestrator import LeanVibeOrchestrator
-from task_queue_module.task_queue import Task
-from agents.base_agent import AgentStatus
 
 
 class TestOrchestratorWorkflow:
@@ -32,7 +33,8 @@ class TestOrchestratorWorkflow:
                 # Create mock agent instance
                 mock_agent = AsyncMock()
                 mock_agent.agent_id = "mock-claude-primary"
-                mock_agent.get_capabilities.return_value = ["code_generation", "text_processing"]
+                mock_agent.get_capabilities.return_value = [
+                    "code_generation", "text_processing"]
                 mock_agent.can_handle_task.return_value = True
                 mock_agent.get_status.return_value = AgentStatus(
                     agent_id="mock-claude-primary",
@@ -46,7 +48,8 @@ class TestOrchestratorWorkflow:
                 # Mock successful task execution
                 mock_result = MagicMock()
                 mock_result.status = "success"
-                mock_result.data = {"response": "Mock task completed successfully"}
+                mock_result.data = {
+                    "response": "Mock task completed successfully"}
                 mock_agent.execute_task.return_value = mock_result
 
                 mock_claude_agent_class.return_value = mock_agent
@@ -59,7 +62,8 @@ class TestOrchestratorWorkflow:
                 await orchestrator.shutdown()
 
     @pytest.mark.integration
-    async def test_basic_task_execution_workflow(self, orchestrator_with_mock_agents, sample_task):
+    async def test_basic_task_execution_workflow(
+            self, orchestrator_with_mock_agents, sample_task):
         """Test basic task execution workflow from start to finish."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -85,7 +89,8 @@ class TestOrchestratorWorkflow:
         assert final_status["pending_tasks"] == 0
 
     @pytest.mark.integration
-    async def test_multiple_tasks_priority_handling(self, orchestrator_with_mock_agents, sample_tasks):
+    async def test_multiple_tasks_priority_handling(
+            self, orchestrator_with_mock_agents, sample_tasks):
         """Test handling multiple tasks with different priorities."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -111,7 +116,8 @@ class TestOrchestratorWorkflow:
         assert priorities == sorted(priorities, reverse=True)
 
     @pytest.mark.integration
-    async def test_agent_health_monitoring(self, orchestrator_with_mock_agents):
+    async def test_agent_health_monitoring(
+            self, orchestrator_with_mock_agents):
         """Test agent health monitoring integration."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -130,7 +136,8 @@ class TestOrchestratorWorkflow:
             health_task.cancel()
 
     @pytest.mark.integration
-    async def test_task_failure_handling(self, orchestrator_with_mock_agents, sample_task):
+    async def test_task_failure_handling(
+            self, orchestrator_with_mock_agents, sample_task):
         """Test handling of task execution failures."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -152,7 +159,8 @@ class TestOrchestratorWorkflow:
         assert queue_status["completed_tasks"] == 0
 
     @pytest.mark.integration
-    async def test_no_suitable_agent_handling(self, orchestrator_with_mock_agents):
+    async def test_no_suitable_agent_handling(
+            self, orchestrator_with_mock_agents):
         """Test handling when no suitable agent is available."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -181,7 +189,8 @@ class TestOrchestratorWorkflow:
         assert queue_status["pending_tasks"] == 1  # Back in pending for retry
 
     @pytest.mark.integration
-    async def test_agent_busy_handling(self, orchestrator_with_mock_agents, sample_task):
+    async def test_agent_busy_handling(
+            self, orchestrator_with_mock_agents, sample_task):
         """Test handling when agent is busy."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -202,7 +211,8 @@ class TestOrchestratorWorkflow:
         assert work_item is None
 
     @pytest.mark.integration
-    async def test_task_capability_matching(self, orchestrator_with_mock_agents):
+    async def test_task_capability_matching(
+            self, orchestrator_with_mock_agents):
         """Test task-agent capability matching."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -218,7 +228,8 @@ class TestOrchestratorWorkflow:
 
         # Agent doesn't have image processing capability
         agent = list(orchestrator.agents.values())[0]
-        agent.get_capabilities.return_value = ["code_generation", "text_processing"]
+        agent.get_capabilities.return_value = [
+            "code_generation", "text_processing"]
         agent.can_handle_task.return_value = False
 
         await orchestrator.add_task(specialized_task)
@@ -228,7 +239,8 @@ class TestOrchestratorWorkflow:
         assert work_item is None
 
     @pytest.mark.integration
-    async def test_concurrent_task_processing_simulation(self, orchestrator_with_mock_agents, sample_tasks):
+    async def test_concurrent_task_processing_simulation(
+            self, orchestrator_with_mock_agents, sample_tasks):
         """Test simulation of concurrent task processing."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -256,7 +268,8 @@ class TestOrchestratorWorkflow:
 
     @pytest.mark.integration
     @pytest.mark.performance
-    async def test_orchestrator_performance_under_load(self, orchestrator_with_mock_agents, performance_thresholds):
+    async def test_orchestrator_performance_under_load(
+            self, orchestrator_with_mock_agents, performance_thresholds):
         """Test orchestrator performance under simulated load."""
         orchestrator = orchestrator_with_mock_agents
 
@@ -299,11 +312,13 @@ class TestOrchestratorWorkflow:
         avg_process_time = process_time / num_tasks
 
         assert avg_add_time < 0.01, f"Task addition too slow: {avg_add_time}s per task"
-        assert avg_process_time < performance_thresholds["task_execution_max_time"], f"Task processing too slow: {avg_process_time}s per task"
+        assert avg_process_time < performance_thresholds[
+            "task_execution_max_time"], f"Task processing too slow: {avg_process_time}s per task"
         assert processed_count == num_tasks
 
     @pytest.mark.integration
-    async def test_orchestrator_graceful_shutdown(self, orchestrator_with_mock_agents, sample_task):
+    async def test_orchestrator_graceful_shutdown(
+            self, orchestrator_with_mock_agents, sample_task):
         """Test orchestrator graceful shutdown."""
         orchestrator = orchestrator_with_mock_agents
 

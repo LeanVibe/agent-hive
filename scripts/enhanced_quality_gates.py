@@ -7,11 +7,11 @@ designed to prevent technical debt accumulation and maintain code health.
 """
 
 import json
+import logging
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-import logging
+from typing import Any, Dict, List
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -24,14 +24,20 @@ class TechnicalDebtEnforcer:
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.quality_thresholds = {
-            'mypy_error_limit': 10,  # Maximum allowed mypy errors (reduced from 50)
-            'pylint_score_minimum': 8.5,  # Minimum pylint score (increased from 8.0)
-            'complexity_threshold': 8,  # Maximum cyclomatic complexity (reduced from 10)
-            'duplicate_code_threshold': 3,  # Maximum % duplicate code (reduced from 5)
-            'test_coverage_minimum': 90,  # Minimum test coverage % (increased from 85)
+            # Maximum allowed mypy errors (reduced from 50)
+            'mypy_error_limit': 10,
+            # Minimum pylint score (increased from 8.0)
+            'pylint_score_minimum': 8.5,
+            # Maximum cyclomatic complexity (reduced from 10)
+            'complexity_threshold': 8,
+            # Maximum % duplicate code (reduced from 5)
+            'duplicate_code_threshold': 3,
+            # Minimum test coverage % (increased from 85)
+            'test_coverage_minimum': 90,
             'security_issues_limit': 0,  # Maximum security issues
             'dead_code_threshold': 5,  # Maximum % dead code
-            'type_annotation_coverage': 95,  # Minimum type annotation coverage %
+            # Minimum type annotation coverage %
+            'type_annotation_coverage': 95,
         }
         self.results: Dict[str, Any] = {}
 
@@ -41,7 +47,8 @@ class TechnicalDebtEnforcer:
 
         try:
             result = subprocess.run(
-                ['python', '-m', 'mypy', '.', '--config-file=mypy.ini', '--exclude', 'new-worktrees'],
+                ['python', '-m', 'mypy', '.', '--config-file=mypy.ini',
+                    '--exclude', 'new-worktrees'],
                 capture_output=True,
                 text=True,
                 cwd=self.project_root
@@ -64,7 +71,12 @@ class TechnicalDebtEnforcer:
 
         except Exception as e:
             logger.error(f"MyPy analysis failed: {e}")
-            return {'error_count': 999, 'errors': [str(e)], 'passed': False, 'exit_code': 1}
+            return {
+                'error_count': 999,
+                'errors': [
+                    str(e)],
+                'passed': False,
+                'exit_code': 1}
 
     def run_pylint_analysis(self) -> Dict[str, Any]:
         """Run Pylint code quality analysis."""
@@ -72,13 +84,15 @@ class TechnicalDebtEnforcer:
 
         try:
             # Focus on main modules to avoid overwhelming output
-            key_modules = ['cli.py', 'advanced_orchestration/', 'external_api/', 'scripts/']
+            key_modules = ['cli.py', 'advanced_orchestration/',
+                           'external_api/', 'scripts/']
 
             scores = []
             for module in key_modules:
                 if Path(self.project_root / module).exists():
                     result = subprocess.run(
-                        ['python', '-m', 'pylint', module, '--score=y', '--reports=n'],
+                        ['python', '-m', 'pylint', module,
+                            '--score=y', '--reports=n'],
                         capture_output=True,
                         text=True,
                         cwd=self.project_root
@@ -107,7 +121,8 @@ class TechnicalDebtEnforcer:
 
         except Exception as e:
             logger.error(f"Pylint analysis failed: {e}")
-            return {'average_score': 0.0, 'passed': False, 'recommendation': f'Analysis failed: {e}'}
+            return {'average_score': 0.0, 'passed': False,
+                    'recommendation': f'Analysis failed: {e}'}
 
     def run_complexity_analysis(self) -> Dict[str, Any]:
         """Run cyclomatic complexity analysis."""
@@ -127,7 +142,9 @@ class TechnicalDebtEnforcer:
 
                 for file_path, functions in complexity_data.items():
                     for func in functions:
-                        if func.get('complexity', 0) > self.quality_thresholds['complexity_threshold']:
+                        if func.get(
+                            'complexity',
+                                0) > self.quality_thresholds['complexity_threshold']:
                             high_complexity.append({
                                 'file': file_path,
                                 'function': func.get('name', 'unknown'),
@@ -141,13 +158,19 @@ class TechnicalDebtEnforcer:
                     'recommendation': 'Consider refactoring complex functions' if high_complexity else 'Good complexity levels'
                 }
 
-                logger.info(f"Complexity analysis: {len(high_complexity)} high-complexity functions")
+                logger.info(
+                    f"Complexity analysis: {
+                        len(high_complexity)} high-complexity functions")
                 return analysis
             else:
-                return {'passed': True, 'recommendation': 'Radon not available, complexity check skipped'}
+                return {
+                    'passed': True,
+                    'recommendation': 'Radon not available, complexity check skipped'}
 
         except (subprocess.CalledProcessError, json.JSONDecodeError, FileNotFoundError):
-            return {'passed': True, 'recommendation': 'Complexity analysis not available'}
+            return {
+                'passed': True,
+                'recommendation': 'Complexity analysis not available'}
 
     def run_security_analysis(self) -> Dict[str, Any]:
         """Run security vulnerability analysis."""
@@ -156,7 +179,8 @@ class TechnicalDebtEnforcer:
         try:
             # Run bandit security linter
             result = subprocess.run(
-                ['python', '-m', 'bandit', '-r', '.', '-f', 'json', '--skip', 'B101'],
+                ['python', '-m', 'bandit', '-r', '.',
+                    '-f', 'json', '--skip', 'B101'],
                 capture_output=True,
                 text=True,
                 cwd=self.project_root
@@ -165,22 +189,29 @@ class TechnicalDebtEnforcer:
             if result.stdout:
                 security_data = json.loads(result.stdout)
                 issues = security_data.get('results', [])
-                high_severity = [issue for issue in issues if issue.get('issue_severity') == 'HIGH']
+                high_severity = [issue for issue in issues if issue.get(
+                    'issue_severity') == 'HIGH']
 
                 analysis = {
                     'total_issues': len(issues),
                     'high_severity_issues': len(high_severity),
                     'passed': len(high_severity) <= self.quality_thresholds['security_issues_limit'],
-                    'recommendation': 'Address high-severity security issues' if high_severity else 'No critical security issues'
-                }
+                    'recommendation': 'Address high-severity security issues' if high_severity else 'No critical security issues'}
 
-                logger.info(f"Security analysis: {len(issues)} total issues, {len(high_severity)} high-severity")
+                logger.info(
+                    f"Security analysis: {
+                        len(issues)} total issues, {
+                        len(high_severity)} high-severity")
                 return analysis
             else:
-                return {'passed': True, 'recommendation': 'No security issues detected'}
+                return {
+                    'passed': True,
+                    'recommendation': 'No security issues detected'}
 
         except (subprocess.CalledProcessError, json.JSONDecodeError, FileNotFoundError):
-            return {'passed': True, 'recommendation': 'Security analysis not available'}
+            return {
+                'passed': True,
+                'recommendation': 'Security analysis not available'}
 
     def run_dead_code_analysis(self) -> Dict[str, Any]:
         """Detect dead/unused code."""
@@ -188,7 +219,8 @@ class TechnicalDebtEnforcer:
 
         try:
             result = subprocess.run(
-                ['python', '-m', 'vulture', '.', '--exclude', 'new-worktrees', '--min-confidence', '80'],
+                ['python', '-m', 'vulture', '.', '--exclude',
+                    'new-worktrees', '--min-confidence', '80'],
                 capture_output=True,
                 text=True,
                 cwd=self.project_root
@@ -196,11 +228,14 @@ class TechnicalDebtEnforcer:
 
             # Count dead code findings
             lines = result.stdout.strip().split('\n') if result.stdout.strip() else []
-            dead_code_count = len([line for line in lines if line and not line.startswith('#')])
+            dead_code_count = len(
+                [line for line in lines if line and not line.startswith('#')])
 
             # Calculate dead code percentage (rough estimate)
             total_files = len(list(self.project_root.rglob('*.py')))
-            dead_code_percentage = (dead_code_count / max(total_files * 10, 1)) * 100  # Rough estimate
+            dead_code_percentage = (
+                # Rough estimate
+                dead_code_count / max(total_files * 10, 1)) * 100
 
             passed = dead_code_percentage <= self.quality_thresholds['dead_code_threshold']
 
@@ -212,7 +247,9 @@ class TechnicalDebtEnforcer:
             }
 
         except (subprocess.CalledProcessError, FileNotFoundError):
-            return {'passed': True, 'recommendation': 'Dead code analysis not available'}
+            return {
+                'passed': True,
+                'recommendation': 'Dead code analysis not available'}
 
     def run_type_annotation_analysis(self) -> Dict[str, Any]:
         """Check type annotation coverage."""
@@ -220,7 +257,8 @@ class TechnicalDebtEnforcer:
 
         try:
             result = subprocess.run(
-                ['python', '-m', 'mypy', '.', '--config-file=mypy.ini', '--exclude', 'new-worktrees', '--strict'],
+                ['python', '-m', 'mypy', '.', '--config-file=mypy.ini',
+                    '--exclude', 'new-worktrees', '--strict'],
                 capture_output=True,
                 text=True,
                 cwd=self.project_root
@@ -228,11 +266,13 @@ class TechnicalDebtEnforcer:
 
             # Count type annotation issues
             lines = result.stdout.split('\n')
-            annotation_errors = len([line for line in lines if 'annotation' in line.lower() or 'untyped' in line.lower()])
+            annotation_errors = len(
+                [line for line in lines if 'annotation' in line.lower() or 'untyped' in line.lower()])
 
             # Estimate type annotation coverage
             total_python_files = len(list(self.project_root.rglob('*.py')))
-            coverage_estimate = max(0, 100 - (annotation_errors / max(total_python_files, 1)) * 10)
+            coverage_estimate = max(
+                0, 100 - (annotation_errors / max(total_python_files, 1)) * 10)
 
             passed = coverage_estimate >= self.quality_thresholds['type_annotation_coverage']
 
@@ -240,11 +280,13 @@ class TechnicalDebtEnforcer:
                 'passed': passed,
                 'annotation_errors': annotation_errors,
                 'coverage_estimate': round(coverage_estimate, 2),
-                'recommendation': f"Add type annotations to improve coverage" if not passed else "Type annotation coverage acceptable"
+                'recommendation': "Add type annotations to improve coverage" if not passed else "Type annotation coverage acceptable"
             }
 
         except (subprocess.CalledProcessError, FileNotFoundError):
-            return {'passed': True, 'recommendation': 'Type annotation analysis not available'}
+            return {
+                'passed': True,
+                'recommendation': 'Type annotation analysis not available'}
 
     def generate_quality_report(self) -> None:
         """Generate comprehensive quality report."""
@@ -258,7 +300,8 @@ class TechnicalDebtEnforcer:
         self.results['type_annotations'] = self.run_type_annotation_analysis()
 
         # Calculate overall status
-        all_passed = all(result.get('passed', False) for result in self.results.values())
+        all_passed = all(result.get('passed', False)
+                         for result in self.results.values())
 
         # Generate report
         report = {
@@ -266,11 +309,16 @@ class TechnicalDebtEnforcer:
             'overall_status': 'PASS' if all_passed else 'FAIL',
             'quality_gates': self.results,
             'summary': {
-                'total_gates': len(self.results),
-                'passed_gates': sum(1 for result in self.results.values() if result.get('passed', False)),
-                'recommendations': [result.get('recommendation', '') for result in self.results.values() if result.get('recommendation')]
-            }
-        }
+                'total_gates': len(
+                    self.results),
+                'passed_gates': sum(
+                    1 for result in self.results.values() if result.get(
+                        'passed',
+                        False)),
+                'recommendations': [
+                    result.get(
+                        'recommendation',
+                        '') for result in self.results.values() if result.get('recommendation')]}}
 
         # Save report
         report_file = self.project_root / 'analysis_reports' / 'quality_gates_report.json'
@@ -291,20 +339,28 @@ class TechnicalDebtEnforcer:
 
         status_emoji = "✅" if report['overall_status'] == 'PASS' else "❌"
         print(f"\n{status_emoji} Overall Status: {report['overall_status']}")
-        print(f"📊 Gates Passed: {report['summary']['passed_gates']}/{report['summary']['total_gates']}")
+        print(
+            f"📊 Gates Passed: {
+                report['summary']['passed_gates']}/{
+                report['summary']['total_gates']}")
 
         print("\n📋 Gate Results:")
         for gate_name, result in report['quality_gates'].items():
             gate_emoji = "✅" if result.get('passed', False) else "❌"
-            print(f"  {gate_emoji} {gate_name.title()}: {result.get('recommendation', 'No issues')}")
+            print(
+                f"  {gate_emoji} {
+                    gate_name.title()}: {
+                    result.get(
+                        'recommendation',
+                        'No issues')}")
 
         if report['summary']['recommendations']:
-            print(f"\n💡 Recommendations:")
+            print("\n💡 Recommendations:")
             for rec in report['summary']['recommendations']:
                 if rec:
                     print(f"  • {rec}")
 
-        print(f"\n📄 Full report saved to: analysis_reports/quality_gates_report.json")
+        print("\n📄 Full report saved to: analysis_reports/quality_gates_report.json")
 
 
 class AutomatedCodeFixer:
@@ -330,7 +386,8 @@ class AutomatedCodeFixer:
                 if lines != new_lines:
                     with open(py_file, 'w') as f:
                         f.writelines(new_lines)
-                    fixed_files.append(str(py_file.relative_to(self.project_root)))
+                    fixed_files.append(
+                        str(py_file.relative_to(self.project_root)))
             except Exception as e:
                 logger.warning(f"Could not fix whitespace in {py_file}: {e}")
 
@@ -342,7 +399,8 @@ class AutomatedCodeFixer:
 
         try:
             result = subprocess.run(
-                ['python', '-m', 'autoflake', '--remove-all-unused-imports', '--in-place', '--recursive', '.'],
+                ['python', '-m', 'autoflake', '--remove-all-unused-imports',
+                    '--in-place', '--recursive', '.'],
                 capture_output=True,
                 text=True,
                 cwd=self.project_root

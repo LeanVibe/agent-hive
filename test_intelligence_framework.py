@@ -5,37 +5,53 @@ This module contains unit tests and integration tests for all components
 of the intelligence framework system.
 """
 
-import pytest
 import asyncio
+import os
 import sqlite3
 import tempfile
-import os
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
-import json
+from unittest.mock import AsyncMock, Mock
+
+import pytest
+
+from advanced_orchestration.models import (
+    AgentInfo,
+    AgentMetadata,
+    AgentRegistration,
+    AgentStatus,
+    ResourceRequirements,
+)
+from agent_coordination_protocols import (
+    AgentCapability,
+    AgentCoordinationProtocols,
+    CoordinationSession,
+    CoordinationStrategy,
+    MessageType,
+    Priority,
+)
 
 # Import the modules to test
 from intelligence_framework import (
-    IntelligenceFramework, IntelligenceConfig, IntelligenceDecision,
-    AgentIntelligence, IntelligenceLevel, DecisionType
-)
-from agent_coordination_protocols import (
-    AgentCoordinationProtocols, AgentMessage, MessageType, Priority,
-    CoordinationSession, CoordinationStrategy, AgentCapability
+    AgentIntelligence,
+    DecisionType,
+    IntelligenceConfig,
+    IntelligenceDecision,
+    IntelligenceFramework,
+    IntelligenceLevel,
 )
 from intelligent_task_allocation import (
-    IntelligentTaskAllocator, IntelligentTask, TaskPriority, TaskComplexity,
-    AllocationStrategy, AgentPerformanceProfile
+    AgentPerformanceProfile,
+    AllocationStrategy,
+    IntelligentTask,
+    IntelligentTaskAllocator,
+    TaskComplexity,
+    TaskPriority,
 )
 from performance_monitoring_optimization import (
-    PerformanceMonitoringOptimization, PerformanceMetric, PerformanceMetricType,
-    PerformanceThreshold, AlertLevel, OptimizationAction
+    AlertLevel,
+    PerformanceMetricType,
+    PerformanceMonitoringOptimization,
 )
-from advanced_orchestration.models import (
-    ResourceRequirements, AgentInfo, AgentStatus, AgentRegistration,
-    AgentMetadata, CoordinatorConfig
-)
-from ml_enhancements.models import MLConfig
 
 
 class TestIntelligenceFramework:
@@ -119,7 +135,8 @@ class TestIntelligenceFramework:
         agent_info.registration.capabilities = ["processing", "analysis"]
 
         # Mock coordinator
-        intelligence_framework.coordinator.get_agent_status = AsyncMock(return_value=agent_info)
+        intelligence_framework.coordinator.get_agent_status = AsyncMock(
+            return_value=agent_info)
 
         intelligence = await intelligence_framework.assess_agent_intelligence("test_agent_1")
 
@@ -141,16 +158,19 @@ class TestIntelligenceFramework:
         mock_state.load_balancing_metrics = Mock()
         mock_state.load_balancing_metrics.distribution_variance = 0.2
 
-        intelligence_framework.coordinator.get_coordinator_state = AsyncMock(return_value=mock_state)
+        intelligence_framework.coordinator.get_coordinator_state = AsyncMock(
+            return_value=mock_state)
 
         # Mock predictive analytics
         mock_prediction = Mock()
         mock_prediction.predicted_value = 0.85
         mock_prediction.accuracy_score = 0.9
-        intelligence_framework.predictive_analytics.predict_performance = AsyncMock(return_value=mock_prediction)
+        intelligence_framework.predictive_analytics.predict_performance = AsyncMock(
+            return_value=mock_prediction)
 
         # Mock pattern optimizer
-        intelligence_framework.pattern_optimizer.analyze_patterns = AsyncMock(return_value=[])
+        intelligence_framework.pattern_optimizer.analyze_patterns = AsyncMock(
+            return_value=[])
 
         optimization_results = await intelligence_framework.optimize_system_performance()
 
@@ -203,7 +223,7 @@ class TestAgentCoordinationProtocols:
         # Mock message delivery
         coordination_protocols._deliver_message = AsyncMock()
 
-        message = await coordination_protocols.send_message(
+        await coordination_protocols.send_message(
             recipient_id="test_agent_2",
             message_type=MessageType.TASK_REQUEST,
             content=content,
@@ -323,7 +343,8 @@ class TestAgentCoordinationProtocols:
         assert session.session_id in coordination_protocols.active_sessions
 
         # Verify coordination requests were sent
-        assert coordination_protocols.send_message.call_count == len(participants)
+        assert coordination_protocols.send_message.call_count == len(
+            participants)
 
 
 class TestIntelligentTaskAllocator:
@@ -421,11 +442,13 @@ class TestIntelligentTaskAllocator:
         async def mock_perform_allocation(task, agent):
             # Simulate the actual allocation behavior
             task_allocator.active_tasks[task.task_id] = task
-            task_allocator.agent_workloads[agent.agent_id] = task_allocator.agent_workloads.get(agent.agent_id, 0) + 1
+            task_allocator.agent_workloads[agent.agent_id] = task_allocator.agent_workloads.get(
+                agent.agent_id, 0) + 1
             task.allocation_attempts += 1
             return True
 
-        task_allocator._perform_allocation = AsyncMock(side_effect=mock_perform_allocation)
+        task_allocator._perform_allocation = AsyncMock(
+            side_effect=mock_perform_allocation)
 
         # Allocate task
         selected_agent_id = await task_allocator.allocate_task(
@@ -508,7 +531,8 @@ class TestIntelligentTaskAllocator:
         )
 
         # Test performance score calculation
-        score = profile.get_performance_score("data_processing", TaskComplexity.MODERATE)
+        score = profile.get_performance_score(
+            "data_processing", TaskComplexity.MODERATE)
         assert 0.0 <= score <= 1.0
 
         # Test performance update
@@ -537,7 +561,8 @@ class TestIntelligentTaskAllocator:
         agent_profile = AgentPerformanceProfile(
             agent_id="test_agent",
             task_types={"data_processing": 0.9, "analysis": 0.7},
-            complexity_handling={TaskComplexity.SIMPLE: 0.9, TaskComplexity.MODERATE: 0.8},
+            complexity_handling={TaskComplexity.SIMPLE: 0.9,
+                                 TaskComplexity.MODERATE: 0.8},
             resource_efficiency={"cpu": 0.8},
             reliability_score=0.85,
             throughput_score=0.9,
@@ -617,7 +642,8 @@ class TestPerformanceMonitoring:
 
         # Verify metric history
         assert PerformanceMetricType.RESPONSE_TIME in performance_monitor.metric_history
-        assert len(performance_monitor.metric_history[PerformanceMetricType.RESPONSE_TIME]) == 1
+        assert len(
+            performance_monitor.metric_history[PerformanceMetricType.RESPONSE_TIME]) == 1
 
     @pytest.mark.asyncio
     async def test_threshold_checking(self, performance_monitor):
@@ -678,12 +704,10 @@ class TestPerformanceMonitoring:
         """Test optimization recommendation generation."""
         # Set up mock metrics that would trigger optimizations
         performance_monitor.metric_history[PerformanceMetricType.RESPONSE_TIME] = [
-            Mock(value=3.0, timestamp=datetime.now())
-        ]
+            Mock(value=3.0, timestamp=datetime.now())]
 
         performance_monitor.metric_history[PerformanceMetricType.ERROR_RATE] = [
-            Mock(value=0.08, timestamp=datetime.now())
-        ]
+            Mock(value=0.08, timestamp=datetime.now())]
 
         # Generate optimization recommendations
         recommendations = await performance_monitor.optimize_performance([
@@ -706,7 +730,7 @@ class TestPerformanceMonitoring:
     async def test_performance_report(self, performance_monitor):
         """Test performance report generation."""
         # Add some historical metrics
-        now = datetime.now()
+        datetime._now()
         for i in range(5):
             await performance_monitor.record_metric(
                 PerformanceMetricType.THROUGHPUT,
@@ -750,7 +774,11 @@ class TestIntegration:
     def temp_db_paths(self):
         """Create temporary database files."""
         paths = {}
-        for component in ['intelligence', 'coordination', 'allocation', 'monitoring']:
+        for component in [
+            'intelligence',
+            'coordination',
+            'allocation',
+                'monitoring']:
             db_fd, db_path = tempfile.mkstemp(suffix=f'_{component}.db')
             os.close(db_fd)
             paths[component] = db_path
@@ -781,7 +809,8 @@ class TestIntegration:
         intelligence_framework = IntelligenceFramework(intelligence_config)
         coordination_protocols = AgentCoordinationProtocols("system_agent")
         task_allocator = IntelligentTaskAllocator(task_allocator_config)
-        performance_monitor = PerformanceMonitoringOptimization(monitoring_config)
+        performance_monitor = PerformanceMonitoringOptimization(
+            monitoring_config)
 
         # Set up component references
         performance_monitor.set_components(
@@ -801,7 +830,7 @@ class TestIntegration:
     async def test_end_to_end_task_processing(self, integrated_system):
         """Test end-to-end task processing workflow."""
         intelligence = integrated_system['intelligence']
-        coordination = integrated_system['coordination']
+        integrated_system['_coordination']
         allocation = integrated_system['allocation']
         monitoring = integrated_system['monitoring']
 
@@ -844,7 +873,6 @@ class TestIntegration:
             assert decision.confidence > 0.0
 
             # Allocate task to agent (simulate agent allocation)
-            from advanced_orchestration.models import AgentInfo, AgentStatus, AgentRegistration
             from unittest.mock import Mock
 
             # Create mock agent
@@ -911,7 +939,7 @@ class TestIntegration:
 
         try:
             # Register agent capabilities
-            capability = await coordination.register_capability(
+            await coordination.register_capability(
                 name="data_processing",
                 description="Process data efficiently",
                 performance_score=0.9,
@@ -953,7 +981,7 @@ class TestIntegration:
         """Test performance optimization workflow."""
         monitoring = integrated_system['monitoring']
         intelligence = integrated_system['intelligence']
-        allocation = integrated_system['allocation']
+        integrated_system['_allocation']
 
         # Start systems
         await intelligence.start()

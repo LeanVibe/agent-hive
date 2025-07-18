@@ -4,19 +4,19 @@ Unit tests for TaskQueue component.
 Tests the priority-based task queue with dependency management.
 """
 
-import pytest
 import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock
 
 # Import the component under test
 import sys
+from datetime import datetime
 from pathlib import Path
+
+import pytest
+from task_queue_module.task_queue import Task, TaskQueue
+
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
-
-from task_queue_module.task_queue import TaskQueue, Task, TaskStatus
 
 
 class TestTaskQueue:
@@ -60,7 +60,8 @@ class TestTaskQueue:
 
     @pytest.mark.unit
     @pytest.mark.asyncio
-    async def test_get_next_task_priority_order(self, task_queue, sample_tasks):
+    async def test_get_next_task_priority_order(
+            self, task_queue, sample_tasks):
         """Test tasks are returned in priority order (highest first)."""
         # Add tasks in random order
         for task in sample_tasks:
@@ -370,7 +371,8 @@ class TestTaskQueue:
 
     @pytest.mark.unit
     @pytest.mark.asyncio
-    async def test_queue_persistence_simulation(self, task_queue, sample_tasks, temp_directory):
+    async def test_queue_persistence_simulation(
+            self, task_queue, sample_tasks, temp_directory):
         """Test queue state persistence simulation."""
         # Add tasks
         for task in sample_tasks:

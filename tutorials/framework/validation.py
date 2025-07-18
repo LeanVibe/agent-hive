@@ -8,17 +8,13 @@ Provides comprehensive validation for tutorial content including:
 - User experience testing
 """
 
-import subprocess
-import re
 import ast
-import time
-import asyncio
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass
-from pathlib import Path
-import json
-import tempfile
 import os
+import subprocess
+import tempfile
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -57,7 +53,10 @@ class StepValidator:
     def __init__(self, timeout: int = 30):
         self.timeout = timeout
 
-    def validate_command(self, command: str, expected_output: Optional[str] = None) -> ValidationResult:
+    def validate_command(
+            self,
+            command: str,
+            expected_output: Optional[str] = None) -> ValidationResult:
         """Validate a command execution."""
         start_time = time.time()
 
@@ -76,10 +75,11 @@ class StepValidator:
                     return ValidationResult(
                         success=False,
                         message=f"Expected output '{expected_output}' not found",
-                        details={"expected": expected_output, "actual": result.stdout},
+                        details={
+                            "expected": expected_output,
+                            "actual": result.stdout},
                         output=result.stdout,
-                        execution_time=execution_time
-                    )
+                        execution_time=execution_time)
 
                 return ValidationResult(
                     success=True,
@@ -90,10 +90,10 @@ class StepValidator:
             else:
                 return ValidationResult(
                     success=False,
-                    message=f"Command failed with return code {result.returncode}",
+                    message=f"Command failed with return code {
+                        result.returncode}",
                     error=result.stderr,
-                    execution_time=execution_time
-                )
+                    execution_time=execution_time)
 
         except subprocess.TimeoutExpired:
             return ValidationResult(
@@ -141,7 +141,7 @@ class StepValidator:
                 else:
                     return ValidationResult(
                         success=False,
-                        message=f"Python code execution failed",
+                        message="Python code execution failed",
                         error=result.stderr,
                         execution_time=execution_time
                     )
@@ -237,7 +237,9 @@ class TutorialValidator:
             execution_time=time.time() - start_time
         )
 
-    def _validate_metadata(self, metadata: 'TutorialMetadata') -> ValidationResult:
+    def _validate_metadata(
+            self,
+            metadata: 'TutorialMetadata') -> ValidationResult:
         """Validate tutorial metadata."""
         errors = []
 
@@ -295,7 +297,11 @@ class TutorialValidator:
         for i, code_example in enumerate(step.code_examples):
             if code_example.strip():
                 result = self.step_validator.validate_python_code(code_example)
-                result.message = f"Step {step.step_id} code example {i+1}: {result.message}"
+                result.message = f"Step {
+                    step.step_id} code example {
+                    i +
+                    1}: {
+                    result.message}"
                 results.append(result)
 
         # Validate command if present
@@ -304,7 +310,9 @@ class TutorialValidator:
                 step.validation_command,
                 step.expected_output
             )
-            result.message = f"Step {step.step_id} validation command: {result.message}"
+            result.message = f"Step {
+                step.step_id} validation command: {
+                result.message}"
             results.append(result)
 
         # If no validation issues found, add success result
@@ -316,7 +324,8 @@ class TutorialValidator:
 
         return results
 
-    def _validate_step_dependencies(self, steps: List['TutorialStep']) -> ValidationResult:
+    def _validate_step_dependencies(
+            self, steps: List['TutorialStep']) -> ValidationResult:
         """Validate step dependency graph."""
         step_ids = {step.step_id for step in steps}
 
@@ -324,9 +333,8 @@ class TutorialValidator:
             for dep in step.dependencies:
                 if dep not in step_ids:
                     return ValidationResult(
-                        success=False,
-                        message=f"Step {step.step_id} has invalid dependency: {dep}"
-                    )
+                        success=False, message=f"Step {
+                            step.step_id} has invalid dependency: {dep}")
 
         # Check for circular dependencies
         if self._has_circular_dependencies(steps):
@@ -377,7 +385,8 @@ class TutorialTestRunner:
     def __init__(self):
         self.validator = TutorialValidator()
 
-    def run_validation_suite(self, tutorial_manager: 'TutorialManager') -> Dict[str, ValidationReport]:
+    def run_validation_suite(
+            self, tutorial_manager: 'TutorialManager') -> Dict[str, ValidationReport]:
         """Run validation suite for all tutorials."""
         reports = {}
 
@@ -389,33 +398,43 @@ class TutorialTestRunner:
             if report.overall_success:
                 print(f"  ✅ {report.success_rate:.1f}% success rate")
             else:
-                print(f"  ❌ {report.success_rate:.1f}% success rate ({report.failed_validations} failures)")
+                print(
+                    f"  ❌ {
+                        report.success_rate:.1f}% success rate ({
+                        report.failed_validations} failures)")
 
         return reports
 
-    def generate_validation_report(self, reports: Dict[str, ValidationReport]) -> str:
+    def generate_validation_report(
+            self, reports: Dict[str, ValidationReport]) -> str:
         """Generate comprehensive validation report."""
         total_tutorials = len(reports)
-        successful_tutorials = sum(1 for r in reports.values() if r.overall_success)
+        successful_tutorials = sum(
+            1 for r in reports.values() if r.overall_success)
 
         report = []
         report.append("# Tutorial Validation Report")
         report.append("=" * 50)
         report.append(f"Total tutorials: {total_tutorials}")
         report.append(f"Successful tutorials: {successful_tutorials}")
-        report.append(f"Failed tutorials: {total_tutorials - successful_tutorials}")
+        report.append(
+            f"Failed tutorials: {total_tutorials - successful_tutorials}")
 
         if total_tutorials > 0:
-            report.append(f"Overall success rate: {(successful_tutorials / total_tutorials) * 100:.1f}%")
+            report.append(
+                f"Overall success rate: {(successful_tutorials / total_tutorials) * 100:.1f}%")
         else:
             report.append("Overall success rate: N/A (no tutorials found)")
         report.append("")
 
         for tutorial_id, validation_report in reports.items():
             report.append(f"## Tutorial: {tutorial_id}")
-            report.append(f"- Success rate: {validation_report.success_rate:.1f}%")
-            report.append(f"- Validations: {validation_report.passed_validations}/{validation_report.total_validations}")
-            report.append(f"- Execution time: {validation_report.execution_time:.2f}s")
+            report.append(
+                f"- Success rate: {validation_report.success_rate:.1f}%")
+            report.append(
+                f"- Validations: {validation_report.passed_validations}/{validation_report.total_validations}")
+            report.append(
+                f"- Execution time: {validation_report.execution_time:.2f}s")
 
             if not validation_report.overall_success:
                 report.append("### Failures:")
@@ -427,7 +446,8 @@ class TutorialTestRunner:
 
         return "\n".join(report)
 
-    def save_validation_report(self, reports: Dict[str, ValidationReport], output_file: str):
+    def save_validation_report(
+            self, reports: Dict[str, ValidationReport], output_file: str):
         """Save validation report to file."""
         report_text = self.generate_validation_report(reports)
 
@@ -462,13 +482,15 @@ def run_validation_cli():
 
     # Print summary
     total_tutorials = len(reports)
-    successful_tutorials = sum(1 for r in reports.values() if r.overall_success)
+    successful_tutorials = sum(
+        1 for r in reports.values() if r.overall_success)
 
-    print(f"\n📊 Validation Summary:")
+    print("\n📊 Validation Summary:")
     print(f"Successful tutorials: {successful_tutorials}/{total_tutorials}")
 
     if total_tutorials > 0:
-        print(f"Overall success rate: {(successful_tutorials / total_tutorials) * 100:.1f}%")
+        print(
+            f"Overall success rate: {(successful_tutorials / total_tutorials) * 100:.1f}%")
 
         if successful_tutorials == total_tutorials:
             print("🎉 All tutorials validated successfully!")

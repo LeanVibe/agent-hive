@@ -4,16 +4,19 @@ Scaling Manager for automatic agent scaling based on demand and performance metr
 This module provides auto-scaling capabilities for the multi-agent system.
 """
 
-import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any, TYPE_CHECKING
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 from .models import (
-    ResourceLimits, ScalingConfig, ScalingReason, ScalingMetrics,
-    ScalingException, AgentStatus
+    AgentStatus,
+    ResourceLimits,
+    ScalingConfig,
+    ScalingException,
+    ScalingMetrics,
+    ScalingReason,
 )
 
 if TYPE_CHECKING:
@@ -75,9 +78,12 @@ class ScalingManager:
         self.metrics_window_size = 10
         self.scaling_enabled = True
 
-        self.logger.info(f"ScalingManager initialized with config: {self.config}")
+        self.logger.info(
+            f"ScalingManager initialized with config: {self.config}")
 
-    async def check_scaling_needs(self, coordinator: 'MultiAgentCoordinator') -> Optional[ScalingDecision]:
+    async def check_scaling_needs(
+            self,
+            coordinator: 'MultiAgentCoordinator') -> Optional[ScalingDecision]:
         """
         Check if scaling is needed and execute if appropriate.
 
@@ -109,7 +115,10 @@ class ScalingManager:
             success = await self._execute_scaling_decision(coordinator, decision, reason)
 
             if success:
-                self.logger.info(f"Scaling decision executed: {decision.value}, reason: {reason.reason}")
+                self.logger.info(
+                    f"Scaling decision executed: {
+                        decision.value}, reason: {
+                        reason.reason}")
                 return decision
 
             return None
@@ -118,7 +127,9 @@ class ScalingManager:
             self.logger.error(f"Error checking scaling needs: {e}")
             return None
 
-    async def should_scale_up(self, coordinator: 'MultiAgentCoordinator') -> Tuple[bool, Optional[ScalingReason]]:
+    async def should_scale_up(self,
+                              coordinator: 'MultiAgentCoordinator') -> Tuple[bool,
+                                                                             Optional[ScalingReason]]:
         """
         Check if the system should scale up.
 
@@ -165,7 +176,9 @@ class ScalingManager:
             # Check throughput decline
             if len(self.scaling_metrics_history) >= 2:
                 previous_metrics = self.scaling_metrics_history[-2]
-                throughput_decline = (previous_metrics.throughput - current_metrics.throughput) / max(1, previous_metrics.throughput)
+                throughput_decline = (
+                    previous_metrics.throughput - current_metrics.throughput) / max(
+                    1, previous_metrics.throughput)
 
                 if throughput_decline > 0.2:  # 20% decline
                     return True, ScalingReason(
@@ -181,7 +194,9 @@ class ScalingManager:
             self.logger.error(f"Error checking scale up conditions: {e}")
             return False, None
 
-    async def should_scale_down(self, coordinator: 'MultiAgentCoordinator') -> Tuple[bool, Optional[ScalingReason]]:
+    async def should_scale_down(self,
+                                coordinator: 'MultiAgentCoordinator') -> Tuple[bool,
+                                                                               Optional[ScalingReason]]:
         """
         Check if the system should scale down.
 
@@ -206,7 +221,7 @@ class ScalingManager:
             if current_metrics.resource_utilization < self.config.scale_down_threshold:
                 # Additional checks to ensure it's safe to scale down
                 if (current_metrics.queue_depth < self.config.queue_depth_threshold * 0.3 and
-                    current_metrics.avg_response_time < self.config.response_time_threshold * 0.5):
+                        current_metrics.avg_response_time < self.config.response_time_threshold * 0.5):
 
                     return True, ScalingReason(
                         reason="Low resource utilization",
@@ -217,8 +232,10 @@ class ScalingManager:
 
             # Check for sustained low queue depth
             if len(self.scaling_metrics_history) >= 5:
-                recent_queue_depths = [m.queue_depth for m in self.scaling_metrics_history[-5:]]
-                avg_queue_depth = sum(recent_queue_depths) / len(recent_queue_depths)
+                recent_queue_depths = [
+                    m.queue_depth for m in self.scaling_metrics_history[-5:]]
+                avg_queue_depth = sum(recent_queue_depths) / \
+                    len(recent_queue_depths)
 
                 if avg_queue_depth < self.config.queue_depth_threshold * 0.2:
                     return True, ScalingReason(
@@ -234,7 +251,10 @@ class ScalingManager:
             self.logger.error(f"Error checking scale down conditions: {e}")
             return False, None
 
-    async def scale_up(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
+    async def scale_up(
+            self,
+            coordinator: 'MultiAgentCoordinator',
+            count: Optional[int] = None) -> List[str]:
         """
         Scale up the number of agents.
 
@@ -252,7 +272,8 @@ class ScalingManager:
             if count is None:
                 count = self.config.scale_up_step
 
-            current_agents = len([a for a in coordinator.agents.values() if a.status == AgentStatus.HEALTHY])
+            current_agents = len(
+                [a for a in coordinator.agents.values() if a.status == AgentStatus.HEALTHY])
 
             # Check limits
             if current_agents + count > self.config.max_agents:
@@ -265,7 +286,8 @@ class ScalingManager:
             # For now, return placeholder agent IDs
             new_agent_ids = []
             for i in range(count):
-                agent_id = f"auto-agent-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{i}"
+                agent_id = f"auto-agent-{
+                    datetime.now().strftime('%Y%m%d-%H%M%S')}-{i}"
                 new_agent_ids.append(agent_id)
 
             self.logger.info(f"Scaled up by {count} agents: {new_agent_ids}")
@@ -275,7 +297,10 @@ class ScalingManager:
             self.logger.error(f"Failed to scale up: {e}")
             raise ScalingException(f"Scale up failed: {e}")
 
-    async def scale_down(self, coordinator: 'MultiAgentCoordinator', count: Optional[int] = None) -> List[str]:
+    async def scale_down(
+            self,
+            coordinator: 'MultiAgentCoordinator',
+            count: Optional[int] = None) -> List[str]:
         """
         Scale down the number of agents.
 
@@ -303,7 +328,8 @@ class ScalingManager:
                 count = len(healthy_agents) - self.config.min_agents
 
             if count <= 0:
-                raise ScalingException("Cannot scale down: at minimum capacity")
+                raise ScalingException(
+                    "Cannot scale down: at minimum capacity")
 
             # Select agents to remove (prefer agents with least active tasks)
             agents_to_remove = sorted(
@@ -317,14 +343,17 @@ class ScalingManager:
                 if await coordinator.unregister_agent(agent_id):
                     removed_agents.append(agent_id)
 
-            self.logger.info(f"Scaled down by {len(removed_agents)} agents: {removed_agents}")
+            self.logger.info(
+                f"Scaled down by {
+                    len(removed_agents)} agents: {removed_agents}")
             return removed_agents
 
         except Exception as e:
             self.logger.error(f"Failed to scale down: {e}")
             raise ScalingException(f"Scale down failed: {e}")
 
-    async def get_scaling_metrics(self, coordinator: 'MultiAgentCoordinator') -> ScalingMetrics:
+    async def get_scaling_metrics(
+            self, coordinator: 'MultiAgentCoordinator') -> ScalingMetrics:
         """
         Get current scaling metrics.
 
@@ -357,8 +386,10 @@ class ScalingManager:
         """
         total_events = len(self.scaling_history)
         successful_events = len([e for e in self.scaling_history if e.success])
-        scale_up_events = len([e for e in self.scaling_history if e.decision == ScalingDecision.SCALE_UP])
-        scale_down_events = len([e for e in self.scaling_history if e.decision == ScalingDecision.SCALE_DOWN])
+        scale_up_events = len(
+            [e for e in self.scaling_history if e.decision == ScalingDecision.SCALE_UP])
+        scale_down_events = len(
+            [e for e in self.scaling_history if e.decision == ScalingDecision.SCALE_DOWN])
 
         # Calculate average scaling effectiveness
         effectiveness = 0.0
@@ -378,9 +409,7 @@ class ScalingManager:
                 'max_agents': self.config.max_agents,
                 'scale_up_threshold': self.config.scale_up_threshold,
                 'scale_down_threshold': self.config.scale_down_threshold,
-                'cooldown_period': self.config.cooldown_period
-            }
-        }
+                'cooldown_period': self.config.cooldown_period}}
 
     def enable_scaling(self) -> None:
         """Enable automatic scaling."""
@@ -402,7 +431,8 @@ class ScalingManager:
         self.config = config
         self.logger.info(f"Scaling configuration updated: {config}")
 
-    async def _make_scaling_decision(self, current_metrics: ScalingMetrics) -> Tuple[ScalingDecision, Optional[ScalingReason]]:
+    async def _make_scaling_decision(
+            self, current_metrics: ScalingMetrics) -> Tuple[ScalingDecision, Optional[ScalingReason]]:
         """
         Make scaling decision based on current metrics.
 
@@ -424,7 +454,8 @@ class ScalingManager:
 
         return ScalingDecision.NO_CHANGE, None
 
-    async def _check_scale_up_conditions(self, metrics: ScalingMetrics) -> Tuple[bool, Optional[ScalingReason]]:
+    async def _check_scale_up_conditions(
+            self, metrics: ScalingMetrics) -> Tuple[bool, Optional[ScalingReason]]:
         """Check if scale up conditions are met."""
         # Check maximum capacity
         if metrics.current_agents >= self.config.max_agents:
@@ -459,7 +490,8 @@ class ScalingManager:
 
         return False, None
 
-    async def _check_scale_down_conditions(self, metrics: ScalingMetrics) -> Tuple[bool, Optional[ScalingReason]]:
+    async def _check_scale_down_conditions(
+            self, metrics: ScalingMetrics) -> Tuple[bool, Optional[ScalingReason]]:
         """Check if scale down conditions are met."""
         # Check minimum capacity
         if metrics.current_agents <= self.config.min_agents:
@@ -473,7 +505,7 @@ class ScalingManager:
         if metrics.resource_utilization < self.config.scale_down_threshold:
             # Additional safety checks
             if (metrics.queue_depth < self.config.queue_depth_threshold * 0.3 and
-                metrics.avg_response_time < self.config.response_time_threshold * 0.5):
+                    metrics.avg_response_time < self.config.response_time_threshold * 0.5):
 
                 return True, ScalingReason(
                     reason="Low resource utilization",
@@ -484,8 +516,11 @@ class ScalingManager:
 
         return False, None
 
-    async def _execute_scaling_decision(self, coordinator: 'MultiAgentCoordinator',
-                                       decision: ScalingDecision, reason: ScalingReason) -> bool:
+    async def _execute_scaling_decision(
+            self,
+            coordinator: 'MultiAgentCoordinator',
+            decision: ScalingDecision,
+            reason: ScalingReason) -> bool:
         """
         Execute scaling decision.
 
@@ -498,7 +533,8 @@ class ScalingManager:
             bool: True if scaling was successful
         """
         try:
-            agents_before = len([a for a in coordinator.agents.values() if a.status == AgentStatus.HEALTHY])
+            agents_before = len([a for a in coordinator.agents.values()
+                                if a.status == AgentStatus.HEALTHY])
 
             if decision == ScalingDecision.SCALE_UP:
                 new_agents = await self.scale_up(coordinator)
@@ -538,7 +574,8 @@ class ScalingManager:
                 timestamp=datetime.now(),
                 decision=decision,
                 reason=reason,
-                agents_before=len([a for a in coordinator.agents.values() if a.status == AgentStatus.HEALTHY]),
+                agents_before=len([a for a in coordinator.agents.values()
+                                  if a.status == AgentStatus.HEALTHY]),
                 agents_after=0,
                 success=False,
                 error=str(e)

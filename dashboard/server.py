@@ -10,26 +10,26 @@ import asyncio
 import json
 import logging
 import subprocess
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, asdict
-from enum import Enum
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import uvicorn
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 try:
-    from .prompt_logger import prompt_logger, PromptLog
+    from .prompt_logger import PromptLog, prompt_logger
 except ImportError:
     # Fallback for direct execution
     import sys
     sys.path.append('.')
-    from prompt_logger import prompt_logger, PromptLog
+    from prompt_logger import PromptLog, prompt_logger
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -134,7 +134,8 @@ class DashboardServer:
         @self.app.get("/api/agents")
         async def get_agents():
             """Get all agents information"""
-            return {"agents": [agent.to_dict() for agent in self.agents.values()]}
+            return {"agents": [agent.to_dict()
+                               for agent in self.agents.values()]}
 
         @self.app.get("/api/agents/{agent_name}")
         async def get_agent(agent_name: str):
@@ -182,7 +183,8 @@ class DashboardServer:
             if success:
                 return {"message": f"Agent {agent_name} spawned successfully"}
             else:
-                raise HTTPException(status_code=500, detail="Failed to spawn agent")
+                raise HTTPException(
+                    status_code=500, detail="Failed to spawn agent")
 
         @self.app.post("/api/agents/{agent_name}/kill")
         async def kill_agent(agent_name: str):
@@ -191,7 +193,8 @@ class DashboardServer:
             if success:
                 return {"message": f"Agent {agent_name} killed successfully"}
             else:
-                raise HTTPException(status_code=500, detail="Failed to kill agent")
+                raise HTTPException(
+                    status_code=500, detail="Failed to kill agent")
 
         @self.app.post("/api/agents/spawn-all")
         async def spawn_all_agents():
@@ -405,9 +408,11 @@ class DashboardServer:
 
                 # Update system metrics
                 self.system_metrics.total_agents = len(self.agents)
-                self.system_metrics.active_agents = len([a for a in self.agents.values() if a.status == AgentStatus.ACTIVE])
+                self.system_metrics.active_agents = len(
+                    [a for a in self.agents.values() if a.status == AgentStatus.ACTIVE])
 
-                logger.info(f"Monitored {len(self.agents)} agents, {self.system_metrics.active_agents} active")
+                logger.info(
+                    f"Monitored {len(self.agents)} agents, {self.system_metrics.active_agents} active")
 
             except Exception as e:
                 logger.error(f"Error monitoring agents: {e}")
@@ -435,9 +440,8 @@ class DashboardServer:
                 if self.websocket_connections:
                     # Send agents update
                     agents_data = {
-                        "type": "agents_update",
-                        "agents": [agent.to_dict() for agent in self.agents.values()]
-                    }
+                        "type": "agents_update", "agents": [
+                            agent.to_dict() for agent in self.agents.values()]}
 
                     # Send metrics update
                     metrics_data = {
@@ -486,7 +490,8 @@ class DashboardServer:
                             last_activity=last_activity
                         )
 
-        # Then, discover agents from git worktree list (for agents outside worktrees/)
+        # Then, discover agents from git worktree list (for agents outside
+        # worktrees/)
         try:
             result = await self._run_command(["git", "worktree", "list", "--porcelain"])
 
@@ -499,15 +504,17 @@ class DashboardServer:
                         # Check if this is an agent worktree (not main repo)
                         if (current_worktree != self.base_dir and
                             current_worktree.name not in agents and
-                            current_worktree.name != "agent-hive"):
+                                current_worktree.name != "agent-hive"):
                             claude_file = current_worktree / "CLAUDE.md"
                             if claude_file.exists():
                                 # Extract agent name from path
                                 agent_name = current_worktree.name
                                 if agent_name.endswith("-worktree"):
-                                    agent_name = agent_name[:-9]  # Remove "-worktree" suffix
+                                    # Remove "-worktree" suffix
+                                    agent_name = agent_name[:-9]
 
-                                # Skip if this agent looks like a generic orchestrator
+                                # Skip if this agent looks like a generic
+                                # orchestrator
                                 if self._is_agent_specific_claude(claude_file):
                                     status = await self._get_agent_status(agent_name)
                                     last_activity = await self._get_last_activity(current_worktree)
@@ -532,7 +539,12 @@ class DashboardServer:
             if "LeanVibe Orchestrator" in content and "Role: Orchestrator" in content:
                 return False
             # Must contain agent-specific content
-            if any(term in content.lower() for term in ["agent identity", "agent instructions", "specialization", "mission statement"]):
+            if any(
+                term in content.lower() for term in [
+                    "agent identity",
+                    "agent instructions",
+                    "specialization",
+                    "mission statement"]):
                 return True
             return False
         except Exception:
@@ -549,14 +561,16 @@ class DashboardServer:
             if result.returncode == 0:
                 for line in result.stdout.splitlines():
                     if line.startswith(window_name + ":"):
-                        return AgentStatus.ACTIVE if line.endswith(":1") else AgentStatus.INACTIVE
+                        return AgentStatus.ACTIVE if line.endswith(
+                            ":1") else AgentStatus.INACTIVE
 
             return AgentStatus.INACTIVE
 
         except Exception:
             return AgentStatus.UNKNOWN
 
-    async def _get_last_activity(self, worktree_dir: Path) -> Optional[datetime]:
+    async def _get_last_activity(
+            self, worktree_dir: Path) -> Optional[datetime]:
         """Get last git activity in worktree"""
         try:
             result = await self._run_command([
@@ -620,7 +634,10 @@ class DashboardServer:
             results[agent_name] = await self._spawn_agent(agent_name)
         return results
 
-    async def _run_command(self, cmd: List[str], cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
+    async def _run_command(
+            self,
+            cmd: List[str],
+            cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
         """Run a command asynchronously"""
         process = await asyncio.create_subprocess_exec(
             *cmd,

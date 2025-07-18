@@ -5,8 +5,9 @@ Data structures and type definitions for the ML enhancement components.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Union
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 import numpy as np
 
 
@@ -37,31 +38,49 @@ class MLConfig:
     def __post_init__(self) -> None:
         """Validate configuration parameters."""
         if not 0 < self.learning_rate < 1:
-            raise ValueError(f"Learning rate must be between 0 and 1, got {self.learning_rate}")
+            raise ValueError(
+                f"Learning rate must be between 0 and 1, got {
+                    self.learning_rate}")
 
         if not 0 < self.confidence_threshold <= 1:
-            raise ValueError(f"Confidence threshold must be between 0 and 1, got {self.confidence_threshold}")
+            raise ValueError(
+                f"Confidence threshold must be between 0 and 1, got {
+                    self.confidence_threshold}")
 
         if not 0 < self.accuracy_threshold <= 1:
-            raise ValueError(f"Accuracy threshold must be between 0 and 1, got {self.accuracy_threshold}")
+            raise ValueError(
+                f"Accuracy threshold must be between 0 and 1, got {
+                    self.accuracy_threshold}")
 
         if not 0 < self.pattern_optimization_threshold < 1:
-            raise ValueError(f"Pattern optimization threshold must be between 0 and 1, got {self.pattern_optimization_threshold}")
+            raise ValueError(
+                f"Pattern optimization threshold must be between 0 and 1, got {
+                    self.pattern_optimization_threshold}")
 
         if self.pattern_analysis_window <= 0:
-            raise ValueError(f"Pattern analysis window must be positive, got {self.pattern_analysis_window}")
+            raise ValueError(
+                f"Pattern analysis window must be positive, got {
+                    self.pattern_analysis_window}")
 
         if self.forecasting_horizon <= 0:
-            raise ValueError(f"Forecasting horizon must be positive, got {self.forecasting_horizon}")
+            raise ValueError(
+                f"Forecasting horizon must be positive, got {
+                    self.forecasting_horizon}")
 
         if self.update_frequency <= 0:
-            raise ValueError(f"Update frequency must be positive, got {self.update_frequency}")
+            raise ValueError(
+                f"Update frequency must be positive, got {
+                    self.update_frequency}")
 
         if self.min_data_points <= 0:
-            raise ValueError(f"Min data points must be positive, got {self.min_data_points}")
+            raise ValueError(
+                f"Min data points must be positive, got {
+                    self.min_data_points}")
 
         if self.max_model_age_days <= 0:
-            raise ValueError(f"Max model age days must be positive, got {self.max_model_age_days}")
+            raise ValueError(
+                f"Max model age days must be positive, got {
+                    self.max_model_age_days}")
 
 
 @dataclass
@@ -153,7 +172,8 @@ class LearningMetrics:
 
         # Calculate slope using least squares
         n = len(x)
-        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / (n * np.sum(x**2) - np.sum(x)**2)
+        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / \
+            (n * np.sum(x**2) - np.sum(x)**2)
         return float(slope)
 
     def to_dict(self) -> Dict[str, Any]:

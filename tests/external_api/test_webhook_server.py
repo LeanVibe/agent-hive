@@ -2,19 +2,13 @@
 Tests for WebhookServer component.
 """
 
-import pytest
 import asyncio
-import json
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
 
+import pytest
+
+from external_api.models import WebhookConfig, WebhookEvent, WebhookEventType
 from external_api.webhook_server import WebhookServer
-from external_api.models import (
-    WebhookConfig,
-    WebhookEvent,
-    WebhookEventType,
-    EventPriority
-)
 
 
 class TestWebhookServer:
@@ -111,7 +105,8 @@ class TestWebhookServer:
         result = webhook_server.unregister_handler("non_existent")
         assert result is False
 
-    async def test_handle_webhook_success(self, webhook_server, sample_payload):
+    async def test_handle_webhook_success(
+            self, webhook_server, sample_payload):
         """Test successful webhook handling."""
         async def test_handler(event):
             return {"processed": True, "event_id": event.event_id}
@@ -124,7 +119,8 @@ class TestWebhookServer:
         assert result["code"] == 200
         assert "result" in result
 
-    async def test_handle_webhook_rate_limit(self, webhook_server, sample_payload):
+    async def test_handle_webhook_rate_limit(
+            self, webhook_server, sample_payload):
         """Test webhook rate limiting."""
         # Fill up rate limit
         for _ in range(10):  # config.rate_limit_requests = 10
@@ -157,14 +153,16 @@ class TestWebhookServer:
         assert result["code"] == 400
         assert "Missing event type" in result["message"]
 
-    async def test_handle_webhook_no_handler(self, webhook_server, sample_payload):
+    async def test_handle_webhook_no_handler(
+            self, webhook_server, sample_payload):
         """Test handling when no handler is registered."""
         result = await webhook_server.handle_webhook(sample_payload, "127.0.0.1")
         assert result["status"] == "error"
         assert result["code"] == 404
         assert "No handler for event type" in result["message"]
 
-    async def test_handle_webhook_handler_timeout(self, webhook_server, sample_payload):
+    async def test_handle_webhook_handler_timeout(
+            self, webhook_server, sample_payload):
         """Test handler timeout handling."""
         async def slow_handler(event):
             await asyncio.sleep(35)  # Longer than config.timeout_seconds (30)
@@ -177,7 +175,8 @@ class TestWebhookServer:
         assert result["code"] == 504
         assert "Handler timeout" in result["message"]
 
-    async def test_handle_webhook_handler_error(self, webhook_server, sample_payload):
+    async def test_handle_webhook_handler_error(
+            self, webhook_server, sample_payload):
         """Test handler error handling."""
         async def error_handler(event):
             raise ValueError("Test error")

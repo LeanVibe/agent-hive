@@ -11,13 +11,12 @@ This script provides comprehensive security monitoring with:
 """
 
 import json
+import logging
 import subprocess
-import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import logging
+from typing import Dict, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -47,9 +46,11 @@ class SecurityMonitor:
 
         # Monitoring intervals
         self.scan_interval = self.config.get("scan_interval_hours", 6)
-        self.dependency_check_interval = self.config.get("dependency_check_hours", 24)
+        self.dependency_check_interval = self.config.get(
+            "dependency_check_hours", 24)
 
-        logger.info("Security Monitor initialized with enterprise-grade monitoring")
+        logger.info(
+            "Security Monitor initialized with enterprise-grade monitoring")
 
     def _load_config(self, config_path: Optional[str]) -> Dict:
         """Load configuration from file or use defaults."""
@@ -72,7 +73,8 @@ class SecurityMonitor:
                     user_config = json.load(f)
                 default_config.update(user_config)
             except Exception as e:
-                logger.warning(f"Failed to load config from {config_path}: {e}")
+                logger.warning(
+                    f"Failed to load config from {config_path}: {e}")
 
         return default_config
 
@@ -90,11 +92,13 @@ class SecurityMonitor:
         }
 
         # Calculate overall security score
-        scan_results["security_score"] = self._calculate_security_score(scan_results)
+        scan_results["security_score"] = self._calculate_security_score(
+            scan_results)
         scan_results["risk_level"] = self._determine_risk_level(scan_results)
 
         # Save detailed report
-        report_file = self.reports_dir / f"security_scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        report_file = self.reports_dir / \
+            f"security_scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_file, 'w') as f:
             json.dump(scan_results, f, indent=2)
 
@@ -112,7 +116,8 @@ class SecurityMonitor:
                 '--severity-level', 'low'
             ]
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=120)
 
             if result.stdout:
                 bandit_data = json.loads(result.stdout)
@@ -125,19 +130,32 @@ class SecurityMonitor:
 
                 return {
                     "status": "completed",
-                    "total_issues": len(bandit_data.get("results", [])),
-                    "high_severity": len(issues_by_severity["HIGH"]),
-                    "medium_severity": len(issues_by_severity["MEDIUM"]),
-                    "low_severity": len(issues_by_severity["LOW"]),
+                    "total_issues": len(
+                        bandit_data.get(
+                            "results",
+                            [])),
+                    "high_severity": len(
+                        issues_by_severity["HIGH"]),
+                    "medium_severity": len(
+                        issues_by_severity["MEDIUM"]),
+                    "low_severity": len(
+                        issues_by_severity["LOW"]),
                     "issues_by_severity": issues_by_severity,
-                    "execution_time": bandit_data.get("metrics", {}).get("_totals", {}).get("elapse", 0)
-                }
+                    "execution_time": bandit_data.get(
+                        "metrics",
+                        {}).get(
+                        "_totals",
+                        {}).get(
+                        "elapse",
+                        0)}
             else:
                 return {"status": "no_issues", "total_issues": 0}
 
         except subprocess.TimeoutExpired:
             logger.error("Bandit scan timed out")
-            return {"status": "timeout", "error": "Scan timed out after 120 seconds"}
+            return {
+                "status": "timeout",
+                "error": "Scan timed out after 120 seconds"}
         except Exception as e:
             logger.error(f"Bandit scan failed: {e}")
             return {"status": "error", "error": str(e)}
@@ -148,7 +166,8 @@ class SecurityMonitor:
 
         try:
             cmd = ['safety', 'scan', '--json']
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
 
             if result.stdout:
                 try:
@@ -156,23 +175,31 @@ class SecurityMonitor:
                     vulnerabilities = safety_data.get("vulnerabilities", [])
 
                     # Categorize vulnerabilities by severity
-                    critical_vulns = [v for v in vulnerabilities if v.get("vulnerability_id", "").startswith("PVE")]
+                    critical_vulns = [v for v in vulnerabilities if v.get(
+                        "vulnerability_id", "").startswith("PVE")]
 
                     return {
                         "status": "completed",
                         "total_vulnerabilities": len(vulnerabilities),
                         "critical_vulnerabilities": len(critical_vulns),
-                        "vulnerabilities": vulnerabilities[:10],  # First 10 for summary
+                        # First 10 for summary
+                        "vulnerabilities": vulnerabilities[:10],
                         "scan_timestamp": datetime.now().isoformat()
                     }
                 except json.JSONDecodeError:
-                    return {"status": "no_vulnerabilities", "total_vulnerabilities": 0}
+                    return {
+                        "status": "no_vulnerabilities",
+                        "total_vulnerabilities": 0}
             else:
-                return {"status": "no_vulnerabilities", "total_vulnerabilities": 0}
+                return {
+                    "status": "no_vulnerabilities",
+                    "total_vulnerabilities": 0}
 
         except subprocess.TimeoutExpired:
             logger.error("Safety scan timed out")
-            return {"status": "timeout", "error": "Scan timed out after 60 seconds"}
+            return {
+                "status": "timeout",
+                "error": "Scan timed out after 60 seconds"}
         except Exception as e:
             logger.error(f"Safety scan failed: {e}")
             return {"status": "error", "error": str(e)}
@@ -183,7 +210,8 @@ class SecurityMonitor:
 
         try:
             cmd = ['pip-audit', '--format=json', '--desc']
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
 
             if result.stdout:
                 try:
@@ -197,13 +225,19 @@ class SecurityMonitor:
                         "scan_version": audit_data.get("version", "unknown")
                     }
                 except json.JSONDecodeError:
-                    return {"status": "no_vulnerabilities", "total_vulnerabilities": 0}
+                    return {
+                        "status": "no_vulnerabilities",
+                        "total_vulnerabilities": 0}
             else:
-                return {"status": "no_vulnerabilities", "total_vulnerabilities": 0}
+                return {
+                    "status": "no_vulnerabilities",
+                    "total_vulnerabilities": 0}
 
         except subprocess.TimeoutExpired:
             logger.error("pip-audit scan timed out")
-            return {"status": "timeout", "error": "Scan timed out after 60 seconds"}
+            return {
+                "status": "timeout",
+                "error": "Scan timed out after 60 seconds"}
         except Exception as e:
             logger.error(f"pip-audit scan failed: {e}")
             return {"status": "error", "error": str(e)}
@@ -215,7 +249,8 @@ class SecurityMonitor:
         try:
             # Get outdated packages
             cmd = ['pip', 'list', '--outdated', '--format=json']
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=30)
 
             if result.stdout:
                 outdated_packages = json.loads(result.stdout)
@@ -231,19 +266,27 @@ class SecurityMonitor:
                     latest = package.get("latest_version", "")
 
                     # Check if security-related
-                    if any(keyword in name for keyword in ['security', 'crypto', 'ssl', 'auth', 'jwt']):
+                    if any(
+                        keyword in name for keyword in [
+                            'security',
+                            'crypto',
+                            'ssl',
+                            'auth',
+                            'jwt']):
                         security_related.append(package)
 
                     # Check update type (simplified version comparison)
                     try:
-                        current_major = int(current.split('.')[0]) if current else 0
-                        latest_major = int(latest.split('.')[0]) if latest else 0
+                        current_major = int(current.split('.')[
+                                            0]) if current else 0
+                        latest_major = int(latest.split('.')[
+                                           0]) if latest else 0
 
                         if latest_major > current_major:
                             major_updates.append(package)
                         else:
                             minor_updates.append(package)
-                    except:
+                    except BaseException:
                         minor_updates.append(package)
 
                 return {
@@ -273,7 +316,8 @@ class SecurityMonitor:
             "environment_security": self._check_environment_security()
         }
 
-        total_issues = sum(check.get("issues_found", 0) for check in checks.values())
+        total_issues = sum(check.get("issues_found", 0)
+                           for check in checks.values())
 
         return {
             "status": "completed",
@@ -292,13 +336,13 @@ class SecurityMonitor:
 
         issues = []
         try:
-            import re
             for pattern in secret_patterns:
-                cmd = ['grep', '-r', '-n', '-i', pattern, '.', '--include=*.py']
+                cmd = ['grep', '-r', '-n', '-i',
+                       pattern, '.', '--include=*.py']
                 result = subprocess.run(cmd, capture_output=True, text=True)
                 if result.stdout:
                     issues.extend(result.stdout.strip().split('\n'))
-        except:
+        except BaseException:
             pass
 
         return {
@@ -317,8 +361,9 @@ class SecurityMonitor:
                 with open(config_file, 'r') as f:
                     content = f.read()
                     if 'debug: true' in content.lower():
-                        config_issues.append(f"Debug mode enabled in {config_file}")
-        except:
+                        config_issues.append(
+                            f"Debug mode enabled in {config_file}")
+        except BaseException:
             pass
 
         return {
@@ -337,7 +382,7 @@ class SecurityMonitor:
             result = subprocess.run(cmd, capture_output=True, text=True)
             if result.stdout:
                 permission_issues.extend(result.stdout.strip().split('\n'))
-        except:
+        except BaseException:
             pass
 
         return {
@@ -358,11 +403,13 @@ class SecurityMonitor:
         try:
             cmd = ['grep', '-r', 'os.environ', '.', '--include=*.py']
             result = subprocess.run(cmd, capture_output=True, text=True)
-            env_var_usage = len(result.stdout.split('\n')) if result.stdout else 0
+            env_var_usage = len(result.stdout.split('\n')
+                                ) if result.stdout else 0
 
             if env_var_usage > 10:
-                env_issues.append(f"High environment variable usage detected: {env_var_usage} instances")
-        except:
+                env_issues.append(
+                    f"High environment variable usage detected: {env_var_usage} instances")
+        except BaseException:
             pass
 
         return {
@@ -403,9 +450,12 @@ class SecurityMonitor:
         security_score = scan_results.get("security_score", 100)
 
         # Count critical issues
-        bandit_high = scan_results.get("bandit_scan", {}).get("high_severity", 0)
-        safety_critical = scan_results.get("safety_scan", {}).get("critical_vulnerabilities", 0)
-        audit_vulns = scan_results.get("pip_audit_scan", {}).get("total_vulnerabilities", 0)
+        bandit_high = scan_results.get(
+            "bandit_scan", {}).get("high_severity", 0)
+        safety_critical = scan_results.get(
+            "safety_scan", {}).get("critical_vulnerabilities", 0)
+        audit_vulns = scan_results.get(
+            "pip_audit_scan", {}).get("total_vulnerabilities", 0)
 
         critical_count = bandit_high + safety_critical + audit_vulns
 
@@ -445,7 +495,9 @@ class SecurityMonitor:
 - **Low Severity**: {bandit_results.get("low_severity", 0)}
 """
         else:
-            report += f"- **Status**: {bandit_results.get('status', 'Unknown')}\n"
+            report += f"- **Status**: {
+                bandit_results.get(
+                    'status', 'Unknown')}\n"
 
         safety_results = scan_results.get("safety_scan", {})
         report += f"""
@@ -533,7 +585,8 @@ class SecurityMonitor:
             should_alert = True
 
         if should_alert:
-            logger.warning(f"🚨 Security alert triggered: {risk_level} risk level detected")
+            logger.warning(
+                f"🚨 Security alert triggered: {risk_level} risk level detected")
 
             if self.config.get("email_alerts"):
                 self._send_email_alert(scan_results)
@@ -547,39 +600,47 @@ class SecurityMonitor:
     def _send_email_alert(self, scan_results: Dict) -> None:
         """Send email security alert."""
         # Implementation for email alerts
-        logger.info("Email alert configured but not implemented in this version")
+        logger.info(
+            "Email alert configured but not implemented in this version")
 
     def _send_slack_alert(self, scan_results: Dict) -> None:
         """Send Slack security alert."""
         # Implementation for Slack alerts
-        logger.info("Slack alert configured but not implemented in this version")
+        logger.info(
+            "Slack alert configured but not implemented in this version")
 
     def start_continuous_monitoring(self) -> None:
         """Start continuous security monitoring."""
-        logger.info(f"🔄 Starting continuous security monitoring (scan interval: {self.scan_interval}h)")
+        logger.info(
+            f"🔄 Starting continuous security monitoring (scan interval: {
+                self.scan_interval}h)")
 
         last_full_scan = datetime.now() - timedelta(hours=self.scan_interval)
-        last_dependency_check = datetime.now() - timedelta(hours=self.dependency_check_interval)
+        last_dependency_check = datetime.now(
+        ) - timedelta(hours=self.dependency_check_interval)
 
         try:
             while True:
                 current_time = datetime.now()
 
                 # Run full security scan
-                if (current_time - last_full_scan).total_seconds() >= self.scan_interval * 3600:
+                if (current_time -
+                        last_full_scan).total_seconds() >= self.scan_interval * 3600:
                     logger.info("🔍 Running scheduled security scan")
                     scan_results = self.run_comprehensive_security_scan()
                     self.send_alert(scan_results)
                     last_full_scan = current_time
 
                 # Run dependency check
-                if (current_time - last_dependency_check).total_seconds() >= self.dependency_check_interval * 3600:
+                if (current_time - last_dependency_check).total_seconds(
+                ) >= self.dependency_check_interval * 3600:
                     logger.info("📦 Running scheduled dependency check")
                     dependency_results = self._check_dependency_updates()
 
                     # Auto-update security dependencies if configured
                     if self.config.get("auto_update_security"):
-                        self._auto_update_security_dependencies(dependency_results)
+                        self._auto_update_security_dependencies(
+                            dependency_results)
 
                     last_dependency_check = current_time
 
@@ -591,7 +652,8 @@ class SecurityMonitor:
         except Exception as e:
             logger.error(f"❌ Security monitoring error: {e}")
 
-    def _auto_update_security_dependencies(self, dependency_results: Dict) -> None:
+    def _auto_update_security_dependencies(
+            self, dependency_results: Dict) -> None:
         """Automatically update security-related dependencies."""
         if dependency_results.get("status") != "completed":
             return
@@ -599,18 +661,22 @@ class SecurityMonitor:
         security_packages = dependency_results.get("security_packages", [])
 
         if security_packages:
-            logger.info(f"🔄 Auto-updating {len(security_packages)} security-related packages")
+            logger.info(
+                f"🔄 Auto-updating {len(security_packages)} security-related packages")
 
             for package in security_packages:
                 package_name = package.get("name")
                 try:
                     cmd = ['pip', 'install', '--upgrade', package_name]
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+                    result = subprocess.run(
+                        cmd, capture_output=True, text=True, timeout=120)
 
                     if result.returncode == 0:
                         logger.info(f"✅ Successfully updated {package_name}")
                     else:
-                        logger.error(f"❌ Failed to update {package_name}: {result.stderr}")
+                        logger.error(
+                            f"❌ Failed to update {package_name}: {
+                                result.stderr}")
 
                 except subprocess.TimeoutExpired:
                     logger.error(f"⏱️ Timeout updating {package_name}")
@@ -622,11 +688,15 @@ def main():
     """Main function for security monitoring script."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="LeanVibe Security Monitoring System")
+    parser = argparse.ArgumentParser(
+        description="LeanVibe Security Monitoring System")
     parser.add_argument("--config", help="Configuration file path")
-    parser.add_argument("--scan", action="store_true", help="Run single security scan")
-    parser.add_argument("--monitor", action="store_true", help="Start continuous monitoring")
-    parser.add_argument("--report", help="Generate report from scan results file")
+    parser.add_argument("--scan", action="store_true",
+                        help="Run single security scan")
+    parser.add_argument("--monitor", action="store_true",
+                        help="Start continuous monitoring")
+    parser.add_argument(
+        "--report", help="Generate report from scan results file")
 
     args = parser.parse_args()
 

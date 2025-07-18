@@ -15,27 +15,26 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from advanced_orchestration.models import CoordinatorConfig, ResourceLimits
+from advanced_orchestration.multi_agent_coordinator import (
+    MultiAgentCoordinator,
+)
 from advanced_orchestration.resource_manager import ResourceManager
 from advanced_orchestration.scaling_manager import ScalingManager
-from advanced_orchestration.models import (
-    CoordinatorConfig,
-    ResourceLimits
-)
 
 # Critical method refactoring imports
 from cli_coordination import CoordinationOrchestrator
 from cli_review import ReviewOrchestrator
-
-# External API Integration imports
-from external_api.webhook_server import WebhookServer
 from external_api.api_gateway import ApiGateway
 from external_api.event_streaming import EventStreaming
 from external_api.models import (
-    WebhookConfig,
     ApiGatewayConfig,
-    EventStreamConfig
+    EventStreamConfig,
+    WebhookConfig,
 )
+
+# External API Integration imports
+from external_api.webhook_server import WebhookServer
 
 
 class LeanVibeCLI:
@@ -87,14 +86,18 @@ class LeanVibeCLI:
             print("✅ External API Integration components ready")
         except ImportError as e:
             print(f"❌ Import error: {e}")
-            print("💡 Make sure you have installed all dependencies: pip install -r requirements.txt")
+            print(
+                "💡 Make sure you have installed all dependencies: pip install -r requirements.txt")
             sys.exit(1)
         except Exception as e:
             print(f"❌ Failed to initialize systems: {e}")
             print("💡 Check if the advanced_orchestration module is available")
             sys.exit(1)
 
-    async def orchestrate(self, workflow: str = "default", validate: bool = False) -> None:
+    async def orchestrate(
+            self,
+            workflow: str = "default",
+            validate: bool = False) -> None:
         """
         Main orchestration command.
 
@@ -122,7 +125,10 @@ class LeanVibeCLI:
         # Get system resources
         if self.resource_manager:
             resources = self.resource_manager.get_available_resources()
-            print(f"📊 Available resources: CPU {resources.cpu_cores} cores, Memory {resources.memory_mb}MB")
+            print(
+                f"📊 Available resources: CPU {
+                    resources.cpu_cores} cores, Memory {
+                    resources.memory_mb}MB")
 
         # Check scaling metrics
         if self.scaling_manager and self.coordinator:
@@ -131,7 +137,11 @@ class LeanVibeCLI:
 
         print(f"✅ Orchestration workflow '{workflow}' completed successfully")
 
-    async def spawn(self, task: str, depth: str = "standard", parallel: bool = False) -> None:
+    async def spawn(
+            self,
+            task: str,
+            depth: str = "standard",
+            parallel: bool = False) -> None:
         """
         Spawn task command.
 
@@ -161,7 +171,10 @@ class LeanVibeCLI:
         print(f"✅ Task '{task}' spawned successfully")
         print(f"📝 Task ID: task-{int(time.time())}")
 
-    async def monitor(self, metrics: bool = False, real_time: bool = False) -> None:
+    async def monitor(
+            self,
+            metrics: bool = False,
+            real_time: bool = False) -> None:
         """
         System monitoring command.
 
@@ -211,11 +224,15 @@ class LeanVibeCLI:
                     if self.resource_manager:
                         resources = self.resource_manager.get_available_resources()
                         summary = await self.resource_manager.get_allocation_summary()
-                        print(f"[{current_time}] Available: CPU {resources.cpu_cores} cores, Memory {resources.memory_mb}MB, Allocations: {summary}")
+                        print(
+                            f"[{current_time}] Available: CPU {resources.cpu_cores} cores, Memory {resources.memory_mb}MB, Allocations: {summary}")
             except KeyboardInterrupt:
                 print("\n✅ Real-time monitoring stopped")
 
-    async def checkpoint(self, name: Optional[str] = None, list_checkpoints: bool = False) -> None:
+    async def checkpoint(
+            self,
+            name: Optional[str] = None,
+            list_checkpoints: bool = False) -> None:
         """
         State checkpoint command.
 
@@ -247,7 +264,8 @@ class LeanVibeCLI:
         checkpoint_data = {
             "name": name,
             "timestamp": datetime.now().isoformat(),
-            "config": str(self.config),  # Convert to string to avoid serialization issues
+            # Convert to string to avoid serialization issues
+            "config": str(self.config),
             "resource_limits": {
                 "max_cpu_cores": self.resource_limits.max_cpu_cores,
                 "max_memory_mb": self.resource_limits.max_memory_mb,
@@ -365,7 +383,10 @@ class LeanVibeCLI:
             print(f"  Registered Routes: {health['registered_routes']}")
             print(f"  Total Requests: {info['total_requests']}")
 
-    async def streaming(self, action: str = "status", publish_test: bool = False) -> None:
+    async def streaming(
+            self,
+            action: str = "status",
+            publish_test: bool = False) -> None:
         """
         Event Streaming command.
 
@@ -387,10 +408,13 @@ class LeanVibeCLI:
 
             # Register sample consumer
             async def log_consumer(batch_data):
-                print(f"📝 Received batch with {batch_data['event_count']} events")
+                print(
+                    f"📝 Received batch with {
+                        batch_data['event_count']} events")
                 return {"processed": True}
 
-            self.event_streaming.register_consumer("log-consumer", log_consumer)
+            self.event_streaming.register_consumer(
+                "log-consumer", log_consumer)
             print("✅ Event streaming started with sample consumer")
 
             if publish_test:
@@ -482,8 +506,13 @@ class LeanVibeCLI:
 
             print("✅ External API status check complete")
 
-    async def pr(self, action: str = "list", title: Optional[str] = None, pr_number: Optional[int] = None,
-                 auto_review: bool = False, reviewers: Optional[str] = None) -> None:
+    async def pr(
+            self,
+            action: str = "list",
+            title: Optional[str] = None,
+            pr_number: Optional[int] = None,
+            auto_review: bool = False,
+            reviewers: Optional[str] = None) -> None:
         """
         Pull Request management command.
 
@@ -515,7 +544,8 @@ class LeanVibeCLI:
             # Simulate GitHub PR creation
             pr_number = 42  # Mock PR number
             print(f"🎉 Pull Request #{pr_number} created successfully")
-            print(f"🔗 URL: https://github.com/leanvibe/agent-hive/pull/{pr_number}")
+            print(
+                f"🔗 URL: https://github.com/leanvibe/agent-hive/pull/{pr_number}")
 
             if auto_review or reviewers:
                 await self._assign_reviewers(pr_number, reviewers)
@@ -524,14 +554,21 @@ class LeanVibeCLI:
             print("📋 Open Pull Requests:")
             # Mock PR list
             prs = [
-                {"number": 42, "title": "Feature: User Authentication", "author": "backend-agent", "status": "open"},
-                {"number": 41, "title": "Fix: Database Connection Pool", "author": "database-agent", "status": "review"},
-                {"number": 40, "title": "Enhancement: API Performance", "author": "performance-agent", "status": "approved"}
+                {"number": 42, "title": "Feature: User Authentication",
+                    "author": "backend-agent", "status": "open"},
+                {"number": 41, "title": "Fix: Database Connection Pool",
+                    "author": "database-agent", "status": "review"},
+                {"number": 40, "title": "Enhancement: API Performance",
+                    "author": "performance-agent", "status": "approved"}
             ]
 
             for pr in prs:
                 status_emoji = "🔄" if pr["status"] == "open" else "👁️" if pr["status"] == "review" else "✅"
-                print(f"  {status_emoji} #{pr['number']}: {pr['title']} ({pr['author']})")
+                print(
+                    f"  {status_emoji} #{
+                        pr['number']}: {
+                        pr['title']} ({
+                        pr['author']})")
 
         elif action == "status":
             if not pr_number:
@@ -547,7 +584,10 @@ class LeanVibeCLI:
             print("  ✅ Quality Gates: All passed")
             print("  📊 Coverage: 95%")
 
-    async def dashboard(self, live: bool = False, format: str = "compact") -> None:
+    async def dashboard(
+            self,
+            live: bool = False,
+            format: str = "compact") -> None:
         """
         Display intelligent agent activity dashboard with business insights.
 
@@ -562,14 +602,18 @@ class LeanVibeCLI:
         agents_status = await self._get_agents_status()
 
         # Display agent overview
-        print(f"📊 ACTIVE AGENTS ({len(agents_status)})                   Last Updated: {datetime.now().strftime('%H:%M:%S')}")
+        print(
+            f"📊 ACTIVE AGENTS ({
+                len(agents_status)})                   Last Updated: {
+                datetime.now().strftime('%H:%M:%S')}")
         print("")
 
         for agent in agents_status:
             progress_bar = self._create_progress_bar(agent['progress'])
             risk_indicator = self._get_risk_indicator(agent['risk_level'])
 
-            print(f"{agent['icon']} {agent['name']:<25} [{progress_bar}] {agent['progress']}%")
+            print(
+                f"{agent['icon']} {agent['name']:<25} [{progress_bar}] {agent['progress']}%")
             print(f"├─ Status: {agent['status_icon']} {agent['status']}")
             print(f"├─ Impact: {agent['business_impact']}")
             print(f"├─ Next: {agent['next_milestone']}")
@@ -589,7 +633,10 @@ class LeanVibeCLI:
         print("📈 PROJECT HEALTH")
         for metric, data in health_metrics.items():
             trend_arrow = self._get_trend_arrow(data['trend'])
-            print(f"• {metric}: {trend_arrow} {data['value']} ({data['description']})")
+            print(
+                f"• {metric}: {trend_arrow} {
+                    data['value']} ({
+                    data['description']})")
 
         print("")
 
@@ -715,9 +762,14 @@ class LeanVibeCLI:
         print("• Tech debt improvements ready for production deployment")
         print("")
 
-    async def coordinate(self, action: str = "status", issue: Optional[int] = None,
-                        worktree: Optional[str] = None, agent_type: Optional[str] = None,
-                        priority: str = "medium", update: Optional[str] = None) -> None:
+    async def coordinate(
+            self,
+            action: str = "status",
+            issue: Optional[int] = None,
+            worktree: Optional[str] = None,
+            agent_type: Optional[str] = None,
+            priority: str = "medium",
+            update: Optional[str] = None) -> None:
         """
         Coordinate parallel work with GitHub issues integration.
 
@@ -734,7 +786,11 @@ class LeanVibeCLI:
             priority=priority, update=update
         )
 
-    async def _generate_agent_instructions(self, worktree: str, agent_type: str, issue: int) -> None:
+    async def _generate_agent_instructions(
+            self,
+            worktree: str,
+            agent_type: str,
+            issue: int) -> None:
         """Generate detailed instructions for spawned agent."""
         print(f"📝 Generating instructions for {agent_type} agent...")
 
@@ -769,8 +825,13 @@ Ready to begin! Comment on issue #{issue} to confirm start.
         print("📋 Instructions saved and ready for agent deployment")
         print(f"\n{instructions}")
 
-    async def review(self, action: str = "status", pr: Optional[int] = None, agent: Optional[str] = None,
-                     agents: Optional[str] = None, format: str = "text") -> None:
+    async def review(
+            self,
+            action: str = "status",
+            pr: Optional[int] = None,
+            agent: Optional[str] = None,
+            agents: Optional[str] = None,
+            format: str = "text") -> None:
         """
         Multi-agent code review command.
 
@@ -791,8 +852,7 @@ Ready to begin! Comment on issue #{issue} to confirm start.
                 "performance-reviewer": "⚡ Performance Engineer - Optimization, scalability, caching",
                 "architecture-reviewer": "🏗️ Architecture Specialist - Design patterns, code structure",
                 "qa-reviewer": "🧪 Quality Assurance - Testing, edge cases, user experience",
-                "devops-reviewer": "🚀 DevOps Engineer - Deployment, infrastructure, monitoring"
-            }
+                "devops-reviewer": "🚀 DevOps Engineer - Deployment, infrastructure, monitoring"}
 
             for agent_name, description in agents_info.items():
                 print(f"  {description}")
@@ -825,7 +885,8 @@ Ready to begin! Comment on issue #{issue} to confirm start.
             print("🔄 Coordinating review agents...")
 
             # Simulate parallel review execution
-            default_agents = ["security-reviewer", "architecture-reviewer", "qa-reviewer"]
+            default_agents = ["security-reviewer",
+                              "architecture-reviewer", "qa-reviewer"]
             for i, agent in enumerate(default_agents, 1):
                 print(f"  📝 {agent} reviewing... ({i}/3)")
                 await asyncio.sleep(0.5)
@@ -852,16 +913,20 @@ Ready to begin! Comment on issue #{issue} to confirm start.
                 print("❌ Error: --pr required for report generation")
                 return
 
-            print(f"📄 Generating review report for PR #{pr} (format: {format})")
+            print(
+                f"📄 Generating review report for PR #{pr} (format: {format})")
 
             if format == "json":
                 report = {
                     "pr_number": pr,
                     "overall_status": "changes_requested",
                     "reviews": [
-                        {"agent": "security-reviewer", "status": "approved", "score": 95},
-                        {"agent": "architecture-reviewer", "status": "changes_requested", "score": 75},
-                        {"agent": "qa-reviewer", "status": "in_progress", "score": None}
+                        {"agent": "security-reviewer",
+                            "status": "approved", "score": 95},
+                        {"agent": "architecture-reviewer",
+                            "status": "changes_requested", "score": 75},
+                        {"agent": "qa-reviewer",
+                            "status": "in_progress", "score": None}
                     ]
                 }
                 print(json.dumps(report, indent=2))
@@ -877,7 +942,10 @@ Ready to begin! Comment on issue #{issue} to confirm start.
                 print("2. Add additional input validation tests")
                 print("3. Consider implementing rate limiting")
 
-    async def _assign_reviewers(self, pr_number: int, reviewers: Optional[str] = None) -> None:
+    async def _assign_reviewers(
+            self,
+            pr_number: int,
+            reviewers: Optional[str] = None) -> None:
         """Helper method to assign review agents to a PR."""
         print(f"👥 Auto-assigning review agents to PR #{pr_number}")
 
@@ -911,8 +979,7 @@ Examples:
   leanvibe review report --pr 42 --format markdown
 
 For more information, visit: https://github.com/leanvibe/agent-hive
-        """
-    )
+        """)
 
     parser.add_argument(
         "--version",
@@ -920,7 +987,8 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         version="LeanVibe Agent Hive 1.0.0"
     )
 
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    subparsers = parser.add_subparsers(
+        dest="command", help="Available commands")
 
     # Orchestrate command
     orchestrate_parser = subparsers.add_parser(
@@ -1104,7 +1172,8 @@ For more information, visit: https://github.com/leanvibe/agent-hive
     )
     review_parser.add_argument(
         "--agent",
-        choices=["security-reviewer", "performance-reviewer", "architecture-reviewer", "qa-reviewer", "devops-reviewer"],
+        choices=["security-reviewer", "performance-reviewer",
+                 "architecture-reviewer", "qa-reviewer", "devops-reviewer"],
         help="Specific review agent to assign"
     )
     review_parser.add_argument(
@@ -1125,7 +1194,8 @@ For more information, visit: https://github.com/leanvibe/agent-hive
     )
     coordinate_parser.add_argument(
         "--action",
-        choices=["create-issue", "update-issue", "spawn-agent", "status", "list"],
+        choices=["create-issue", "update-issue",
+                 "spawn-agent", "status", "list"],
         default="status",
         help="Coordination action to perform (default: status)"
     )
@@ -1140,7 +1210,8 @@ For more information, visit: https://github.com/leanvibe/agent-hive
     )
     coordinate_parser.add_argument(
         "--agent-type",
-        choices=["docs", "analysis", "backend", "frontend", "testing", "devops"],
+        choices=["docs", "analysis", "backend",
+                 "frontend", "testing", "devops"],
         help="Type of agent to spawn or coordinate"
     )
     coordinate_parser.add_argument(
@@ -1157,8 +1228,7 @@ For more information, visit: https://github.com/leanvibe/agent-hive
     # Dashboard command - Intelligent agent activity dashboard
     dashboard_parser = subparsers.add_parser(
         "dashboard",
-        help="Display intelligent agent activity dashboard with business insights"
-    )
+        help="Display intelligent agent activity dashboard with business insights")
     dashboard_parser.add_argument(
         "--live",
         action="store_true",

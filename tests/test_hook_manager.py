@@ -5,23 +5,21 @@ Tests for the Hook Manager and Real-Time Observability System
 Comprehensive test suite for the observability system components.
 """
 
-import asyncio
-import pytest
-import json
-import time
 from datetime import datetime
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 from observability.hook_manager import (
+    AgentMonitor,
+    EventPriority,
+    EventStream,
+    HookEvent,
     HookManager,
     HookType,
-    EventPriority,
-    HookEvent,
-    EventStream,
-    AgentMonitor,
-    track_tool_use,
     track_agent_error,
-    track_performance_metrics
+    track_performance_metrics,
+    track_tool_use,
 )
 
 
@@ -127,7 +125,8 @@ class TestAgentMonitor:
         monitor.behavior_patterns["agent_002"] = {
             "tool_usage": {"bash": 1},
             "session_duration": [60],  # Very short
-            "error_patterns": ["error1", "error2", "error3", "error4", "error5", "error6"],  # More errors
+            # More errors
+            "error_patterns": ["error1", "error2", "error3", "error4", "error5", "error6"],
             "performance_trends": []
         }
 
@@ -170,7 +169,7 @@ class TestEventStream:
 
         # Mock the server creation to avoid actual network binding
         with patch('websockets.serve') as mock_websocket_serve, \
-             patch.object(stream, 'start_http_server') as mock_http_start:
+                patch.object(stream, 'start_http_server') as mock_http_start:
 
             # Create a mock server that can be awaited
             mock_server = Mock()
@@ -371,7 +370,8 @@ class TestHookManager:
             event = HookEvent(
                 event_id=f"test_{i}",
                 hook_type=HookType.PRE_TOOL_USE,
-                agent_id=f"agent_{i % 2}",  # alternating between agent_0 and agent_1
+                # alternating between agent_0 and agent_1
+                agent_id=f"agent_{i % 2}",
                 session_id="session_001",
                 timestamp=datetime.now(),
                 priority=EventPriority.MEDIUM,

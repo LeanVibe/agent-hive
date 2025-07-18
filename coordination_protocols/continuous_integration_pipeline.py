@@ -12,14 +12,14 @@ import logging
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from quality_gate_validation import QualityGateValidator, ValidationStatus
 from progress_monitoring import ProgressMonitor
+from quality_gate_validation import QualityGateValidator, ValidationStatus
 
 logger = logging.getLogger(__name__)
 
@@ -189,7 +189,8 @@ class ContinuousIntegrationPipeline:
                 1 for result in pipeline_run.stage_results
                 if result.status == PipelineStatus.SUCCESS
             )
-            pipeline_run.success_rate = (successful_stages / len(pipeline_run.stage_results)) * 100
+            pipeline_run.success_rate = (
+                successful_stages / len(pipeline_run.stage_results)) * 100
 
             # Update component progress
             await self._update_component_progress(pipeline_run)
@@ -197,7 +198,8 @@ class ContinuousIntegrationPipeline:
             # Generate pipeline report
             await self._generate_pipeline_report(pipeline_run)
 
-            self.logger.info(f"Pipeline completed: {run_id} - {pipeline_run.status.value}")
+            self.logger.info(
+                f"Pipeline completed: {run_id} - {pipeline_run.status.value}")
 
         except Exception as e:
             pipeline_run.status = PipelineStatus.FAILED
@@ -222,7 +224,8 @@ class ContinuousIntegrationPipeline:
             start_time=datetime.now()
         )
 
-        self.logger.info(f"Executing stage: {stage.value} for {pipeline_run.run_id}")
+        self.logger.info(
+            f"Executing stage: {stage.value} for {pipeline_run.run_id}")
 
         try:
             # Execute stage based on type
@@ -268,7 +271,10 @@ class ContinuousIntegrationPipeline:
 
         return stage_result
 
-    async def _stage_initialization(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_initialization(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Initialize pipeline environment."""
         stage_result.output = "Pipeline environment initialized"
         stage_result.metrics = {
@@ -277,10 +283,14 @@ class ContinuousIntegrationPipeline:
             "trigger": pipeline_run.trigger
         }
 
-    async def _stage_code_checkout(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_code_checkout(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Checkout code from repository."""
         # Simulate git checkout
-        stage_result.output = f"Code checked out from branch: {pipeline_run.branch}"
+        stage_result.output = f"Code checked out from branch: {
+            pipeline_run.branch}"
         stage_result.metrics = {
             "commit_hash": pipeline_run.commit_hash,
             "files_changed": 15,
@@ -288,7 +298,10 @@ class ContinuousIntegrationPipeline:
             "lines_removed": 120
         }
 
-    async def _stage_dependency_install(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_dependency_install(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Install project dependencies."""
         # Simulate dependency installation
         stage_result.output = "Dependencies installed successfully"
@@ -298,7 +311,10 @@ class ContinuousIntegrationPipeline:
             "cache_hit_rate": 85.0
         }
 
-    async def _stage_linting(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_linting(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Run code linting checks."""
         # Simulate linting
         stage_result.output = "Linting completed with 2 warnings"
@@ -309,7 +325,10 @@ class ContinuousIntegrationPipeline:
             "score": 92.0
         }
 
-    async def _stage_type_checking(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_type_checking(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Run type checking."""
         # Simulate type checking
         stage_result.output = "Type checking completed successfully"
@@ -319,7 +338,10 @@ class ContinuousIntegrationPipeline:
             "type_coverage": 89.0
         }
 
-    async def _stage_unit_tests(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_unit_tests(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Run unit tests."""
         # Simulate unit tests
         stage_result.output = "Unit tests: 24 passed, 0 failed"
@@ -331,7 +353,10 @@ class ContinuousIntegrationPipeline:
             "execution_time": 12.8
         }
 
-    async def _stage_integration_tests(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_integration_tests(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Run integration tests."""
         # Simulate integration tests
         stage_result.output = "Integration tests: 8 passed, 0 failed"
@@ -342,10 +367,13 @@ class ContinuousIntegrationPipeline:
             "execution_time": 35.2
         }
 
-    async def _stage_quality_gates(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_quality_gates(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Run quality gate validation."""
         # Use actual quality gate validator
-        component_path = Path(f"components/{pipeline_run.component_id}")
+        Path(f"components/{pipeline_run.component_id}")
 
         # Simulate quality validation
         stage_result.output = "Quality gates: 4/5 passed"
@@ -358,7 +386,10 @@ class ContinuousIntegrationPipeline:
 
         pipeline_run.quality_score = stage_result.metrics["overall_score"]
 
-    async def _stage_security_scan(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_security_scan(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Run security vulnerability scan."""
         # Simulate security scan
         stage_result.output = "Security scan: 0 critical, 1 medium vulnerability"
@@ -370,7 +401,10 @@ class ContinuousIntegrationPipeline:
             "security_score": 94.0
         }
 
-    async def _stage_performance_tests(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_performance_tests(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Run performance tests."""
         # Simulate performance tests
         stage_result.output = "Performance tests completed"
@@ -382,7 +416,10 @@ class ContinuousIntegrationPipeline:
             "performance_score": 78.0
         }
 
-    async def _stage_deployment_validation(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_deployment_validation(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Validate deployment readiness."""
         # Check all quality metrics
         quality_ok = pipeline_run.quality_score >= self.config["quality_threshold"]
@@ -400,7 +437,10 @@ class ContinuousIntegrationPipeline:
             "performance_check": performance_ok
         }
 
-    async def _stage_completion(self, stage_result: PipelineStageResult, pipeline_run: PipelineRun):
+    async def _stage_completion(
+            self,
+            stage_result: PipelineStageResult,
+            pipeline_run: PipelineRun):
         """Complete pipeline execution."""
         stage_result.output = "Pipeline execution completed"
         stage_result.metrics = {
@@ -475,13 +515,15 @@ class ContinuousIntegrationPipeline:
         }
 
         # Save report
-        report_path = Path(f"coordination_protocols/ci_pipeline_{pipeline_run.run_id}.json")
+        report_path = Path(
+            f"coordination_protocols/ci_pipeline_{pipeline_run.run_id}.json")
         with open(report_path, 'w') as f:
             json.dump(report, f, indent=2, default=str)
 
         self.logger.info(f"Pipeline report saved: {report_path}")
 
-    def _generate_recommendations(self, pipeline_run: PipelineRun) -> List[str]:
+    def _generate_recommendations(
+            self, pipeline_run: PipelineRun) -> List[str]:
         """Generate recommendations based on pipeline results."""
 
         recommendations = []
@@ -493,17 +535,23 @@ class ContinuousIntegrationPipeline:
         ]
 
         if failed_stages:
-            recommendations.append("Address failing pipeline stages before deployment")
+            recommendations.append(
+                "Address failing pipeline stages before deployment")
             for failed_stage in failed_stages:
-                recommendations.append(f"Fix {failed_stage.stage.value}: {failed_stage.error_message}")
+                recommendations.append(
+                    f"Fix {
+                        failed_stage.stage.value}: {
+                        failed_stage.error_message}")
 
         # Check quality score
         if pipeline_run.quality_score < self.config["quality_threshold"]:
-            recommendations.append("Improve quality score by addressing code quality issues")
+            recommendations.append(
+                "Improve quality score by addressing code quality issues")
 
         # Check deployment readiness
         if not pipeline_run.deployment_ready:
-            recommendations.append("Component not ready for deployment - address quality gates")
+            recommendations.append(
+                "Component not ready for deployment - address quality gates")
 
         return recommendations
 
@@ -564,7 +612,8 @@ async def demonstrate_ci_pipeline():
     while run_id in ci_pipeline.active_runs:
         status = ci_pipeline.get_pipeline_status(run_id)
         if status:
-            print(f"📊 Progress: {status['progress']}/{status['total_stages']} stages - {status['status']}")
+            print(
+                f"📊 Progress: {status['progress']}/{status['total_stages']} stages - {status['status']}")
 
         await asyncio.sleep(2)
 
@@ -586,7 +635,8 @@ async def demonstrate_ci_pipeline():
         status_emoji = "✅" if result.status == PipelineStatus.SUCCESS else "❌"
         print(f"{status_emoji} {result.stage.value}: {result.duration:.1f}s")
 
-    print(f"\n📄 Pipeline report saved to coordination_protocols/ci_pipeline_{run_id}.json")
+    print(
+        f"\n📄 Pipeline report saved to coordination_protocols/ci_pipeline_{run_id}.json")
     print("✅ CI/CD pipeline demonstration complete")
 
     return pipeline_run.status == PipelineStatus.SUCCESS

@@ -35,7 +35,8 @@ class SmartQualityGate:
         """
         self.confidence_tracker = confidence_tracker or ConfidenceTracker()
         self.metrics_calculator = metrics_calculator or MetricsCalculator()
-        logger.info("SmartQualityGate initialized with ML-based confidence tracking")
+        logger.info(
+            "SmartQualityGate initialized with ML-based confidence tracking")
 
     def evaluate(self, context: Dict) -> Dict:
         """Evaluate quality with smart thresholds and ML-based decisions.
@@ -46,7 +47,10 @@ class SmartQualityGate:
         Returns:
             Dictionary with decision, confidence, metrics, and reasoning
         """
-        logger.debug(f"Evaluating quality gate for context: {list(context.keys())}")
+        logger.debug(
+    f"Evaluating quality gate for context: {
+        list(
+            context.keys())}")
 
         # Calculate all quality metrics
         try:
@@ -69,7 +73,8 @@ class SmartQualityGate:
         }
 
         # Check if human involvement needed based on learned patterns
-        need_human, combined_conf = self.confidence_tracker.should_involve_human(enhanced_context)
+        need_human, combined_conf = self.confidence_tracker.should_involve_human(
+            enhanced_context)
 
         # Generate decision based on ML recommendation and quality metrics
         decision = self._make_decision(metrics, need_human, combined_conf)
@@ -103,7 +108,8 @@ class SmartQualityGate:
 
         return response
 
-    def _make_decision(self, metrics: Dict, need_human: bool, confidence: float) -> str:
+    def _make_decision(self, metrics: Dict, need_human: bool,
+                       confidence: float) -> str:
         """Make final decision based on metrics and ML recommendation.
 
         Args:
@@ -130,7 +136,8 @@ class SmartQualityGate:
 
         # Use ML recommendation for borderline cases
         if need_human:
-            review_threshold = config.get('quality.confidence.review_threshold', 0.6)
+            review_threshold = config.get(
+    'quality.confidence.review_threshold', 0.6)
             if confidence < review_threshold:
                 return "block"
             else:
@@ -139,7 +146,8 @@ class SmartQualityGate:
         # Allow for high confidence cases
         return "allow"
 
-    def _generate_reason(self, metrics: Dict, need_human: bool, decision: str) -> str:
+    def _generate_reason(self, metrics: Dict,
+                         need_human: bool, decision: str) -> str:
         """Generate human-readable reason for the decision.
 
         Args:
@@ -194,7 +202,8 @@ class SmartQualityGate:
             "quality_score": 0.0
         }
 
-    def record_final_outcome(self, decision_id: str, actual_outcome: str) -> None:
+    def record_final_outcome(self, decision_id: str,
+                             actual_outcome: str) -> None:
         """Record the final outcome of a decision for learning.
 
         Args:
@@ -203,8 +212,10 @@ class SmartQualityGate:
         """
         try:
             # Update the pending record with actual outcome
-            # This would require modifying the ConfidenceTracker to support updates
-            logger.info(f"Final outcome recorded: {decision_id} -> {actual_outcome}")
+            # This would require modifying the ConfidenceTracker to support
+            # updates
+            logger.info(
+    f"Final outcome recorded: {decision_id} -> {actual_outcome}")
         except Exception as e:
             logger.error(f"Failed to record final outcome: {e}")
 
@@ -301,8 +312,12 @@ class MetricsCalculator:
         Returns:
             True if all tests pass, False otherwise
         """
-        test_command = self.config.get('quality.test_command', ['pytest', '-q', '--tb=no'])
-        timeout = self.config.get('quality.test_timeout', 300)  # 5 minutes default
+        test_command = self.config.get(
+    'quality.test_command', [
+        'pytest', '-q', '--tb=no'])
+        timeout = self.config.get(
+    'quality.test_timeout',
+     300)  # 5 minutes default
 
         try:
             result = subprocess.run(
@@ -325,15 +340,21 @@ class MetricsCalculator:
         """
         coverage_command = self.config.get('quality.coverage_command',
                                          ['pytest', '--cov', '--cov-report=json', '-q'])
-        coverage_file = self.config.get('quality.coverage_file', 'coverage.json')
+        coverage_file = self.config.get(
+    'quality.coverage_file', 'coverage.json')
 
         try:
-            result = subprocess.run(coverage_command, capture_output=True, timeout=300)
+            result = subprocess.run(
+    coverage_command,
+    capture_output=True,
+     timeout=300)
 
             if result.returncode == 0 and Path(coverage_file).exists():
                 with open(coverage_file) as f:
                     data = json.load(f)
-                    coverage = data.get("totals", {}).get("percent_covered", 0.0)
+                    coverage = data.get(
+    "totals", {}).get(
+        "percent_covered", 0.0)
                     logger.debug(f"Coverage: {coverage:.1f}%")
                     return coverage
         except Exception as e:
@@ -347,10 +368,13 @@ class MetricsCalculator:
         Returns:
             True if linting passes, False otherwise
         """
-        lint_command = self.config.get('quality.lint_command', ['ruff', 'check', '.', '--quiet'])
+        lint_command = self.config.get(
+    'quality.lint_command', [
+        'ruff', 'check', '.', '--quiet'])
 
         try:
-            result = subprocess.run(lint_command, capture_output=True, timeout=120)
+            result = subprocess.run(
+    lint_command, capture_output=True, timeout=120)
             logger.debug(f"Lint command result: {result.returncode}")
             return result.returncode == 0
         except Exception as e:
@@ -394,7 +418,10 @@ class MetricsCalculator:
         Returns:
             Performance impact score or None if no benchmarks
         """
-        benchmark_dir = Path(self.config.get('quality.benchmark_dir', 'benchmarks'))
+        benchmark_dir = Path(
+    self.config.get(
+        'quality.benchmark_dir',
+         'benchmarks'))
 
         if not benchmark_dir.exists():
             return None
@@ -449,7 +476,8 @@ class MetricsCalculator:
         coverage = metrics.get("coverage", 100)
         if coverage < 100:
             coverage_factor = coverage / 100.0
-            score *= (1.0 - weights.get('coverage', 0.3)) + (weights.get('coverage', 0.3) * coverage_factor)
+            score *= (1.0 - weights.get('coverage', 0.3)) + \
+                      (weights.get('coverage', 0.3) * coverage_factor)
 
         # Apply lint weight
         if not metrics.get("lint_passed", True):

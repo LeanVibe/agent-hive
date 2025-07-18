@@ -6,9 +6,8 @@ Ensures tests exist without blocking development by generating them asynchronous
 """
 
 import asyncio
-import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from config.config_loader import get_config
 from utils.logging_config import get_logger
@@ -99,7 +98,8 @@ class SmartTestEnforcer:
             return True
 
         except Exception as e:
-            logger.error(f"Error checking/generating tests for {file_path}: {e}")
+            logger.error(
+    f"Error checking/generating tests for {file_path}: {e}")
             return False
 
     async def _generate_tests_async(self, path: Path) -> None:
@@ -117,7 +117,9 @@ class SmartTestEnforcer:
 
             # Call Gemini CLI
             config = get_config()
-            gemini_model = config.get('dev_tools.test_generation.model', 'gemini-1.5-flash')
+            gemini_model = config.get(
+    'dev_tools.test_generation.model',
+     'gemini-1.5-flash')
             timeout = config.get('dev_tools.test_generation.timeout', 120)
 
             result = await asyncio.create_subprocess_exec(
@@ -141,7 +143,8 @@ class SmartTestEnforcer:
                 logger.info(f"✅ Tests generated: {test_path}")
             else:
                 error_msg = stderr.decode('utf-8')
-                logger.error(f"Failed to generate tests for {path}: {error_msg}")
+                logger.error(
+    f"Failed to generate tests for {path}: {error_msg}")
 
         except asyncio.TimeoutError:
             logger.warning(f"Test generation timed out for {path}")
@@ -266,8 +269,10 @@ class SmartTestEnforcer:
                 parts = path.parts
                 if 'src' in parts:
                     src_index = parts.index('src')
-                    if src_index + 1 < len(parts) and parts[src_index + 1] == 'main':
-                        if src_index + 2 < len(parts) and parts[src_index + 2] == 'java':
+                    if src_index + \
+                        1 < len(parts) and parts[src_index + 1] == 'main':
+                        if src_index + \
+                            2 < len(parts) and parts[src_index + 2] == 'java':
                             package_parts = parts[src_index + 3:-1]
 
             package = '/'.join(package_parts) if package_parts else ''
@@ -283,7 +288,8 @@ class SmartTestEnforcer:
             return Path(formatted)
 
         except Exception as e:
-            logger.warning(f"Failed to format test path pattern {pattern}: {e}")
+            logger.warning(
+    f"Failed to format test path pattern {pattern}: {e}")
             return None
 
     def _get_language(self, path: Path) -> str:
@@ -297,7 +303,8 @@ class SmartTestEnforcer:
         """
         return self.code_extensions.get(path.suffix, 'python')
 
-    def _create_test_prompt(self, content: str, language: str, path: Path) -> str:
+    def _create_test_prompt(
+        self, content: str, language: str, path: Path) -> str:
         """Create a language-specific test generation prompt.
 
         Args:
@@ -323,7 +330,8 @@ class SmartTestEnforcer:
         framework = frameworks.get(language, 'pytest')
 
         # Get custom prompt template if available
-        custom_prompt = config.get(f'dev_tools.test_generation.prompts.{language}')
+        custom_prompt = config.get(
+    f'dev_tools.test_generation.prompts.{language}')
         if custom_prompt:
             return custom_prompt.format(
                 content=content,
@@ -407,14 +415,17 @@ Output only the test code, no explanations or markdown."""
         # Find files without tests
         files_without_tests = []
         for path in directory.rglob('*'):
-            if self._is_code_file(path) and not self._find_existing_tests(path):
+            if self._is_code_file(
+                path) and not self._find_existing_tests(path):
                 files_without_tests.append(path)
 
         if not files_without_tests:
             logger.info("All code files have tests!")
             return
 
-        logger.info(f"Generating tests for {len(files_without_tests)} files...")
+        logger.info(
+    f"Generating tests for {
+        len(files_without_tests)} files...")
 
         # Generate tests with concurrency limit
         async def generate_batch():
@@ -424,12 +435,13 @@ Output only the test code, no explanations or markdown."""
                 async with semaphore:
                     await self._generate_tests_async(path)
 
-            tasks = [generate_with_semaphore(path) for path in files_without_tests]
+            tasks = [generate_with_semaphore(path)
+                                             for path in files_without_tests]
             await asyncio.gather(*tasks, return_exceptions=True)
 
         # Run the batch generation - handle event loop properly
         try:
-            loop = asyncio.get_running_loop()
+            asyncio.get_running_loop()
             # If we're in a running event loop, schedule the task
             asyncio.create_task(generate_batch())
         except RuntimeError:

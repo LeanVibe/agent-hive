@@ -4,23 +4,23 @@ Tests for Accountability Framework - XP Methodology Compliance
 Test-Driven Development requirement for XP quality gate.
 """
 
-import pytest
-import asyncio
-import tempfile
 import json
-from datetime import datetime, timedelta
-from pathlib import Path
 
 # Import the module under test
 import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
+import tempfile
+from pathlib import Path
+
+import pytest
+
 from scripts.accountability_framework import (
     AccountabilityFramework,
-    TaskAssignment,
-    TaskStatus,
     EscalationLevel,
-    EvidenceRequirement
+    EvidenceRequirement,
+    TaskStatus,
 )
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
 class TestAccountabilityFramework:

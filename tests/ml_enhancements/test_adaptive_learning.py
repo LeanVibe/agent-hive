@@ -2,16 +2,16 @@
 Comprehensive tests for AdaptiveLearning ML component.
 """
 
-import json
-import pytest
 import sqlite3
 import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
+
+import pytest
 
 from ml_enhancements.adaptive_learning import AdaptiveLearning
-from ml_enhancements.models import MLConfig, LearningMetrics
+from ml_enhancements.models import LearningMetrics, MLConfig
 
 
 class TestAdaptiveLearning:
@@ -42,7 +42,7 @@ class TestAdaptiveLearning:
 
     def test_init_creates_database_schema(self, temp_db, config):
         """Test that initialization creates proper database schema."""
-        learning = AdaptiveLearning(config=config, db_path=temp_db)
+        AdaptiveLearning(config=config, db_path=temp_db)
 
         # Verify database file exists
         assert Path(temp_db).exists()
@@ -52,19 +52,23 @@ class TestAdaptiveLearning:
             cursor = conn.cursor()
 
             # Check learning_sessions table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='learning_sessions'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='learning_sessions'")
             assert cursor.fetchone() is not None
 
             # Check feedback_data table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='feedback_data'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='feedback_data'")
             assert cursor.fetchone() is not None
 
             # Check model_adaptations table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='model_adaptations'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='model_adaptations'")
             assert cursor.fetchone() is not None
 
             # Check performance_history table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='performance_history'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='performance_history'")
             assert cursor.fetchone() is not None
 
     def test_start_learning_session(self, learning):
@@ -81,7 +85,8 @@ class TestAdaptiveLearning:
         # Verify session was stored in database
         with sqlite3.connect(learning.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM learning_sessions WHERE session_id = ?", (session_id,))
+            cursor.execute(
+                "SELECT * FROM learning_sessions WHERE session_id = ?", (session_id,))
             result = cursor.fetchone()
 
             assert result is not None
@@ -108,7 +113,8 @@ class TestAdaptiveLearning:
         # Verify feedback was stored in database
         with sqlite3.connect(learning.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM feedback_data WHERE session_id = ?", (session_id,))
+            cursor.execute(
+                "SELECT * FROM feedback_data WHERE session_id = ?", (session_id,))
             result = cursor.fetchone()
 
             assert result is not None
@@ -221,7 +227,8 @@ class TestAdaptiveLearning:
         assert convergence_time == 0.0
 
         # Test with stable performance
-        learning.learning_state['model_performance'][session_id] = [0.8, 0.81, 0.805, 0.802, 0.801]
+        learning.learning_state['model_performance'][session_id] = [
+            0.8, 0.81, 0.805, 0.802, 0.801]
         convergence_time = learning._calculate_convergence_time(session_id)
         assert convergence_time > 0
 
@@ -249,12 +256,15 @@ class TestAdaptiveLearning:
         session_id = 'test_session'
 
         # Test with insufficient history
-        converged = learning._check_convergence(session_id, 'performance_optimizer')
+        converged = learning._check_convergence(
+            session_id, 'performance_optimizer')
         assert not converged
 
         # Test with stable performance (converged)
-        learning.learning_state['model_performance'][session_id] = [0.8, 0.801, 0.802, 0.8015, 0.8018]
-        converged = learning._check_convergence(session_id, 'performance_optimizer')
+        learning.learning_state['model_performance'][session_id] = [
+            0.8, 0.801, 0.802, 0.8015, 0.8018]
+        converged = learning._check_convergence(
+            session_id, 'performance_optimizer')
         assert converged
 
         # Check convergence was recorded
@@ -269,7 +279,8 @@ class TestAdaptiveLearning:
         )
 
         # Add some performance history
-        learning.learning_state['model_performance'][session_id] = [0.7, 0.8, 0.85]
+        learning.learning_state['model_performance'][session_id] = [
+            0.7, 0.8, 0.85]
 
         summary = learning.end_learning_session(session_id)
 
@@ -281,7 +292,10 @@ class TestAdaptiveLearning:
         # Verify session was updated in database
         with sqlite3.connect(learning.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT final_performance FROM learning_sessions WHERE session_id = ?", (session_id,))
+            cursor.execute(
+                "SELECT final_performance FROM learning_sessions WHERE session_id = ?",
+                (session_id,
+                 ))
             result = cursor.fetchone()
 
             assert result is not None
@@ -340,8 +354,7 @@ class TestAdaptiveLearning:
         features = {'feature1': 1.0, 'feature2': 2.0}
 
         prediction, confidence, needs_adaptation = learning.predict_with_adaptation(
-            'performance_optimizer', features
-        )
+            'performance_optimizer', features)
 
         assert prediction == 0.5  # Default prediction
         assert confidence == 0.1   # Low confidence
@@ -358,13 +371,13 @@ class TestAdaptiveLearning:
         training_data = [{'feature1': 1.0, 'feature2': 2.0}]
         target_values = [0.8]
 
-        learning.adapt_model(session_id, 'performance_optimizer', training_data, target_values)
+        learning.adapt_model(session_id, 'performance_optimizer',
+                             training_data, target_values)
 
         # Now test prediction
         features = {'feature1': 1.0, 'feature2': 2.0}
         prediction, confidence, needs_adaptation = learning.predict_with_adaptation(
-            'performance_optimizer', features, confidence_threshold=0.5
-        )
+            'performance_optimizer', features, confidence_threshold=0.5)
 
         assert 0.0 <= prediction <= 1.0
         assert 0.0 <= confidence <= 1.0
@@ -398,7 +411,9 @@ class TestAdaptiveLearning:
         assert isinstance(recommendations, list)
 
         # Should recommend initialization for new system
-        init_rec = next((r for r in recommendations if r['type'] == 'initialization'), None)
+        init_rec = next(
+            (r for r in recommendations if r['type'] == 'initialization'),
+            None)
         assert init_rec is not None
         assert init_rec['priority'] == 'high'
 
@@ -424,18 +439,38 @@ class TestAdaptiveLearning:
 
         with sqlite3.connect(learning.db_path) as conn:
             # Insert old session
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO learning_sessions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                "old_session", "test_model", old_time, None, 0.5, None, 0.0, 10, 0.0, "{}", "{}"
-            ))
+            """,
+                ("old_session",
+                 "test_model",
+                 old_time,
+                 None,
+                 0.5,
+                 None,
+                 0.0,
+                 10,
+                 0.0,
+                 "{}",
+                 "{}"))
 
             # Insert recent session
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO learning_sessions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                "recent_session", "test_model", recent_time, None, 0.8, None, 0.1, 20, 0.0, "{}", "{}"
-            ))
+            """,
+                ("recent_session",
+                 "test_model",
+                 recent_time,
+                 None,
+                 0.8,
+                 None,
+                 0.1,
+                 20,
+                 0.0,
+                 "{}",
+                 "{}"))
 
             conn.commit()
 
@@ -446,7 +481,8 @@ class TestAdaptiveLearning:
 
         # Verify recent session still exists
         with sqlite3.connect(learning.db_path) as conn:
-            cursor = conn.execute("SELECT COUNT(*) FROM learning_sessions WHERE session_id = 'recent_session'")
+            cursor = conn.execute(
+                "SELECT COUNT(*) FROM learning_sessions WHERE session_id = 'recent_session'")
             assert cursor.fetchone()[0] == 1
 
     def test_learning_metrics_serialization(self, learning):
@@ -515,7 +551,8 @@ class TestAdaptiveLearning:
         # Run multiple threads
         threads = []
         for t in range(3):
-            thread = threading.Thread(target=provide_feedback_thread, args=(t,))
+            thread = threading.Thread(
+                target=provide_feedback_thread, args=(t,))
             threads.append(thread)
             thread.start()
 
@@ -524,14 +561,15 @@ class TestAdaptiveLearning:
 
         # Verify all feedback was recorded
         with sqlite3.connect(learning.db_path) as conn:
-            cursor = conn.execute("SELECT COUNT(*) FROM feedback_data WHERE session_id = ?", (session_id,))
+            cursor = conn.execute(
+                "SELECT COUNT(*) FROM feedback_data WHERE session_id = ?", (session_id,))
             count = cursor.fetchone()[0]
             assert count == 9  # 3 threads * 3 feedback each
 
     @patch('ml_enhancements.adaptive_learning.logger')
     def test_logging_integration(self, mock_logger, learning):
         """Test that logging is properly integrated."""
-        session_id = learning.start_learning_session(
+        learning.start_learning_session(
             model_type='performance_optimizer',
             initial_context={'workflow': 'test'}
         )

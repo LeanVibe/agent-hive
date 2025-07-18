@@ -6,22 +6,18 @@ by introducing deliberate bugs (mutations) into the code and verifying that
 tests catch these bugs.
 """
 
-import pytest
 import ast
+import importlib
 import sys
 import tempfile
-import subprocess
-import importlib
-import types
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
-from unittest.mock import Mock, patch
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import pytest
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
-
-from state.state_manager import StateManager, AgentState, TaskState
 
 
 @dataclass
@@ -233,7 +229,8 @@ class MutationTester:
         ]
         self.mutation_counter = 0
 
-    def generate_mutations(self, source_file: Path) -> List[Tuple[ast.AST, MutationResult]]:
+    def generate_mutations(
+            self, source_file: Path) -> List[Tuple[ast.AST, MutationResult]]:
         """Generate mutations for a source file."""
         with open(source_file, 'r') as f:
             source_code = f.read()
@@ -272,7 +269,11 @@ class MutationTester:
 
         return mutations
 
-    def _replace_node(self, tree: ast.AST, old_node: ast.AST, new_node: ast.AST) -> ast.AST:
+    def _replace_node(
+            self,
+            tree: ast.AST,
+            old_node: ast.AST,
+            new_node: ast.AST) -> ast.AST:
         """Replace a node in the AST."""
         class NodeReplacer(ast.NodeTransformer):
             def visit(self, node):
@@ -283,7 +284,7 @@ class MutationTester:
         return NodeReplacer().visit(tree)
 
     def run_tests_with_mutation(self, mutated_tree: ast.AST,
-                               source_file: Path) -> Tuple[bool, List[str]]:
+                                source_file: Path) -> Tuple[bool, List[str]]:
         """Run tests with mutated code."""
         # Create temporary file with mutated code
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
@@ -292,14 +293,16 @@ class MutationTester:
 
         try:
             # Import the mutated module
-            spec = importlib.util.spec_from_file_location("mutated_module", temp_file)
+            spec = importlib.util.spec_from_file_location(
+                "mutated_module", temp_file)
             if spec is None or spec.loader is None:
                 return False, ["Import failed"]
 
             mutated_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mutated_module)
 
-            # Run tests (simplified - in real implementation, would run actual test suite)
+            # Run tests (simplified - in real implementation, would run actual
+            # test suite)
             surviving_tests = []
             killed = False
 
@@ -307,7 +310,8 @@ class MutationTester:
                 # Test basic functionality
                 if hasattr(mutated_module, 'StateManager'):
                     with tempfile.TemporaryDirectory() as temp_dir:
-                        state_manager = mutated_module.StateManager(Path(temp_dir))
+                        state_manager = mutated_module.StateManager(
+                            Path(temp_dir))
 
                         # Test agent state operations
                         agent_state = mutated_module.AgentState(
@@ -357,7 +361,8 @@ class MutationTester:
         killed_mutations = sum(1 for r in all_results if r.killed)
         surviving_mutations = total_mutations - killed_mutations
 
-        mutation_score = (killed_mutations / total_mutations * 100) if total_mutations > 0 else 0
+        mutation_score = (killed_mutations / total_mutations *
+                          100) if total_mutations > 0 else 0
 
         return MutationReport(
             total_mutations=total_mutations,
@@ -486,7 +491,8 @@ def is_valid(flag):
             assert len(mutations) > 0
 
             # Check that we have different types of mutations
-            mutation_types = set(result.mutation_type for _, result in mutations)
+            mutation_types = set(
+                result.mutation_type for _, result in mutations)
             assert "AOM" in mutation_types  # Arithmetic
             assert "ROR" in mutation_types  # Relational
             assert "LOR" in mutation_types  # Logical
@@ -529,11 +535,13 @@ class SimpleStateManager:
             results = [result for _, result in mutations]
 
             # Should have mutations for logical operators (and)
-            logical_mutations = [r for r in results if r.mutation_type == "LOR"]
+            logical_mutations = [
+                r for r in results if r.mutation_type == "LOR"]
             assert len(logical_mutations) > 0
 
             # Should have mutations for comparison operators (==)
-            relational_mutations = [r for r in results if r.mutation_type == "ROR"]
+            relational_mutations = [
+                r for r in results if r.mutation_type == "ROR"]
             assert len(relational_mutations) > 0
 
         finally:
@@ -599,7 +607,8 @@ class SimpleStateManager:
         # Some mutations surviving
         results_some_surviving = [
             MutationResult("MUT_001", "x + y", "x - y", "AOM", 1, 1, True, []),
-            MutationResult("MUT_002", "x > 0", "x < 0", "ROR", 2, 1, False, ["test"])
+            MutationResult("MUT_002", "x > 0", "x < 0",
+                           "ROR", 2, 1, False, ["test"])
         ]
 
         report = MutationReport(2, 1, 1, 50.0, results_some_surviving, {})
@@ -607,7 +616,8 @@ class SimpleStateManager:
 
     def test_integration_with_existing_tests(self):
         """Test integration with existing test framework."""
-        # This test verifies that mutation testing can work with our existing test suite
+        # This test verifies that mutation testing can work with our existing
+        # test suite
 
         # Create a simple function to mutate
         source_code = """
@@ -640,7 +650,8 @@ def calculate_score(correct, total):
             # Should have both killed and possibly surviving mutations
             assert report.killed_mutations >= 0
             assert report.surviving_mutations >= 0
-            assert report.killed_mutations + report.surviving_mutations == report.total_mutations
+            assert report.killed_mutations + \
+                report.surviving_mutations == report.total_mutations
 
         finally:
             temp_file.unlink(missing_ok=True)

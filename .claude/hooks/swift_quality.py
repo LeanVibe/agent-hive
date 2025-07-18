@@ -1,6 +1,6 @@
-import sys
-import subprocess
 import json
+import subprocess
+import sys
 
 data = json.load(sys.stdin)
 path = data.get("file_path", "")

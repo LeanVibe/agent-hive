@@ -15,7 +15,8 @@ class SmartXPEnforcer:
 
     def suggest_pair_programming(self, complexity_score):
         """Only suggest when genuinely helpful - Phase 0 placeholder"""
-        print(f"Checking pair programming suggestion for complexity: {complexity_score}")
+        print(
+    f"Checking pair programming suggestion for complexity: {complexity_score}")
         return None  # No pair programming suggestions in Phase 0
 
     def enforce_small_commits(self, commit_candidate):

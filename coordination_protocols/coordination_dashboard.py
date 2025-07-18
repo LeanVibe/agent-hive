@@ -10,7 +10,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -62,8 +62,8 @@ class CoordinationDashboard:
                 status[component] = {
                     "status": "✅ operational",
                     "file": str(full_path),
-                    "last_updated": datetime.fromtimestamp(full_path.stat().st_mtime).isoformat()
-                }
+                    "last_updated": datetime.fromtimestamp(
+                        full_path.stat().st_mtime).isoformat()}
             else:
                 status[component] = {
                     "status": "❌ missing",
@@ -73,11 +73,12 @@ class CoordinationDashboard:
 
         return {
             "overall_status": "✅ fully operational" if all(
-                s["status"].startswith("✅") for s in status.values()
-            ) else "⚠️ partial",
+                s["status"].startswith("✅") for s in status.values()) else "⚠️ partial",
             "components": status,
-            "infrastructure_score": sum(1 for s in status.values() if s["status"].startswith("✅")) / len(status) * 100
-        }
+            "infrastructure_score": sum(
+                1 for s in status.values() if s["status"].startswith("✅")) /
+            len(status) *
+            100}
 
     def _get_component_progress(self) -> Dict[str, Any]:
         """Get PR #28 component development progress."""
@@ -89,16 +90,34 @@ class CoordinationDashboard:
                 progress_data = json.load(f)
 
             return {
-                "overall_progress": progress_data.get("overall_progress", {}),
-                "component_details": progress_data.get("component_summary", {}),
+                "overall_progress": progress_data.get(
+                    "overall_progress",
+                    {}),
+                "component_details": progress_data.get(
+                    "component_summary",
+                    {}),
                 "last_updated": progress_data.get("report_timestamp"),
                 "components_status": {
-                    "total": progress_data.get("overall_progress", {}).get("total_components", 0),
-                    "completed": progress_data.get("overall_progress", {}).get("completed_components", 0),
-                    "in_progress": progress_data.get("overall_progress", {}).get("in_progress_components", 0),
-                    "blocked": progress_data.get("overall_progress", {}).get("blocked_components", 0)
-                }
-            }
+                    "total": progress_data.get(
+                        "overall_progress",
+                        {}).get(
+                        "total_components",
+                        0),
+                    "completed": progress_data.get(
+                        "overall_progress",
+                        {}).get(
+                        "completed_components",
+                        0),
+                    "in_progress": progress_data.get(
+                        "overall_progress",
+                        {}).get(
+                        "in_progress_components",
+                        0),
+                    "blocked": progress_data.get(
+                        "overall_progress",
+                        {}).get(
+                        "blocked_components",
+                        0)}}
         else:
             return {
                 "status": "⚠️ progress data not available",
@@ -113,26 +132,48 @@ class CoordinationDashboard:
     def _get_quality_metrics(self) -> Dict[str, Any]:
         """Get quality metrics from validation reports."""
 
-        quality_reports = list(self.coordination_protocols_dir.glob("*_quality_report.json"))
+        quality_reports = list(
+            self.coordination_protocols_dir.glob("*_quality_report.json"))
 
         if quality_reports:
             # Get latest quality report
-            latest_report = max(quality_reports, key=lambda p: p.stat().st_mtime)
+            latest_report = max(
+                quality_reports, key=lambda p: p.stat().st_mtime)
 
             with open(latest_report) as f:
                 quality_data = json.load(f)
 
             return {
-                "latest_component": quality_data.get("component_info", {}).get("name"),
-                "overall_score": quality_data.get("overall_results", {}).get("percentage", 0),
+                "latest_component": quality_data.get(
+                    "component_info",
+                    {}).get("name"),
+                "overall_score": quality_data.get(
+                    "overall_results",
+                    {}).get(
+                    "percentage",
+                    0),
                 "gates_status": {
-                    "total": quality_data.get("summary", {}).get("total_gates", 0),
-                    "passed": quality_data.get("summary", {}).get("passed_gates", 0),
-                    "failed": quality_data.get("summary", {}).get("failed_gates", 0)
-                },
-                "gate_details": quality_data.get("gate_results", []),
-                "last_validation": quality_data.get("component_info", {}).get("validation_date")
-            }
+                    "total": quality_data.get(
+                        "summary",
+                        {}).get(
+                            "total_gates",
+                            0),
+                    "passed": quality_data.get(
+                        "summary",
+                        {}).get(
+                        "passed_gates",
+                        0),
+                    "failed": quality_data.get(
+                        "summary",
+                        {}).get(
+                        "failed_gates",
+                        0)},
+                "gate_details": quality_data.get(
+                    "gate_results",
+                    []),
+                "last_validation": quality_data.get(
+                    "component_info",
+                    {}).get("validation_date")}
         else:
             return {
                 "status": "⚠️ no quality reports available",
@@ -142,7 +183,8 @@ class CoordinationDashboard:
     def _get_ci_cd_status(self) -> Dict[str, Any]:
         """Get CI/CD pipeline status."""
 
-        ci_reports = list(self.coordination_protocols_dir.glob("ci_pipeline_*.json"))
+        ci_reports = list(
+            self.coordination_protocols_dir.glob("ci_pipeline_*.json"))
 
         if ci_reports:
             # Get latest CI report
@@ -169,8 +211,7 @@ class CoordinationDashboard:
             return {
                 "status": "⚠️ no CI pipeline runs found",
                 "pipeline_health": "🔄 not yet executed",
-                "github_actions": "✅ configured" if Path(".github/workflows/component-ci.yml").exists() else "❌ missing"
-            }
+                "github_actions": "✅ configured" if Path(".github/workflows/component-ci.yml").exists() else "❌ missing"}
 
     def _get_agent_coordination_status(self) -> Dict[str, Any]:
         """Get agent coordination status."""
@@ -178,8 +219,7 @@ class CoordinationDashboard:
         coordination_files = {
             "integration_communication": "integration_agent_communication.py",
             "coordination_request": "integration_agent_coordination_request.json",
-            "development_handoff": "integration_agent_development_handoff.json"
-        }
+            "development_handoff": "integration_agent_development_handoff.json"}
 
         status = {}
         for coord_type, file_name in coordination_files.items():
@@ -187,8 +227,8 @@ class CoordinationDashboard:
             if file_path.exists():
                 status[coord_type] = {
                     "status": "✅ active",
-                    "last_updated": datetime.fromtimestamp(file_path.stat().st_mtime).isoformat()
-                }
+                    "last_updated": datetime.fromtimestamp(
+                        file_path.stat().st_mtime).isoformat()}
             else:
                 status[coord_type] = {
                     "status": "❌ missing",
@@ -241,18 +281,27 @@ class CoordinationDashboard:
 
         # Calculate health score
         health_factors = {
-            "infrastructure": infrastructure.get("infrastructure_score", 0),
-            "component_progress": component_progress.get("overall_progress", {}).get("overall_percentage", 0),
-            "quality_gates": quality.get("overall_score", 0) if "overall_score" in quality else 50,
-            "ci_cd_pipeline": 100 if ci_cd.get("pipeline_health", "").startswith("✅") else 50
-        }
+            "infrastructure": infrastructure.get(
+                "infrastructure_score",
+                0),
+            "component_progress": component_progress.get(
+                "overall_progress",
+                {}).get(
+                "overall_percentage",
+                0),
+            "quality_gates": quality.get(
+                "overall_score",
+                    0) if "overall_score" in quality else 50,
+            "ci_cd_pipeline": 100 if ci_cd.get(
+                "pipeline_health",
+                "").startswith("✅") else 50}
 
         overall_health = sum(health_factors.values()) / len(health_factors)
 
         health_status = "🟢 excellent" if overall_health >= 90 else \
-                       "🟡 good" if overall_health >= 75 else \
-                       "🟠 needs attention" if overall_health >= 60 else \
-                       "🔴 critical"
+            "🟡 good" if overall_health >= 75 else \
+            "🟠 needs attention" if overall_health >= 60 else \
+            "🔴 critical"
 
         return {
             "overall_health": health_status,
@@ -261,7 +310,8 @@ class CoordinationDashboard:
             "recommendations": self._get_health_recommendations(health_factors)
         }
 
-    def _get_health_recommendations(self, health_factors: Dict[str, float]) -> List[str]:
+    def _get_health_recommendations(
+            self, health_factors: Dict[str, float]) -> List[str]:
         """Generate health recommendations based on factors."""
 
         recommendations = []
@@ -269,16 +319,21 @@ class CoordinationDashboard:
         for factor, score in health_factors.items():
             if score < 75:
                 if factor == "infrastructure":
-                    recommendations.append("Review and complete missing infrastructure components")
+                    recommendations.append(
+                        "Review and complete missing infrastructure components")
                 elif factor == "component_progress":
-                    recommendations.append("Accelerate component development to meet timeline")
+                    recommendations.append(
+                        "Accelerate component development to meet timeline")
                 elif factor == "quality_gates":
-                    recommendations.append("Address quality gate failures before proceeding")
+                    recommendations.append(
+                        "Address quality gate failures before proceeding")
                 elif factor == "ci_cd_pipeline":
-                    recommendations.append("Investigate and resolve CI/CD pipeline issues")
+                    recommendations.append(
+                        "Investigate and resolve CI/CD pipeline issues")
 
         if not recommendations:
-            recommendations.append("System operating at optimal levels - continue current approach")
+            recommendations.append(
+                "System operating at optimal levels - continue current approach")
 
         return recommendations
 
@@ -290,7 +345,8 @@ class CoordinationDashboard:
         # Check for recent file modifications
         recent_files = []
         for file_path in self.coordination_protocols_dir.iterdir():
-            if file_path.is_file() and file_path.suffix in ['.py', '.json', '.md']:
+            if file_path.is_file() and file_path.suffix in [
+                    '.py', '.json', '.md']:
                 mtime = datetime.fromtimestamp(file_path.stat().st_mtime)
                 recent_files.append((file_path, mtime))
 
@@ -299,8 +355,8 @@ class CoordinationDashboard:
 
         for file_path, mtime in recent_files[:10]:  # Last 10 activities
             activity_type = "📝 file_update" if file_path.suffix == '.py' else \
-                           "📊 report_generated" if file_path.suffix == '.json' else \
-                           "📋 documentation_update"
+                "📊 report_generated" if file_path.suffix == '.json' else \
+                "📋 documentation_update"
 
             activities.append({
                 "timestamp": mtime.isoformat(),
@@ -385,9 +441,16 @@ class CoordinationDashboard:
         progress = dashboard['component_progress']
         if 'components_status' in progress:
             comp_status = progress['components_status']
-            print(f"📦 COMPONENTS: {comp_status['in_progress']} in progress, {comp_status['completed']} completed")
+            print(
+                f"📦 COMPONENTS: {
+                    comp_status['in_progress']} in progress, {
+                    comp_status['completed']} completed")
             if 'overall_progress' in progress:
-                print(f"   Overall Progress: {progress['overall_progress'].get('overall_percentage', 0):.1f}%")
+                print(
+                    f"   Overall Progress: {
+                        progress['overall_progress'].get(
+                            'overall_percentage',
+                            0):.1f}%")
         print()
 
         # Quality Metrics
@@ -400,17 +463,25 @@ class CoordinationDashboard:
 
         # System Health
         health = dashboard['system_health']
-        print(f"🏥 HEALTH: {health['overall_health']} ({health['health_score']:.1f}%)")
+        print(
+            f"🏥 HEALTH: {
+                health['overall_health']} ({
+                health['health_score']:.1f}%)")
         print()
 
         # Next Actions
         actions = dashboard['next_actions']
         print("🎯 NEXT ACTIONS:")
         for action in actions[:3]:  # Show top 3 actions
-            print(f"   {action['priority']} {action['action']} ({action['assigned_to']})")
+            print(
+                f"   {
+                    action['priority']} {
+                    action['action']} ({
+                    action['assigned_to']})")
         print()
 
-        print("📄 Full dashboard saved to coordination_protocols/coordination_dashboard.json")
+        print(
+            "📄 Full dashboard saved to coordination_protocols/coordination_dashboard.json")
 
 
 def main():

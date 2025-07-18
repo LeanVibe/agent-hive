@@ -12,20 +12,20 @@ This test suite covers:
 """
 
 import asyncio
-import pytest
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
 import sys
+from datetime import datetime
 from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
+from orchestrator import LeanVibeOrchestrator
+from task_queue_module.task_queue import Task
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Add .claude directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
-
-from orchestrator import LeanVibeOrchestrator
-from task_queue_module.task_queue import Task
 
 
 class TestLeanVibeOrchestrator:
@@ -90,7 +90,8 @@ class TestLeanVibeOrchestrator:
         assert work_item is None
 
     @pytest.mark.asyncio
-    async def test_get_next_priority_with_agents(self, orchestrator, sample_task):
+    async def test_get_next_priority_with_agents(
+            self, orchestrator, sample_task):
         """Test getting next priority with available agents"""
         # Initialize agents first
         await orchestrator._initialize_agents()
@@ -104,7 +105,8 @@ class TestLeanVibeOrchestrator:
         assert work_item.task_id == sample_task.id
 
     @pytest.mark.asyncio
-    async def test_execute_autonomously_success(self, orchestrator, sample_task):
+    async def test_execute_autonomously_success(
+            self, orchestrator, sample_task):
         """Test successful autonomous task execution"""
         # Initialize agents
         await orchestrator._initialize_agents()
@@ -127,7 +129,8 @@ class TestLeanVibeOrchestrator:
             assert task_state is None or task_state.status == "completed"
 
     @pytest.mark.asyncio
-    async def test_execute_autonomously_failure(self, orchestrator, sample_task):
+    async def test_execute_autonomously_failure(
+            self, orchestrator, sample_task):
         """Test failed autonomous task execution"""
         # Initialize agents
         await orchestrator._initialize_agents()
@@ -150,7 +153,8 @@ class TestLeanVibeOrchestrator:
             # (This would require checking the database directly)
 
     @pytest.mark.asyncio
-    async def test_execute_autonomously_exception(self, orchestrator, sample_task):
+    async def test_execute_autonomously_exception(
+            self, orchestrator, sample_task):
         """Test exception handling during autonomous execution"""
         # Initialize agents
         await orchestrator._initialize_agents()
@@ -214,7 +218,7 @@ class TestLeanVibeOrchestrator:
 
             # Start health monitor for a short time
             orchestrator.running = True
-            task = asyncio.create_task(orchestrator._monitor_agent_health())
+            asyncio.create_task(orchestrator._monitor_agent_health())
 
             # Let it run briefly
             await asyncio.sleep(0.1)
@@ -238,7 +242,7 @@ class TestLeanVibeOrchestrator:
 
                 # Start checkpoint monitor for a short time
                 orchestrator.running = True
-                task = asyncio.create_task(orchestrator._monitor_checkpoints())
+                asyncio.create_task(orchestrator._monitor_checkpoints())
 
                 # Let it run briefly
                 await asyncio.sleep(0.1)
@@ -318,7 +322,8 @@ class TestOrchestratorIntegration:
 
         # Test confidence tracking integration
         context = {"test": "context"}
-        need_human, confidence = orchestrator.state_manager.confidence_tracker.should_involve_human(context)
+        need_human, confidence = orchestrator.state_manager.confidence_tracker.should_involve_human(
+            context)
         assert isinstance(need_human, bool)
         assert isinstance(confidence, float)
 

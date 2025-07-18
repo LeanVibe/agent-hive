@@ -10,16 +10,14 @@ import asyncio
 import logging
 import sys
 from datetime import datetime
-from pathlib import Path
+
+from advanced_orchestration import EnhancedOrchestrationCLI
+from advanced_orchestration.models import CoordinatorConfig, ResourceLimits
 
 # Add the orchestration agent path
-sys.path.append('/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/orchestration-agent')
+sys.path.append(
+    '/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/orchestration-agent')
 
-from advanced_orchestration import EnhancedCoordinationProtocol, EnhancedOrchestrationCLI
-from advanced_orchestration.models import (
-    CoordinatorConfig, ResourceLimits, WorkflowDefinition, WorkflowType,
-    AgentSpecialization, TaskDependency, DependencyType, AgentCapabilities
-)
 
 # Configure logging
 logging.basicConfig(
@@ -96,11 +94,12 @@ async def main():
 
         # Get workflow status
         workflow_status = await cli.get_workflow_status(workflow_id)
-        print(f"\n📋 Workflow Status:")
+        print("\n📋 Workflow Status:")
         print(f"  • Status: {workflow_status['status']}")
         print(f"  • Progress: {workflow_status['progress']:.1f}%")
         print(f"  • Active tasks: {len(workflow_status['active_tasks'])}")
-        print(f"  • Completed tasks: {len(workflow_status['completed_tasks'])}")
+        print(
+            f"  • Completed tasks: {len(workflow_status['completed_tasks'])}")
 
         # Step 5: Report coordination status
         print("\n🎉 MULTI-AGENT COORDINATION LAUNCHED SUCCESSFULLY!")
@@ -110,9 +109,15 @@ async def main():
         print("📊 Real-time monitoring and analytics enabled")
         print("🔄 Intelligent routing and dependency management operational")
 
-        print(f"\n⏰ Coordination started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(
+            f"\n⏰ Coordination started at: {
+                datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"📋 Workflow ID: {result['workflow_id']}")
-        print(f"🎯 Expected completion: {result.get('estimated_completion', 'calculating...')}")
+        print(
+            f"🎯 Expected completion: {
+                result.get(
+                    'estimated_completion',
+                    'calculating...')}")
 
         # Keep monitoring
         print("\n🔄 Entering continuous monitoring mode...")
@@ -123,10 +128,17 @@ async def main():
             metrics_result = await cli.get_coordination_metrics()
             metrics = metrics_result['real_time_metrics']
 
-            print(f"📊 [{datetime.now().strftime('%H:%M:%S')}] Coordination Status:")
-            print(f"  • Workflow completion: {metrics['workflow_completion_rate']:.1%}")
-            print(f"  • Parallel efficiency: {metrics['parallel_efficiency']:.1%}")
-            print(f"  • Quality consistency: {metrics['quality_consistency']:.1%}")
+            print(
+                f"📊 [{datetime.now().strftime('%H:%M:%S')}] Coordination Status:")
+            print(
+                f"  • Workflow completion: {
+                    metrics['workflow_completion_rate']:.1%}")
+            print(
+                f"  • Parallel efficiency: {
+                    metrics['parallel_efficiency']:.1%}")
+            print(
+                f"  • Quality consistency: {
+                    metrics['quality_consistency']:.1%}")
 
             # Check for completion
             if metrics['workflow_completion_rate'] >= 0.95:

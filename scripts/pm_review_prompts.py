@@ -7,9 +7,11 @@ Simple tool for PM to review prompts and suggest improvements.
 
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))
 
 from dashboard.prompt_logger import prompt_logger
+
+sys.path.append(str(Path(__file__).parent.parent))
+
 
 def review_prompts():
     """Interactive PM review of prompts"""
@@ -32,31 +34,33 @@ def review_prompts():
         if prompt.error_message:
             print(f"❌ Error: {prompt.error_message}")
 
-        print(f"\n💬 Prompt:")
+        print("\n💬 Prompt:")
         print("-" * 40)
         print(prompt.prompt_text)
         print("-" * 40)
 
         if prompt.response_text:
-            print(f"\n🤖 Response:")
+            print("\n🤖 Response:")
             print("-" * 40)
-            print(prompt.response_text[:200] + ("..." if len(prompt.response_text) > 200 else ""))
+            print(prompt.response_text[:200] +
+                  ("..." if len(prompt.response_text) > 200 else ""))
             print("-" * 40)
 
         if prompt.gemini_feedback:
-            print(f"\n🧠 Gemini Feedback:")
+            print("\n🧠 Gemini Feedback:")
             print(prompt.gemini_feedback)
 
         # Auto-review based on common patterns
         auto_review = generate_auto_review(prompt)
-        print(f"\n🤖 Auto-Review Suggestion:")
+        print("\n🤖 Auto-Review Suggestion:")
         print(auto_review['review'])
-        print(f"\n💡 Suggested Improvement:")
+        print("\n💡 Suggested Improvement:")
         print(auto_review['improvement'])
 
         # Option to accept auto-review or provide custom review
         try:
-            choice = input(f"\n[A]ccept auto-review, [C]ustom review, [S]kip? (a/c/s): ").lower()
+            choice = input(
+                "\n[A]ccept auto-review, [C]ustom review, [S]kip? (a/c/s): ").lower()
 
             if choice == 'a':
                 prompt_logger.add_pm_review(
@@ -83,7 +87,8 @@ def review_prompts():
             print("\n\n👋 End of input")
             break
 
-    print(f"\n✨ Review complete!")
+    print("\n✨ Review complete!")
+
 
 def generate_auto_review(prompt):
     """Generate automatic review based on prompt patterns"""
@@ -111,9 +116,11 @@ def generate_auto_review(prompt):
         improvements.append("Use specific, actionable language")
 
     # Check for missing context
-    if 'please' not in prompt.prompt_text.lower() and 'help' in prompt.prompt_text.lower():
+    if 'please' not in prompt.prompt_text.lower(
+    ) and 'help' in prompt.prompt_text.lower():
         review_parts.append("Request lacks polite context")
-        improvements.append("Add 'please' and provide more context about the request")
+        improvements.append(
+            "Add 'please' and provide more context about the request")
 
     # Check for agent-specific improvements
     agent_specific = {
@@ -132,19 +139,22 @@ def generate_auto_review(prompt):
     }
 
     agent_info = agent_specific.get(prompt.agent_name)
-    if agent_info and not any(keyword in prompt.prompt_text.lower() for keyword in agent_info['keywords']):
+    if agent_info and not any(keyword in prompt.prompt_text.lower()
+                              for keyword in agent_info['keywords']):
         review_parts.append(f"Missing {prompt.agent_name} specific context")
         improvements.append(agent_info['suggestion'])
 
     # Default positive review
     if not review_parts:
         review_parts.append("Clear and well-structured prompt")
-        improvements.append("Consider adding success criteria or expected outcomes")
+        improvements.append(
+            "Consider adding success criteria or expected outcomes")
 
     return {
         'review': '. '.join(review_parts),
         'improvement': '. '.join(improvements)
     }
+
 
 def show_statistics():
     """Show prompt statistics"""
@@ -155,9 +165,10 @@ def show_statistics():
     print(f"Total prompts: {stats['total_prompts']}")
     print(f"Success rate: {stats['success_rate']:.1%}")
     print(f"Needs review: {stats['needs_review']}")
-    print(f"\nAgent breakdown:")
+    print("\nAgent breakdown:")
     for agent, count in stats['agent_stats'].items():
         print(f"  {agent}: {count}")
+
 
 def main():
     """Main PM review interface"""
@@ -188,6 +199,7 @@ def main():
         except EOFError:
             print("\n\n👋 Goodbye!")
             break
+
 
 if __name__ == "__main__":
     main()

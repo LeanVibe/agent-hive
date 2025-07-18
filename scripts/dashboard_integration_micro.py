@@ -7,12 +7,12 @@ This micro-component handles ONLY integration with enhanced dashboard.
 Follows XP Small Releases principle: ≤400 lines, single responsibility.
 """
 
-import json
-import requests
 import sqlite3
-from datetime import datetime
-from typing import Dict, List, Optional
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Dict, List
+
+import requests
 
 
 @dataclass
@@ -52,7 +52,8 @@ class DashboardIntegrationMicro:
     def push_xp_compliance_metric(self, compliance_score: float) -> bool:
         """Push XP compliance metric to dashboard - core functionality."""
         metric = DashboardMetric(
-            metric_id=f"xp-compliance-{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            metric_id=f"xp-compliance-{
+    datetime.now().strftime('%Y%m%d_%H%M%S')}",
             metric_type="xp_compliance",
             value=compliance_score,
             status=self._get_compliance_status(compliance_score),
@@ -68,7 +69,8 @@ class DashboardIntegrationMicro:
     def push_pr_size_metric(self, pr_number: int, line_count: int) -> bool:
         """Push PR size metric to dashboard - core functionality."""
         metric = DashboardMetric(
-            metric_id=f"pr-size-{pr_number}-{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            metric_id=f"pr-size-{pr_number}-{
+    datetime.now().strftime('%Y%m%d_%H%M%S')}",
             metric_type="pr_size",
             value=float(line_count),
             status=self._get_pr_size_status(line_count),
@@ -94,14 +96,15 @@ class DashboardIntegrationMicro:
     def get_dashboard_status(self) -> Dict:
         """Get dashboard connection status - core functionality."""
         try:
-            response = requests.get(f"{self.dashboard_url}/api/health", timeout=5)
+            response = requests.get(
+                f"{self.dashboard_url}/api/health", timeout=5)
             if response.status_code == 200:
                 return {
                     "status": "connected",
                     "dashboard_url": self.dashboard_url,
                     "response_time_ms": response.elapsed.total_seconds() * 1000
                 }
-        except Exception as e:
+        except Exception as _e:  # noqa: F841
             pass
 
         return {
@@ -135,7 +138,8 @@ class DashboardIntegrationMicro:
                 LIMIT 50
             """)
 
-            failed_metrics = [DashboardMetric(*row) for row in cursor.fetchall()]
+            failed_metrics = [DashboardMetric(*row)
+                              for row in cursor.fetchall()]
             successful_pushes = 0
 
             for metric in failed_metrics:
@@ -267,7 +271,8 @@ def main():
         pr_number = int(sys.argv[2])
         lines = int(sys.argv[3])
         success = dashboard.push_pr_size_metric(pr_number, lines)
-        print(f"{'✅' if success else '❌'} PR size metric: PR #{pr_number} ({lines} lines)")
+        print(
+            f"{'✅' if success else '❌'} PR size metric: PR #{pr_number} ({lines} lines)")
 
     elif command == "push-velocity":
         if len(sys.argv) < 3:
@@ -284,7 +289,12 @@ def main():
 
         print(f"Recent Dashboard Metrics (last {limit}):")
         for metric in metrics:
-            print(f"  {metric.metric_type}: {metric.value} [{metric.status}] - {metric.timestamp}")
+            print(
+                f"  {
+                    metric.metric_type}: {
+                    metric.value} [{
+                    metric.status}] - {
+                    metric.timestamp}")
 
     elif command == "retry":
         pushed = dashboard.retry_failed_pushes()

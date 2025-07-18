@@ -10,18 +10,17 @@ import json
 import logging
 import time
 import uuid
-from datetime import datetime
-from typing import Dict, Any, Optional, Callable, List
 from dataclasses import asdict
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
 
 from .models import (
+    EventPriority,
     WebhookConfig,
+    WebhookDelivery,
     WebhookEvent,
     WebhookEventType,
-    EventPriority,
-    WebhookDelivery
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +47,8 @@ class WebhookServer:
         self.delivery_status: Dict[str, WebhookDelivery] = {}
         self._server_task: Optional[asyncio.Task] = None
 
-        logger.info(f"WebhookServer initialized on {config.host}:{config.port}")
+        logger.info(
+            f"WebhookServer initialized on {config.host}:{config.port}")
 
     async def start_server(self) -> None:
         """Start the webhook server."""
@@ -58,7 +58,10 @@ class WebhookServer:
 
         try:
             # Simulate server startup
-            logger.info(f"Starting webhook server on {self.config.host}:{self.config.port}")
+            logger.info(
+                f"Starting webhook server on {
+                    self.config.host}:{
+                    self.config.port}")
             await asyncio.sleep(0.1)  # Simulate startup time
 
             self.server_started = True
@@ -121,7 +124,8 @@ class WebhookServer:
             return True
         return False
 
-    async def handle_webhook(self, payload: Dict[str, Any], source_ip: str = "unknown") -> Dict[str, Any]:
+    async def handle_webhook(
+            self, payload: Dict[str, Any], source_ip: str = "unknown") -> Dict[str, Any]:
         """
         Handle incoming webhook request.
 
@@ -163,13 +167,17 @@ class WebhookServer:
 
             # Create webhook event
             webhook_event = WebhookEvent(
-                event_type=WebhookEventType(event_type) if event_type in [e.value for e in WebhookEventType] else WebhookEventType.SYSTEM_ALERT,
-                event_id=str(uuid.uuid4()),
+                event_type=WebhookEventType(event_type) if event_type in [
+                    e.value for e in WebhookEventType] else WebhookEventType.SYSTEM_ALERT,
+                event_id=str(
+                    uuid.uuid4()),
                 timestamp=datetime.now(),
                 source=source_ip,
                 payload=payload,
-                priority=EventPriority(payload.get("priority", "medium"))
-            )
+                priority=EventPriority(
+                    payload.get(
+                        "priority",
+                        "medium")))
 
             # Process the event
             response = await self._process_event(webhook_event)
@@ -181,12 +189,15 @@ class WebhookServer:
                 endpoint_url=f"{self.config.endpoint_prefix}/{event_type}",
                 attempt_count=1,
                 last_attempt=datetime.now(),
-                status="success" if response.get("status") == "success" else "failed",
+                status="success" if response.get(
+                    "status") == "success" else "failed",
                 response_code=response.get("code", 200)
             )
             self.delivery_status[delivery.webhook_id] = delivery
 
-            logger.info(f"Processed webhook event {webhook_event.event_id} from {source_ip}")
+            logger.info(
+                f"Processed webhook event {
+                    webhook_event.event_id} from {source_ip}")
             return response
 
         except Exception as e:
@@ -210,12 +221,14 @@ class WebhookServer:
         handler = self.handlers.get(event.event_type.value)
 
         if not handler:
-            logger.warning(f"No handler registered for event type: {event.event_type.value}")
+            logger.warning(
+                f"No handler registered for event type: {
+                    event.event_type.value}")
             return {
                 "status": "error",
-                "message": f"No handler for event type: {event.event_type.value}",
-                "code": 404
-            }
+                "message": f"No handler for event type: {
+                    event.event_type.value}",
+                "code": 404}
 
         try:
             # Execute handler with timeout
@@ -277,7 +290,9 @@ class WebhookServer:
         self.rate_limiter[source_ip].append(current_time)
         return True
 
-    def get_delivery_status(self, webhook_id: str) -> Optional[WebhookDelivery]:
+    def get_delivery_status(
+            self,
+            webhook_id: str) -> Optional[WebhookDelivery]:
         """
         Get delivery status for a webhook.
 

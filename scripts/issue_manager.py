@@ -8,16 +8,13 @@ and lifecycle management for XP methodology compliance.
 """
 
 import json
-import os
+import re
 import sqlite3
 import subprocess
 import sys
-import time
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
+from typing import Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -205,17 +202,20 @@ class IssueManager:
             conn.commit()
 
     def fetch_github_issues(self, state: str = "all", labels: List[str] = None,
-                           limit: int = 100) -> List[Dict]:
+                            limit: int = 100) -> List[Dict]:
         """Fetch issues from GitHub API."""
         try:
-            cmd = ["gh", "issue", "list", "--state", state, "--limit", str(limit)]
-            cmd.extend(["--json", "number,title,body,state,author,assignees,labels,milestone,createdAt,updatedAt,closedAt"])
+            cmd = ["gh", "issue", "list", "--state",
+                   state, "--limit", str(limit)]
+            cmd.extend(
+                ["--json", "number,title,body,state,author,assignees,labels,milestone,createdAt,updatedAt,closedAt"])
 
             if labels:
                 for label in labels:
                     cmd.extend(["--label", label])
 
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, check=True)
             return json.loads(result.stdout)
 
         except subprocess.CalledProcessError as e:
@@ -232,14 +232,16 @@ class IssueManager:
         # Determine issue type
         issue_type = 'task'  # default
         for type_key, type_labels in self.type_labels.items():
-            if any(label.lower() in [l.lower() for l in labels] for label in type_labels):
+            if any(label.lower() in [l.lower()
+                   for l in labels] for label in type_labels):
                 issue_type = type_key
                 break
 
         # Determine priority
         priority = 'medium'  # default
         for priority_key, priority_labels in self.priority_labels.items():
-            if any(label.lower() in [l.lower() for l in labels] for label in priority_labels):
+            if any(label.lower() in [l.lower() for l in labels]
+                   for label in priority_labels):
                 priority = priority_key
                 break
 
@@ -326,8 +328,10 @@ class IssueManager:
                 state=issue_data['state'],
                 author=issue_data['author']['login'],
                 assignee=issue_data['assignees'][0]['login'] if issue_data['assignees'] else None,
-                labels=[label['name'] for label in issue_data.get('labels', [])],
-                milestone=issue_data.get('milestone', {}).get('title') if issue_data.get('milestone') else None,
+                labels=[label['name']
+                        for label in issue_data.get('labels', [])],
+                milestone=issue_data.get('milestone', {}).get(
+                    'title') if issue_data.get('milestone') else None,
                 created_at=issue_data['createdAt'],
                 updated_at=issue_data['updatedAt'],
                 closed_at=issue_data.get('closedAt'),
@@ -339,7 +343,8 @@ class IssueManager:
                 acceptance_criteria=metadata['acceptance_criteria'],
                 blockers=metadata['blockers'],
                 linked_prs=[],  # To be populated by PR linking
-                resolution_time_hours=self.calculate_resolution_time(issue_data),
+                resolution_time_hours=self.calculate_resolution_time(
+                    issue_data),
                 first_response_time_hours=None,  # To be calculated
                 customer_satisfaction=None  # To be collected
             )
@@ -352,16 +357,25 @@ class IssueManager:
     def determine_progress_status(self, issue_data: Dict) -> str:
         """Determine progress status from GitHub issue data."""
         state = issue_data['state']
-        labels = [label['name'].lower() for label in issue_data.get('labels', [])]
+        labels = [label['name'].lower()
+                  for label in issue_data.get('labels', [])]
 
         if state == 'closed':
             return 'done'
 
         # Check for status labels
-        if any(label in labels for label in ['in-progress', 'working', 'started']):
+        if any(
+            label in labels for label in [
+                'in-progress',
+                'working',
+                'started']):
             return 'in_progress'
 
-        if any(label in labels for label in ['review', 'needs-review', 'pending-review']):
+        if any(
+            label in labels for label in [
+                'review',
+                'needs-review',
+                'pending-review']):
             return 'review'
 
         return 'todo'  # default for open issues
@@ -372,10 +386,13 @@ class IssueManager:
             return None
 
         try:
-            created = datetime.fromisoformat(issue_data['createdAt'].replace('Z', '+00:00'))
-            closed = datetime.fromisoformat(issue_data['closedAt'].replace('Z', '+00:00'))
+            created = datetime.fromisoformat(
+                issue_data['createdAt'].replace('Z', '+00:00'))
+            closed = datetime.fromisoformat(
+                issue_data['closedAt'].replace('Z', '+00:00'))
 
-            resolution_time = (closed - created).total_seconds() / 3600  # hours
+            resolution_time = (
+                closed - created).total_seconds() / 3600  # hours
             return resolution_time
         except Exception:
             return None
@@ -383,7 +400,8 @@ class IssueManager:
     def save_issue(self, issue: Issue):
         """Save issue to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO issues
                 (number, title, body, state, author, assignee, labels, milestone,
                  created_at, updated_at, closed_at, story_points, priority, type,
@@ -391,20 +409,37 @@ class IssueManager:
                  linked_prs, resolution_time_hours, first_response_time_hours,
                  customer_satisfaction)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                issue.number, issue.title, issue.body, issue.state, issue.author,
-                issue.assignee, json.dumps(issue.labels), issue.milestone,
-                issue.created_at, issue.updated_at, issue.closed_at,
-                issue.story_points, issue.priority, issue.type, issue.sprint_id,
-                issue.progress_status, json.dumps(issue.acceptance_criteria),
-                json.dumps(issue.blockers), json.dumps(issue.linked_prs),
-                issue.resolution_time_hours, issue.first_response_time_hours,
-                issue.customer_satisfaction
-            ))
+            """,
+                (issue.number,
+                 issue.title,
+                 issue.body,
+                 issue.state,
+                 issue.author,
+                 issue.assignee,
+                 json.dumps(
+                     issue.labels),
+                    issue.milestone,
+                    issue.created_at,
+                    issue.updated_at,
+                    issue.closed_at,
+                    issue.story_points,
+                    issue.priority,
+                    issue.type,
+                    issue.sprint_id,
+                    issue.progress_status,
+                    json.dumps(
+                     issue.acceptance_criteria),
+                    json.dumps(
+                     issue.blockers),
+                    json.dumps(
+                     issue.linked_prs),
+                    issue.resolution_time_hours,
+                    issue.first_response_time_hours,
+                    issue.customer_satisfaction))
             conn.commit()
 
     def update_issue_status(self, issue_number: int, new_status: str,
-                           actor: str = "system") -> bool:
+                            actor: str = "system") -> bool:
         """Update issue status and log activity."""
         try:
             # Update in database
@@ -416,14 +451,16 @@ class IssueManager:
                 """, (new_status, datetime.now().isoformat(), issue_number))
 
                 # Log activity
-                activity_id = f"activity-{issue_number}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                activity_id = f"activity-{issue_number}-{
+                    datetime.now().strftime('%Y%m%d_%H%M%S')}"
                 conn.execute("""
                     INSERT INTO issue_activity
                     (activity_id, issue_number, activity_type, actor, timestamp, details)
                     VALUES (?, ?, ?, ?, ?, ?)
                 """, (
                     activity_id, issue_number, 'status_change', actor,
-                    datetime.now().isoformat(), f"Status changed to {new_status}"
+                    datetime.now().isoformat(
+                    ), f"Status changed to {new_status}"
                 ))
 
                 conn.commit()
@@ -487,7 +524,8 @@ class IssueManager:
         if issue.state != 'closed' or not issue.resolution_time_hours:
             return False, 0.0
 
-        target_hours = self.sla_targets.get(issue.priority, self.sla_targets['medium'])
+        target_hours = self.sla_targets.get(
+            issue.priority, self.sla_targets['medium'])
         compliance = issue.resolution_time_hours <= target_hours
 
         # Calculate compliance percentage
@@ -553,11 +591,15 @@ class IssueManager:
             story_points_completed = cursor.fetchone()[0] or 0
 
         # Calculate additional metrics
-        resolution_rate = (resolved_issues / created_issues) * 100 if created_issues > 0 else 0
-        velocity = story_points_completed / (days / 7) if days >= 7 else story_points_completed  # points per week
+        resolution_rate = (resolved_issues / created_issues) * \
+            100 if created_issues > 0 else 0
+        velocity = story_points_completed / \
+            (days / 7) if days >= 7 else story_points_completed  # points per week
 
         return IssueMetrics(
-            period_id=f"metrics-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}",
+            period_id=f"metrics-{
+                start_date.strftime('%Y%m%d')}-{
+                end_date.strftime('%Y%m%d')}",
             start_date=start_date.strftime('%Y-%m-%d'),
             end_date=end_date.strftime('%Y-%m-%d'),
             total_issues=total_issues,
@@ -664,19 +706,23 @@ class IssueManager:
         recommendations = []
 
         if metrics.resolution_rate < 80:
-            recommendations.append("Improve issue resolution rate - currently below 80%")
+            recommendations.append(
+                "Improve issue resolution rate - currently below 80%")
 
         if metrics.avg_resolution_time_hours > 48:
             recommendations.append("Focus on reducing average resolution time")
 
         if metrics.velocity < 20:
-            recommendations.append("Increase team velocity through better planning")
+            recommendations.append(
+                "Increase team velocity through better planning")
 
         if len(priority_groups['critical']) > 0:
-            recommendations.append("Address critical priority issues immediately")
+            recommendations.append(
+                "Address critical priority issues immediately")
 
         if not recommendations:
-            recommendations.append("Continue current issue management practices")
+            recommendations.append(
+                "Continue current issue management practices")
 
         for i, rec in enumerate(recommendations, 1):
             report += f"{i}. {rec}\n"
@@ -696,21 +742,26 @@ Synced Issues: {len(synced_issues)}
         return report
 
     def create_issue_template(self, template_name: str, template_type: str,
-                             template_content: str) -> bool:
+                              template_content: str) -> bool:
         """Create issue template for consistent issue creation."""
         try:
-            template_id = f"template-{template_name}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            template_id = f"template-{template_name}-{
+                datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
             with sqlite3.connect(self.db_path) as conn:
-                conn.execute("""
+                conn.execute(
+                    """
                     INSERT INTO issue_templates
                     (template_id, template_name, template_type, template_content,
                      created_at, updated_at)
                     VALUES (?, ?, ?, ?, ?, ?)
-                """, (
-                    template_id, template_name, template_type, template_content,
-                    datetime.now().isoformat(), datetime.now().isoformat()
-                ))
+                """,
+                    (template_id,
+                     template_name,
+                     template_type,
+                     template_content,
+                     datetime.now().isoformat(),
+                        datetime.now().isoformat()))
                 conn.commit()
 
             return True
@@ -760,7 +811,11 @@ Synced Issues: {len(synced_issues)}
 
         return triaged
 
-    def suggest_assignee(self, title: str, body: str, issue_type: str) -> Optional[str]:
+    def suggest_assignee(
+            self,
+            title: str,
+            body: str,
+            issue_type: str) -> Optional[str]:
         """Suggest assignee based on issue content."""
         # Simplified assignee suggestion
         text = (title + " " + body).lower()
@@ -782,15 +837,31 @@ Synced Issues: {len(synced_issues)}
         text = (title + " " + body).lower()
 
         # Critical indicators
-        if any(keyword in text for keyword in ['critical', 'urgent', 'production', 'down', 'broken']):
+        if any(
+            keyword in text for keyword in [
+                'critical',
+                'urgent',
+                'production',
+                'down',
+                'broken']):
             return 'critical'
 
         # High priority indicators
-        if any(keyword in text for keyword in ['important', 'blocker', 'security', 'data loss']):
+        if any(
+            keyword in text for keyword in [
+                'important',
+                'blocker',
+                'security',
+                'data loss']):
             return 'high'
 
         # Low priority indicators
-        if any(keyword in text for keyword in ['minor', 'cosmetic', 'nice to have', 'enhancement']):
+        if any(
+            keyword in text for keyword in [
+                'minor',
+                'cosmetic',
+                'nice to have',
+                'enhancement']):
             return 'low'
 
         return 'medium'  # default
@@ -803,7 +874,11 @@ Synced Issues: {len(synced_issues)}
         complexity_score = 0
 
         # Simple tasks
-        if any(keyword in text for keyword in ['fix typo', 'update text', 'change color']):
+        if any(
+            keyword in text for keyword in [
+                'fix typo',
+                'update text',
+                'change color']):
             complexity_score = 1
 
         # Medium tasks
@@ -855,14 +930,16 @@ def main():
         print(f"✅ Synced {len(synced_issues)} issues")
 
         for issue in synced_issues[:5]:  # Show first 5
-            print(f"#{issue.number}: {issue.title} [{issue.state}] - {issue.type}/{issue.priority}")
+            print(
+                f"#{issue.number}: {issue.title} [{issue.state}] - {issue.type}/{issue.priority}")
 
     elif command == "report":
         days = int(sys.argv[2]) if len(sys.argv) > 2 else 30
         report = manager.generate_issue_report(days)
 
         # Save report
-        filename = f"issue_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"issue_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(report)
 
@@ -905,7 +982,9 @@ def main():
         print(f"  Created: {metrics.created_issues}")
         print(f"  Resolved: {metrics.resolved_issues}")
         print(f"  Resolution Rate: {metrics.resolution_rate:.1f}%")
-        print(f"  Average Resolution Time: {metrics.avg_resolution_time_hours:.1f} hours")
+        print(
+            f"  Average Resolution Time: {
+                metrics.avg_resolution_time_hours:.1f} hours")
         print(f"  Story Points Completed: {metrics.story_points_completed}")
         print(f"  Team Velocity: {metrics.velocity:.1f} points/week")
 
@@ -916,12 +995,17 @@ def main():
         print(f"📋 Triaged {len(triaged)} issues:")
         for item in triaged:
             print(f"#{item['number']}: {item['title']}")
-            print(f"  Suggested: {item['suggested_assignee']} | {item['suggested_priority']} | {item['suggested_points']} pts")
+            print(
+                f"  Suggested: {
+                    item['suggested_assignee']} | {
+                    item['suggested_priority']} | {
+                    item['suggested_points']} pts")
 
     elif command == "templates":
         with sqlite3.connect(manager.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT template_name, template_type FROM issue_templates")
+            cursor.execute(
+                "SELECT template_name, template_type FROM issue_templates")
             templates = cursor.fetchall()
 
         print(f"Issue Templates ({len(templates)} found):")

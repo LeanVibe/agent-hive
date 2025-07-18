@@ -5,7 +5,7 @@ Ping all agents to resume work with clear instructions
 
 import subprocess
 import time
-from pathlib import Path
+
 
 def ping_agent(agent_name: str, window_name: str):
     """Send resume message to specific agent"""
@@ -42,7 +42,8 @@ START WORKING NOW! Do not wait for further instructions. Begin with your next ta
         from pathlib import Path
         sys.path.append(str(Path(__file__).parent.parent))
         from dashboard.prompt_logger import prompt_logger
-        prompt_logger.log_prompt(agent_name, resume_message, "Resume work ping sent", True)
+        prompt_logger.log_prompt(agent_name, resume_message,
+                                 "Resume work ping sent", True)
     except ImportError:
         pass  # Continue without logging if dashboard not available
 
@@ -71,7 +72,8 @@ START WORKING NOW! Do not wait for further instructions. Begin with your next ta
         ], capture_output=True, text=True)
 
         if result.returncode != 0:
-            print(f"❌ Failed to paste buffer for {agent_name}: {result.stderr}")
+            print(
+                f"❌ Failed to paste buffer for {agent_name}: {result.stderr}")
             return
 
         # Auto-submit with Enter
@@ -84,6 +86,7 @@ START WORKING NOW! Do not wait for further instructions. Begin with your next ta
 
     except Exception as e:
         print(f"❌ Failed to send message to {agent_name}: {e}")
+
 
 def main():
     """Ping all agents to resume work"""
@@ -112,6 +115,7 @@ def main():
     print("\n🔍 Monitor agent activity:")
     print("  python scripts/agent_manager.py --status")
     print("  tmux attach-session -t agent-hive")
+
 
 if __name__ == "__main__":
     main()

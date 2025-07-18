@@ -6,19 +6,23 @@ automatic milestone creation, commit recommendations, and progress tracking.
 """
 
 import asyncio
-import pytest
-import tempfile
 import subprocess
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, AsyncMock
-from datetime import datetime, timedelta
-import json
 import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+
+from state.git_milestone_manager import (
+    CommitRecommendation,
+    GitMilestone,
+    GitMilestoneManager,
+)
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
-
-from state.git_milestone_manager import GitMilestoneManager, GitMilestone, CommitRecommendation
 
 
 class TestGitMilestone:
@@ -83,13 +87,21 @@ class TestGitMilestoneManager:
 
             # Initialize git repository
             subprocess.run(["git", "init"], cwd=repo_path, capture_output=True)
-            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo_path, capture_output=True)
-            subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo_path, capture_output=True)
+            subprocess.run(["git",
+                            "config",
+                            "user.email",
+                            "test@example.com"],
+                           cwd=repo_path,
+                           capture_output=True)
+            subprocess.run(["git", "config", "user.name", "Test User"],
+                           cwd=repo_path, capture_output=True)
 
             # Create initial commit
             (repo_path / "README.md").write_text("# Test Repository")
-            subprocess.run(["git", "add", "README.md"], cwd=repo_path, capture_output=True)
-            subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_path, capture_output=True)
+            subprocess.run(["git", "add", "README.md"],
+                           cwd=repo_path, capture_output=True)
+            subprocess.run(["git", "commit", "-m", "Initial commit"],
+                           cwd=repo_path, capture_output=True)
 
             yield repo_path
 
@@ -107,7 +119,8 @@ class TestGitMilestoneManager:
         system_state.average_context_usage = 0.6
 
         state_manager.get_system_state = AsyncMock(return_value=system_state)
-        state_manager.create_checkpoint = AsyncMock(return_value="checkpoint-123")
+        state_manager.create_checkpoint = AsyncMock(
+            return_value="checkpoint-123")
 
         # Mock quality gate
         quality_gate = Mock()
@@ -197,7 +210,8 @@ class TestGitMilestoneManager:
         assert isinstance(branch, str)
         assert branch in ['main', 'master']  # Default branch names
 
-    def test_calculate_milestone_metrics(self, git_manager, mock_state_manager):
+    def test_calculate_milestone_metrics(
+            self, git_manager, mock_state_manager):
         """Test _calculate_milestone_metrics method."""
         git_status = {
             'commit_count': 50,
@@ -206,7 +220,8 @@ class TestGitMilestoneManager:
 
         system_state = mock_state_manager.get_system_state()
 
-        metrics = git_manager._calculate_milestone_metrics(git_status, system_state)
+        metrics = git_manager._calculate_milestone_metrics(
+            git_status, system_state)
 
         assert isinstance(metrics, dict)
         assert 'commits_since_last_milestone' in metrics
@@ -308,7 +323,8 @@ class TestGitMilestoneManager:
             'complexity_score': 0.5
         }
 
-        confidence = git_manager._calculate_commit_confidence(commit_metrics, 0.8)
+        confidence = git_manager._calculate_commit_confidence(
+            commit_metrics, 0.8)
 
         assert isinstance(confidence, float)
         assert 0.0 <= confidence <= 1.0
@@ -323,7 +339,8 @@ class TestGitMilestoneManager:
             'complexity_score': 0.3
         }
 
-        confidence = git_manager._calculate_commit_confidence(commit_metrics, 0.8)
+        confidence = git_manager._calculate_commit_confidence(
+            commit_metrics, 0.8)
 
         assert isinstance(confidence, float)
         assert 0.0 <= confidence <= 1.0
@@ -338,7 +355,8 @@ class TestGitMilestoneManager:
             'file_count': 3
         }
 
-        reason = git_manager._generate_commit_reason(commit_metrics, 0.85, True)
+        reason = git_manager._generate_commit_reason(
+            commit_metrics, 0.85, True)
 
         assert isinstance(reason, str)
         assert "Ready to commit" in reason
@@ -353,7 +371,8 @@ class TestGitMilestoneManager:
             'source_files': 1
         }
 
-        reason = git_manager._generate_commit_reason(commit_metrics, 0.4, False)
+        reason = git_manager._generate_commit_reason(
+            commit_metrics, 0.4, False)
 
         assert isinstance(reason, str)
         assert "Quality score too low" in reason
@@ -436,7 +455,8 @@ class TestGitMilestoneManager:
         assert "test-tag" in result.stdout
 
     @pytest.mark.asyncio
-    async def test_save_milestone_to_state(self, git_manager, mock_state_manager):
+    async def test_save_milestone_to_state(
+            self, git_manager, mock_state_manager):
         """Test _save_milestone_to_state method."""
         milestone = GitMilestone(
             milestone_id="test-milestone",
@@ -460,14 +480,16 @@ class TestGitMilestoneManager:
         assert kwargs['state_data']['type'] == 'git_milestone'
 
     @pytest.mark.asyncio
-    async def test_should_create_milestone_true(self, git_manager, temp_git_repo):
+    async def test_should_create_milestone_true(
+            self, git_manager, temp_git_repo):
         """Test should_create_milestone method returning True."""
         # Add some commits to meet threshold
         for i in range(6):
             test_file = temp_git_repo / f"test_{i}.py"
             test_file.write_text(f"def test_{i}(): pass")
             subprocess.run(["git", "add", str(test_file)], cwd=temp_git_repo)
-            subprocess.run(["git", "commit", "-m", f"Add test_{i}"], cwd=temp_git_repo)
+            subprocess.run(
+                ["git", "commit", "-m", f"Add test_{i}"], cwd=temp_git_repo)
 
         should_create, reason, data = await git_manager.should_create_milestone()
 
@@ -517,7 +539,8 @@ class TestGitMilestoneManager:
         assert milestone.tags == []
 
     @pytest.mark.asyncio
-    async def test_get_commit_recommendation_should_commit(self, git_manager, temp_git_repo):
+    async def test_get_commit_recommendation_should_commit(
+            self, git_manager, temp_git_repo):
         """Test get_commit_recommendation method recommending commit."""
         # Create test files
         (temp_git_repo / "src.py").write_text("def func(): pass")
@@ -537,7 +560,8 @@ class TestGitMilestoneManager:
         assert 0.0 <= recommendation.quality_score <= 1.0
 
     @pytest.mark.asyncio
-    async def test_get_commit_recommendation_should_not_commit(self, git_manager):
+    async def test_get_commit_recommendation_should_not_commit(
+            self, git_manager):
         """Test get_commit_recommendation method not recommending commit."""
         # No files changed
         recommendation = await git_manager.get_commit_recommendation([])
@@ -548,7 +572,8 @@ class TestGitMilestoneManager:
         assert "No files to commit" in recommendation.reason
 
     @pytest.mark.asyncio
-    async def test_get_commit_recommendation_specific_files(self, git_manager, temp_git_repo):
+    async def test_get_commit_recommendation_specific_files(
+            self, git_manager, temp_git_repo):
         """Test get_commit_recommendation method with specific files."""
         # Create test files
         (temp_git_repo / "test1.py").write_text("def test1(): pass")
@@ -636,7 +661,8 @@ class TestGitMilestoneManager:
             assert recommendation.should_commit is False
 
     @pytest.mark.asyncio
-    async def test_integration_with_state_manager(self, git_manager, mock_state_manager):
+    async def test_integration_with_state_manager(
+            self, git_manager, mock_state_manager):
         """Test integration with StateManager."""
         # Create milestone
         milestone = await git_manager.create_milestone("Integration Test")

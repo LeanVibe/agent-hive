@@ -2,17 +2,27 @@
 Tests for enhanced coordination protocols.
 """
 
-import asyncio
+from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
 import pytest_asyncio
-from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
 
-from advanced_orchestration.enhanced_coordination import EnhancedCoordinationProtocol
+from advanced_orchestration.enhanced_coordination import (
+    EnhancedCoordinationProtocol,
+)
 from advanced_orchestration.models import (
-    CoordinatorConfig, WorkflowDefinition, WorkflowType, AgentSpecialization,
-    EnhancedTaskAssignment, TaskPriority, TaskStatus, TaskDependency,
-    DependencyType, AgentCapabilities, ResourceLimits
+    AgentCapabilities,
+    AgentSpecialization,
+    CoordinatorConfig,
+    DependencyType,
+    EnhancedTaskAssignment,
+    ResourceLimits,
+    TaskDependency,
+    TaskPriority,
+    TaskStatus,
+    WorkflowDefinition,
+    WorkflowType,
 )
 
 
@@ -97,21 +107,25 @@ def sample_agent_capabilities():
             skill_level=0.9,
             supported_workflows=[WorkflowType.DOCUMENTATION],
             max_concurrent_tasks=3,
-            performance_metrics={"success_rate": 0.95, "avg_completion_time": 45.0}
+            performance_metrics={"success_rate": 0.95,
+                                 "avg_completion_time": 45.0}
         ),
         "quality_agent_001": AgentCapabilities(
             specialization=AgentSpecialization.QUALITY,
             skill_level=0.8,
             supported_workflows=[WorkflowType.QUALITY],
             max_concurrent_tasks=2,
-            performance_metrics={"success_rate": 0.90, "avg_completion_time": 60.0}
+            performance_metrics={"success_rate": 0.90,
+                                 "avg_completion_time": 60.0}
         ),
         "general_agent_001": AgentCapabilities(
             specialization=AgentSpecialization.GENERAL,
             skill_level=0.7,
-            supported_workflows=[WorkflowType.DOCUMENTATION, WorkflowType.QUALITY],
+            supported_workflows=[
+                WorkflowType.DOCUMENTATION, WorkflowType.QUALITY],
             max_concurrent_tasks=4,
-            performance_metrics={"success_rate": 0.85, "avg_completion_time": 50.0}
+            performance_metrics={"success_rate": 0.85,
+                                 "avg_completion_time": 50.0}
         )
     }
 
@@ -130,7 +144,8 @@ async def enhanced_coordination_protocol(coordinator_config):
     protocol.workflow_coordinator = Mock()
     protocol.workflow_coordinator.start = AsyncMock()
     protocol.workflow_coordinator.stop = AsyncMock()
-    protocol.workflow_coordinator.register_workflow = AsyncMock(return_value=True)
+    protocol.workflow_coordinator.register_workflow = AsyncMock(
+        return_value=True)
     protocol.workflow_coordinator.execute_workflow = AsyncMock()
     protocol.workflow_coordinator.get_workflow_state = AsyncMock()
     protocol.workflow_coordinator.workflow_definitions = {}
@@ -199,8 +214,7 @@ class TestEnhancedCoordinationProtocol:
 
         assert result == mock_workflow_state
         protocol.workflow_coordinator.register_workflow.assert_called_once_with(
-            sample_workflow_definition
-        )
+            sample_workflow_definition)
         protocol.workflow_coordinator.execute_workflow.assert_called_once()
 
         # Check coordination event was logged
@@ -225,7 +239,9 @@ class TestEnhancedCoordinationProtocol:
         assert protocol.coordination_events[-1]["type"] == "intelligent_routing"
 
         # Test cache hit
-        cache_key = f"{sample_enhanced_task.task_id}_{sample_enhanced_task.agent_specialization.value}"
+        cache_key = f"{
+            sample_enhanced_task.task_id}_{
+            sample_enhanced_task.agent_specialization.value}"
         protocol.intelligent_routing_cache[cache_key] = ("agent_001", 0.9)
 
         result = await protocol.intelligent_task_routing(sample_enhanced_task, available_agents)
@@ -253,7 +269,8 @@ class TestEnhancedCoordinationProtocol:
         protocol = enhanced_coordination_protocol
 
         # Setup workflow
-        protocol.workflow_coordinator.workflow_definitions[sample_workflow_definition.workflow_id] = sample_workflow_definition
+        protocol.workflow_coordinator.workflow_definitions[
+            sample_workflow_definition.workflow_id] = sample_workflow_definition
 
         # Mock workflow state
         mock_workflow_state = Mock()
@@ -312,7 +329,8 @@ class TestEnhancedCoordinationProtocol:
         assert protocol.coordination_events[-1]["type"] == "parallel_optimization"
 
     @pytest.mark.asyncio
-    async def test_monitor_real_time_coordination(self, enhanced_coordination_protocol):
+    async def test_monitor_real_time_coordination(
+            self, enhanced_coordination_protocol):
         """Test real-time coordination monitoring."""
         protocol = enhanced_coordination_protocol
 
@@ -357,7 +375,8 @@ class TestEnhancedCoordinationProtocol:
         }
         protocol.multi_agent_coordinator.get_coordinator_state.return_value = mock_coordinator_state
 
-        available_agents = ["doc_agent_001", "quality_agent_001", "general_agent_001"]
+        available_agents = ["doc_agent_001",
+                            "quality_agent_001", "general_agent_001"]
 
         result = await protocol._calculate_agent_scores(sample_enhanced_task, available_agents)
 
@@ -481,7 +500,7 @@ class TestEnhancedCoordinationProtocol:
         }
 
         result = await protocol._calculate_workflow_completion_rate()
-        assert result == 2/3  # 2 completed out of 3 total
+        assert result == 2 / 3  # 2 completed out of 3 total
 
         # Test parallel efficiency
         protocol.parallel_execution_analytics = {
@@ -493,7 +512,8 @@ class TestEnhancedCoordinationProtocol:
         assert result == 0.4  # Average of 0.3 and 0.5
 
     @pytest.mark.asyncio
-    async def test_coordination_event_logging(self, enhanced_coordination_protocol):
+    async def test_coordination_event_logging(
+            self, enhanced_coordination_protocol):
         """Test coordination event logging."""
         protocol = enhanced_coordination_protocol
 
@@ -508,13 +528,15 @@ class TestEnhancedCoordinationProtocol:
         assert "timestamp" in event
 
     @pytest.mark.asyncio
-    async def test_get_coordination_statistics(self, enhanced_coordination_protocol):
+    async def test_get_coordination_statistics(
+            self, enhanced_coordination_protocol):
         """Test coordination statistics retrieval."""
         protocol = enhanced_coordination_protocol
 
         # Add some test data
         protocol.coordination_events.append({"type": "test", "data": {}})
-        protocol.performance_alerts.append({"type": "alert", "message": "test"})
+        protocol.performance_alerts.append(
+            {"type": "alert", "message": "test"})
         protocol.intelligent_routing_cache["test_key"] = ("agent_001", 0.9)
         protocol.dependency_resolution_cache["test_dep"] = ["task_001"]
 
@@ -562,7 +584,8 @@ class TestEnhancedCoordinationProtocol:
         protocol = enhanced_coordination_protocol
 
         # Mock error in workflow state retrieval
-        protocol.workflow_coordinator.get_workflow_state.side_effect = Exception("Test error")
+        protocol.workflow_coordinator.get_workflow_state.side_effect = Exception(
+            "Test error")
 
         result = await protocol.resolve_dynamic_dependencies(
             sample_workflow_definition.workflow_id,
@@ -572,7 +595,8 @@ class TestEnhancedCoordinationProtocol:
         assert result == []  # Should return empty list on error
 
     @pytest.mark.asyncio
-    async def test_performance_alert_generation(self, enhanced_coordination_protocol):
+    async def test_performance_alert_generation(
+            self, enhanced_coordination_protocol):
         """Test performance alert generation."""
         protocol = enhanced_coordination_protocol
 
@@ -591,13 +615,15 @@ class TestEnhancedCoordinationProtocol:
         assert alert["progress"] == 30.0
 
     @pytest.mark.asyncio
-    async def test_cache_cleanup_mechanisms(self, enhanced_coordination_protocol):
+    async def test_cache_cleanup_mechanisms(
+            self, enhanced_coordination_protocol):
         """Test cache cleanup mechanisms."""
         protocol = enhanced_coordination_protocol
 
         # Fill caches beyond limits
         for i in range(1001):
-            protocol.intelligent_routing_cache[f"key_{i}"] = (f"agent_{i}", 0.5)
+            protocol.intelligent_routing_cache[f"key_{i}"] = (
+                f"agent_{i}", 0.5)
 
         for i in range(501):
             protocol.dependency_resolution_cache[f"dep_{i}"] = [f"task_{i}"]
@@ -652,7 +678,8 @@ class TestIntegrationScenarios:
         protocol = enhanced_coordination_protocol
 
         # Setup workflow
-        protocol.workflow_coordinator.workflow_definitions[sample_workflow_definition.workflow_id] = sample_workflow_definition
+        protocol.workflow_coordinator.workflow_definitions[
+            sample_workflow_definition.workflow_id] = sample_workflow_definition
 
         # Mock workflow state
         mock_workflow_state = Mock()
@@ -670,7 +697,8 @@ class TestIntegrationScenarios:
         )
 
         # task_002 should have task_001 as dependency
-        # task_003 should have optimized dependencies (soft dependency might be removed)
+        # task_003 should have optimized dependencies (soft dependency might be
+        # removed)
         assert len(task_002_deps) >= 0  # At least some dependencies
         assert len(task_003_deps) >= 0  # Dependencies might be optimized
 
@@ -688,8 +716,10 @@ class TestIntegrationScenarios:
         protocol.workflow_coordinator.agent_capabilities = sample_agent_capabilities
 
         # Add performance history
-        protocol.agent_performance_history["doc_agent_001"].extend([0.9, 0.8, 0.95])
-        protocol.agent_performance_history["quality_agent_001"].extend([0.7, 0.6, 0.75])
+        protocol.agent_performance_history["doc_agent_001"].extend([
+                                                                   0.9, 0.8, 0.95])
+        protocol.agent_performance_history["quality_agent_001"].extend([
+                                                                       0.7, 0.6, 0.75])
 
         # Mock coordinator state
         mock_coordinator_state = Mock()
@@ -705,7 +735,8 @@ class TestIntegrationScenarios:
             ["doc_agent_001", "quality_agent_001"]
         )
 
-        # Should prefer doc_agent_001 due to specialization match and good performance
+        # Should prefer doc_agent_001 due to specialization match and good
+        # performance
         assert result == "doc_agent_001"
 
     @pytest.mark.asyncio
@@ -734,7 +765,8 @@ class TestIntegrationScenarios:
         # Test optimization identification
         await protocol._identify_optimization_opportunities()
 
-        # Should identify load balancing optimization due to uneven task distribution
+        # Should identify load balancing optimization due to uneven task
+        # distribution
         assert len(protocol.coordination_events) > 0
         optimization_event = next(
             (event for event in protocol.coordination_events

@@ -5,11 +5,12 @@ Agent Status Checker
 Provides real-time status of all agents in the system.
 """
 
-import subprocess
 import json
+import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
+
 
 class AgentStatusChecker:
     """Check status of all agents in the system"""
@@ -37,10 +38,16 @@ class AgentStatusChecker:
                 "name": agent_name,
                 "tmux_active": agent_name in tmux_agents,
                 "has_worktree": agent_name in worktree_agents,
-                "worktree_path": worktree_agents.get(agent_name, {}).get("path"),
-                "last_activity": worktree_agents.get(agent_name, {}).get("last_activity"),
-                "status": self._determine_status(agent_name, tmux_agents, worktree_agents)
-            }
+                "worktree_path": worktree_agents.get(
+                    agent_name,
+                    {}).get("path"),
+                "last_activity": worktree_agents.get(
+                    agent_name,
+                    {}).get("last_activity"),
+                "status": self._determine_status(
+                    agent_name,
+                    tmux_agents,
+                    worktree_agents)}
 
         return agents
 
@@ -64,7 +71,8 @@ class AgentStatusChecker:
 
                             # Extract agent name
                             if window_name.startswith("agent-"):
-                                agent_name = window_name[6:]  # Remove "agent-" prefix
+                                # Remove "agent-" prefix
+                                agent_name = window_name[6:]
                                 agents[agent_name] = {
                                     "window_name": window_name,
                                     "active": is_active
@@ -86,7 +94,8 @@ class AgentStatusChecker:
                     claude_file = worktree_dir / "CLAUDE.md"
                     if claude_file.exists():
                         agent_name = worktree_dir.name
-                        last_activity = self._get_last_git_activity(worktree_dir)
+                        last_activity = self._get_last_git_activity(
+                            worktree_dir)
 
                         agents[agent_name] = {
                             "path": str(worktree_dir),
@@ -101,7 +110,8 @@ class AgentStatusChecker:
                     claude_file = worktree_dir / "CLAUDE.md"
                     if claude_file.exists():
                         agent_name = worktree_dir.name
-                        last_activity = self._get_last_git_activity(worktree_dir)
+                        last_activity = self._get_last_git_activity(
+                            worktree_dir)
 
                         agents[agent_name] = {
                             "path": str(worktree_dir),
@@ -119,12 +129,16 @@ class AgentStatusChecker:
 
             if result.returncode == 0 and result.stdout.strip():
                 return result.stdout.strip()
-        except:
+        except BaseException:
             pass
 
         return None
 
-    def _determine_status(self, agent_name: str, tmux_agents: Dict, worktree_agents: Dict) -> str:
+    def _determine_status(
+            self,
+            agent_name: str,
+            tmux_agents: Dict,
+            worktree_agents: Dict) -> str:
         """Determine overall agent status"""
         has_tmux = agent_name in tmux_agents
         has_worktree = agent_name in worktree_agents
@@ -197,11 +211,13 @@ class AgentStatusChecker:
                     content = claude_file.read_text()
                     # Extract capabilities section
                     if "capabilities" in content.lower() or "specialization" in content.lower():
-                        return content[:500] + "..." if len(content) > 500 else content
-                except:
+                        return content[:500] + \
+                            "..." if len(content) > 500 else content
+                except BaseException:
                     pass
 
         return None
+
 
 def main():
     """Main CLI interface"""
@@ -228,6 +244,7 @@ def main():
                 print(capabilities)
             else:
                 print(f"\n❓ No capabilities found for {agent_name}")
+
 
 if __name__ == "__main__":
     main()

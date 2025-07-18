@@ -10,30 +10,37 @@ import asyncio
 import json
 import logging
 import subprocess
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, asdict
-from enum import Enum
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import uvicorn
+from fastapi import (
+    FastAPI,
+    HTTPException,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 try:
-    from .prompt_logger import prompt_logger, PromptLog
+    from .prompt_logger import PromptLog, prompt_logger
 except ImportError:
     # Fallback for direct execution
     import sys
     sys.path.append('.')
-    from prompt_logger import prompt_logger, PromptLog
+    from prompt_logger import PromptLog, prompt_logger
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class EnhancedDashboardServer:
     """Enhanced dashboard server with GitHub integration and prompt review workflow"""
@@ -84,7 +91,7 @@ class EnhancedDashboardServer:
             """Get GitHub PRs for dashboard"""
             try:
                 result = await self._run_command(["gh", "pr", "list", "--json",
-                    "number,title,author,state,additions,deletions,reviewDecision,mergeable,headRefName,updatedAt"])
+                                                  "number,title,author,state,additions,deletions,reviewDecision,mergeable,headRefName,updatedAt"])
                 if result.returncode == 0:
                     prs = json.loads(result.stdout)
                     return {"prs": prs}
@@ -99,7 +106,7 @@ class EnhancedDashboardServer:
             try:
                 # Get recent commits
                 result = await self._run_command(["git", "log", "--oneline",
-                    "-10", "--pretty=format:%h|%an|%ar|%s"])
+                                                  "-10", "--pretty=format:%h|%an|%ar|%s"])
                 commits = []
                 if result.returncode == 0:
                     for line in result.stdout.strip().split('\n'):
@@ -129,7 +136,8 @@ class EnhancedDashboardServer:
                 ])
 
                 if result.returncode == 0:
-                    return {"success": True, "message": f"Message sent to {agent_name}"}
+                    return {"success": True,
+                            "message": f"Message sent to {agent_name}"}
                 else:
                     return {"success": False, "error": result.stderr}
             except Exception as e:
@@ -184,9 +192,11 @@ class EnhancedDashboardServer:
                 data = await request.json()
 
                 # Validate required fields
-                required_fields = ['metric_id', 'type', 'value', 'status', 'timestamp']
+                required_fields = ['metric_id', 'type',
+                                   'value', 'status', 'timestamp']
                 if not all(field in data for field in required_fields):
-                    raise HTTPException(status_code=400, detail="Missing required fields")
+                    raise HTTPException(
+                        status_code=400, detail="Missing required fields")
 
                 # Store metric data for dashboard display
                 metric_data = {
@@ -201,8 +211,14 @@ class EnhancedDashboardServer:
                 # Broadcast to connected WebSocket clients
                 await self._broadcast_metric_update(metric_data)
 
-                logger.info(f"Received metric: {data['type']} = {data['value']} [{data['status']}]")
-                return {"message": "Metric received successfully", "metric_id": data['metric_id']}
+                logger.info(
+                    f"Received metric: {
+                        data['type']} = {
+                        data['value']} [{
+                        data['status']}]")
+                return {
+                    "message": "Metric received successfully",
+                    "metric_id": data['metric_id']}
 
             except Exception as e:
                 logger.error(f"Error receiving metric: {e}")
@@ -1188,7 +1204,10 @@ class EnhancedDashboardServer:
             for ws in disconnected:
                 self.websocket_connections.remove(ws)
 
-    async def _run_command(self, cmd: List[str], cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
+    async def _run_command(
+            self,
+            cmd: List[str],
+            cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
         """Run a command asynchronously"""
         process = await asyncio.create_subprocess_exec(
             *cmd,
@@ -1202,6 +1221,7 @@ class EnhancedDashboardServer:
             cmd, process.returncode, stdout.decode(), stderr.decode()
         )
 
+
 def main():
     """Main function to run the enhanced dashboard server"""
     server = EnhancedDashboardServer()
@@ -1210,6 +1230,7 @@ def main():
     logger.info("Enhanced Dashboard available at: http://localhost:8001")
 
     uvicorn.run(server.app, host="0.0.0.0", port=8002, log_level="info")
+
 
 if __name__ == "__main__":
     main()

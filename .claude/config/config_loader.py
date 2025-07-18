@@ -1,11 +1,12 @@
 # .claude/config/config_loader.py
 """Configuration loader for LeanVibe orchestration system."""
 
-import os
-import yaml
-from pathlib import Path
-from typing import Dict, Any, Optional
 import logging
+import os
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +157,9 @@ class ConfigLoader:
         agent_config = self.get_agent_config(agent_name)
 
         if self.should_use_mock_cli():
-            path = agent_config.get('test_cli_path', agent_config.get('cli_path', ''))
+            path = agent_config.get(
+    'test_cli_path', agent_config.get(
+        'cli_path', ''))
         else:
             path = agent_config.get('cli_path', '')
 

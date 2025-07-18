@@ -5,7 +5,6 @@ Restores essential knowledge and project state from persistent memory
 """
 
 import asyncio
-import json
 import sys
 from pathlib import Path
 
@@ -14,6 +13,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root))
 
 from scripts.context_memory_manager import ContextMemoryManager
+
 
 async def main():
     print("🌅 Initiating wake protocol - restoring memory")

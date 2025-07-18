@@ -7,12 +7,11 @@ Focused alert system with threshold management and notification handling.
 Compliant micro-component: <300 lines alert functionality.
 """
 
-import json
 import logging
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, asdict
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +109,7 @@ class AlertManager:
         }
 
     def add_threshold(self, metric_name: str, warning_value: float,
-                     critical_value: float, comparison: str = ">"):
+                      critical_value: float, comparison: str = ">"):
         """Add or update alert threshold."""
         self.thresholds[metric_name] = AlertThreshold(
             metric_name, warning_value, critical_value, comparison
@@ -126,19 +125,27 @@ class AlertManager:
                 level = threshold.check_threshold(value)
 
                 if level:
-                    alert_id = f"{metric_name}_{level.value}_{int(datetime.now().timestamp())}"
+                    alert_id = f"{metric_name}_{
+                        level.value}_{
+                        int(
+                            datetime.now().timestamp())}"
                     alert = Alert(
                         alert_id=alert_id,
                         level=level,
-                        message=f"{metric_name} {threshold.comparison} {threshold.warning_value if level == AlertLevel.WARNING else threshold.critical_value} (current: {value})",
+                        message=f"{metric_name} {
+                            threshold.comparison} {
+                            threshold.warning_value if level == AlertLevel.WARNING else threshold.critical_value} (current: {value})",
                         source="monitoring_alerts",
                         timestamp=datetime.now(),
-                        metadata={"metric": metric_name, "value": value, "threshold": threshold.warning_value if level == AlertLevel.WARNING else threshold.critical_value}
-                    )
+                        metadata={
+                            "metric": metric_name,
+                            "value": value,
+                            "threshold": threshold.warning_value if level == AlertLevel.WARNING else threshold.critical_value})
 
                     # Check if similar alert already exists
                     existing_key = f"{metric_name}_{level.value}"
-                    if not any(existing_key in aid for aid in self.active_alerts.keys()):
+                    if not any(
+                            existing_key in aid for aid in self.active_alerts.keys()):
                         self.active_alerts[alert_id] = alert
                         new_alerts.append(alert)
                         self._add_to_history(alert)
@@ -163,7 +170,9 @@ class AlertManager:
             return True
         return False
 
-    def get_active_alerts(self, level: Optional[AlertLevel] = None) -> List[Alert]:
+    def get_active_alerts(
+            self,
+            level: Optional[AlertLevel] = None) -> List[Alert]:
         """Get active alerts, optionally filtered by level."""
         alerts = list(self.active_alerts.values())
         if level:
@@ -174,7 +183,8 @@ class AlertManager:
         """Get alert summary statistics."""
         active_by_level = {}
         for level in AlertLevel:
-            active_by_level[level.value] = len([a for a in self.active_alerts.values() if a.level == level])
+            active_by_level[level.value] = len(
+                [a for a in self.active_alerts.values() if a.level == level])
 
         return {
             "active_alerts_total": len(self.active_alerts),
@@ -196,7 +206,7 @@ class AlertManager:
         self.alert_history = [
             alert for alert in self.alert_history
             if not (alert.status == AlertStatus.RESOLVED and
-                   alert.resolved_at and alert.resolved_at < cutoff_time)
+                    alert.resolved_at and alert.resolved_at < cutoff_time)
         ]
 
 
@@ -248,7 +258,7 @@ if __name__ == "__main__":
 
     # Get summary
     summary = get_alert_summary()
-    print(f"\nAlert Summary:")
+    print("\nAlert Summary:")
     print(f"Active Alerts: {summary['active_alerts_total']}")
     print(f"Critical: {summary['active_by_level']['critical']}")
     print(f"Warning: {summary['active_by_level']['warning']}")

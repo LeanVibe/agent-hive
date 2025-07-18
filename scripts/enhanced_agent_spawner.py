@@ -8,16 +8,16 @@ import argparse
 import asyncio
 import json
 import logging
-import os
 import subprocess
 import sys
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class EnhancedAgentSpawner:
     """Reliable agent spawning with consistent instruction delivery"""
@@ -67,27 +67,32 @@ class EnhancedAgentSpawner:
                 human_decision_points, success_criteria, escalation_triggers
             )
             if not success:
-                return False, agent_id, {"error": "Failed to create instructions"}
+                return False, agent_id, {
+                    "error": "Failed to create instructions"}
 
             # Step 3: Start tmux session with Claude Code
             success = await self._start_tmux_session(agent_id, worktree_path)
             if not success:
-                return False, agent_id, {"error": "Failed to start tmux session"}
+                return False, agent_id, {
+                    "error": "Failed to start tmux session"}
 
             # Step 4: Initialize Claude Code with reliable instruction delivery
             success = await self._initialize_claude_code(agent_id, task, priority)
             if not success:
-                return False, agent_id, {"error": "Failed to initialize Claude Code"}
+                return False, agent_id, {
+                    "error": "Failed to initialize Claude Code"}
 
             # Step 4.5: Ensure agent is fully activated and working
             success = await self._ensure_agent_activation(agent_id, task, priority)
             if not success:
-                return False, agent_id, {"error": "Failed to fully activate agent"}
+                return False, agent_id, {
+                    "error": "Failed to fully activate agent"}
 
             # Step 5: Verify agent initialization
             success = await self._verify_agent_initialization(agent_id)
             if not success:
-                return False, agent_id, {"error": "Agent initialization verification failed"}
+                return False, agent_id, {
+                    "error": "Agent initialization verification failed"}
 
             # Step 6: Register agent in tracking system
             metadata = {
@@ -101,15 +106,15 @@ class EnhancedAgentSpawner:
                 "status": "active",
                 "human_decision_points": human_decision_points.split(",") if human_decision_points else [],
                 "success_criteria": success_criteria.split(",") if success_criteria else [],
-                "escalation_triggers": escalation_triggers.split(",") if escalation_triggers else []
-            }
+                "escalation_triggers": escalation_triggers.split(",") if escalation_triggers else []}
 
             await self._register_agent(agent_id, metadata)
 
             # Step 7: Setup progress monitoring
             await self._setup_progress_monitoring(agent_id)
 
-            logger.info(f"✅ Agent {agent_id} spawned successfully and verified active")
+            logger.info(
+                f"✅ Agent {agent_id} spawned successfully and verified active")
             return True, agent_id, metadata
 
         except Exception as e:
@@ -117,13 +122,17 @@ class EnhancedAgentSpawner:
             await self._cleanup_failed_spawn(agent_id)
             return False, agent_id, {"error": str(e)}
 
-    async def _create_worktree(self, agent_id: str) -> Tuple[bool, Optional[Path]]:
+    async def _create_worktree(
+            self, agent_id: str) -> Tuple[bool, Optional[Path]]:
         """Create Git worktree for agent"""
         try:
             # Extract agent type from agent_id (before timestamp)
-            agent_type = agent_id.split('-Jul-')[0] if '-Jul-' in agent_id else agent_id.split('-')[0]
-            cmd = ["python", "scripts/new_worktree_manager.py", "create", agent_type, "main"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            agent_type = agent_id.split(
+                '-Jul-')[0] if '-Jul-' in agent_id else agent_id.split('-')[0]
+            cmd = ["python", "scripts/new_worktree_manager.py",
+                   "create", agent_type, "main"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode != 0:
                 logger.error(f"Worktree creation failed: {result.stderr}")
@@ -141,7 +150,8 @@ class EnhancedAgentSpawner:
                 target_path = created_path.parent / agent_id
                 if created_path != target_path:
                     created_path.rename(target_path)
-                    logger.info(f"📁 Worktree created and renamed: {target_path}")
+                    logger.info(
+                        f"📁 Worktree created and renamed: {target_path}")
                     return True, target_path
                 else:
                     logger.info(f"📁 Worktree created: {created_path}")
@@ -191,10 +201,14 @@ class EnhancedAgentSpawner:
             logger.error(f"Failed to create instructions: {e}")
             return False
 
-    async def _start_tmux_session(self, agent_id: str, worktree_path: Path) -> bool:
+    async def _start_tmux_session(
+            self,
+            agent_id: str,
+            worktree_path: Path) -> bool:
         """Start tmux session with reliable Claude Code initialization"""
         try:
-            # Create tmux window with proper agent- prefix for communication compatibility
+            # Create tmux window with proper agent- prefix for communication
+            # compatibility
             tmux_window_name = f"agent-{agent_id}"
             cmd = [
                 "tmux", "new-window",
@@ -202,7 +216,8 @@ class EnhancedAgentSpawner:
                 "-n", tmux_window_name,
                 "-c", str(worktree_path)
             ]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode != 0:
                 logger.error(f"Failed to create tmux window: {result.stderr}")
@@ -215,7 +230,11 @@ class EnhancedAgentSpawner:
             logger.error(f"Failed to start tmux session: {e}")
             return False
 
-    async def _initialize_claude_code(self, agent_id: str, task: str, priority: str) -> bool:
+    async def _initialize_claude_code(
+            self,
+            agent_id: str,
+            task: str,
+            priority: str) -> bool:
         """Initialize Claude Code with reliable instruction delivery"""
         try:
             # Use proper agent- prefixed window name for all tmux commands
@@ -250,7 +269,8 @@ class EnhancedAgentSpawner:
             logger.error(f"Failed to initialize Claude Code: {e}")
             return False
 
-    async def _reliable_instruction_delivery(self, agent_id: str, instruction: str) -> bool:
+    async def _reliable_instruction_delivery(
+            self, agent_id: str, instruction: str) -> bool:
         """Deliver instructions with multiple retry mechanisms"""
 
         # Use proper agent- prefixed window name for all tmux commands
@@ -274,13 +294,15 @@ class EnhancedAgentSpawner:
             if agent_worktrees:
                 instruction_file = agent_worktrees[0] / "INSTRUCTIONS.txt"
                 with open(instruction_file, 'w') as f:
-                    f.write(f"TASK INSTRUCTIONS:\n{instruction}\n\nDelivered at: {datetime.now().isoformat()}")
+                    f.write(
+                        f"TASK INSTRUCTIONS:\n{instruction}\n\nDelivered at: {
+                            datetime.now().isoformat()}")
 
                 # Send file read command
                 cmd = [
                     "tmux", "send-keys",
                     "-t", f"agent-hive:{tmux_window_name}",
-                    f"cat INSTRUCTIONS.txt",
+                    "cat INSTRUCTIONS.txt",
                     "Enter"
                 ]
                 subprocess.run(cmd, timeout=10)
@@ -293,7 +315,7 @@ class EnhancedAgentSpawner:
                     "--message", f"TASK START: {instruction}"
                 ]
                 subprocess.run(cmd, timeout=10)
-            except:
+            except BaseException:
                 pass  # Backup method, don't fail if not available
 
             logger.info(f"📨 Instructions delivered to {agent_id}")
@@ -303,7 +325,11 @@ class EnhancedAgentSpawner:
             logger.error(f"Failed to deliver instructions: {e}")
             return False
 
-    async def _ensure_agent_activation(self, agent_id: str, task: str, priority: str) -> bool:
+    async def _ensure_agent_activation(
+            self,
+            agent_id: str,
+            task: str,
+            priority: str) -> bool:
         """Ensure agent is fully activated and working without manual intervention"""
         try:
             # Create comprehensive task prompt
@@ -316,7 +342,8 @@ class EnhancedAgentSpawner:
                 "--task", task_prompt
             ]
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
 
             if result.returncode == 0:
                 logger.info(f"✅ Agent {agent_id} fully activated and working")
@@ -336,8 +363,10 @@ class EnhancedAgentSpawner:
             await asyncio.sleep(10)
 
             # Check if agent tmux session is active
-            cmd = ["tmux", "list-windows", "-t", "agent-hive", "-F", "#{window_name}"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "list-windows", "-t",
+                   "agent-hive", "-F", "#{window_name}"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if agent_id not in result.stdout:
                 logger.error(f"Agent {agent_id} tmux session not found")
@@ -345,8 +374,10 @@ class EnhancedAgentSpawner:
 
             # Check agent status via status script
             try:
-                cmd = ["python", "scripts/check_agent_status.py", "--format", "json"]
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+                cmd = ["python", "scripts/check_agent_status.py",
+                       "--format", "json"]
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=15)
 
                 if result.returncode == 0:
                     status_data = json.loads(result.stdout)
@@ -355,7 +386,7 @@ class EnhancedAgentSpawner:
                         if agent_id in agent.get("name", ""):
                             logger.info(f"✅ Agent {agent_id} verified active")
                             return True
-            except:
+            except BaseException:
                 pass  # Status check is nice-to-have
 
             # If status check fails, assume success if tmux session exists
@@ -401,7 +432,8 @@ class EnhancedAgentSpawner:
                 start_new_session=True
             )
 
-            logger.info(f"📈 Progress monitoring and completion detection setup for {agent_id}")
+            logger.info(
+                f"📈 Progress monitoring and completion detection setup for {agent_id}")
             return True
 
         except Exception as e:
@@ -413,7 +445,8 @@ class EnhancedAgentSpawner:
         try:
             # Kill tmux window if it exists (with proper agent- prefix)
             tmux_window_name = f"agent-{agent_id}"
-            cmd = ["tmux", "kill-window", "-t", f"agent-hive:{tmux_window_name}"]
+            cmd = ["tmux", "kill-window", "-t",
+                   f"agent-hive:{tmux_window_name}"]
             subprocess.run(cmd, capture_output=True, timeout=10)
 
             # Remove worktree if it exists
@@ -622,16 +655,40 @@ Report progress every 2 hours to pm-agent with:
 Remember: This is Priority 1.3 - essential for monitoring system visibility. No more data loss!
 """
 
-    def _get_security_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+    def _get_security_template(
+            self,
+            task: str,
+            timeline: str,
+            human_decision_points: str,
+            success_criteria: str,
+            escalation_triggers: str) -> str:
         return f"# Security Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Security implementation details...]"
 
-    def _get_infrastructure_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+    def _get_infrastructure_template(
+            self,
+            task: str,
+            timeline: str,
+            human_decision_points: str,
+            success_criteria: str,
+            escalation_triggers: str) -> str:
         return f"# Infrastructure Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Infrastructure implementation details...]"
 
-    def _get_performance_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+    def _get_performance_template(
+            self,
+            task: str,
+            timeline: str,
+            human_decision_points: str,
+            success_criteria: str,
+            escalation_triggers: str) -> str:
         return f"# Performance Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Performance implementation details...]"
 
-    def _get_monitoring_template(self, task: str, timeline: str, human_decision_points: str, success_criteria: str, escalation_triggers: str) -> str:
+    def _get_monitoring_template(
+            self,
+            task: str,
+            timeline: str,
+            human_decision_points: str,
+            success_criteria: str,
+            escalation_triggers: str) -> str:
         return f"# Monitoring Specialist Template\n\nTask: {task}\nTimeline: {timeline}\n\n[Monitoring implementation details...]"
 
 
@@ -641,12 +698,16 @@ async def main():
         'integration-specialist', 'service-mesh', 'frontend',
         'security', 'infrastructure', 'performance', 'monitoring'
     ])
-    parser.add_argument("--priority", required=True, help="Priority level (e.g., 1.1, 1.2)")
+    parser.add_argument("--priority", required=True,
+                        help="Priority level (e.g., 1.1, 1.2)")
     parser.add_argument("--task", required=True, help="Task description")
     parser.add_argument("--timeline", required=True, help="Expected timeline")
-    parser.add_argument("--human-decision-points", default="", help="Comma-separated human decision points")
-    parser.add_argument("--success-criteria", default="", help="Comma-separated success criteria")
-    parser.add_argument("--escalation-triggers", default="", help="Comma-separated escalation triggers")
+    parser.add_argument("--human-decision-points", default="",
+                        help="Comma-separated human decision points")
+    parser.add_argument("--success-criteria", default="",
+                        help="Comma-separated success criteria")
+    parser.add_argument("--escalation-triggers", default="",
+                        help="Comma-separated escalation triggers")
 
     args = parser.parse_args()
 
@@ -667,7 +728,11 @@ async def main():
         print(f"📊 Metadata: {json.dumps(metadata, indent=2)}")
         sys.exit(0)
     else:
-        print(f"❌ Failed to spawn agent: {metadata.get('error', 'Unknown error')}")
+        print(
+            f"❌ Failed to spawn agent: {
+                metadata.get(
+                    'error',
+                    'Unknown error')}")
         sys.exit(1)
 
 

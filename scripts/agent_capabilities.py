@@ -5,11 +5,11 @@ Agent Capabilities Registry
 Manages and queries agent capabilities, specializations, and skills.
 """
 
-import json
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List
+
 
 class AgentCapabilityRegistry:
     """Registry of agent capabilities and specializations"""
@@ -70,15 +70,19 @@ class AgentCapabilityRegistry:
             "pm-agent": {
                 "capabilities": [
                     ("project_management", 9, "Project coordination and planning"),
-                    ("task_breakdown", 8, "Breaking down complex tasks into manageable chunks"),
-                    ("conflict_resolution", 7, "Resolving conflicts between team members and agents"),
+                    ("task_breakdown", 8,
+                     "Breaking down complex tasks into manageable chunks"),
+                    ("conflict_resolution", 7,
+                     "Resolving conflicts between team members and agents"),
                     ("quality_assurance", 6, "Ensuring quality standards are met"),
                     ("communication", 9, "Facilitating communication between agents"),
-                    ("escalation_management", 8, "Managing escalations to human oversight")
+                    ("escalation_management", 8,
+                     "Managing escalations to human oversight")
                 ],
                 "specializations": [
                     ("agile_methodology", "Expert in Agile/XP development practices", 9),
-                    ("multi_agent_coordination", "Coordinating multiple AI agents", 8),
+                    ("multi_agent_coordination",
+                     "Coordinating multiple AI agents", 8),
                     ("pr_management", "Pull request review and merge coordination", 7),
                     ("sprint_planning", "Sprint planning and velocity tracking", 8)
                 ]
@@ -95,8 +99,10 @@ class AgentCapabilityRegistry:
                 "specializations": [
                     ("system_documentation", "Comprehensive system documentation", 9),
                     ("integration_guides", "Integration and setup documentation", 8),
-                    ("monitoring_systems", "Monitoring and observability documentation", 7),
-                    ("validation_frameworks", "Documentation validation and testing", 8)
+                    ("monitoring_systems",
+                     "Monitoring and observability documentation", 7),
+                    ("validation_frameworks",
+                     "Documentation validation and testing", 8)
                 ]
             },
             "integration-agent": {
@@ -136,7 +142,8 @@ class AgentCapabilityRegistry:
                     ("machine_learning", 8, "ML model development and integration"),
                     ("data_analysis", 7, "Data analysis and insights"),
                     ("ai_orchestration", 9, "AI agent orchestration"),
-                    ("pattern_recognition", 8, "Pattern recognition and classification"),
+                    ("pattern_recognition", 8,
+                     "Pattern recognition and classification"),
                     ("natural_language", 7, "Natural language processing"),
                     ("optimization", 8, "System optimization and efficiency")
                 ],
@@ -144,12 +151,14 @@ class AgentCapabilityRegistry:
                     ("agent_intelligence", "AI agent intelligence frameworks", 9),
                     ("decision_making", "Automated decision making systems", 8),
                     ("learning_systems", "Adaptive learning systems", 7),
-                    ("intelligence_frameworks", "Intelligence framework development", 8)
+                    ("intelligence_frameworks",
+                     "Intelligence framework development", 8)
                 ]
             },
             "orchestration-agent": {
                 "capabilities": [
-                    ("multi_agent_coordination", 9, "Coordinating multiple agents"),
+                    ("multi_agent_coordination", 9,
+                     "Coordinating multiple agents"),
                     ("workflow_management", 8, "Managing complex workflows"),
                     ("resource_allocation", 7, "Allocating resources efficiently"),
                     ("load_balancing", 8, "Balancing workloads across agents"),
@@ -159,7 +168,8 @@ class AgentCapabilityRegistry:
                 "specializations": [
                     ("orchestration_systems", "Multi-agent orchestration", 9),
                     ("coordination_protocols", "Agent coordination protocols", 8),
-                    ("workflow_optimization", "Workflow optimization and management", 8),
+                    ("workflow_optimization",
+                     "Workflow optimization and management", 8),
                     ("system_orchestration", "System-level orchestration", 7)
                 ]
             }
@@ -185,7 +195,7 @@ class AgentCapabilityRegistry:
             self.update_availability(agent_name, "available", "", 0)
 
     def add_capability(self, agent_name: str, capability: str,
-                      proficiency_level: int = 5, description: str = ""):
+                       proficiency_level: int = 5, description: str = ""):
         """Add a capability for an agent"""
         conn = sqlite3.connect(self.db_path)
         conn.execute("""
@@ -197,7 +207,7 @@ class AgentCapabilityRegistry:
         conn.close()
 
     def add_specialization(self, agent_name: str, specialization: str,
-                          description: str = "", confidence_level: int = 8):
+                           description: str = "", confidence_level: int = 8):
         """Add a specialization for an agent"""
         conn = sqlite3.connect(self.db_path)
         conn.execute("""
@@ -209,7 +219,7 @@ class AgentCapabilityRegistry:
         conn.close()
 
     def update_availability(self, agent_name: str, status: str = "available",
-                           current_task: str = "", workload_level: int = 0):
+                            current_task: str = "", workload_level: int = 0):
         """Update agent availability status"""
         conn = sqlite3.connect(self.db_path)
         conn.execute("""
@@ -220,7 +230,10 @@ class AgentCapabilityRegistry:
         conn.commit()
         conn.close()
 
-    def find_agents_by_capability(self, capability: str, min_level: int = 5) -> List[Dict]:
+    def find_agents_by_capability(
+            self,
+            capability: str,
+            min_level: int = 5) -> List[Dict]:
         """Find agents with a specific capability above minimum level"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.execute("""
@@ -244,7 +257,10 @@ class AgentCapabilityRegistry:
         conn.close()
         return agents
 
-    def find_agents_by_specialization(self, specialization: str, min_confidence: int = 6) -> List[Dict]:
+    def find_agents_by_specialization(
+            self,
+            specialization: str,
+            min_confidence: int = 6) -> List[Dict]:
         """Find agents with a specific specialization above minimum confidence"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.execute("""
@@ -342,7 +358,10 @@ class AgentCapabilityRegistry:
         conn.close()
         return agents
 
-    def recommend_agent_for_task(self, task_description: str, task_type: str = "") -> List[Dict]:
+    def recommend_agent_for_task(
+            self,
+            task_description: str,
+            task_type: str = "") -> List[Dict]:
         """Recommend best agents for a given task"""
         # Simple keyword matching for now - could be enhanced with ML
         task_lower = task_description.lower()
@@ -382,7 +401,8 @@ class AgentCapabilityRegistry:
                 recommendations.append(agent)
 
             # Also check specializations
-            agents = self.find_agents_by_specialization(skill, min_confidence=6)
+            agents = self.find_agents_by_specialization(
+                skill, min_confidence=6)
             for agent in agents:
                 agent['matched_skill'] = skill
                 agent['skill_type'] = 'specialization'
@@ -391,7 +411,15 @@ class AgentCapabilityRegistry:
         # Remove duplicates and sort by skill level
         seen_agents = set()
         unique_recommendations = []
-        for rec in sorted(recommendations, key=lambda x: x.get('proficiency_level', 0) + x.get('confidence_level', 0), reverse=True):
+        for rec in sorted(
+                recommendations,
+                key=lambda x: x.get(
+                    'proficiency_level',
+                    0) +
+                x.get(
+                    'confidence_level',
+                    0),
+                reverse=True):
             if rec['agent_name'] not in seen_agents:
                 unique_recommendations.append(rec)
                 seen_agents.add(rec['agent_name'])
@@ -436,9 +464,12 @@ class AgentCapabilityRegistry:
         for spec in profile['specializations']:
             confidence = spec['confidence_level']
             confidence_bar = "█" * confidence + "░" * (10 - confidence)
-            print(f"  {spec['specialization']}: {confidence_bar} ({confidence}/10)")
+            print(
+                f"  {
+                    spec['specialization']}: {confidence_bar} ({confidence}/10)")
             if spec['description']:
                 print(f"    └─ {spec['description']}")
+
 
 def main():
     """Main CLI interface"""
@@ -450,10 +481,13 @@ def main():
         print("Usage:")
         print("  python agent_capabilities.py --list")
         print("  python agent_capabilities.py --agent <agent-name>")
-        print("  python agent_capabilities.py --find-capability <capability> [--min-level 5]")
-        print("  python agent_capabilities.py --find-specialization <specialization> [--min-confidence 6]")
+        print(
+            "  python agent_capabilities.py --find-capability <capability> [--min-level 5]")
+        print(
+            "  python agent_capabilities.py --find-specialization <specialization> [--min-confidence 6]")
         print("  python agent_capabilities.py --recommend '<task description>'")
-        print("  python agent_capabilities.py --update-status <agent-name> <status> [task] [workload]")
+        print(
+            "  python agent_capabilities.py --update-status <agent-name> <status> [task] [workload]")
         return
 
     command = sys.argv[1]
@@ -474,7 +508,8 @@ def main():
                 'unknown': '❓'
             }.get(status, '❓')
 
-            print(f"  {status_emoji} {agent} - {status} (workload: {workload}/10)")
+            print(
+                f"  {status_emoji} {agent} - {status} (workload: {workload}/10)")
 
     elif command == "--agent" and len(sys.argv) > 2:
         agent_name = sys.argv[2]
@@ -491,7 +526,8 @@ def main():
         print("=" * 60)
 
         for agent in agents:
-            print(f"  {agent['agent_name']}: {agent['proficiency_level']}/10 ({agent['status']})")
+            print(
+                f"  {agent['agent_name']}: {agent['proficiency_level']}/10 ({agent['status']})")
             if agent['description']:
                 print(f"    └─ {agent['description']}")
 
@@ -503,12 +539,18 @@ def main():
         print("=" * 60)
 
         for i, rec in enumerate(recommendations, 1):
-            skill_level = rec.get('proficiency_level', rec.get('confidence_level', 0))
-            print(f"  {i}. {rec['agent_name']} - {rec['matched_skill']} ({skill_level}/10)")
-            print(f"     Status: {rec['status']} | Workload: {rec['workload_level']}/10")
+            skill_level = rec.get('proficiency_level',
+                                  rec.get('confidence_level', 0))
+            print(
+                f"  {i}. {rec['agent_name']} - {rec['matched_skill']} ({skill_level}/10)")
+            print(
+                f"     Status: {
+                    rec['status']} | Workload: {
+                    rec['workload_level']}/10")
 
     else:
         print(f"Unknown command: {command}")
+
 
 if __name__ == "__main__":
     main()

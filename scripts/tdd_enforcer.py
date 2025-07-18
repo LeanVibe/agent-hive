@@ -7,17 +7,16 @@ This module enforces Test-Driven Development (TDD) practices by monitoring
 red-green-refactor cycles, test coverage, and test-first development compliance.
 """
 
+import ast
 import json
 import os
+import re
 import sqlite3
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
-import ast
+from typing import Dict, List, Tuple
 
 
 @dataclass
@@ -158,7 +157,9 @@ class TDDEnforcer:
             # Parse AST to find test functions
             tree = ast.parse(content)
             for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef) and node.name.startswith('test_'):
+                if isinstance(
+                        node,
+                        ast.FunctionDef) and node.name.startswith('test_'):
                     test_functions.append(node.name)
         except Exception as e:
             print(f"Error extracting test functions from {file_path}: {e}")
@@ -169,7 +170,7 @@ class TDDEnforcer:
         """Run coverage analysis and return metrics."""
         try:
             # Run coverage
-            result = subprocess.run([
+            subprocess.run([
                 "python", "-m", "pytest", "--cov=.", "--cov-report=json",
                 "--cov-report=term-missing", "-q"
             ], capture_output=True, text=True, cwd=".")
@@ -180,16 +181,22 @@ class TDDEnforcer:
                 with open(coverage_file, 'r') as f:
                     coverage_data = json.loads(f.read())
 
-                total_coverage = coverage_data.get('totals', {}).get('percent_covered', 0)
-                lines_covered = coverage_data.get('totals', {}).get('covered_lines', 0)
-                lines_total = coverage_data.get('totals', {}).get('num_statements', 0)
+                total_coverage = coverage_data.get(
+                    'totals', {}).get('percent_covered', 0)
+                lines_covered = coverage_data.get(
+                    'totals', {}).get('covered_lines', 0)
+                lines_total = coverage_data.get(
+                    'totals', {}).get('num_statements', 0)
 
                 return {
                     'total_coverage': total_coverage,
                     'lines_covered': lines_covered,
                     'lines_total': lines_total,
-                    'branch_coverage': coverage_data.get('totals', {}).get('percent_covered_display', 0)
-                }
+                    'branch_coverage': coverage_data.get(
+                        'totals',
+                        {}).get(
+                        'percent_covered_display',
+                        0)}
         except Exception as e:
             print(f"Error running coverage analysis: {e}")
 
@@ -204,11 +211,13 @@ class TDDEnforcer:
         """Analyze git commits for TDD patterns."""
         try:
             # Get git log with file changes
-            cmd = ["git", "log", "--name-status", "--pretty=format:%H|%s|%an|%ad", "--date=iso"]
+            cmd = ["git", "log", "--name-status",
+                   "--pretty=format:%H|%s|%an|%ad", "--date=iso"]
             if since_date:
                 cmd.extend(["--since", since_date])
 
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, check=True)
 
             commits = []
             current_commit = None
@@ -249,7 +258,8 @@ class TDDEnforcer:
 
         for commit in commits:
             test_changes = [f for f in commit['files'] if f['is_test']]
-            code_changes = [f for f in commit['files'] if not f['is_test'] and f['path'].endswith('.py')]
+            code_changes = [f for f in commit['files']
+                            if not f['is_test'] and f['path'].endswith('.py')]
 
             # Violation 1: Code changes without corresponding test changes
             if code_changes and not test_changes:
@@ -274,11 +284,12 @@ class TDDEnforcer:
 
             # Violation 3: Test deletion without refactoring
             deleted_tests = [f for f in test_changes if f['type'] == 'D']
-            if deleted_tests and not any(f['type'] == 'M' for f in test_changes):
+            if deleted_tests and not any(
+                    f['type'] == 'M' for f in test_changes):
                 violations.append({
                     'type': 'test_deletion',
                     'commit': commit['hash'],
-                    'description': f"Test files deleted without refactoring",
+                    'description': "Test files deleted without refactoring",
                     'severity': 'high',
                     'files': [f['path'] for f in deleted_tests]
                 })
@@ -343,12 +354,14 @@ class TDDEnforcer:
         test_first_commits = 0
         for commit in commits:
             test_changes = [f for f in commit['files'] if f['is_test']]
-            code_changes = [f for f in commit['files'] if not f['is_test'] and f['path'].endswith('.py')]
+            code_changes = [f for f in commit['files']
+                            if not f['is_test'] and f['path'].endswith('.py')]
 
             if test_changes and code_changes:
                 test_first_commits += 1
 
-        test_first_compliance = (test_first_commits / len(commits)) * 100 if commits else 0
+        test_first_compliance = (test_first_commits /
+                                 len(commits)) * 100 if commits else 0
 
         # Calculate coverage trend
         coverage_trend = "stable"  # Simplified for now
@@ -373,7 +386,9 @@ class TDDEnforcer:
         )
 
         return TDDMetrics(
-            period_id=f"tdd-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}",
+            period_id=f"tdd-{
+    start_date.strftime('%Y%m%d')}-{
+        end_date.strftime('%Y%m%d')}",
             start_date=start_date.strftime('%Y-%m-%d'),
             end_date=end_date.strftime('%Y-%m-%d'),
             total_cycles=total_cycles,
@@ -389,8 +404,13 @@ class TDDEnforcer:
             recommendations=recommendations
         )
 
-    def calculate_quality_score(self, coverage: float, test_first: float,
-                               violation_count: int, completed: int, failed: int) -> float:
+    def calculate_quality_score(
+            self,
+            coverage: float,
+            test_first: float,
+            violation_count: int,
+            completed: int,
+            failed: int) -> float:
         """Calculate overall TDD quality score (0-100)."""
         # Coverage component (40% weight)
         coverage_score = min(coverage, 100) * 0.4
@@ -403,59 +423,82 @@ class TDDEnforcer:
 
         # Success rate (10% weight)
         total_attempts = completed + failed
-        success_rate = (completed / total_attempts) * 10 if total_attempts > 0 else 5
+        success_rate = (completed / total_attempts) * \
+            10 if total_attempts > 0 else 5
 
         return coverage_score + test_first_score + violation_penalty + success_rate
 
-    def generate_recommendations(self, coverage: float, test_first: float,
-                               violations: List[Dict], red_ratio: float,
-                               green_ratio: float, refactor_ratio: float) -> List[str]:
+    def generate_recommendations(
+            self,
+            coverage: float,
+            test_first: float,
+            violations: List[Dict],
+            red_ratio: float,
+            green_ratio: float,
+            refactor_ratio: float) -> List[str]:
         """Generate TDD improvement recommendations."""
         recommendations = []
 
         if coverage < self.coverage_threshold:
-            recommendations.append(f"Increase test coverage from {coverage:.1f}% to {self.coverage_threshold}%")
+            recommendations.append(
+                f"Increase test coverage from {
+                    coverage:.1f}% to {
+                    self.coverage_threshold}%")
 
         if test_first < 70:
-            recommendations.append(f"Improve test-first compliance from {test_first:.1f}% to 70%+")
+            recommendations.append(
+                f"Improve test-first compliance from {test_first:.1f}% to 70%+")
 
         if len(violations) > 5:
             recommendations.append(f"Address {len(violations)} TDD violations")
 
         # Check TDD cycle balance
         if red_ratio < 0.2:
-            recommendations.append("Increase red phase focus - write failing tests first")
+            recommendations.append(
+                "Increase red phase focus - write failing tests first")
 
         if green_ratio < 0.3:
-            recommendations.append("Improve green phase - focus on making tests pass")
+            recommendations.append(
+                "Improve green phase - focus on making tests pass")
 
         if refactor_ratio < 0.2:
-            recommendations.append("Increase refactoring frequency - improve code quality")
+            recommendations.append(
+                "Increase refactoring frequency - improve code quality")
 
         # General recommendations
         if not recommendations:
-            recommendations.append("Continue current TDD practices - quality is good")
+            recommendations.append(
+                "Continue current TDD practices - quality is good")
 
         return recommendations
 
     def save_tdd_metrics(self, metrics: TDDMetrics):
         """Save TDD metrics to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO tdd_metrics
                 (period_id, start_date, end_date, total_cycles, completed_cycles,
                  failed_cycles, avg_cycle_duration, test_coverage, coverage_trend,
                  test_first_compliance, red_ratio, green_ratio, refactor_ratio,
                  quality_score, recorded_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                metrics.period_id, metrics.start_date, metrics.end_date,
-                metrics.total_cycles, metrics.completed_cycles, metrics.failed_cycles,
-                metrics.avg_cycle_duration, metrics.test_coverage, metrics.coverage_trend,
-                metrics.test_first_compliance, metrics.red_green_refactor_ratio[0],
-                metrics.red_green_refactor_ratio[1], metrics.red_green_refactor_ratio[2],
-                metrics.quality_score, datetime.now().isoformat()
-            ))
+            """,
+                (metrics.period_id,
+                 metrics.start_date,
+                 metrics.end_date,
+                 metrics.total_cycles,
+                 metrics.completed_cycles,
+                 metrics.failed_cycles,
+                 metrics.avg_cycle_duration,
+                 metrics.test_coverage,
+                 metrics.coverage_trend,
+                 metrics.test_first_compliance,
+                 metrics.red_green_refactor_ratio[0],
+                 metrics.red_green_refactor_ratio[1],
+                 metrics.red_green_refactor_ratio[2],
+                 metrics.quality_score,
+                 datetime.now().isoformat()))
             conn.commit()
 
     def generate_tdd_report(self, period_days: int = 7) -> str:
@@ -497,7 +540,7 @@ class TDDEnforcer:
         if not metrics.violations:
             report += "✅ No TDD violations detected\n"
 
-        report += f"""
+        report += """
 ### 💡 Recommendations
 """
 
@@ -542,18 +585,19 @@ Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
         try:
             # Run tests
             test_result = subprocess.run(["python", "-m", "pytest", "-v"],
-                                       capture_output=True, text=True)
+                                         capture_output=True, text=True)
 
             # Check coverage
             coverage_data = self.run_coverage_analysis()
 
             # Check for test files in staged changes
             staged_result = subprocess.run(["git", "diff", "--cached", "--name-only"],
-                                         capture_output=True, text=True)
+                                           capture_output=True, text=True)
 
             staged_files = staged_result.stdout.strip().split('\n')
             test_files = [f for f in staged_files if self.is_test_file(f)]
-            code_files = [f for f in staged_files if f.endswith('.py') and not self.is_test_file(f)]
+            code_files = [f for f in staged_files if f.endswith(
+                '.py') and not self.is_test_file(f)]
 
             # TDD compliance checks
             issues = []
@@ -562,10 +606,14 @@ Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 issues.append("❌ Tests are failing")
 
             if coverage_data['total_coverage'] < self.coverage_threshold:
-                issues.append(f"❌ Coverage {coverage_data['total_coverage']:.1f}% < {self.coverage_threshold}%")
+                issues.append(
+                    f"❌ Coverage {
+                        coverage_data['total_coverage']:.1f}% < {
+                        self.coverage_threshold}%")
 
             if code_files and not test_files:
-                issues.append("❌ Code changes without corresponding test changes")
+                issues.append(
+                    "❌ Code changes without corresponding test changes")
 
             if issues:
                 print("TDD Compliance Issues:")
@@ -625,7 +673,8 @@ def main():
     elif command == "coverage":
         coverage_data = enforcer.run_coverage_analysis()
         print(f"Coverage: {coverage_data['total_coverage']:.1f}%")
-        print(f"Lines: {coverage_data['lines_covered']}/{coverage_data['lines_total']}")
+        print(
+            f"Lines: {coverage_data['lines_covered']}/{coverage_data['lines_total']}")
         print(f"Branch Coverage: {coverage_data['branch_coverage']:.1f}%")
 
     elif command == "violations":
@@ -648,7 +697,11 @@ def main():
         print(f"Test Coverage: {metrics.test_coverage:.1f}%")
         print(f"Test-First Compliance: {metrics.test_first_compliance:.1f}%")
         print(f"Cycles: {metrics.completed_cycles}/{metrics.total_cycles}")
-        print(f"Phase Ratios: R{metrics.red_green_refactor_ratio[0]:.1%} G{metrics.red_green_refactor_ratio[1]:.1%} F{metrics.red_green_refactor_ratio[2]:.1%}")
+        print(
+            f"Phase Ratios: R{
+                metrics.red_green_refactor_ratio[0]:.1%} G{
+                metrics.red_green_refactor_ratio[1]:.1%} F{
+                metrics.red_green_refactor_ratio[2]:.1%}")
 
     else:
         print(f"Unknown command: {command}")

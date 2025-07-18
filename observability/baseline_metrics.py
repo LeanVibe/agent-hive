@@ -6,18 +6,15 @@ Establishes baseline performance metrics and monitors system health
 to track improvements and detect regressions in the agent orchestration system.
 """
 
-import time
-import asyncio
 import json
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, asdict
-from pathlib import Path
 import sqlite3
-from statistics import mean, median, stdev
 import threading
-from contextlib import contextmanager
+import time
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from statistics import mean, median, stdev
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -164,8 +161,10 @@ class MetricsCollector:
 
         # Memory usage
         memory = psutil.virtual_memory()
-        self.record_metric("memory_usage_mb", memory.used / (1024 * 1024), "MB", timestamp)
-        self.record_metric("memory_usage_percent", memory.percent, "%", timestamp)
+        self.record_metric("memory_usage_mb", memory.used /
+                           (1024 * 1024), "MB", timestamp)
+        self.record_metric("memory_usage_percent",
+                           memory.percent, "%", timestamp)
 
         # CPU usage
         cpu_percent = psutil.cpu_percent(interval=1)
@@ -178,26 +177,32 @@ class MetricsCollector:
         # Load average (Unix systems)
         try:
             load_avg = psutil.getloadavg()
-            self.record_metric("load_average_1min", load_avg[0], "load", timestamp)
-            self.record_metric("load_average_5min", load_avg[1], "load", timestamp)
-            self.record_metric("load_average_15min", load_avg[2], "load", timestamp)
+            self.record_metric("load_average_1min",
+                               load_avg[0], "load", timestamp)
+            self.record_metric("load_average_5min",
+                               load_avg[1], "load", timestamp)
+            self.record_metric("load_average_15min",
+                               load_avg[2], "load", timestamp)
         except AttributeError:
             # getloadavg not available on Windows
             pass
 
         # Network I/O
         net_io = psutil.net_io_counters()
-        self.record_metric("network_bytes_sent", net_io.bytes_sent, "bytes", timestamp)
-        self.record_metric("network_bytes_recv", net_io.bytes_recv, "bytes", timestamp)
+        self.record_metric("network_bytes_sent",
+                           net_io.bytes_sent, "bytes", timestamp)
+        self.record_metric("network_bytes_recv",
+                           net_io.bytes_recv, "bytes", timestamp)
 
         # Process count
-        self.record_metric("process_count", len(psutil.pids()), "count", timestamp)
+        self.record_metric("process_count", len(
+            psutil.pids()), "count", timestamp)
 
         logger.debug(f"Collected system metrics at {timestamp}")
 
     def record_metric(self, metric_name: str, value: float, unit: str,
-                     timestamp: datetime = None, agent_id: str = None,
-                     session_id: str = None, metadata: Dict[str, Any] = None):
+                      timestamp: datetime = None, agent_id: str = None,
+                      session_id: str = None, metadata: Dict[str, Any] = None):
         """Record a single metric measurement."""
         if timestamp is None:
             timestamp = datetime.now()
@@ -230,7 +235,8 @@ class MetricsCollector:
                 json.dumps(metric.metadata) if metric.metadata else None
             ))
 
-    def get_metric_stats(self, metric_name: str, hours: int = 24) -> Dict[str, Any]:
+    def get_metric_stats(self, metric_name: str,
+                         hours: int = 24) -> Dict[str, Any]:
         """Get statistics for a specific metric over time period."""
         cutoff_time = datetime.now() - timedelta(hours=hours)
 
@@ -305,7 +311,9 @@ class MetricsCollector:
 
         logger.info(f"Baseline snapshot saved with version {version}")
 
-    def load_baseline_snapshot(self, version: str = None) -> Optional[PerformanceBaseline]:
+    def load_baseline_snapshot(
+            self,
+            version: str = None) -> Optional[PerformanceBaseline]:
         """Load a baseline snapshot by version."""
         with sqlite3.connect(self.db_path) as conn:
             if version:
@@ -323,12 +331,17 @@ class MetricsCollector:
             row = cursor.fetchone()
             if row:
                 baseline_data = json.loads(row[0])
-                baseline_data["timestamp"] = datetime.fromisoformat(baseline_data["timestamp"])
+                baseline_data["timestamp"] = datetime.fromisoformat(
+                    baseline_data["timestamp"])
                 return PerformanceBaseline(**baseline_data)
 
         return None
 
-    def export_metrics(self, output_path: str, format: str = "json", hours: int = 24):
+    def export_metrics(
+            self,
+            output_path: str,
+            format: str = "json",
+            hours: int = 24):
         """Export metrics to file."""
         cutoff_time = datetime.now() - timedelta(hours=hours)
 
@@ -378,7 +391,8 @@ class BaselineAnalyzer:
     def __init__(self, metrics_collector: MetricsCollector):
         self.collector = metrics_collector
 
-    def analyze_trends(self, metric_name: str, hours: int = 168) -> Dict[str, Any]:
+    def analyze_trends(self, metric_name: str,
+                       hours: int = 168) -> Dict[str, Any]:
         """Analyze trends for a specific metric over time."""
         # Get hourly averages
         cutoff_time = datetime.now() - timedelta(hours=hours)
@@ -400,7 +414,7 @@ class BaselineAnalyzer:
             return {"error": "Insufficient data for trend analysis"}
 
         values = [row[1] for row in hourly_data]
-        hours_list = [row[0] for row in hourly_data]
+        [row[0] for row in hourly_data]
 
         # Calculate trend
         n = len(values)
@@ -411,7 +425,8 @@ class BaselineAnalyzer:
         x_mean = mean(x)
         y_mean = mean(y)
 
-        slope = sum((x[i] - x_mean) * (y[i] - y_mean) for i in range(n)) / sum((x[i] - x_mean) ** 2 for i in range(n))
+        slope = sum((x[i] - x_mean) * (y[i] - y_mean)
+                    for i in range(n)) / sum((x[i] - x_mean) ** 2 for i in range(n))
         intercept = y_mean - slope * x_mean
 
         # Determine trend direction
@@ -480,8 +495,7 @@ class BaselineAnalyzer:
             "analysis_timestamp": datetime.now().isoformat(),
             "opportunities_count": len(opportunities),
             "opportunities": opportunities,
-            "overall_health": "good" if len(opportunities) == 0 else "needs_attention"
-        }
+            "overall_health": "good" if len(opportunities) == 0 else "needs_attention"}
 
     def generate_baseline_report(self) -> Dict[str, Any]:
         """Generate comprehensive baseline report."""
@@ -489,8 +503,7 @@ class BaselineAnalyzer:
             "report_timestamp": datetime.now().isoformat(),
             "baseline_version": "1.0.0",
             "system_summary": self.collector.get_baseline_summary(),
-            "performance_opportunities": self.identify_performance_opportunities()
-        }
+            "performance_opportunities": self.identify_performance_opportunities()}
 
         # Key metrics trends
         key_metrics = [
@@ -551,7 +564,10 @@ def get_baseline_report() -> Dict[str, Any]:
     return baseline_analyzer.generate_baseline_report()
 
 
-def export_baseline_metrics(output_path: str, format: str = "json", hours: int = 24):
+def export_baseline_metrics(
+        output_path: str,
+        format: str = "json",
+        hours: int = 24):
     """Export baseline metrics to file."""
     metrics_collector.export_metrics(output_path, format, hours)
 

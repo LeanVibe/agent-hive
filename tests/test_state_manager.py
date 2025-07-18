@@ -6,19 +6,25 @@ including agent states, task states, checkpoints, and ML integration.
 """
 
 import asyncio
-import pytest
-import tempfile
+import json
 import sqlite3
+import sys
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import Mock, patch, AsyncMock
-import json
-import sys
+from unittest.mock import Mock, patch
+
+import pytest
+
+from state.state_manager import (
+    AgentState,
+    StateManager,
+    SystemState,
+    TaskState,
+)
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
-
-from state.state_manager import StateManager, AgentState, TaskState, SystemState
 
 
 class TestAgentState:
@@ -93,7 +99,8 @@ class TestTaskState:
         assert state.priority == 1
         assert state.created_at == now
         assert state.started_at == now
-        assert state.metadata == {"type": "code_generation", "complexity": "high"}
+        assert state.metadata == {
+            "type": "code_generation", "complexity": "high"}
 
 
 class TestSystemState:
@@ -157,7 +164,7 @@ class TestStateManager:
 
     def test_init_creates_database_schema(self, temp_db_path):
         """Test that StateManager initialization creates proper database schema."""
-        manager = StateManager(db_path=temp_db_path)
+        StateManager(db_path=temp_db_path)
 
         # Check database file exists
         assert Path(temp_db_path).exists()
@@ -170,7 +177,8 @@ class TestStateManager:
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
             tables = [row[0] for row in cursor.fetchall()]
 
-            expected_tables = ['agents', 'tasks', 'system_snapshots', 'checkpoints']
+            expected_tables = ['agents', 'tasks',
+                               'system_snapshots', 'checkpoints']
             for table in expected_tables:
                 assert table in tables
 
@@ -184,13 +192,15 @@ class TestStateManager:
         # Check database
         with sqlite3.connect(state_manager.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM agents WHERE agent_id = ?", ("test-agent",))
+            cursor.execute(
+                "SELECT * FROM agents WHERE agent_id = ?", ("test-agent",))
             row = cursor.fetchone()
 
             assert row is not None
             assert row[0] == "test-agent"  # agent_id
             assert row[1] == "idle"  # status
-            assert json.loads(row[5]) == ["python", "javascript"]  # capabilities
+            assert json.loads(row[5]) == [
+                "python", "javascript"]  # capabilities
 
     @pytest.mark.asyncio
     async def test_register_agent_updates_cache(self, state_manager):
@@ -221,7 +231,10 @@ class TestStateManager:
         # Check database
         with sqlite3.connect(state_manager.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT status, context_usage, current_task_id FROM agents WHERE agent_id = ?", ("test-agent",))
+            cursor.execute(
+                "SELECT status, context_usage, current_task_id FROM agents WHERE agent_id = ?",
+                ("test-agent",
+                 ))
             row = cursor.fetchone()
 
             assert row[0] == "working"
@@ -300,7 +313,8 @@ class TestStateManager:
         # Check database
         with sqlite3.connect(state_manager.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM tasks WHERE task_id = ?", ("test-task",))
+            cursor.execute(
+                "SELECT * FROM tasks WHERE task_id = ?", ("test-task",))
             row = cursor.fetchone()
 
             assert row is not None
@@ -338,7 +352,10 @@ class TestStateManager:
         # Check database
         with sqlite3.connect(state_manager.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT status, agent_id, priority, started_at FROM tasks WHERE task_id = ?", ("test-task",))
+            cursor.execute(
+                "SELECT status, agent_id, priority, started_at FROM tasks WHERE task_id = ?",
+                ("test-task",
+                 ))
             row = cursor.fetchone()
 
             assert row[0] == "in_progress"
@@ -422,7 +439,8 @@ class TestStateManager:
         # Check database
         with sqlite3.connect(state_manager.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM checkpoints WHERE checkpoint_id = ?", (checkpoint_id,))
+            cursor.execute(
+                "SELECT * FROM checkpoints WHERE checkpoint_id = ?", (checkpoint_id,))
             row = cursor.fetchone()
 
             assert row is not None
@@ -431,7 +449,8 @@ class TestStateManager:
             assert row[3] is not None  # state_data
 
     @pytest.mark.asyncio
-    async def test_should_create_checkpoint_high_context_usage(self, state_manager):
+    async def test_should_create_checkpoint_high_context_usage(
+            self, state_manager):
         """Test checkpoint recommendation for high context usage."""
         await state_manager.register_agent("agent-1")
         await state_manager.update_agent_state("agent-1", context_usage=0.9)
@@ -442,7 +461,8 @@ class TestStateManager:
         assert "context usage" in reason.lower()
 
     @pytest.mark.asyncio
-    async def test_should_create_checkpoint_low_context_usage(self, state_manager):
+    async def test_should_create_checkpoint_low_context_usage(
+            self, state_manager):
         """Test no checkpoint recommendation for low context usage."""
         await state_manager.register_agent("agent-1")
         await state_manager.update_agent_state("agent-1", context_usage=0.3)
@@ -482,7 +502,8 @@ class TestStateManager:
         # Check that new data remains
         with sqlite3.connect(state_manager.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM tasks WHERE task_id = ?", ("new-task",))
+            cursor.execute(
+                "SELECT COUNT(*) FROM tasks WHERE task_id = ?", ("new-task",))
             count = cursor.fetchone()[0]
             assert count == 1
 
@@ -550,7 +571,8 @@ class TestStateManager:
 
         # Update all agents concurrently
         update_tasks = [
-            state_manager.update_agent_state(f"agent-{i}", context_usage=i * 0.1)
+            state_manager.update_agent_state(
+                f"agent-{i}", context_usage=i * 0.1)
             for i in range(10)
         ]
 
@@ -618,7 +640,8 @@ class TestStateManager:
         # Create multiple threads
         threads = []
         for i in range(10):
-            thread = threading.Thread(target=register_agent, args=(f"thread-agent-{i}",))
+            thread = threading.Thread(target=register_agent,
+                                      args=(f"thread-agent-{i}",))
             threads.append(thread)
             thread.start()
 

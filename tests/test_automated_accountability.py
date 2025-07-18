@@ -4,16 +4,16 @@ Test suite for automated accountability system.
 Validates coordination crisis prevention capabilities.
 """
 
-import unittest
 import json
-import tempfile
+import unittest
 from datetime import datetime, timedelta
+
 from scripts.automated_accountability import (
-    AutomatedAccountability,
     AccountabilityTask,
+    AutomatedAccountability,
+    EscalationLevel,
     EvidenceRequirement,
     TaskStatus,
-    EscalationLevel
 )
 
 
@@ -52,7 +52,8 @@ class TestAutomatedAccountability(unittest.TestCase):
 
         # Submit evidence
         success = self.accountability.submit_evidence(
-            "test-task-2", "commit", {"hash": "abc123", "message": "Test commit"}
+            "test-task-2", "commit", {"hash": "abc123",
+                                      "message": "Test commit"}
         )
 
         self.assertTrue(success)
@@ -71,7 +72,8 @@ class TestAutomatedAccountability(unittest.TestCase):
         """Test deadline escalation logic."""
         # Create overdue task
         task = self.accountability.assign_task(
-            "overdue-task", "test-agent", "Overdue test", 0.001, self.evidence_reqs  # 0.001 hours = 3.6 seconds
+            # 0.001 hours = 3.6 seconds
+            "overdue-task", "test-agent", "Overdue test", 0.001, self.evidence_reqs
         )
 
         # Wait for task to become overdue
@@ -82,14 +84,18 @@ class TestAutomatedAccountability(unittest.TestCase):
         report = self.accountability.check_accountability()
 
         # Should be in critical or emergency
-        self.assertTrue(len(report['critical']) > 0 or len(report['emergency']) > 0)
+        self.assertTrue(len(report['critical']) >
+                        0 or len(report['emergency']) > 0)
         self.assertTrue(task.is_overdue())
 
     def test_progress_calculation(self):
         """Test progress percentage calculation."""
         task = self.accountability.assign_task(
-            "progress-task", "test-agent", "Progress test", 2.0, self.evidence_reqs
-        )
+            "progress-task",
+            "test-agent",
+            "Progress test",
+            2.0,
+            self.evidence_reqs)
 
         # No evidence submitted
         self.assertEqual(task.progress_percentage(), 0.0)
@@ -136,9 +142,12 @@ class TestAutomatedAccountability(unittest.TestCase):
     def test_enforcement_actions(self):
         """Test accountability enforcement actions."""
         # Create task requiring enforcement
-        task = self.accountability.assign_task(
-            "enforce-task", "silent-agent", "Enforcement test", 1.0, self.evidence_reqs
-        )
+        self.accountability.assign_task(
+            "enforce-task",
+            "silent-agent",
+            "Enforcement test",
+            1.0,
+            self.evidence_reqs)
 
         # Trigger enforcement
         actions = self.accountability.enforce_accountability()
@@ -153,8 +162,11 @@ class TestAutomatedAccountability(unittest.TestCase):
         """Test emergency task reassignment."""
         # Create task that will trigger reassignment
         task = self.accountability.assign_task(
-            "reassign-task", "unresponsive-agent", "Reassign test", 0.0001, self.evidence_reqs
-        )
+            "reassign-task",
+            "unresponsive-agent",
+            "Reassign test",
+            0.0001,
+            self.evidence_reqs)
 
         # Force emergency escalation
         task.escalation_level = EscalationLevel.RED

@@ -6,20 +6,18 @@ Provides comprehensive persona management including dynamic switching,
 context compression, and performance optimization for specialized agent capabilities.
 """
 
-import asyncio
+import hashlib
 import json
 import logging
-import yaml
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple, Set
-from dataclasses import dataclass, field, asdict
+import re
+import time
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-import hashlib
-import re
-from collections import defaultdict
-import threading
-import time
+from typing import Any, Dict, List, Tuple
+
+import yaml
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -116,7 +114,13 @@ class ContextCompressor:
         self.compression_cache = {}
         self.quality_validator = QualityValidator()
 
-    def compress_context(self, context: Dict[str, Any], persona_config: PersonaConfig) -> Tuple[Dict[str, Any], Dict[str, float]]:
+    def compress_context(self,
+                         context: Dict[str,
+                                       Any],
+                         persona_config: PersonaConfig) -> Tuple[Dict[str,
+                                                                      Any],
+                                                                 Dict[str,
+                                                                      float]]:
         """
         Compress context based on persona configuration.
 
@@ -134,32 +138,38 @@ class ContextCompressor:
 
         # Apply compression based on persona type
         if persona_config.persona_type == PersonaType.ARCHITECT:
-            compressed_context = self._compress_architecture_context(context, persona_config)
+            compressed_context = self._compress_architecture_context(
+                context, persona_config)
         elif persona_config.persona_type == PersonaType.SECURITY:
-            compressed_context = self._compress_security_context(context, persona_config)
+            compressed_context = self._compress_security_context(
+                context, persona_config)
         elif persona_config.persona_type == PersonaType.FRONTEND:
-            compressed_context = self._compress_frontend_context(context, persona_config)
+            compressed_context = self._compress_frontend_context(
+                context, persona_config)
         elif persona_config.persona_type == PersonaType.BACKEND:
-            compressed_context = self._compress_backend_context(context, persona_config)
+            compressed_context = self._compress_backend_context(
+                context, persona_config)
         elif persona_config.persona_type == PersonaType.PERFORMANCE:
-            compressed_context = self._compress_performance_context(context, persona_config)
+            compressed_context = self._compress_performance_context(
+                context, persona_config)
         else:
-            compressed_context = self._compress_general_context(context, persona_config)
+            compressed_context = self._compress_general_context(
+                context, persona_config)
 
         # Calculate compressed token count
         compressed_tokens = self._estimate_tokens(compressed_context)
 
         # Calculate compression statistics
         compression_time = time.time() - start_time
-        token_reduction = 1.0 - (compressed_tokens / original_tokens) if original_tokens > 0 else 0.0
+        token_reduction = 1.0 - \
+            (compressed_tokens / original_tokens) if original_tokens > 0 else 0.0
 
         compression_stats = {
             'original_tokens': original_tokens,
             'compressed_tokens': compressed_tokens,
             'token_reduction': token_reduction,
             'compression_time': compression_time,
-            'compression_ratio': compressed_tokens / original_tokens if original_tokens > 0 else 1.0
-        }
+            'compression_ratio': compressed_tokens / original_tokens if original_tokens > 0 else 1.0}
 
         return compressed_context, compression_stats
 
@@ -169,7 +179,8 @@ class ContextCompressor:
         # Rough estimation: 1 token ≈ 4 characters
         return len(text) // 4
 
-    def _compress_architecture_context(self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
+    def _compress_architecture_context(
+            self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
         """Compress context for architecture persona."""
         compressed = {}
 
@@ -183,36 +194,43 @@ class ContextCompressor:
 
         # Compress code snippets to focus on structure
         if 'code' in context:
-            compressed['code'] = self._compress_code_for_architecture(context['code'])
+            compressed['code'] = self._compress_code_for_architecture(
+                context['code'])
 
         # Summarize non-architecture content
         if 'description' in context:
-            compressed['description'] = self._summarize_text(context['description'], max_length=200)
+            compressed['description'] = self._summarize_text(
+                context['description'], max_length=200)
 
         return compressed
 
-    def _compress_security_context(self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
+    def _compress_security_context(
+            self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
         """Compress context for security persona."""
         compressed = {}
 
         # Keep security-relevant information
-        security_keys = ['security_requirements', 'threat_model', 'vulnerabilities', 'compliance']
+        security_keys = ['security_requirements',
+                         'threat_model', 'vulnerabilities', 'compliance']
         for key in security_keys:
             if key in context:
                 compressed[key] = context[key]
 
         # Focus on security-relevant code
         if 'code' in context:
-            compressed['code'] = self._extract_security_relevant_code(context['code'])
+            compressed['code'] = self._extract_security_relevant_code(
+                context['code'])
 
         return compressed
 
-    def _compress_frontend_context(self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
+    def _compress_frontend_context(
+            self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
         """Compress context for frontend persona."""
         compressed = {}
 
         # Keep UI/UX relevant information
-        frontend_keys = ['ui_requirements', 'user_experience', 'accessibility', 'performance']
+        frontend_keys = ['ui_requirements',
+                         'user_experience', 'accessibility', 'performance']
         for key in frontend_keys:
             if key in context:
                 compressed[key] = context[key]
@@ -223,12 +241,14 @@ class ContextCompressor:
 
         return compressed
 
-    def _compress_backend_context(self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
+    def _compress_backend_context(
+            self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
         """Compress context for backend persona."""
         compressed = {}
 
         # Keep backend-relevant information
-        backend_keys = ['api_design', 'database_schema', 'business_logic', 'integrations']
+        backend_keys = ['api_design', 'database_schema',
+                        'business_logic', 'integrations']
         for key in backend_keys:
             if key in context:
                 compressed[key] = context[key]
@@ -239,23 +259,27 @@ class ContextCompressor:
 
         return compressed
 
-    def _compress_performance_context(self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
+    def _compress_performance_context(
+            self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
         """Compress context for performance persona."""
         compressed = {}
 
         # Keep performance-relevant information
-        performance_keys = ['performance_requirements', 'benchmarks', 'bottlenecks', 'optimization']
+        performance_keys = ['performance_requirements',
+                            'benchmarks', 'bottlenecks', 'optimization']
         for key in performance_keys:
             if key in context:
                 compressed[key] = context[key]
 
         # Focus on performance-critical code
         if 'code' in context:
-            compressed['code'] = self._extract_performance_critical_code(context['code'])
+            compressed['code'] = self._extract_performance_critical_code(
+                context['code'])
 
         return compressed
 
-    def _compress_general_context(self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
+    def _compress_general_context(
+            self, context: Dict[str, Any], config: PersonaConfig) -> Dict[str, Any]:
         """General context compression."""
         compressed = {}
 
@@ -264,7 +288,8 @@ class ContextCompressor:
 
         # Prioritize based on persona expertise areas
         for key, value in context.items():
-            if any(area.lower() in key.lower() for area in config.expertise_areas):
+            if any(area.lower() in key.lower()
+                   for area in config.expertise_areas):
                 compressed[key] = value
             elif len(compressed) < len(context) * (1 - compression_ratio):
                 compressed[key] = value
@@ -283,7 +308,7 @@ class ContextCompressor:
                 stripped.startswith('def ') or
                 stripped.startswith('import ') or
                 stripped.startswith('from ') or
-                stripped.startswith('@')):
+                    stripped.startswith('@')):
                 important_lines.append(line)
 
         return '\n'.join(important_lines)
@@ -300,7 +325,8 @@ class ContextCompressor:
         relevant_lines = []
 
         for line in lines:
-            if any(re.search(pattern, line, re.IGNORECASE) for pattern in security_patterns):
+            if any(re.search(pattern, line, re.IGNORECASE)
+                   for pattern in security_patterns):
                 relevant_lines.append(line)
 
         return '\n'.join(relevant_lines)
@@ -317,7 +343,8 @@ class ContextCompressor:
         relevant_lines = []
 
         for line in lines:
-            if any(re.search(pattern, line, re.IGNORECASE) for pattern in frontend_patterns):
+            if any(re.search(pattern, line, re.IGNORECASE)
+                   for pattern in frontend_patterns):
                 relevant_lines.append(line)
 
         return '\n'.join(relevant_lines)
@@ -334,7 +361,8 @@ class ContextCompressor:
         relevant_lines = []
 
         for line in lines:
-            if any(re.search(pattern, line, re.IGNORECASE) for pattern in backend_patterns):
+            if any(re.search(pattern, line, re.IGNORECASE)
+                   for pattern in backend_patterns):
                 relevant_lines.append(line)
 
         return '\n'.join(relevant_lines)
@@ -351,7 +379,8 @@ class ContextCompressor:
         relevant_lines = []
 
         for line in lines:
-            if any(re.search(pattern, line, re.IGNORECASE) for pattern in performance_patterns):
+            if any(re.search(pattern, line, re.IGNORECASE)
+                   for pattern in performance_patterns):
                 relevant_lines.append(line)
 
         return '\n'.join(relevant_lines)
@@ -377,7 +406,8 @@ class ContextCompressor:
 class QualityValidator:
     """Validates quality of compressed contexts."""
 
-    def validate_compression_quality(self, original: Dict[str, Any], compressed: Dict[str, Any]) -> float:
+    def validate_compression_quality(
+            self, original: Dict[str, Any], compressed: Dict[str, Any]) -> float:
         """
         Validate quality of compression.
 
@@ -393,20 +423,25 @@ class QualityValidator:
         compressed_keys = set(compressed.keys())
 
         # Key retention score
-        key_retention = len(compressed_keys) / len(original_keys) if original_keys else 1.0
+        key_retention = len(compressed_keys) / \
+            len(original_keys) if original_keys else 1.0
 
         # Content preservation score
-        content_preservation = self._calculate_content_preservation(original, compressed)
+        content_preservation = self._calculate_content_preservation(
+            original, compressed)
 
         # Essential information score
-        essential_info_score = self._calculate_essential_info_score(original, compressed)
+        essential_info_score = self._calculate_essential_info_score(
+            original, compressed)
 
         # Weighted average
-        quality_score = (key_retention * 0.3 + content_preservation * 0.4 + essential_info_score * 0.3)
+        quality_score = (key_retention * 0.3 + content_preservation *
+                         0.4 + essential_info_score * 0.3)
 
         return min(1.0, quality_score)
 
-    def _calculate_content_preservation(self, original: Dict[str, Any], compressed: Dict[str, Any]) -> float:
+    def _calculate_content_preservation(
+            self, original: Dict[str, Any], compressed: Dict[str, Any]) -> float:
         """Calculate how well content is preserved."""
         preservation_score = 0.0
         total_items = 0
@@ -422,7 +457,8 @@ class QualityValidator:
 
         return preservation_score / total_items if total_items > 0 else 0.0
 
-    def _calculate_essential_info_score(self, original: Dict[str, Any], compressed: Dict[str, Any]) -> float:
+    def _calculate_essential_info_score(
+            self, original: Dict[str, Any], compressed: Dict[str, Any]) -> float:
         """Calculate preservation of essential information."""
         essential_keys = ['description', 'requirements', 'code', 'context']
         essential_score = 0.0
@@ -472,10 +508,12 @@ class PersonaManager:
                     try:
                         with open(persona_file, 'r') as f:
                             persona_data = yaml.safe_load(f)
-                            persona_config = self._create_persona_config(persona_data)
+                            persona_config = self._create_persona_config(
+                                persona_data)
                             self.personas[persona_config.name] = persona_config
                     except Exception as e:
-                        logger.error(f"Failed to load persona from {persona_file}: {e}")
+                        logger.error(
+                            f"Failed to load persona from {persona_file}: {e}")
 
             logger.info(f"Loaded {len(self.personas)} personas")
         except Exception as e:
@@ -540,7 +578,8 @@ class PersonaManager:
             persona_config = self._create_persona_config(persona_data)
             self.personas[persona_name] = persona_config
 
-    def _create_persona_config(self, persona_data: Dict[str, Any]) -> PersonaConfig:
+    def _create_persona_config(
+            self, persona_data: Dict[str, Any]) -> PersonaConfig:
         """Create PersonaConfig from dictionary data."""
         return PersonaConfig(
             name=persona_data["name"],
@@ -552,8 +591,10 @@ class PersonaManager:
             personality_traits=persona_data.get("personality_traits", []),
             context_optimization=persona_data.get("context_optimization", {}),
             prompt_template=persona_data.get("prompt_template", ""),
-            compression_level=persona_data.get("compression_level", CompressionLevel.MEDIUM),
-            token_reduction_target=persona_data.get("token_reduction_target", 0.7)
+            compression_level=persona_data.get(
+                "compression_level", CompressionLevel.MEDIUM),
+            token_reduction_target=persona_data.get(
+                "token_reduction_target", 0.7)
         )
 
     def _initialize_performance_metrics(self):
@@ -563,7 +604,11 @@ class PersonaManager:
                 persona_name=persona_name
             )
 
-    def activate_persona(self, persona_name: str, context: Dict[str, Any], session_id: str = None) -> PersonaContext:
+    def activate_persona(self,
+                         persona_name: str,
+                         context: Dict[str,
+                                       Any],
+                         session_id: str = None) -> PersonaContext:
         """
         Activate a persona with given context.
 
@@ -589,8 +634,7 @@ class PersonaManager:
 
         # Compress context for persona
         compressed_context, compression_stats = self.context_compressor.compress_context(
-            context, persona_config
-        )
+            context, persona_config)
 
         # Validate compression quality
         quality_score = self.quality_validator.validate_compression_quality(
@@ -613,13 +657,21 @@ class PersonaManager:
         self.active_contexts[session_id] = persona_context
 
         # Update performance metrics
-        self._update_performance_metrics(persona_name, quality_score, compression_stats)
+        self._update_performance_metrics(
+            persona_name, quality_score, compression_stats)
 
-        logger.info(f"Activated persona '{persona_name}' with {compression_stats['token_reduction']:.1%} token reduction")
+        logger.info(
+            f"Activated persona '{persona_name}' with {
+                compression_stats['token_reduction']:.1%} token reduction")
 
         return persona_context
 
-    def switch_persona(self, from_persona: str, to_persona: str, context: Dict[str, Any], session_id: str = None) -> PersonaContext:
+    def switch_persona(self,
+                       from_persona: str,
+                       to_persona: str,
+                       context: Dict[str,
+                                     Any],
+                       session_id: str = None) -> PersonaContext:
         """
         Switch from one persona to another.
 
@@ -691,7 +743,10 @@ class PersonaManager:
 
         return best_persona or "analyst"  # Default fallback
 
-    def _calculate_capability_score(self, required: List[str], available: List[str]) -> float:
+    def _calculate_capability_score(
+            self,
+            required: List[str],
+            available: List[str]) -> float:
         """Calculate capability match score."""
         if not required:
             return 0.0
@@ -705,7 +760,8 @@ class PersonaManager:
 
         return matches / len(required)
 
-    def get_persona_performance(self, persona_name: str) -> PersonaPerformanceMetrics:
+    def get_persona_performance(
+            self, persona_name: str) -> PersonaPerformanceMetrics:
         """
         Get performance metrics for a persona.
 
@@ -715,7 +771,8 @@ class PersonaManager:
         Returns:
             PersonaPerformanceMetrics
         """
-        return self.performance_metrics.get(persona_name, PersonaPerformanceMetrics(persona_name))
+        return self.performance_metrics.get(
+            persona_name, PersonaPerformanceMetrics(persona_name))
 
     def get_system_metrics(self) -> Dict[str, Any]:
         """Get comprehensive system metrics."""
@@ -754,10 +811,15 @@ class PersonaManager:
 
         return total_quality / count if count > 0 else 0.0
 
-    def _update_performance_metrics(self, persona_name: str, quality_score: float, compression_stats: Dict[str, float]):
+    def _update_performance_metrics(self,
+                                    persona_name: str,
+                                    quality_score: float,
+                                    compression_stats: Dict[str,
+                                                            float]):
         """Update performance metrics for a persona."""
         if persona_name not in self.performance_metrics:
-            self.performance_metrics[persona_name] = PersonaPerformanceMetrics(persona_name)
+            self.performance_metrics[persona_name] = PersonaPerformanceMetrics(
+                persona_name)
 
         metrics = self.performance_metrics[persona_name]
 
@@ -771,23 +833,31 @@ class PersonaManager:
         )
 
         metrics.avg_token_reduction = self._update_average(
-            metrics.avg_token_reduction, compression_stats['token_reduction'], metrics.total_tasks
-        )
+            metrics.avg_token_reduction,
+            compression_stats['token_reduction'],
+            metrics.total_tasks)
 
         metrics.avg_compression_time = self._update_average(
-            metrics.avg_compression_time, compression_stats['compression_time'], metrics.total_tasks
-        )
+            metrics.avg_compression_time,
+            compression_stats['compression_time'],
+            metrics.total_tasks)
 
         # Calculate effectiveness score
-        metrics.effectiveness_score = self._calculate_effectiveness_score(metrics)
+        metrics.effectiveness_score = self._calculate_effectiveness_score(
+            metrics)
 
         metrics.last_updated = datetime.now()
 
-    def _update_average(self, current_avg: float, new_value: float, count: int) -> float:
+    def _update_average(
+            self,
+            current_avg: float,
+            new_value: float,
+            count: int) -> float:
         """Update running average."""
         return (current_avg * (count - 1) + new_value) / count
 
-    def _calculate_effectiveness_score(self, metrics: PersonaPerformanceMetrics) -> float:
+    def _calculate_effectiveness_score(
+            self, metrics: PersonaPerformanceMetrics) -> float:
         """Calculate effectiveness score for a persona."""
         if metrics.total_tasks == 0:
             return 0.0
@@ -798,14 +868,17 @@ class PersonaManager:
         efficiency_factor = metrics.avg_token_reduction
 
         # Weighted score
-        effectiveness = (success_rate * 0.4 + quality_factor * 0.4 + efficiency_factor * 0.2)
+        effectiveness = (success_rate * 0.4 + quality_factor *
+                         0.4 + efficiency_factor * 0.2)
 
         return min(1.0, effectiveness)
 
-    def _generate_session_id(self, persona_name: str, context: Dict[str, Any]) -> str:
+    def _generate_session_id(self, persona_name: str,
+                             context: Dict[str, Any]) -> str:
         """Generate unique session ID."""
         timestamp = datetime.now().isoformat()
-        context_hash = hashlib.md5(json.dumps(context, sort_keys=True).encode()).hexdigest()[:8]
+        context_hash = hashlib.md5(json.dumps(
+            context, sort_keys=True).encode()).hexdigest()[:8]
         return f"{persona_name}_{timestamp}_{context_hash}"
 
 
@@ -814,14 +887,22 @@ persona_manager = PersonaManager()
 
 
 # Convenience functions
-def activate_persona(persona_name: str, context: Dict[str, Any], session_id: str = None) -> PersonaContext:
+def activate_persona(persona_name: str,
+                     context: Dict[str,
+                                   Any],
+                     session_id: str = None) -> PersonaContext:
     """Activate a persona with given context."""
     return persona_manager.activate_persona(persona_name, context, session_id)
 
 
-def switch_persona(from_persona: str, to_persona: str, context: Dict[str, Any], session_id: str = None) -> PersonaContext:
+def switch_persona(from_persona: str,
+                   to_persona: str,
+                   context: Dict[str,
+                                 Any],
+                   session_id: str = None) -> PersonaContext:
     """Switch from one persona to another."""
-    return persona_manager.switch_persona(from_persona, to_persona, context, session_id)
+    return persona_manager.switch_persona(
+        from_persona, to_persona, context, session_id)
 
 
 def find_optimal_persona(required_capabilities: List[str]) -> str:
@@ -847,19 +928,26 @@ if __name__ == "__main__":
     # Test persona activation
     test_context = {
         "description": "Design a scalable microservices architecture",
-        "requirements": ["high availability", "fault tolerance", "performance"],
+        "requirements": [
+            "high availability",
+            "fault tolerance",
+            "performance"],
         "code": "class ServiceRegistry:\n    def register_service(self, service):\n        pass",
-        "constraints": ["budget", "timeline"]
-    }
+        "constraints": [
+            "budget",
+            "timeline"]}
 
     # Find optimal persona
-    optimal_persona = find_optimal_persona(["architecture", "scalability", "microservices"])
+    optimal_persona = find_optimal_persona(
+        ["architecture", "scalability", "microservices"])
     print(f"Optimal persona: {optimal_persona}")
 
     # Activate persona
     persona_context = activate_persona(optimal_persona, test_context)
     print(f"Activated persona: {persona_context.persona_name}")
-    print(f"Token reduction: {persona_context.compression_stats['token_reduction']:.1%}")
+    print(
+        f"Token reduction: {
+            persona_context.compression_stats['token_reduction']:.1%}")
     print(f"Quality score: {persona_context.quality_score:.2f}")
 
     # Get system metrics

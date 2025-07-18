@@ -5,24 +5,24 @@ Tests for the Baseline Metrics System
 Comprehensive test suite for the observability baseline metrics components.
 """
 
-import pytest
 import json
-import time
-import tempfile
 import os
-from datetime import datetime, timedelta
-from unittest.mock import Mock, patch, MagicMock
 import sqlite3
+import tempfile
+from datetime import datetime, timedelta
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from observability.baseline_metrics import (
-    BaselineMetric,
-    PerformanceBaseline,
-    MetricsCollector,
     BaselineAnalyzer,
+    BaselineMetric,
+    MetricsCollector,
+    PerformanceBaseline,
+    get_baseline_report,
     metrics_collector,
     start_baseline_monitoring,
     stop_baseline_monitoring,
-    get_baseline_report
 )
 
 
@@ -176,7 +176,8 @@ class TestMetricsCollector:
 
         for i, value in enumerate(test_values):
             timestamp = base_time + timedelta(minutes=i)
-            self.collector.record_metric("test_metric", value, "units", timestamp)
+            self.collector.record_metric(
+                "test_metric", value, "units", timestamp)
 
         # Get statistics
         stats = self.collector.get_metric_stats("test_metric", hours=1)
@@ -278,10 +279,17 @@ class TestMetricsCollector:
     @patch('psutil.disk_usage')
     @patch('psutil.net_io_counters')
     @patch('psutil.pids')
-    def test_collect_system_metrics(self, mock_pids, mock_net, mock_disk, mock_cpu, mock_memory):
+    def test_collect_system_metrics(
+            self,
+            mock_pids,
+            mock_net,
+            mock_disk,
+            mock_cpu,
+            mock_memory):
         """Test system metrics collection."""
         # Mock psutil calls
-        mock_memory.return_value = MagicMock(used=268435456, percent=25.0)  # 256MB
+        mock_memory.return_value = MagicMock(
+            used=268435456, percent=25.0)  # 256MB
         mock_cpu.return_value = 35.0
         mock_disk.return_value = MagicMock(percent=45.0)
         mock_net.return_value = MagicMock(bytes_sent=1000, bytes_recv=2000)
@@ -341,7 +349,8 @@ class TestBaselineAnalyzer:
         for i in range(10):
             timestamp = base_time + timedelta(hours=i)
             value = 10.0 + i * 2.0  # Increasing trend
-            self.collector.record_metric("test_metric", value, "units", timestamp)
+            self.collector.record_metric(
+                "test_metric", value, "units", timestamp)
 
         # Analyze trends
         result = self.analyzer.analyze_trends("test_metric", hours=6)
@@ -377,7 +386,8 @@ class TestBaselineAnalyzer:
         assert opportunities["overall_health"] == "needs_attention"
 
         # Check specific opportunities
-        opportunity_categories = [opp["category"] for opp in opportunities["opportunities"]]
+        opportunity_categories = [opp["category"]
+                                  for opp in opportunities["opportunities"]]
         assert "memory" in opportunity_categories
         assert "cpu" in opportunity_categories
 
@@ -481,7 +491,8 @@ class TestIntegration:
 
         # Save and load baseline snapshot
         self.collector.save_baseline_snapshot("integration_test")
-        loaded_baseline = self.collector.load_baseline_snapshot("integration_test")
+        loaded_baseline = self.collector.load_baseline_snapshot(
+            "integration_test")
         assert loaded_baseline is not None
 
         # Generate performance analysis

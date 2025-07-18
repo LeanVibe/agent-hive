@@ -9,9 +9,17 @@ Following compliant micro-component testing pattern.
 
 import unittest
 from datetime import datetime, timedelta
+
 from monitoring_alerts import (
-    AlertManager, Alert, AlertThreshold, AlertLevel, AlertStatus,
-    check_system_alerts, get_active_alerts, resolve_alert, get_alert_summary
+    Alert,
+    AlertLevel,
+    AlertManager,
+    AlertStatus,
+    AlertThreshold,
+    check_system_alerts,
+    get_active_alerts,
+    get_alert_summary,
+    resolve_alert,
 )
 
 
@@ -204,7 +212,9 @@ class TestAlertManager(unittest.TestCase):
         success = self.manager.acknowledge_alert(alert_id)
 
         self.assertTrue(success)
-        self.assertEqual(self.manager.active_alerts[alert_id].status, AlertStatus.ACKNOWLEDGED)
+        self.assertEqual(
+            self.manager.active_alerts[alert_id].status,
+            AlertStatus.ACKNOWLEDGED)
         # Should still be in active alerts
         self.assertEqual(len(self.manager.active_alerts), 1)
 
@@ -257,14 +267,16 @@ class TestAlertManager(unittest.TestCase):
 
         # Manually set resolved time to be old
         self.manager.resolve_alert(alert_id)
-        old_alert = next(a for a in self.manager.alert_history if a.alert_id == alert_id)
+        old_alert = next(
+            a for a in self.manager.alert_history if a.alert_id == alert_id)
         old_alert.resolved_at = datetime.now() - timedelta(hours=25)
 
         # Clear old alerts
         self.manager.clear_resolved_alerts(24)
 
         # Should be removed from history
-        remaining_alerts = [a for a in self.manager.alert_history if a.alert_id == alert_id]
+        remaining_alerts = [
+            a for a in self.manager.alert_history if a.alert_id == alert_id]
         self.assertEqual(len(remaining_alerts), 0)
 
 

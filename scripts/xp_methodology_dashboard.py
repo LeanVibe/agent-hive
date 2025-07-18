@@ -8,29 +8,25 @@ enforcement components into a unified monitoring and reporting system.
 """
 
 import json
-import os
 import sqlite3
-import subprocess
-import sys
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
 import statistics
-from collections import defaultdict
+import sys
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Dict, List
+
+from ci_enforcer import CIEnforcer
+from issue_manager import IssueManager
+from pair_programming_tracker import PairProgrammingTracker
+from pr_manager import PRManager
+from refactoring_tracker import RefactoringTracker
 
 # Import our XP enforcement modules
 from sprint_planning import SprintPlanningSystem
-from velocity_tracker import VelocityTracker
+from sustainable_pace_monitor import SustainablePaceMonitor
 from tdd_enforcer import TDDEnforcer
 from test_coverage_enforcer import TestCoverageEnforcer
-from pr_manager import PRManager
-from issue_manager import IssueManager
-from ci_enforcer import CIEnforcer
-from pair_programming_tracker import PairProgrammingTracker
-from refactoring_tracker import RefactoringTracker
-from sustainable_pace_monitor import SustainablePaceMonitor
+from velocity_tracker import VelocityTracker
 
 
 @dataclass
@@ -201,7 +197,8 @@ class XPMethodologyDashboard:
 
             conn.commit()
 
-    def calculate_xp_methodology_score(self, days: int = 7) -> XPMethodologyScore:
+    def calculate_xp_methodology_score(
+            self, days: int = 7) -> XPMethodologyScore:
         """Calculate comprehensive XP methodology compliance score."""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
@@ -212,8 +209,9 @@ class XPMethodologyDashboard:
         # 1. Planning Game (Sprint Planning & Velocity)
         try:
             velocity_data = self.velocity_tracker.analyze_velocity_trend()
-            sprint_metrics = self.sprint_planning.get_current_sprint_metrics()
-            planning_game_score = min(100, (velocity_data.current_velocity / 20) * 100)
+            self.sprint_planning.get_current_sprint_metrics()
+            planning_game_score = min(
+                100, (velocity_data.current_velocity / 20) * 100)
             practice_scores['planning_game'] = planning_game_score
         except Exception:
             practice_scores['planning_game'] = 70.0
@@ -223,7 +221,8 @@ class XPMethodologyDashboard:
             pr_metrics = self.pr_manager.calculate_pr_metrics(days)
             # Score based on small PR sizes and frequent releases
             avg_pr_size = pr_metrics.avg_files_changed
-            small_releases_score = max(0, 100 - (avg_pr_size * 2))  # Penalty for large PRs
+            small_releases_score = max(
+                0, 100 - (avg_pr_size * 2))  # Penalty for large PRs
             practice_scores['small_releases'] = small_releases_score
         except Exception:
             practice_scores['small_releases'] = 75.0
@@ -234,10 +233,12 @@ class XPMethodologyDashboard:
 
         # 4. Simple Design (Code Quality & Refactoring)
         try:
-            refactoring_metrics = self.refactoring_tracker.analyze_refactoring_opportunities(".")
+            refactoring_metrics = self.refactoring_tracker.analyze_refactoring_opportunities(
+                ".")
             # Score based on code complexity and refactoring activity
             if refactoring_metrics['total_opportunities'] > 0:
-                complexity_score = max(0, 100 - refactoring_metrics['total_opportunities'])
+                complexity_score = max(
+                    0, 100 - refactoring_metrics['total_opportunities'])
             else:
                 complexity_score = 85.0
             practice_scores['simple_design'] = complexity_score
@@ -259,7 +260,8 @@ class XPMethodologyDashboard:
 
         # 6. Refactoring (Continuous Code Improvement)
         try:
-            refactoring_sessions = self.refactoring_tracker.get_recent_refactoring_sessions(days)
+            refactoring_sessions = self.refactoring_tracker.get_recent_refactoring_sessions(
+                days)
             if refactoring_sessions:
                 refactoring_score = min(100, len(refactoring_sessions) * 20)
             else:
@@ -270,7 +272,8 @@ class XPMethodologyDashboard:
 
         # 7. Pair Programming
         try:
-            pair_metrics = self.pair_tracker.calculate_pair_programming_metrics(days)
+            pair_metrics = self.pair_tracker.calculate_pair_programming_metrics(
+                days)
             pair_score = pair_metrics.pair_programming_coverage
             practice_scores['pair_programming'] = pair_score
         except Exception:
@@ -279,7 +282,8 @@ class XPMethodologyDashboard:
         # 8. Collective Code Ownership
         try:
             # Based on pair programming and code distribution
-            pair_metrics = self.pair_tracker.calculate_pair_programming_metrics(days)
+            pair_metrics = self.pair_tracker.calculate_pair_programming_metrics(
+                days)
             ownership_score = pair_metrics.avg_collective_ownership_score * 100
             practice_scores['collective_ownership'] = ownership_score
         except Exception:
@@ -383,18 +387,24 @@ class XPMethodologyDashboard:
             improvement_areas=improvement_areas,
             score_trend=score_trend,
             velocity_trend="stable",
-            quality_trend="stable"
-        )
+            quality_trend="stable")
 
         self.save_xp_methodology_score(score_obj, start_date, end_date)
         return score_obj
 
-    def save_xp_methodology_score(self, score: XPMethodologyScore, start_date: datetime, end_date: datetime):
+    def save_xp_methodology_score(
+            self,
+            score: XPMethodologyScore,
+            start_date: datetime,
+            end_date: datetime):
         """Save XP methodology score to database."""
-        score_id = f"xp-score-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"
+        score_id = f"xp-score-{
+            start_date.strftime('%Y%m%d')}-{
+            end_date.strftime('%Y%m%d')}"
 
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO xp_methodology_scores
                 (score_id, period_start, period_end, overall_score,
                  planning_game_score, small_releases_score, metaphor_score,
@@ -406,18 +416,34 @@ class XPMethodologyDashboard:
                  improvement_areas, score_trend, velocity_trend,
                  quality_trend, recorded_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                score_id, start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),
-                score.overall_score, score.planning_game_score, score.small_releases_score,
-                score.metaphor_score, score.simple_design_score, score.testing_score,
-                score.refactoring_score, score.pair_programming_score,
-                score.collective_ownership_score, score.continuous_integration_score,
-                score.forty_hour_week_score, score.onsite_customer_score,
-                score.coding_standards_score, score.team_velocity,
-                json.dumps(score.quality_indicators), json.dumps(score.risk_factors),
-                json.dumps(score.improvement_areas), score.score_trend,
-                score.velocity_trend, score.quality_trend, datetime.now().isoformat()
-            ))
+            """,
+                (score_id,
+                 start_date.strftime('%Y-%m-%d'),
+                 end_date.strftime('%Y-%m-%d'),
+                 score.overall_score,
+                 score.planning_game_score,
+                 score.small_releases_score,
+                 score.metaphor_score,
+                 score.simple_design_score,
+                 score.testing_score,
+                 score.refactoring_score,
+                 score.pair_programming_score,
+                 score.collective_ownership_score,
+                 score.continuous_integration_score,
+                 score.forty_hour_week_score,
+                 score.onsite_customer_score,
+                 score.coding_standards_score,
+                 score.team_velocity,
+                 json.dumps(
+                     score.quality_indicators),
+                    json.dumps(
+                     score.risk_factors),
+                    json.dumps(
+                     score.improvement_areas),
+                    score.score_trend,
+                    score.velocity_trend,
+                    score.quality_trend,
+                    datetime.now().isoformat()))
             conn.commit()
 
     def generate_dashboard_summary(self, days: int = 7) -> DashboardSummary:
@@ -469,11 +495,13 @@ class XPMethodologyDashboard:
         # Generate recommendations based on improvement areas
         for area in xp_score.improvement_areas:
             if area == "Testing":
-                recommendations.append("Focus on improving test coverage and TDD practices")
+                recommendations.append(
+                    "Focus on improving test coverage and TDD practices")
             elif area == "Pair Programming":
                 recommendations.append("Increase pair programming sessions")
             elif area == "Simple Design":
-                recommendations.append("Refactor complex code for better design")
+                recommendations.append(
+                    "Refactor complex code for better design")
             elif area == "Continuous Integration":
                 recommendations.append("Optimize CI/CD pipeline reliability")
 
@@ -493,7 +521,8 @@ class XPMethodologyDashboard:
             xp_compliance_score=xp_score.overall_score,
             team_velocity=xp_score.team_velocity,
             sprint_health=sprint_health,
-            quality_score=statistics.mean(xp_score.quality_indicators.values()),
+            quality_score=statistics.mean(
+                xp_score.quality_indicators.values()),
             critical_alerts=critical_alerts,
             warnings=warnings,
             recommendations=recommendations,
@@ -515,7 +544,8 @@ class XPMethodologyDashboard:
         snapshot_id = f"dashboard-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO dashboard_snapshots
                 (snapshot_id, period_start, period_end, xp_compliance_score,
                  team_velocity, sprint_health, quality_score, critical_alerts,
@@ -523,15 +553,29 @@ class XPMethodologyDashboard:
                  pending_prs, team_size, build_success_rate, test_coverage,
                  code_quality, team_satisfaction, snapshot_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                snapshot_id, summary.period_start, summary.period_end,
-                summary.xp_compliance_score, summary.team_velocity, summary.sprint_health,
-                summary.quality_score, json.dumps(summary.critical_alerts),
-                json.dumps(summary.warnings), json.dumps(summary.recommendations),
-                summary.active_sprints, summary.open_issues, summary.pending_prs,
-                summary.team_size, summary.build_success_rate, summary.test_coverage,
-                summary.code_quality, summary.team_satisfaction, datetime.now().isoformat()
-            ))
+            """,
+                (snapshot_id,
+                 summary.period_start,
+                 summary.period_end,
+                 summary.xp_compliance_score,
+                 summary.team_velocity,
+                 summary.sprint_health,
+                 summary.quality_score,
+                 json.dumps(
+                     summary.critical_alerts),
+                    json.dumps(
+                     summary.warnings),
+                    json.dumps(
+                     summary.recommendations),
+                    summary.active_sprints,
+                    summary.open_issues,
+                    summary.pending_prs,
+                    summary.team_size,
+                    summary.build_success_rate,
+                    summary.test_coverage,
+                    summary.code_quality,
+                    summary.team_satisfaction,
+                    datetime.now().isoformat()))
             conn.commit()
 
     def generate_comprehensive_dashboard_report(self, days: int = 7) -> str:
@@ -611,7 +655,7 @@ class XPMethodologyDashboard:
         else:
             report += "- ✅ No critical alerts\n"
 
-        report += f"""
+        report += """
 ### ⚠️ Warnings
 """
 
@@ -621,7 +665,7 @@ class XPMethodologyDashboard:
         else:
             report += "- ✅ No warnings\n"
 
-        report += f"""
+        report += """
 ---
 
 ## 🎯 Risk Assessment
@@ -655,7 +699,7 @@ class XPMethodologyDashboard:
         else:
             report += "✅ No immediate improvements needed\n"
 
-        report += f"""
+        report += """
 ### 📈 Focus Areas
 """
 
@@ -707,11 +751,11 @@ class XPMethodologyDashboard:
 ## 🎯 XP Methodology Maturity Assessment
 
 **Current Level**: {
-    'Advanced' if summary.xp_compliance_score >= 80 else
-    'Intermediate' if summary.xp_compliance_score >= 60 else
-    'Basic' if summary.xp_compliance_score >= 40 else
-    'Beginner'
-}
+            'Advanced' if summary.xp_compliance_score >= 80 else
+            'Intermediate' if summary.xp_compliance_score >= 60 else
+            'Basic' if summary.xp_compliance_score >= 40 else
+            'Beginner'
+        }
 
 **Target Level**: Advanced (80%+ compliance)
 
@@ -757,13 +801,15 @@ XP Practices Monitored: 12
 """
 
         if summary.critical_alerts:
-            exec_summary += f"**Critical Issues**: {len(summary.critical_alerts)} items require immediate attention\n"
+            exec_summary += f"**Critical Issues**: {
+                len(
+                    summary.critical_alerts)} items require immediate attention\n"
             for alert in summary.critical_alerts:
                 exec_summary += f"- {alert}\n"
         else:
             exec_summary += "**Status**: ✅ No critical issues\n"
 
-        exec_summary += f"""
+        exec_summary += """
 ## 💡 Recommendations
 """
 
@@ -788,7 +834,8 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python xp_methodology_dashboard.py <command> [options]")
         print("Commands:")
-        print("  dashboard [days]    - Generate comprehensive dashboard report")
+        print(
+            "  dashboard [days]    - Generate comprehensive dashboard report")
         print("  summary [days]      - Generate dashboard summary")
         print("  executive [days]    - Generate executive summary")
         print("  score [days]        - Calculate XP methodology score")
@@ -804,7 +851,8 @@ def main():
         report = dashboard.generate_comprehensive_dashboard_report(days)
 
         # Save report
-        filename = f"xp_methodology_dashboard_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"xp_methodology_dashboard_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(report)
 
@@ -835,7 +883,8 @@ def main():
         exec_summary = dashboard.generate_executive_summary(days)
 
         # Save executive summary
-        filename = f"xp_executive_summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"xp_executive_summary_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(exec_summary)
 
@@ -850,24 +899,29 @@ def main():
         print(f"  Overall Score: {score.overall_score:.1f}%")
         print(f"  Team Velocity: {score.team_velocity:.1f}")
         print(f"  Score Trend: {score.score_trend}")
-        print(f"  ")
-        print(f"  Practice Scores:")
+        print("  ")
+        print("  Practice Scores:")
         print(f"    Planning Game: {score.planning_game_score:.1f}%")
         print(f"    Small Releases: {score.small_releases_score:.1f}%")
         print(f"    Testing: {score.testing_score:.1f}%")
         print(f"    Pair Programming: {score.pair_programming_score:.1f}%")
-        print(f"    Continuous Integration: {score.continuous_integration_score:.1f}%")
+        print(
+            f"    Continuous Integration: {
+                score.continuous_integration_score:.1f}%")
         print(f"    40-Hour Week: {score.forty_hour_week_score:.1f}%")
 
         if score.risk_factors:
             print(f"  🔴 Risk Factors: {', '.join(score.risk_factors)}")
 
         if score.improvement_areas:
-            print(f"  📈 Improvement Areas: {', '.join(score.improvement_areas)}")
+            print(
+                f"  📈 Improvement Areas: {', '.join(score.improvement_areas)}")
 
     elif command == "snapshot":
         summary = dashboard.generate_dashboard_summary(7)
-        print(f"✅ Dashboard snapshot taken at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(
+            f"✅ Dashboard snapshot taken at {
+                datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"XP Compliance: {summary.xp_compliance_score:.1f}%")
         print(f"Sprint Health: {summary.sprint_health}")
 
@@ -890,7 +944,10 @@ def main():
         print(f"XP Methodology Trends ({days} days):")
         if historical_data:
             for date, score, velocity, trend in historical_data:
-                print(f"  {date}: {score:.1f}% (Velocity: {velocity:.1f}, Trend: {trend})")
+                print(
+                    f"  {date}: {
+                        score:.1f}% (Velocity: {
+                        velocity:.1f}, Trend: {trend})")
         else:
             print("  No historical data available")
 

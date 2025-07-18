@@ -2,16 +2,20 @@
 Comprehensive tests for PredictiveAnalytics ML component.
 """
 
-import json
-import pytest
 import sqlite3
 import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
+import pytest
+
+from ml_enhancements.models import (
+    AnalyticsResult,
+    MLConfig,
+    ResourcePrediction,
+)
 from ml_enhancements.predictive_analytics import PredictiveAnalytics
-from ml_enhancements.models import MLConfig, AnalyticsResult, ResourcePrediction
 
 
 class TestPredictiveAnalytics:
@@ -42,7 +46,7 @@ class TestPredictiveAnalytics:
 
     def test_init_creates_database_schema(self, temp_db, config):
         """Test that initialization creates proper database schema."""
-        analytics = PredictiveAnalytics(config=config, db_path=temp_db)
+        PredictiveAnalytics(config=config, db_path=temp_db)
 
         # Verify database file exists
         assert Path(temp_db).exists()
@@ -52,15 +56,18 @@ class TestPredictiveAnalytics:
             cursor = conn.cursor()
 
             # Check system_metrics table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='system_metrics'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='system_metrics'")
             assert cursor.fetchone() is not None
 
             # Check predictions table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='predictions'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='predictions'")
             assert cursor.fetchone() is not None
 
             # Check resource_forecasts table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='resource_forecasts'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='resource_forecasts'")
             assert cursor.fetchone() is not None
 
     def test_record_system_metrics(self, analytics):
@@ -84,7 +91,8 @@ class TestPredictiveAnalytics:
         # Verify metric was recorded
         with sqlite3.connect(analytics.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM system_metrics WHERE metric_id = ?", (metric_id,))
+            cursor.execute(
+                "SELECT * FROM system_metrics WHERE metric_id = ?", (metric_id,))
             result = cursor.fetchone()
 
             assert result is not None
@@ -132,7 +140,8 @@ class TestPredictiveAnalytics:
         assert prediction.current_usage == 0.6
         assert 0.0 <= prediction.predicted_usage <= 1.0
         assert prediction.prediction_horizon == 60
-        assert prediction.trend_direction in ['increasing', 'decreasing', 'stable']
+        assert prediction.trend_direction in [
+            'increasing', 'decreasing', 'stable']
 
     def test_train_models_insufficient_data(self, analytics):
         """Test model training with insufficient data."""
@@ -165,7 +174,7 @@ class TestPredictiveAnalytics:
 
         # Check that at least some models were trained successfully
         successful_models = [k for k, v in result.items()
-                           if isinstance(v, dict) and 'error' not in v]
+                             if isinstance(v, dict) and 'error' not in v]
         assert len(successful_models) > 0
 
     def test_calculate_performance_score(self, analytics):
@@ -193,7 +202,8 @@ class TestPredictiveAnalytics:
         assert len(scores) == 2
         assert 0.0 <= scores[0] <= 1.0
         assert 0.0 <= scores[1] <= 1.0
-        assert scores[0] > scores[1]  # First row should have better performance
+        # First row should have better performance
+        assert scores[0] > scores[1]
 
     def test_prepare_feature_vector(self, analytics):
         """Test feature vector preparation."""
@@ -285,18 +295,42 @@ class TestPredictiveAnalytics:
 
         with sqlite3.connect(analytics.db_path) as conn:
             # Insert old metric
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO system_metrics VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                "old_metric", old_time, 0.5, 0.4, 0.3, 0.2, 2, 3, 0.8, 0.1, 1.0, 5.0, "{}"
-            ))
+            """,
+                ("old_metric",
+                 old_time,
+                 0.5,
+                 0.4,
+                 0.3,
+                 0.2,
+                 2,
+                 3,
+                 0.8,
+                 0.1,
+                 1.0,
+                 5.0,
+                 "{}"))
 
             # Insert recent metric
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO system_metrics VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                "recent_metric", recent_time, 0.6, 0.5, 0.4, 0.3, 3, 4, 0.9, 0.05, 1.2, 8.0, "{}"
-            ))
+            """,
+                ("recent_metric",
+                 recent_time,
+                 0.6,
+                 0.5,
+                 0.4,
+                 0.3,
+                 3,
+                 4,
+                 0.9,
+                 0.05,
+                 1.2,
+                 8.0,
+                 "{}"))
 
             conn.commit()
 
@@ -307,7 +341,8 @@ class TestPredictiveAnalytics:
 
         # Verify recent data still exists
         with sqlite3.connect(analytics.db_path) as conn:
-            cursor = conn.execute("SELECT COUNT(*) FROM system_metrics WHERE metric_id = 'recent_metric'")
+            cursor = conn.execute(
+                "SELECT COUNT(*) FROM system_metrics WHERE metric_id = 'recent_metric'")
             assert cursor.fetchone()[0] == 1
 
     def test_analytics_result_serialization(self, analytics):
@@ -415,6 +450,11 @@ class TestPredictiveAnalytics:
         assert isinstance(analytics.model_metrics, dict)
 
         # Test that scalers are initialized for each model
-        expected_models = ['performance', 'cpu_usage', 'memory_usage', 'network_usage', 'task_completion_time']
+        expected_models = [
+            'performance',
+            'cpu_usage',
+            'memory_usage',
+            'network_usage',
+            'task_completion_time']
         for model_name in expected_models:
             assert model_name in analytics.scalers

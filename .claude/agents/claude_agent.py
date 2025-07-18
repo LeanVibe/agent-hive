@@ -3,29 +3,29 @@
 
 import asyncio
 import json
-import time
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, Any, Optional, List
-import subprocess
 import signal
-import psutil
+import time
+from typing import Any, Dict, List
 
-from agents.base_agent import BaseAgent, Task, Result, AgentInfo, AgentStatus
+import psutil
+from agents.base_agent import AgentInfo, AgentStatus, BaseAgent, Result, Task
 from config.config_loader import get_config
-from utils.logging_config import get_logger, log_performance, log_error, set_task_context
+from utils.logging_config import (
+    get_logger,
+    log_error,
+    log_performance,
+    set_task_context,
+)
 
 logger = get_logger('claude_agent')
 
 
 class CLIError(Exception):
     """Exception raised when CLI command fails."""
-    pass
 
 
 class CLITimeout(Exception):
     """Exception raised when CLI command times out."""
-    pass
 
 
 class CircuitBreaker:
@@ -63,7 +63,9 @@ class CircuitBreaker:
 
         if self.failure_count >= self.failure_threshold:
             self.state = 'OPEN'
-            logger.warning(f"Circuit breaker opened after {self.failure_count} failures")
+            logger.warning(
+    f"Circuit breaker opened after {
+        self.failure_count} failures")
 
 
 class CLIManager:
@@ -74,7 +76,8 @@ class CLIManager:
         self.timeout = timeout
         self.circuit_breaker = CircuitBreaker()
 
-    async def execute_command(self, args: List[str], input_data: str = None) -> Dict[str, Any]:
+    async def execute_command(
+        self, args: List[str], input_data: str = None) -> Dict[str, Any]:
         """Execute CLI command with proper error handling.
 
         Args:
@@ -105,13 +108,15 @@ class CLIManager:
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                preexec_fn=lambda: signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+                preexec_fn=lambda: signal.signal(
+                    signal.SIGPIPE, signal.SIG_DFL)
             )
 
             # Execute with timeout
             try:
                 stdout, stderr = await asyncio.wait_for(
-                    process.communicate(input=input_data.encode() if input_data else None),
+                    process.communicate(
+    input=input_data.encode() if input_data else None),
                     timeout=self.timeout
                 )
             except asyncio.TimeoutError:
@@ -196,7 +201,8 @@ class CLIManager:
         except Exception as e:
             logger.warning(f"Error killing process tree: {e}")
 
-    def _parse_command_result(self, return_code: int, stdout: str, stderr: str) -> Dict[str, Any]:
+    def _parse_command_result(self, return_code: int,
+                              stdout: str, stderr: str) -> Dict[str, Any]:
         """Parse command result from stdout/stderr.
 
         Args:
@@ -291,7 +297,10 @@ class ClaudeAgent(BaseAgent):
 
             self.complete_task()
 
-            logger.info(f"Task {task.id} completed successfully in {execution_time:.2f}s")
+            logger.info(
+    f"Task {
+        task.id} completed successfully in {
+            execution_time:.2f}s")
             return result
 
         except Exception as e:
@@ -328,10 +337,17 @@ class ClaudeAgent(BaseAgent):
                 last_error = e
                 if attempt < self.max_retries - 1:
                     wait_time = 2 ** attempt  # Exponential backoff
-                    logger.warning(f"Task {task.id} failed (attempt {attempt + 1}), retrying in {wait_time}s: {e}")
+                    logger.warning(
+    f"Task {
+        task.id} failed (attempt {
+            attempt +
+             1}), retrying in {wait_time}s: {e}")
                     await asyncio.sleep(wait_time)
                 else:
-                    logger.error(f"Task {task.id} failed after {self.max_retries} attempts: {e}")
+                    logger.error(
+    f"Task {
+        task.id} failed after {
+            self.max_retries} attempts: {e}")
 
         raise last_error
 
@@ -381,7 +397,8 @@ class ClaudeAgent(BaseAgent):
 
         return args
 
-    def _parse_task_result(self, task: Task, cli_result: Dict[str, Any]) -> Result:
+    def _parse_task_result(
+        self, task: Task, cli_result: Dict[str, Any]) -> Result:
         """Parse CLI result into Task result.
 
         Args:
@@ -449,7 +466,7 @@ class ClaudeAgent(BaseAgent):
         try:
             # Test CLI availability
             test_args = ['--version']
-            result = await self.cli_manager.execute_command(test_args)
+            await self.cli_manager.execute_command(test_args)
 
             # Check circuit breaker state
             if self.cli_manager.circuit_breaker.state == 'OPEN':
@@ -465,11 +482,13 @@ class ClaudeAgent(BaseAgent):
                 max_cpu = self.resource_limits.get('max_cpu_percent', 90)
 
                 if memory_mb > max_memory:
-                    logger.warning(f"High memory usage: {memory_mb}MB > {max_memory}MB")
+                    logger.warning(
+    f"High memory usage: {memory_mb}MB > {max_memory}MB")
                     return False
 
                 if cpu_percent > max_cpu:
-                    logger.warning(f"High CPU usage: {cpu_percent}% > {max_cpu}%")
+                    logger.warning(
+    f"High CPU usage: {cpu_percent}% > {max_cpu}%")
                     return False
 
             return True

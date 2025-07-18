@@ -2,16 +2,16 @@
 Comprehensive tests for PatternOptimizer ML component.
 """
 
-import json
-import pytest
 import sqlite3
 import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-from ml_enhancements.pattern_optimizer import PatternOptimizer
+import pytest
+
 from ml_enhancements.models import MLConfig, PatternData, WorkflowOptimization
+from ml_enhancements.pattern_optimizer import PatternOptimizer
 
 
 class TestPatternOptimizer:
@@ -42,7 +42,7 @@ class TestPatternOptimizer:
 
     def test_init_creates_database_schema(self, temp_db, config):
         """Test that initialization creates proper database schema."""
-        optimizer = PatternOptimizer(config=config, db_path=temp_db)
+        PatternOptimizer(config=config, db_path=temp_db)
 
         # Verify database file exists
         assert Path(temp_db).exists()
@@ -52,15 +52,18 @@ class TestPatternOptimizer:
             cursor = conn.cursor()
 
             # Check workflow_patterns table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='workflow_patterns'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='workflow_patterns'")
             assert cursor.fetchone() is not None
 
             # Check workflow_executions table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='workflow_executions'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='workflow_executions'")
             assert cursor.fetchone() is not None
 
             # Check indexes
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_patterns_type'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_patterns_type'")
             assert cursor.fetchone() is not None
 
     def test_record_workflow_execution(self, optimizer):
@@ -92,7 +95,8 @@ class TestPatternOptimizer:
         # Verify execution was recorded
         with sqlite3.connect(optimizer.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM workflow_executions WHERE execution_id = ?", ("test_exec_1",))
+            cursor.execute(
+                "SELECT * FROM workflow_executions WHERE execution_id = ?", ("test_exec_1",))
             result = cursor.fetchone()
 
             assert result is not None
@@ -313,7 +317,8 @@ class TestPatternOptimizer:
                 execution_id=f"stats_test_{i}",
                 workflow_type="stats_workflow",
                 features={'task_complexity': 1.0, 'agent_count': 2},
-                performance_metrics={'completion_time': 1.0, 'success_rate': 0.9},
+                performance_metrics={
+                    'completion_time': 1.0, 'success_rate': 0.9},
                 execution_time=1.0,
                 success=True
             )
@@ -342,19 +347,35 @@ class TestPatternOptimizer:
             ))
 
             # Insert recent pattern with sufficient samples
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO workflow_patterns VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                "recent_pattern", "recent_workflow", "hash2", 0.8, 0.2, 0.9, 20,
-                recent_time, recent_time, "{}"
-            ))
+            """,
+                ("recent_pattern",
+                 "recent_workflow",
+                 "hash2",
+                 0.8,
+                 0.2,
+                 0.9,
+                 20,
+                 recent_time,
+                 recent_time,
+                 "{}"))
 
             # Insert old execution
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO workflow_executions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                "old_exec", "old_workflow", "{}", "{}", 1.0, 1, old_time, "agent1", "{}"
-            ))
+            """,
+                ("old_exec",
+                 "old_workflow",
+                 "{}",
+                 "{}",
+                 1.0,
+                 1,
+                 old_time,
+                 "agent1",
+                 "{}"))
 
             conn.commit()
 
@@ -365,7 +386,8 @@ class TestPatternOptimizer:
 
         # Verify recent pattern still exists
         with sqlite3.connect(optimizer.db_path) as conn:
-            cursor = conn.execute("SELECT COUNT(*) FROM workflow_patterns WHERE pattern_id = 'recent_pattern'")
+            cursor = conn.execute(
+                "SELECT COUNT(*) FROM workflow_patterns WHERE pattern_id = 'recent_pattern'")
             assert cursor.fetchone()[0] == 1
 
     def test_workflow_optimization_creation(self, optimizer):
@@ -376,7 +398,8 @@ class TestPatternOptimizer:
             current_performance=0.7,
             predicted_improvement=0.15,
             confidence=0.85,
-            recommended_changes=["Increase agent count", "Optimize resource allocation"],
+            recommended_changes=["Increase agent count",
+                                 "Optimize resource allocation"],
             effort_estimate="medium",
             impact_score=0.85 * 0.15
         )
@@ -462,7 +485,8 @@ class TestPatternOptimizer:
 
         assert optimizer._estimate_effort(high_effort_changes) == "high"
         assert optimizer._estimate_effort(medium_effort_changes) == "medium"
-        assert optimizer._estimate_effort(low_effort_changes) == "medium"  # Default for implement
+        assert optimizer._estimate_effort(
+            low_effort_changes) == "medium"  # Default for implement
 
     def test_concurrent_pattern_updates(self, optimizer):
         """Test thread safety of pattern updates."""
@@ -544,4 +568,5 @@ class TestPatternOptimizer:
         )
 
         # Verify debug logging was called
-        mock_logger.debug.assert_called_with("Recorded workflow execution: log_test")
+        mock_logger.debug.assert_called_with(
+            "Recorded workflow execution: log_test")

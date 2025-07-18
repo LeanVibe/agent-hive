@@ -6,9 +6,8 @@ integration with the Service Discovery system.
 """
 
 import logging
-from typing import Dict, Any, List
 from abc import ABC, abstractmethod
-
+from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ class ClientLibraryGenerator(ABC):
         Returns:
             Generated client code
         """
-        pass
 
 
 class PythonClientGenerator(ClientLibraryGenerator):
@@ -272,7 +270,9 @@ if __name__ == "__main__":
     asyncio.run(main())
 '''
 
-        service_name_class = ''.join(word.capitalize() for word in service_name.replace('-', '_').split('_'))
+        service_name_class = ''.join(
+            word.capitalize() for word in service_name.replace(
+                '-', '_').split('_'))
 
         return template.format(
             service_name=service_name,
@@ -497,7 +497,9 @@ module.exports = {{ {service_name_class}Client, ServiceInstance }};
 // }}
 '''
 
-        service_name_class = ''.join(word.capitalize() for word in service_name.replace('-', '_').split('_'))
+        service_name_class = ''.join(
+            word.capitalize() for word in service_name.replace(
+                '-', '_').split('_'))
 
         return template.format(
             service_name=service_name,
@@ -533,12 +535,17 @@ class ClientLibraryFactory:
         language = language.lower()
         if language not in cls._generators:
             supported = ', '.join(cls._generators.keys())
-            raise ValueError(f"Unsupported language: {language}. Supported: {supported}")
+            raise ValueError(
+                f"Unsupported language: {language}. Supported: {supported}")
 
         return cls._generators[language]()
 
     @classmethod
-    def generate_client_library(cls, language: str, api_endpoint: str, service_name: str) -> str:
+    def generate_client_library(
+            cls,
+            language: str,
+            api_endpoint: str,
+            service_name: str) -> str:
         """
         Generate client library for specified language.
 
@@ -562,15 +569,21 @@ class ClientLibraryFactory:
 # Convenience functions
 def generate_python_client(api_endpoint: str, service_name: str) -> str:
     """Generate Python client library."""
-    return ClientLibraryFactory.generate_client_library('python', api_endpoint, service_name)
+    return ClientLibraryFactory.generate_client_library(
+        'python', api_endpoint, service_name)
 
 
 def generate_javascript_client(api_endpoint: str, service_name: str) -> str:
     """Generate JavaScript client library."""
-    return ClientLibraryFactory.generate_client_library('javascript', api_endpoint, service_name)
+    return ClientLibraryFactory.generate_client_library(
+        'javascript', api_endpoint, service_name)
 
 
-def save_client_library(language: str, api_endpoint: str, service_name: str, output_path: str) -> bool:
+def save_client_library(
+        language: str,
+        api_endpoint: str,
+        service_name: str,
+        output_path: str) -> bool:
     """
     Generate and save client library to file.
 
@@ -584,12 +597,14 @@ def save_client_library(language: str, api_endpoint: str, service_name: str, out
         True if successful, False otherwise
     """
     try:
-        client_code = ClientLibraryFactory.generate_client_library(language, api_endpoint, service_name)
+        client_code = ClientLibraryFactory.generate_client_library(
+            language, api_endpoint, service_name)
 
         with open(output_path, 'w') as f:
             f.write(client_code)
 
-        logger.info(f"Generated {language} client library for {service_name} at {output_path}")
+        logger.info(
+            f"Generated {language} client library for {service_name} at {output_path}")
         return True
 
     except Exception as e:
@@ -613,4 +628,6 @@ if __name__ == "__main__":
     print(js_client[:500] + "...")
 
     # Show supported languages
-    print(f"\nSupported languages: {ClientLibraryFactory.get_supported_languages()}")
+    print(
+        f"\nSupported languages: {
+            ClientLibraryFactory.get_supported_languages()}")

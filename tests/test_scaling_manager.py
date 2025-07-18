@@ -10,21 +10,33 @@ This test suite covers:
 - Scaling configuration
 """
 
-import pytest
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime, timedelta
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
+from unittest.mock import AsyncMock, Mock
+
+import pytest
+
+from advanced_orchestration.models import (
+    AgentStatus,
+    CoordinatorConfig,
+    ResourceLimits,
+    ScalingConfig,
+    ScalingException,
+    ScalingMetrics,
+    ScalingReason,
+)
+from advanced_orchestration.multi_agent_coordinator import (
+    MultiAgentCoordinator,
+)
+from advanced_orchestration.scaling_manager import (
+    ScalingDecision,
+    ScalingEvent,
+    ScalingManager,
+)
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from advanced_orchestration.scaling_manager import ScalingManager, ScalingDecision, ScalingEvent
-from advanced_orchestration.models import (
-    ResourceLimits, ScalingConfig, ScalingReason, ScalingMetrics,
-    ScalingException, AgentStatus, CoordinatorConfig
-)
-from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
 
 
 class TestScalingManager:
@@ -68,7 +80,8 @@ class TestScalingManager:
             error_rate=0.01
         )
 
-    def test_scaling_manager_initialization(self, scaling_manager, resource_limits):
+    def test_scaling_manager_initialization(
+            self, scaling_manager, resource_limits):
         """Test scaling manager initializes correctly"""
         assert scaling_manager.resource_limits == resource_limits
         assert scaling_manager.config.max_agents == resource_limits.max_agents
@@ -78,7 +91,8 @@ class TestScalingManager:
         assert scaling_manager.scaling_enabled is True
 
     @pytest.mark.asyncio
-    async def test_should_scale_up_high_queue_depth(self, scaling_manager, mock_coordinator):
+    async def test_should_scale_up_high_queue_depth(
+            self, scaling_manager, mock_coordinator):
         """Test scale up decision based on high queue depth"""
         # Mock high queue depth metrics
         mock_metrics = ScalingMetrics(
@@ -90,7 +104,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Check scale up decision
         should_scale, reason = await scaling_manager.should_scale_up(mock_coordinator)
@@ -102,7 +117,8 @@ class TestScalingManager:
         assert reason.current_value == 150
 
     @pytest.mark.asyncio
-    async def test_should_scale_up_high_response_time(self, scaling_manager, mock_coordinator):
+    async def test_should_scale_up_high_response_time(
+            self, scaling_manager, mock_coordinator):
         """Test scale up decision based on high response time"""
         # Mock high response time metrics
         mock_metrics = ScalingMetrics(
@@ -114,7 +130,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Check scale up decision
         should_scale, reason = await scaling_manager.should_scale_up(mock_coordinator)
@@ -126,7 +143,8 @@ class TestScalingManager:
         assert reason.current_value == 10.0
 
     @pytest.mark.asyncio
-    async def test_should_scale_up_high_resource_utilization(self, scaling_manager, mock_coordinator):
+    async def test_should_scale_up_high_resource_utilization(
+            self, scaling_manager, mock_coordinator):
         """Test scale up decision based on high resource utilization"""
         # Mock high resource utilization metrics
         mock_metrics = ScalingMetrics(
@@ -138,7 +156,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Check scale up decision
         should_scale, reason = await scaling_manager.should_scale_up(mock_coordinator)
@@ -150,7 +169,8 @@ class TestScalingManager:
         assert reason.current_value == 0.9
 
     @pytest.mark.asyncio
-    async def test_should_scale_up_at_max_capacity(self, scaling_manager, mock_coordinator):
+    async def test_should_scale_up_at_max_capacity(
+            self, scaling_manager, mock_coordinator):
         """Test scale up decision at maximum capacity"""
         # Mock metrics at max capacity
         mock_metrics = ScalingMetrics(
@@ -162,7 +182,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Check scale up decision
         should_scale, reason = await scaling_manager.should_scale_up(mock_coordinator)
@@ -171,7 +192,8 @@ class TestScalingManager:
         assert reason is None
 
     @pytest.mark.asyncio
-    async def test_should_scale_down_low_utilization(self, scaling_manager, mock_coordinator):
+    async def test_should_scale_down_low_utilization(
+            self, scaling_manager, mock_coordinator):
         """Test scale down decision based on low resource utilization"""
         # Mock low utilization metrics
         mock_metrics = ScalingMetrics(
@@ -183,7 +205,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Add stable metrics history
         for i in range(5):
@@ -199,7 +222,8 @@ class TestScalingManager:
         assert reason.current_value == 0.2
 
     @pytest.mark.asyncio
-    async def test_should_scale_down_at_min_capacity(self, scaling_manager, mock_coordinator):
+    async def test_should_scale_down_at_min_capacity(
+            self, scaling_manager, mock_coordinator):
         """Test scale down decision at minimum capacity"""
         # Mock metrics at min capacity
         mock_metrics = ScalingMetrics(
@@ -211,7 +235,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Check scale down decision
         should_scale, reason = await scaling_manager.should_scale_down(mock_coordinator)
@@ -232,10 +257,12 @@ class TestScalingManager:
         new_agents = await scaling_manager.scale_up(mock_coordinator, count=2)
 
         assert len(new_agents) == 2
-        assert all(agent_id.startswith("auto-agent-") for agent_id in new_agents)
+        assert all(agent_id.startswith("auto-agent-")
+                   for agent_id in new_agents)
 
     @pytest.mark.asyncio
-    async def test_scale_up_at_max_capacity(self, scaling_manager, mock_coordinator):
+    async def test_scale_up_at_max_capacity(
+            self, scaling_manager, mock_coordinator):
         """Test scale up at maximum capacity"""
         # Mock coordinator agents at max capacity
         mock_coordinator.agents = {
@@ -262,11 +289,13 @@ class TestScalingManager:
         removed_agents = await scaling_manager.scale_down(mock_coordinator, count=1)
 
         assert len(removed_agents) == 1
-        assert removed_agents[0] == "agent-1"  # Should remove agent with least tasks
+        # Should remove agent with least tasks
+        assert removed_agents[0] == "agent-1"
         mock_coordinator.unregister_agent.assert_called_once_with("agent-1")
 
     @pytest.mark.asyncio
-    async def test_scale_down_at_min_capacity(self, scaling_manager, mock_coordinator):
+    async def test_scale_down_at_min_capacity(
+            self, scaling_manager, mock_coordinator):
         """Test scale down at minimum capacity"""
         # Mock coordinator agents at min capacity
         mock_coordinator.agents = {
@@ -279,7 +308,8 @@ class TestScalingManager:
             await scaling_manager.scale_down(mock_coordinator, count=1)
 
     @pytest.mark.asyncio
-    async def test_check_scaling_needs_disabled(self, scaling_manager, mock_coordinator):
+    async def test_check_scaling_needs_disabled(
+            self, scaling_manager, mock_coordinator):
         """Test scaling check when scaling is disabled"""
         # Disable scaling
         scaling_manager.disable_scaling()
@@ -290,7 +320,8 @@ class TestScalingManager:
         assert decision is None
 
     @pytest.mark.asyncio
-    async def test_check_scaling_needs_cooldown(self, scaling_manager, mock_coordinator):
+    async def test_check_scaling_needs_cooldown(
+            self, scaling_manager, mock_coordinator):
         """Test scaling check during cooldown period"""
         # Set recent scaling event
         scaling_manager.last_scaling_event = datetime.now() - timedelta(seconds=30)
@@ -305,7 +336,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Check scaling needs
         decision = await scaling_manager.check_scaling_needs(mock_coordinator)
@@ -313,7 +345,8 @@ class TestScalingManager:
         assert decision is None  # Should be blocked by cooldown
 
     @pytest.mark.asyncio
-    async def test_check_scaling_needs_scale_up(self, scaling_manager, mock_coordinator):
+    async def test_check_scaling_needs_scale_up(
+            self, scaling_manager, mock_coordinator):
         """Test scaling check that triggers scale up"""
         # Mock metrics that trigger scale up
         mock_metrics = ScalingMetrics(
@@ -325,7 +358,8 @@ class TestScalingManager:
             throughput=50.0,
             error_rate=0.01
         )
-        mock_coordinator._calculate_scaling_metrics = AsyncMock(return_value=mock_metrics)
+        mock_coordinator._calculate_scaling_metrics = AsyncMock(
+            return_value=mock_metrics)
 
         # Mock coordinator agents
         mock_coordinator.agents = {
@@ -398,7 +432,7 @@ class TestScalingManager:
         assert stats['successful_events'] == 2
         assert stats['scale_up_events'] == 2
         assert stats['scale_down_events'] == 1
-        assert stats['success_rate'] == 2/3
+        assert stats['success_rate'] == 2 / 3
         assert stats['scaling_enabled'] is True
 
     def test_enable_disable_scaling(self, scaling_manager):
@@ -529,16 +563,21 @@ class TestScalingManagerIntegration:
         coordinator = MultiAgentCoordinator(config)
 
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
-        coordinator.resource_manager.deallocate_resources = AsyncMock(return_value=True)
-        coordinator.resource_manager.get_resource_usage = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
+        coordinator.resource_manager.deallocate_resources = AsyncMock(
+            return_value=True)
+        coordinator.resource_manager.get_resource_usage = AsyncMock(
+            return_value=Mock())
 
         # Start coordinator
         await coordinator.start()
 
         # Register initial agents
         from advanced_orchestration.models import (
-            AgentRegistration, AgentMetadata, ResourceRequirements
+            AgentMetadata,
+            AgentRegistration,
+            ResourceRequirements,
         )
 
         for i in range(2):
@@ -565,7 +604,8 @@ class TestScalingManagerIntegration:
         decision = await coordinator.scaling_manager.check_scaling_needs(coordinator)
 
         # Should trigger scale up due to high queue depth
-        assert decision == ScalingDecision.SCALE_UP or decision is None  # May be None due to cooldown
+        # May be None due to cooldown
+        assert decision == ScalingDecision.SCALE_UP or decision is None
 
         # Stop coordinator
         await coordinator.stop()

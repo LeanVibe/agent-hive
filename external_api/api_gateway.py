@@ -6,21 +6,14 @@ the LeanVibe Agent Hive orchestration system.
 """
 
 import asyncio
-import json
 import logging
 import time
-import uuid
-from datetime import datetime
-from typing import Dict, Any, Optional, List, Callable
 from dataclasses import asdict
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
 
-from .models import (
-    ApiGatewayConfig,
-    ApiRequest,
-    ApiResponse
-)
+from .models import ApiGatewayConfig, ApiRequest, ApiResponse
 from .service_discovery import ServiceDiscovery, ServiceInstance
-
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +26,10 @@ class ApiGateway:
     and response formatting for the orchestration system.
     """
 
-    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
+    def __init__(
+            self,
+            config: ApiGatewayConfig,
+            service_discovery: Optional[ServiceDiscovery] = None):
         """
         Initialize API gateway.
 
@@ -43,7 +39,8 @@ class ApiGateway:
         """
         self.config = config
         self.service_discovery = service_discovery
-        self.routes: Dict[str, Dict[str, Callable]] = {}  # {path: {method: handler}}
+        # {path: {method: handler}}
+        self.routes: Dict[str, Dict[str, Callable]] = {}
         self.service_routes: Dict[str, str] = {}  # {path_prefix: service_name}
         self.middleware: List[Callable] = []
         self.rate_limiter: Dict[str, List[float]] = {}
@@ -62,7 +59,10 @@ class ApiGateway:
             return
 
         try:
-            logger.info(f"Starting API gateway on {self.config.host}:{self.config.port}")
+            logger.info(
+                f"Starting API gateway on {
+                    self.config.host}:{
+                    self.config.port}")
             await asyncio.sleep(0.1)  # Simulate startup time
 
             self.server_started = True
@@ -87,7 +87,11 @@ class ApiGateway:
             logger.error(f"Error stopping API gateway: {e}")
             raise
 
-    def register_route(self, path: str, method: str, handler: Callable) -> None:
+    def register_route(
+            self,
+            path: str,
+            method: str,
+            handler: Callable) -> None:
         """
         Register a route handler.
 
@@ -151,9 +155,13 @@ class ApiGateway:
             "last_used": None,
             "request_count": 0
         }
-        logger.info(f"Registered API key with metadata: {list(metadata.keys())}")
+        logger.info(
+            f"Registered API key with metadata: {list(metadata.keys())}")
 
-    def register_service_route(self, path_prefix: str, service_name: str) -> None:
+    def register_service_route(
+            self,
+            path_prefix: str,
+            service_name: str) -> None:
         """
         Register a path prefix to be routed to a specific service.
 
@@ -162,7 +170,8 @@ class ApiGateway:
             service_name: Service name to route to
         """
         self.service_routes[path_prefix] = service_name
-        logger.info(f"Registered service route: {path_prefix} -> {service_name}")
+        logger.info(
+            f"Registered service route: {path_prefix} -> {service_name}")
 
     def unregister_service_route(self, path_prefix: str) -> bool:
         """
@@ -180,7 +189,8 @@ class ApiGateway:
             return True
         return False
 
-    async def get_service_instance(self, service_name: str) -> Optional[ServiceInstance]:
+    async def get_service_instance(
+            self, service_name: str) -> Optional[ServiceInstance]:
         """
         Get a healthy service instance for routing.
 
@@ -196,15 +206,21 @@ class ApiGateway:
         try:
             instance = await self.service_discovery.get_healthy_instance(service_name)
             if instance:
-                logger.debug(f"Found healthy instance for {service_name}: {instance.host}:{instance.port}")
+                logger.debug(
+                    f"Found healthy instance for {service_name}: {
+                        instance.host}:{
+                        instance.port}")
             else:
-                logger.warning(f"No healthy instances found for service: {service_name}")
+                logger.warning(
+                    f"No healthy instances found for service: {service_name}")
             return instance
         except Exception as e:
-            logger.error(f"Error getting service instance for {service_name}: {e}")
+            logger.error(
+                f"Error getting service instance for {service_name}: {e}")
             return None
 
-    async def proxy_to_service(self, request: ApiRequest, service_name: str) -> Dict[str, Any]:
+    async def proxy_to_service(
+            self, request: ApiRequest, service_name: str) -> Dict[str, Any]:
         """
         Proxy request to a service instance.
 
@@ -226,10 +242,14 @@ class ApiGateway:
             import aiohttp
 
             # Build target URL
-            target_url = f"http://{instance.host}:{instance.port}{request.path}"
+            target_url = f"http://{
+                instance.host}:{
+                instance.port}{
+                request.path}"
 
             # Prepare headers (exclude host header to avoid conflicts)
-            headers = {k: v for k, v in request.headers.items() if k.lower() != 'host'}
+            headers = {k: v for k, v in request.headers.items()
+                       if k.lower() != 'host'}
 
             timeout = aiohttp.ClientTimeout(total=self.config.request_timeout)
 
@@ -239,7 +259,8 @@ class ApiGateway:
                     url=target_url,
                     headers=headers,
                     params=request.query_params,
-                    json=request.body if request.method in ["POST", "PUT", "PATCH"] else None
+                    json=request.body if request.method in [
+                        "POST", "PUT", "PATCH"] else None
                 ) as response:
                     body = await response.text()
 
@@ -313,7 +334,8 @@ class ApiGateway:
 
             # CORS handling
             if self.config.enable_cors and request.method == "OPTIONS":
-                return self._create_cors_response(request.request_id, start_time)
+                return self._create_cors_response(
+                    request.request_id, start_time)
 
             # Route matching - first try direct handlers
             handler = self._find_handler(request.path, request.method)
@@ -328,7 +350,8 @@ class ApiGateway:
 
                         response = ApiResponse(
                             status_code=result.get("status_code", 200),
-                            headers={**self._get_response_headers(), **result.get("headers", {})},
+                            headers={**self._get_response_headers(), **
+                                     result.get("headers", {})},
                             body=result.get("body"),
                             timestamp=datetime.now(),
                             processing_time=(time.time() - start_time) * 1000,
@@ -336,11 +359,15 @@ class ApiGateway:
                         )
 
                         self._request_count += 1
-                        logger.info(f"Proxied request {request.request_id} to {service_name} in {response.processing_time:.2f}ms")
+                        logger.info(
+                            f"Proxied request {
+                                request.request_id} to {service_name} in {
+                                response.processing_time:.2f}ms")
                         return response
 
                     except Exception as e:
-                        logger.error(f"Error proxying to service {service_name}: {e}")
+                        logger.error(
+                            f"Error proxying to service {service_name}: {e}")
                         return self._create_error_response(
                             request.request_id,
                             502,
@@ -374,7 +401,8 @@ class ApiGateway:
 
                 # Update API key usage
                 if self.config.auth_required:
-                    self._update_api_key_usage(request.headers.get(self.config.api_key_header))
+                    self._update_api_key_usage(
+                        request.headers.get(self.config.api_key_header))
 
                 response = ApiResponse(
                     status_code=result.get("status_code", 200),
@@ -386,7 +414,10 @@ class ApiGateway:
                 )
 
                 self._request_count += 1
-                logger.info(f"Processed request {request.request_id} in {response.processing_time:.2f}ms")
+                logger.info(
+                    f"Processed request {
+                        request.request_id} in {
+                        response.processing_time:.2f}ms")
                 return response
 
             except asyncio.TimeoutError:
@@ -407,7 +438,8 @@ class ApiGateway:
                 start_time
             )
 
-    async def _authenticate_request(self, request: ApiRequest) -> Dict[str, Any]:
+    async def _authenticate_request(
+            self, request: ApiRequest) -> Dict[str, Any]:
         """
         Authenticate API request using API key.
 
@@ -456,7 +488,8 @@ class ApiGateway:
             Rate limit check result
         """
         # Use API key or client IP for rate limiting
-        rate_limit_key = request.headers.get(self.config.api_key_header, request.client_ip)
+        rate_limit_key = request.headers.get(
+            self.config.api_key_header, request.client_ip)
 
         current_time = time.time()
         window_start = current_time - self.config.rate_limit_window
@@ -543,7 +576,12 @@ class ApiGateway:
 
         return headers
 
-    def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
+    def _create_error_response(
+            self,
+            request_id: str,
+            status_code: int,
+            message: str,
+            start_time: float) -> ApiResponse:
         """Create error response."""
         return ApiResponse(
             status_code=status_code,
@@ -554,7 +592,10 @@ class ApiGateway:
             request_id=request_id
         )
 
-    def _create_cors_response(self, request_id: str, start_time: float) -> ApiResponse:
+    def _create_cors_response(
+            self,
+            request_id: str,
+            start_time: float) -> ApiResponse:
         """Create CORS preflight response."""
         return ApiResponse(
             status_code=200,
@@ -565,7 +606,11 @@ class ApiGateway:
             request_id=request_id
         )
 
-    def _create_response_from_middleware(self, request_id: str, middleware_result: Dict[str, Any], start_time: float) -> ApiResponse:
+    def _create_response_from_middleware(self,
+                                         request_id: str,
+                                         middleware_result: Dict[str,
+                                                                 Any],
+                                         start_time: float) -> ApiResponse:
         """Create response from middleware result."""
         return ApiResponse(
             status_code=middleware_result.get("status_code", 200),

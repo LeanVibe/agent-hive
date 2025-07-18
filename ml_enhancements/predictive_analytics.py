@@ -9,19 +9,17 @@ import json
 import logging
 import sqlite3
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
-from .models import MLConfig, AnalyticsResult, ResourcePrediction
-
+from .models import AnalyticsResult, MLConfig, ResourcePrediction
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +35,10 @@ class PredictiveAnalytics:
     - Real-time analytics and monitoring
     """
 
-    def __init__(self, config: Optional[MLConfig] = None, db_path: Optional[str] = None):
+    def __init__(
+            self,
+            config: Optional[MLConfig] = None,
+            db_path: Optional[str] = None):
         """Initialize PredictiveAnalytics with configuration and database."""
         self.config = config or MLConfig()
         self.db_path = db_path or "predictive_analytics.db"
@@ -45,12 +46,19 @@ class PredictiveAnalytics:
 
         # ML models for different prediction types
         self.models = {
-            'performance': RandomForestRegressor(n_estimators=100, random_state=42),
-            'cpu_usage': GradientBoostingRegressor(n_estimators=100, random_state=42),
-            'memory_usage': RandomForestRegressor(n_estimators=100, random_state=42),
+            'performance': RandomForestRegressor(
+                n_estimators=100,
+                random_state=42),
+            'cpu_usage': GradientBoostingRegressor(
+                n_estimators=100,
+                random_state=42),
+            'memory_usage': RandomForestRegressor(
+                n_estimators=100,
+                random_state=42),
             'network_usage': LinearRegression(),
-            'task_completion_time': RandomForestRegressor(n_estimators=100, random_state=42)
-        }
+            'task_completion_time': RandomForestRegressor(
+                n_estimators=100,
+                random_state=42)}
 
         self.scalers = {
             model_name: StandardScaler() for model_name in self.models.keys()
@@ -61,7 +69,8 @@ class PredictiveAnalytics:
         # Initialize database
         self._init_database()
 
-        logger.info(f"PredictiveAnalytics initialized with config: {self.config}")
+        logger.info(
+            f"PredictiveAnalytics initialized with config: {self.config}")
 
     def _init_database(self) -> None:
         """Initialize SQLite database for analytics data storage."""
@@ -163,7 +172,8 @@ class PredictiveAnalytics:
             """, (
                 metric_id, timestamp, cpu_usage, memory_usage, disk_usage,
                 network_usage, active_agents, queue_size, task_completion_rate,
-                error_rate, response_time, throughput, json.dumps(metadata or {})
+                error_rate, response_time, throughput, json.dumps(
+                    metadata or {})
             ))
             conn.commit()
 
@@ -197,7 +207,8 @@ class PredictiveAnalytics:
             prediction_type='performance',
             predicted_value=prediction,
             confidence_interval=confidence_interval,
-            accuracy_score=self.model_metrics['performance'].get('r2_score', 0.8),
+            accuracy_score=self.model_metrics['performance'].get(
+                'r2_score', 0.8),
             timestamp=datetime.now(),
             features_used=list(features.keys()),
             model_version=self.model_version
@@ -206,7 +217,9 @@ class PredictiveAnalytics:
         # Store prediction
         self._store_prediction(result, prediction_horizon)
 
-        logger.info(f"Performance prediction: {prediction:.3f} with confidence {confidence_interval}")
+        logger.info(
+            f"Performance prediction: {
+                prediction:.3f} with confidence {confidence_interval}")
         return result
 
     def predict_resource_usage(
@@ -232,10 +245,12 @@ class PredictiveAnalytics:
         feature_vector = self._prepare_feature_vector(features, resource_type)
 
         # Make prediction
-        predicted_usage = self.models[resource_type].predict([feature_vector])[0]
+        predicted_usage = self.models[resource_type].predict([feature_vector])[
+            0]
 
         # Calculate confidence
-        confidence = self._calculate_prediction_confidence(resource_type, features)
+        confidence = self._calculate_prediction_confidence(
+            resource_type, features)
 
         # Determine trend
         trend_direction = self._determine_trend(current_usage, predicted_usage)
@@ -259,7 +274,8 @@ class PredictiveAnalytics:
         # Store forecast
         self._store_resource_forecast(prediction)
 
-        logger.info(f"Resource prediction for {resource_type}: {predicted_usage:.3f}")
+        logger.info(
+            f"Resource prediction for {resource_type}: {predicted_usage:.3f}")
         return prediction
 
     def train_models(self) -> Dict[str, Any]:
@@ -268,7 +284,8 @@ class PredictiveAnalytics:
         # Get training data
         training_data = self._prepare_training_data()
         if len(training_data) < self.config.min_data_points:
-            logger.warning(f"Insufficient training data: {len(training_data)} samples")
+            logger.warning(
+                f"Insufficient training data: {len(training_data)} samples")
             return {'error': 'insufficient_data'}
 
         results: Dict[str, Any] = {}
@@ -293,7 +310,8 @@ class PredictiveAnalytics:
                 )
 
                 # Scale features
-                X_train_scaled = self.scalers[model_name].fit_transform(X_train)
+                X_train_scaled = self.scalers[model_name].fit_transform(
+                    X_train)
                 X_test_scaled = self.scalers[model_name].transform(X_test)
 
                 # Train model
@@ -318,7 +336,8 @@ class PredictiveAnalytics:
 
                 results[model_name] = self.model_metrics[model_name]
 
-                logger.info(f"Trained {model_name} model: MAE={mae:.4f}, R2={r2:.4f}")
+                logger.info(
+                    f"Trained {model_name} model: MAE={mae:.4f}, R2={r2:.4f}")
 
             except Exception as e:
                 logger.error(f"Failed to train {model_name} model: {e}")
@@ -344,7 +363,8 @@ class PredictiveAnalytics:
                 LIMIT ?
             """
 
-            cursor = conn.execute(query, (cutoff_date, self.config.forecasting_horizon * 24))
+            cursor = conn.execute(
+                query, (cutoff_date, self.config.forecasting_horizon * 24))
 
             columns = [desc[0] for desc in cursor.description]
             data = []
@@ -352,7 +372,8 @@ class PredictiveAnalytics:
             for row in cursor.fetchall():
                 record = dict(zip(columns, row))
                 # Parse timestamp
-                record['timestamp'] = datetime.fromisoformat(record['timestamp'])
+                record['timestamp'] = datetime.fromisoformat(
+                    record['timestamp'])
                 # Parse metadata
                 record['metadata'] = json.loads(record['metadata'] or '{}')
                 data.append(record)
@@ -368,14 +389,20 @@ class PredictiveAnalytics:
             # Add rolling averages and trends
             df = df.sort_values('timestamp')
 
-            for col in ['cpu_usage', 'memory_usage', 'network_usage', 'response_time']:
+            for col in [
+                'cpu_usage',
+                'memory_usage',
+                'network_usage',
+                    'response_time']:
                 if col in df.columns:
-                    df[f'{col}_ma5'] = df[col].rolling(window=5, min_periods=1).mean()
+                    df[f'{col}_ma5'] = df[col].rolling(
+                        window=5, min_periods=1).mean()
                     df[f'{col}_trend'] = df[col].diff()
 
         return df
 
-    def _prepare_feature_vector(self, features: Dict[str, float], model_type: str) -> np.ndarray:
+    def _prepare_feature_vector(
+            self, features: Dict[str, float], model_type: str) -> np.ndarray:
         """Prepare feature vector for prediction."""
 
         # Base features
@@ -414,7 +441,10 @@ class PredictiveAnalytics:
 
         return np.array(base_features)
 
-    def _prepare_feature_matrix(self, df: pd.DataFrame, model_type: str) -> np.ndarray[Any, np.dtype[Any]]:
+    def _prepare_feature_matrix(self,
+                                df: pd.DataFrame,
+                                model_type: str) -> np.ndarray[Any,
+                                                               np.dtype[Any]]:
         """Prepare feature matrix for training."""
 
         base_cols = ['active_agents', 'queue_size', 'hour', 'day_of_week']
@@ -462,7 +492,8 @@ class PredictiveAnalytics:
                     value = row[metric]
                     if metric == 'response_time':
                         # Invert and normalize response time
-                        normalized_value = max(0, 1 - value / 5.0)  # Assuming 5s is poor
+                        # Assuming 5s is poor
+                        normalized_value = max(0, 1 - value / 5.0)
                     elif metric == 'error_rate':
                         # Invert error rate
                         normalized_value = max(0, 1 - value)
@@ -496,7 +527,8 @@ class PredictiveAnalytics:
             std = 0.1  # Default uncertainty
 
         # Adjust based on feature confidence
-        feature_confidence = self._calculate_prediction_confidence(model_type, features)
+        feature_confidence = self._calculate_prediction_confidence(
+            model_type, features)
         adjusted_std = std / feature_confidence
 
         # 95% confidence interval
@@ -516,7 +548,8 @@ class PredictiveAnalytics:
 
         # Base confidence from model performance
         if model_type in self.model_metrics:
-            base_confidence = max(0.1, float(self.model_metrics[model_type].get('r2_score', 0.8)))
+            base_confidence = max(0.1, float(
+                self.model_metrics[model_type].get('r2_score', 0.8)))
         else:
             base_confidence = 0.5
 
@@ -569,15 +602,23 @@ class PredictiveAnalytics:
 
         if predicted > threshold:
             if trend == 'increasing':
-                return f"Scale up {resource_type.replace('_', ' ')} - predicted high usage with increasing trend"
+                return f"Scale up {
+                    resource_type.replace(
+                        '_', ' ')} - predicted high usage with increasing trend"
             else:
-                return f"Monitor {resource_type.replace('_', ' ')} - predicted high usage"
+                return f"Monitor {
+                    resource_type.replace(
+                        '_', ' ')} - predicted high usage"
 
         elif current > threshold and trend == 'decreasing':
-            return f"Consider scaling down {resource_type.replace('_', ' ')} - usage decreasing"
+            return f"Consider scaling down {
+                resource_type.replace(
+                    '_', ' ')} - usage decreasing"
 
         elif trend == 'increasing' and predicted > 0.6:
-            return f"Prepare to scale {resource_type.replace('_', ' ')} - usage trending up"
+            return f"Prepare to scale {
+                resource_type.replace(
+                    '_', ' ')} - usage trending up"
 
         return None
 
@@ -624,40 +665,61 @@ class PredictiveAnalytics:
     def _store_prediction(self, result: AnalyticsResult, horizon: int) -> None:
         """Store prediction in database."""
 
-        prediction_id = f"pred_{result.prediction_type}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
+        prediction_id = f"pred_{
+            result.prediction_type}_{
+            datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
         target_time = datetime.now() + timedelta(minutes=horizon)
 
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO predictions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                prediction_id, result.prediction_type, result.predicted_value, None,
-                result.confidence_interval[0], result.confidence_interval[1],
-                result.accuracy_score, json.dumps(result.features_used),
-                result.model_version, result.timestamp, target_time,
-                json.dumps(result.metadata)
-            ))
+            """,
+                (prediction_id,
+                 result.prediction_type,
+                 result.predicted_value,
+                 None,
+                 result.confidence_interval[0],
+                 result.confidence_interval[1],
+                 result.accuracy_score,
+                 json.dumps(
+                     result.features_used),
+                    result.model_version,
+                    result.timestamp,
+                    target_time,
+                    json.dumps(
+                     result.metadata)))
             conn.commit()
 
     def _store_resource_forecast(self, prediction: ResourcePrediction) -> None:
         """Store resource forecast in database."""
 
-        forecast_id = f"forecast_{prediction.resource_type}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
+        forecast_id = f"forecast_{
+            prediction.resource_type}_{
+            datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
         target_time = datetime.now() + timedelta(minutes=prediction.prediction_horizon)
 
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO resource_forecasts VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                forecast_id, prediction.resource_type, prediction.current_usage,
-                prediction.predicted_usage, prediction.prediction_horizon,
-                prediction.confidence, prediction.trend_direction,
-                prediction.timestamp, target_time, prediction.recommended_action,
-                json.dumps({})
-            ))
+            """,
+                (forecast_id,
+                 prediction.resource_type,
+                 prediction.current_usage,
+                 prediction.predicted_usage,
+                 prediction.prediction_horizon,
+                 prediction.confidence,
+                 prediction.trend_direction,
+                 prediction.timestamp,
+                 target_time,
+                 prediction.recommended_action,
+                 json.dumps(
+                     {})))
             conn.commit()
 
-    def get_prediction_accuracy(self, prediction_type: Optional[str] = None) -> Dict[str, Any]:
+    def get_prediction_accuracy(
+            self, prediction_type: Optional[str] = None) -> Dict[str, Any]:
         """Get accuracy metrics for predictions."""
 
         with sqlite3.connect(self.db_path) as conn:
@@ -685,11 +747,13 @@ class PredictiveAnalytics:
 
         # Calculate accuracy metrics
         by_type: Dict[str, Dict[str, List[float]]] = {}
-        overall_metrics: Dict[str, List[float]] = {'mae': [], 'mse': [], 'r2': []}
+        overall_metrics: Dict[str, List[float]] = {
+            'mae': [], 'mse': [], 'r2': []}
 
         for pred_type, predicted, actual, accuracy, pred_time in predictions:
             if pred_type not in by_type:
-                by_type[pred_type] = {'predicted': [], 'actual': [], 'accuracies': []}
+                by_type[pred_type] = {'predicted': [],
+                                      'actual': [], 'accuracies': []}
 
             by_type[pred_type]['predicted'].append(predicted)
             by_type[pred_type]['actual'].append(actual)

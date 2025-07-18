@@ -6,16 +6,16 @@ Solves the issue of Claude Code sessions waiting for manual input.
 
 import argparse
 import asyncio
-import json
 import logging
 import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import List, Optional
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class AgentActivator:
     """Ensures agents are fully active and responsive without manual intervention"""
@@ -35,7 +35,7 @@ class AgentActivator:
 
         # Step 2: Check if Claude Code is responsive
         if not await self._check_claude_responsiveness(agent_id):
-            logger.warning(f"⚠️ Claude Code not responsive, restarting...")
+            logger.warning("⚠️ Claude Code not responsive, restarting...")
             if not await self._restart_claude_code(agent_id):
                 return False
 
@@ -52,8 +52,10 @@ class AgentActivator:
     async def _verify_tmux_window(self, agent_id: str) -> bool:
         """Verify tmux window exists for agent"""
         try:
-            cmd = ["tmux", "list-windows", "-t", "agent-hive", "-F", "#{window_name}"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "list-windows", "-t",
+                   "agent-hive", "-F", "#{window_name}"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 windows = result.stdout.strip().split('\n')
@@ -71,15 +73,18 @@ class AgentActivator:
             test_command = "echo 'responsiveness_test'"
 
             # Send command
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", test_command, "Enter"]
+            cmd = ["tmux", "send-keys", "-t",
+                   f"agent-hive:{agent_id}", test_command, "Enter"]
             subprocess.run(cmd, timeout=5)
 
             # Wait a moment
             await asyncio.sleep(2)
 
             # Capture output
-            cmd = ["tmux", "capture-pane", "-t", f"agent-hive:{agent_id}", "-p"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "capture-pane", "-t",
+                   f"agent-hive:{agent_id}", "-p"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 output = result.stdout
@@ -99,13 +104,15 @@ class AgentActivator:
             logger.info(f"🔄 Restarting Claude Code for {agent_id}...")
 
             # Kill any existing processes
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", "C-c", "Enter"]
+            cmd = ["tmux", "send-keys", "-t",
+                   f"agent-hive:{agent_id}", "C-c", "Enter"]
             subprocess.run(cmd, timeout=5)
 
             await asyncio.sleep(2)
 
             # Clear the session
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", "clear", "Enter"]
+            cmd = ["tmux", "send-keys", "-t",
+                   f"agent-hive:{agent_id}", "clear", "Enter"]
             subprocess.run(cmd, timeout=5)
 
             await asyncio.sleep(1)
@@ -125,12 +132,15 @@ class AgentActivator:
             logger.error(f"Error restarting Claude Code: {e}")
             return False
 
-    async def _send_activation_sequence(self, agent_id: str, task_prompt: str) -> bool:
+    async def _send_activation_sequence(
+            self, agent_id: str, task_prompt: str) -> bool:
         """Send activation sequence to ensure agent starts working"""
 
         for attempt in range(self.max_activation_attempts):
             try:
-                logger.info(f"🎯 Sending activation sequence to {agent_id} (attempt {attempt + 1})")
+                logger.info(
+                    f"🎯 Sending activation sequence to {agent_id} (attempt {
+                        attempt + 1})")
 
                 # First, detect the current state of the agent
                 agent_state = await self._detect_agent_state(agent_id)
@@ -156,7 +166,10 @@ class AgentActivator:
                         return True
 
                 # If not working, try alternative activation
-                logger.warning(f"⚠️ Attempt {attempt + 1} failed, trying alternative activation...")
+                logger.warning(
+                    f"⚠️ Attempt {
+                        attempt +
+                        1} failed, trying alternative activation...")
 
                 # Alternative: Clear and restart conversation
                 await self._restart_agent_conversation(agent_id, task_prompt)
@@ -180,11 +193,18 @@ class AgentActivator:
                 task_file = worktree / "CURRENT_TASK.txt"
 
                 with open(task_file, 'w') as f:
-                    f.write(f"URGENT TASK:\n{task_prompt}\n\nDelivered at: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+                    f.write(
+                        f"URGENT TASK:\n{task_prompt}\n\nDelivered at: {
+                            time.strftime('%Y-%m-%d %H:%M:%S')}")
 
                 # Tell agent to read the file
-                cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}",
-                       "cat CURRENT_TASK.txt && echo 'TASK RECEIVED - STARTING WORK'", "Enter"]
+                cmd = [
+                    "tmux",
+                    "send-keys",
+                    "-t",
+                    f"agent-hive:{agent_id}",
+                    "cat CURRENT_TASK.txt && echo 'TASK RECEIVED - STARTING WORK'",
+                    "Enter"]
                 subprocess.run(cmd, timeout=10)
 
         except Exception as e:
@@ -196,8 +216,10 @@ class AgentActivator:
             await asyncio.sleep(3)
 
             # Capture recent output
-            cmd = ["tmux", "capture-pane", "-t", f"agent-hive:{agent_id}", "-p"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "capture-pane", "-t",
+                   f"agent-hive:{agent_id}", "-p"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 output = result.stdout.lower()
@@ -211,7 +233,8 @@ class AgentActivator:
 
                 for indicator in working_indicators:
                     if indicator in output:
-                        logger.info(f"✅ Agent {agent_id} shows working indicator: '{indicator}'")
+                        logger.info(
+                            f"✅ Agent {agent_id} shows working indicator: '{indicator}'")
                         return True
 
                 # Also check if Claude Code is still responsive (not stuck)
@@ -241,17 +264,23 @@ class AgentActivator:
 
         return results
 
-    async def monitor_agent_activity(self, agent_id: str, duration: int = 300) -> bool:
+    async def monitor_agent_activity(
+            self,
+            agent_id: str,
+            duration: int = 300) -> bool:
         """Monitor agent for activity over a duration"""
-        logger.info(f"👀 Monitoring {agent_id} for activity over {duration} seconds...")
+        logger.info(
+            f"👀 Monitoring {agent_id} for activity over {duration} seconds...")
 
         start_time = time.time()
         last_output = ""
 
         while time.time() - start_time < duration:
             try:
-                cmd = ["tmux", "capture-pane", "-t", f"agent-hive:{agent_id}", "-p"]
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+                cmd = ["tmux", "capture-pane", "-t",
+                       f"agent-hive:{agent_id}", "-p"]
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=10)
 
                 if result.returncode == 0:
                     current_output = result.stdout
@@ -267,14 +296,17 @@ class AgentActivator:
             except Exception as e:
                 logger.debug(f"Error monitoring {agent_id}: {e}")
 
-        logger.warning(f"⚠️ {agent_id}: No activity detected in {duration} seconds")
+        logger.warning(
+            f"⚠️ {agent_id}: No activity detected in {duration} seconds")
         return False
 
     async def _detect_agent_state(self, agent_id: str) -> str:
         """Detect the current state of the agent (idle, conversation, working, etc.)"""
         try:
-            cmd = ["tmux", "capture-pane", "-t", f"agent-hive:{agent_id}", "-p"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "capture-pane", "-t",
+                   f"agent-hive:{agent_id}", "-p"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 output = result.stdout.lower()
@@ -300,7 +332,8 @@ class AgentActivator:
         """Clear any pending input in the agent conversation"""
         try:
             # Send Escape to clear any pending input
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", "Escape"]
+            cmd = ["tmux", "send-keys", "-t",
+                   f"agent-hive:{agent_id}", "Escape"]
             subprocess.run(cmd, timeout=5)
 
             await asyncio.sleep(1)
@@ -314,7 +347,8 @@ class AgentActivator:
         except Exception as e:
             logger.debug(f"Error clearing pending input: {e}")
 
-    async def _send_message_with_enter(self, agent_id: str, message: str) -> bool:
+    async def _send_message_with_enter(
+            self, agent_id: str, message: str) -> bool:
         """Send a message to the agent and ensure Enter is pressed"""
         try:
             # Clear the input area first
@@ -324,13 +358,15 @@ class AgentActivator:
             await asyncio.sleep(0.5)
 
             # Type the message
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", message]
+            cmd = ["tmux", "send-keys", "-t",
+                   f"agent-hive:{agent_id}", message]
             subprocess.run(cmd, timeout=10)
 
             await asyncio.sleep(1)
 
             # Explicitly press Enter
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", "Enter"]
+            cmd = ["tmux", "send-keys", "-t",
+                   f"agent-hive:{agent_id}", "Enter"]
             subprocess.run(cmd, timeout=5)
 
             logger.info(f"📤 Message sent to {agent_id} with Enter key")
@@ -338,14 +374,21 @@ class AgentActivator:
             await asyncio.sleep(2)
 
             # Verify the message was sent by checking output
-            cmd = ["tmux", "capture-pane", "-t", f"agent-hive:{agent_id}", "-p"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "capture-pane", "-t",
+                   f"agent-hive:{agent_id}", "-p"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 recent_output = result.stdout[-500:]  # Last 500 chars
 
                 # Check if the message appears to have been processed
-                if any(keyword in recent_output.lower() for keyword in ["starting", "beginning", "working", "acknowledge"]):
+                if any(
+                    keyword in recent_output.lower() for keyword in [
+                        "starting",
+                        "beginning",
+                        "working",
+                        "acknowledge"]):
                     return True
 
             return True  # Assume success if no obvious failure
@@ -354,14 +397,16 @@ class AgentActivator:
             logger.debug(f"Error sending message with Enter: {e}")
             return False
 
-    async def _restart_agent_conversation(self, agent_id: str, task_prompt: str):
+    async def _restart_agent_conversation(
+            self, agent_id: str, task_prompt: str):
         """Restart the agent conversation to clear any stuck state"""
         try:
             logger.info(f"🔄 Restarting conversation for {agent_id}")
 
             # Send multiple escape sequences to clear state
             for _ in range(3):
-                cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", "Escape"]
+                cmd = ["tmux", "send-keys", "-t",
+                       f"agent-hive:{agent_id}", "Escape"]
                 subprocess.run(cmd, timeout=5)
                 await asyncio.sleep(0.5)
 
@@ -372,7 +417,8 @@ class AgentActivator:
             await asyncio.sleep(1)
 
             # Try to get back to a clean state
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", "clear", "Enter"]
+            cmd = ["tmux", "send-keys", "-t",
+                   f"agent-hive:{agent_id}", "clear", "Enter"]
             subprocess.run(cmd, timeout=5)
 
             await asyncio.sleep(1)
@@ -388,8 +434,10 @@ async def main():
     parser = argparse.ArgumentParser(description="Agent Activator")
     parser.add_argument("--agent", help="Specific agent to activate")
     parser.add_argument("--task", help="Task prompt to send to agent")
-    parser.add_argument("--activate-all", action="store_true", help="Activate all production readiness agents")
-    parser.add_argument("--monitor", help="Monitor specific agent for activity")
+    parser.add_argument("--activate-all", action="store_true",
+                        help="Activate all production readiness agents")
+    parser.add_argument(
+        "--monitor", help="Monitor specific agent for activity")
 
     args = parser.parse_args()
 
@@ -418,7 +466,8 @@ async def main():
         success_count = sum(1 for success in results.values() if success)
         total_count = len(results)
 
-        print(f"📊 Activation Results: {success_count}/{total_count} agents successfully activated")
+        print(
+            f"📊 Activation Results: {success_count}/{total_count} agents successfully activated")
 
         for agent_id, success in results.items():
             status = "✅ SUCCESS" if success else "❌ FAILED"
@@ -427,7 +476,8 @@ async def main():
         if success_count == total_count:
             print("🎉 All production readiness agents are now active and working!")
         else:
-            print("⚠️ Some agents failed to activate - manual intervention may be required")
+            print(
+                "⚠️ Some agents failed to activate - manual intervention may be required")
             sys.exit(1)
 
     elif args.monitor:

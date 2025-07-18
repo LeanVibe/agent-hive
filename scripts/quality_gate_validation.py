@@ -5,14 +5,15 @@ Runs comprehensive quality checks for PR integration
 """
 
 import argparse
+import json
 import logging
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Tuple, Dict
-import json
+from typing import Dict
 
 logger = logging.getLogger(__name__)
+
 
 class QualityGateValidator:
     """Validates code quality gates for PR integration."""
@@ -48,10 +49,12 @@ class QualityGateValidator:
 
                 if result.returncode != 0:
                     failed_files.append(str(py_file))
-                    self.issues.append(f"Syntax error in {py_file}: {result.stderr.strip()}")
+                    self.issues.append(
+                        f"Syntax error in {py_file}: {result.stderr.strip()}")
 
             if failed_files:
-                logger.error(f"❌ Syntax check failed for {len(failed_files)} files")
+                logger.error(
+                    f"❌ Syntax check failed for {len(failed_files)} files")
                 return False
             else:
                 logger.info("✅ Python syntax check passed")
@@ -122,7 +125,8 @@ class QualityGateValidator:
 
             for py_file in python_files:
                 # Skip certain directories and files
-                if any(skip in str(py_file) for skip in ['__pycache__', '.git', 'build', 'dist']):
+                if any(skip in str(py_file)
+                       for skip in ['__pycache__', '.git', 'build', 'dist']):
                     continue
 
                 # Try to compile the file (checks imports and syntax)
@@ -138,15 +142,18 @@ class QualityGateValidator:
 
             if failed_imports:
                 # Only fail on critical import issues
-                critical_failures = [f for f in failed_imports if 'No module named' not in f]
+                critical_failures = [
+                    f for f in failed_imports if 'No module named' not in f]
                 if critical_failures:
                     for failure in critical_failures:
-                        self.issues.append(f"Import validation failed: {failure}")
+                        self.issues.append(
+                            f"Import validation failed: {failure}")
                     return False
                 else:
                     # Just warnings for missing optional modules
                     for failure in failed_imports:
-                        self.warnings.append(f"Optional import issue: {failure}")
+                        self.warnings.append(
+                            f"Optional import issue: {failure}")
 
             logger.info("✅ Import validation passed")
             return True
@@ -170,7 +177,8 @@ class QualityGateValidator:
 
             if missing_files:
                 for missing in missing_files:
-                    self.warnings.append(f"Missing recommended file: {missing}")
+                    self.warnings.append(
+                        f"Missing recommended file: {missing}")
 
             # Check for Python package structure
             if list(self.project_root.rglob("*.py")):
@@ -210,7 +218,9 @@ class QualityGateValidator:
                             if pattern in content:
                                 # Count occurrences
                                 count = content.count(pattern)
-                                security_issues.append(f"{py_file}: {message} ({count} occurrence{'s' if count > 1 else ''})")
+                                security_issues.append(
+                                    f"{py_file}: {message} ({count} occurrence{
+                                        's' if count > 1 else ''})")
                 except Exception:
                     continue
 
@@ -228,14 +238,21 @@ class QualityGateValidator:
     def generate_report(self) -> Dict:
         """Generate quality gate report."""
         return {
-            "timestamp": str(subprocess.run(['date'], capture_output=True, text=True).stdout.strip()),
-            "project_root": str(self.project_root),
+            "timestamp": str(
+                subprocess.run(
+                    ['date'],
+                    capture_output=True,
+                    text=True).stdout.strip()),
+            "project_root": str(
+                self.project_root),
             "issues": self.issues,
             "warnings": self.warnings,
-            "quality_gate_passed": len(self.issues) == 0,
-            "total_issues": len(self.issues),
-            "total_warnings": len(self.warnings)
-        }
+            "quality_gate_passed": len(
+                self.issues) == 0,
+            "total_issues": len(
+                self.issues),
+            "total_warnings": len(
+                self.warnings)}
 
     def run_all_checks(self) -> bool:
         """Run all quality gate checks."""
@@ -261,7 +278,8 @@ class QualityGateValidator:
                 else:
                     logger.info(f"✅ {check_name} passed")
             except Exception as e:
-                self.issues.append(f"{check_name} check failed with error: {e}")
+                self.issues.append(
+                    f"{check_name} check failed with error: {e}")
                 all_passed = False
                 logger.error(f"❌ {check_name} failed with error: {e}")
 
@@ -278,7 +296,8 @@ class QualityGateValidator:
         if all_passed:
             logger.info("🎉 All quality gates passed!")
         else:
-            logger.error(f"❌ Quality gates failed with {len(self.issues)} issues")
+            logger.error(
+                f"❌ Quality gates failed with {len(self.issues)} issues")
             for issue in self.issues:
                 logger.error(f"   - {issue}")
 
@@ -289,11 +308,14 @@ class QualityGateValidator:
 
         return all_passed
 
+
 def main():
     """Main CLI interface."""
     parser = argparse.ArgumentParser(description="Quality Gate Validator")
-    parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
-    parser.add_argument('--report-only', action='store_true', help='Generate report without enforcing gates')
+    parser.add_argument('--verbose', '-v',
+                        action='store_true', help='Verbose output')
+    parser.add_argument('--report-only', action='store_true',
+                        help='Generate report without enforcing gates')
 
     args = parser.parse_args()
 
@@ -317,6 +339,7 @@ def main():
     except Exception as e:
         logger.error(f"❌ Quality gate validation failed: {e}")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())

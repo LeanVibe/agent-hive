@@ -9,12 +9,12 @@ velocity-based recommendations for sprint planning and capacity management.
 
 import json
 import sqlite3
-import subprocess
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass, asdict
 import statistics
+import subprocess
 import sys
+from dataclasses import dataclass
+from datetime import datetime
+from typing import List, Optional, Tuple
 
 
 @dataclass
@@ -110,7 +110,8 @@ class VelocityTracker:
 
             conn.commit()
 
-    def calculate_sprint_velocity(self, sprint_id: str) -> Optional[VelocityMetrics]:
+    def calculate_sprint_velocity(
+            self, sprint_id: str) -> Optional[VelocityMetrics]:
         """Calculate comprehensive velocity metrics for a sprint."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -147,7 +148,8 @@ class VelocityTracker:
 
         completion_rate = total_completed / total_planned if total_planned > 0 else 0
         story_count = len(stories)
-        avg_story_points = sum(s[0] for s in stories) / story_count if story_count > 0 else 0
+        avg_story_points = sum(s[0] for s in stories) / \
+            story_count if story_count > 0 else 0
 
         # Calculate cycle time (simplified)
         start_dt = datetime.fromisoformat(start_date)
@@ -159,7 +161,9 @@ class VelocityTracker:
         throughput = story_count / sprint_duration if sprint_duration > 0 else 0
 
         # Calculate predictability score (how close actual vs planned)
-        predictability_score = 1.0 - abs(total_completed - total_planned) / total_planned if total_planned > 0 else 0
+        predictability_score = 1.0 - \
+            abs(total_completed - total_planned) / \
+            total_planned if total_planned > 0 else 0
         predictability_score = max(0, min(1, predictability_score))
 
         return VelocityMetrics(
@@ -180,22 +184,31 @@ class VelocityTracker:
     def save_velocity_metrics(self, metrics: VelocityMetrics):
         """Save velocity metrics to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO velocity_metrics
                 (period_id, period_name, start_date, end_date, planned_points,
                  completed_points, completion_rate, story_count, avg_story_points,
                  cycle_time_days, throughput, predictability_score, recorded_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                metrics.period_id, metrics.period_name, metrics.start_date,
-                metrics.end_date, metrics.planned_points, metrics.completed_points,
-                metrics.completion_rate, metrics.story_count, metrics.avg_story_points,
-                metrics.cycle_time_days, metrics.throughput, metrics.predictability_score,
-                datetime.now().isoformat()
-            ))
+            """,
+                (metrics.period_id,
+                 metrics.period_name,
+                 metrics.start_date,
+                 metrics.end_date,
+                 metrics.planned_points,
+                 metrics.completed_points,
+                 metrics.completion_rate,
+                 metrics.story_count,
+                 metrics.avg_story_points,
+                 metrics.cycle_time_days,
+                 metrics.throughput,
+                 metrics.predictability_score,
+                 datetime.now().isoformat()))
             conn.commit()
 
-    def analyze_velocity_trend(self, lookback_periods: int = 6) -> VelocityTrend:
+    def analyze_velocity_trend(
+            self, lookback_periods: int = 6) -> VelocityTrend:
         """Analyze velocity trends over recent periods."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -221,7 +234,7 @@ class VelocityTracker:
 
         # Calculate trend metrics
         velocities = [m[0] for m in metrics]
-        completion_rates = [m[1] for m in metrics]
+        [m[1] for m in metrics]
         predictability_scores = [m[2] for m in metrics]
 
         avg_velocity = statistics.mean(velocities)
@@ -238,12 +251,16 @@ class VelocityTracker:
                 mean_x = statistics.mean(x)
                 mean_y = statistics.mean(y)
 
-                numerator = sum((x[i] - mean_x) * (y[i] - mean_y) for i in range(len(x)))
-                denominator_x = sum((x[i] - mean_x) ** 2 for i in range(len(x)))
-                denominator_y = sum((y[i] - mean_y) ** 2 for i in range(len(y)))
+                numerator = sum((x[i] - mean_x) * (y[i] - mean_y)
+                                for i in range(len(x)))
+                denominator_x = sum((x[i] - mean_x) **
+                                    2 for i in range(len(x)))
+                denominator_y = sum((y[i] - mean_y) **
+                                    2 for i in range(len(y)))
 
                 if denominator_x > 0 and denominator_y > 0:
-                    correlation = numerator / (denominator_x * denominator_y) ** 0.5
+                    correlation = numerator / \
+                        (denominator_x * denominator_y) ** 0.5
                     trend_strength = abs(correlation)
 
                     if correlation > 0.3:
@@ -266,19 +283,25 @@ class VelocityTracker:
         recommendations = []
 
         if avg_predictability < 0.7:
-            recommendations.append("Improve sprint planning accuracy - high variance in delivery")
+            recommendations.append(
+                "Improve sprint planning accuracy - high variance in delivery")
 
         if velocity_trend == "decreasing":
-            recommendations.append("Investigate factors causing velocity decline")
-            recommendations.append("Consider reducing scope or addressing blockers")
+            recommendations.append(
+                "Investigate factors causing velocity decline")
+            recommendations.append(
+                "Consider reducing scope or addressing blockers")
         elif velocity_trend == "increasing":
-            recommendations.append("Team is improving - consider gradually increasing commitment")
+            recommendations.append(
+                "Team is improving - consider gradually increasing commitment")
 
         if statistics.stdev(velocities) / avg_velocity > 0.3:
-            recommendations.append("High velocity variance - focus on consistent delivery")
+            recommendations.append(
+                "High velocity variance - focus on consistent delivery")
 
         if avg_velocity < 30:
-            recommendations.append("Low velocity - investigate capacity constraints")
+            recommendations.append(
+                "Low velocity - investigate capacity constraints")
 
         # Determine confidence level
         if len(metrics) >= 5 and trend_strength > 0.6:
@@ -298,7 +321,8 @@ class VelocityTracker:
             confidence_level=confidence_level
         )
 
-    def predict_next_velocity(self, confidence_interval: float = 0.8) -> Tuple[int, int, int]:
+    def predict_next_velocity(
+            self, confidence_interval: float = 0.8) -> Tuple[int, int, int]:
         """Predict next sprint velocity with confidence interval."""
         trend = self.analyze_velocity_trend()
 
@@ -365,13 +389,15 @@ class VelocityTracker:
 """
 
         if trend.velocity_trend == "increasing":
-            report += f"📈 **Positive Trend**: Team velocity is increasing (strength: {trend.trend_strength:.2f})\n"
+            report += f"📈 **Positive Trend**: Team velocity is increasing (strength: {
+                trend.trend_strength:.2f})\n"
         elif trend.velocity_trend == "decreasing":
-            report += f"📉 **Declining Trend**: Team velocity is decreasing (strength: {trend.trend_strength:.2f})\n"
+            report += f"📉 **Declining Trend**: Team velocity is decreasing (strength: {
+                trend.trend_strength:.2f})\n"
         else:
-            report += f"📊 **Stable Trend**: Team velocity is consistent\n"
+            report += "📊 **Stable Trend**: Team velocity is consistent\n"
 
-        report += f"""
+        report += """
 ## Recommendations
 """
 
@@ -381,7 +407,7 @@ class VelocityTracker:
         if not trend.recommendations:
             report += "No specific recommendations - team performance is satisfactory.\n"
 
-        report += f"""
+        report += """
 ## Historical Performance
 """
 
@@ -398,7 +424,9 @@ class VelocityTracker:
             history = cursor.fetchall()
 
         for period_name, completed, completion_rate, predictability, recorded_at in history:
-            report += f"- **{period_name}**: {completed} points ({completion_rate:.1%} completion, {predictability:.2f} predictability)\n"
+            report += f"- **{period_name}**: {completed} points ({
+                completion_rate:.1%} completion, {
+                predictability:.2f} predictability)\n"
 
         report += f"""
 ## Capacity Planning Guidelines
@@ -440,7 +468,10 @@ Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
             merged_prs = json.loads(result.stdout)
 
             # Analyze completion patterns
-            print(f"Analyzed {len(closed_issues)} closed issues and {len(merged_prs)} merged PRs")
+            print(
+                f"Analyzed {
+                    len(closed_issues)} closed issues and {
+                    len(merged_prs)} merged PRs")
 
             # This could be enhanced to automatically update velocity metrics
             # based on GitHub activity patterns
@@ -459,7 +490,8 @@ def main():
         print("  calculate <sprint_id>    - Calculate velocity for specific sprint")
         print("  trend [periods]          - Analyze velocity trends")
         print("  predict                  - Predict next sprint velocity")
-        print("  report [periods]         - Generate comprehensive velocity report")
+        print(
+            "  report [periods]         - Generate comprehensive velocity report")
         print("  sync                     - Sync with GitHub data")
         sys.exit(1)
 
@@ -477,7 +509,8 @@ def main():
         if metrics:
             tracker.save_velocity_metrics(metrics)
             print(f"✅ Velocity calculated for {metrics.period_name}")
-            print(f"Completed Points: {metrics.completed_points}/{metrics.planned_points}")
+            print(
+                f"Completed Points: {metrics.completed_points}/{metrics.planned_points}")
             print(f"Completion Rate: {metrics.completion_rate:.1%}")
             print(f"Predictability: {metrics.predictability_score:.2f}")
         else:
@@ -489,7 +522,10 @@ def main():
 
         print(f"Velocity Trend Analysis ({periods} periods)")
         print(f"Average Velocity: {trend.avg_velocity:.1f} points")
-        print(f"Trend: {trend.velocity_trend} (strength: {trend.trend_strength:.2f})")
+        print(
+            f"Trend: {
+                trend.velocity_trend} (strength: {
+                trend.trend_strength:.2f})")
         print(f"Predictability: {trend.predictability:.2f}")
         print(f"Confidence: {trend.confidence_level}")
 
@@ -508,7 +544,8 @@ def main():
         report = tracker.generate_velocity_report(periods)
 
         # Save report to file
-        filename = f"velocity_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"velocity_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(report)
 

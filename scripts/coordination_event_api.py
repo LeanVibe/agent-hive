@@ -5,16 +5,17 @@ Provides programmatic interface for consuming coordination events
 Built on existing accountability infrastructure and coordination_alerts.json
 """
 
-import json
 import asyncio
+import json
 import logging
+import time
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Callable, AsyncGenerator
-from dataclasses import dataclass
-import time
+from typing import Any, AsyncGenerator, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class CoordinationEvent:
@@ -32,7 +33,8 @@ class CoordinationEvent:
         try:
             # Handle various timestamp formats
             if 'T' in timestamp_str:
-                timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+                timestamp = datetime.fromisoformat(
+                    timestamp_str.replace('Z', '+00:00'))
             else:
                 timestamp = datetime.now()
         except ValueError:
@@ -50,6 +52,7 @@ class CoordinationEvent:
         """Convert to dictionary."""
         return self.data
 
+
 class CoordinationEventConsumer:
     """Event consumer for coordination events."""
 
@@ -59,7 +62,8 @@ class CoordinationEventConsumer:
         self.last_position = 0
         self.processed_events: set = set()
 
-    def subscribe(self, event_type: str, handler: Callable[[CoordinationEvent], None]):
+    def subscribe(self, event_type: str,
+                  handler: Callable[[CoordinationEvent], None]):
         """Subscribe to specific event types."""
         if event_type not in self.event_handlers:
             self.event_handlers[event_type] = []
@@ -83,20 +87,25 @@ class CoordinationEventConsumer:
             lines = content.strip().split('\n')
 
             # Process lines starting from last position
-            for i, line in enumerate(lines[self.last_position:], start=self.last_position):
+            for i, line in enumerate(
+                    lines[self.last_position:], start=self.last_position):
                 if line.strip():
                     try:
                         event_dict = json.loads(line.strip())
                         event = CoordinationEvent.from_dict(event_dict)
 
                         # Avoid duplicate processing
-                        event_id = f"{event.event_type}_{event.timestamp}_{event.task_id}"
+                        event_id = f"{
+                            event.event_type}_{
+                            event.timestamp}_{
+                            event.task_id}"
                         if event_id not in self.processed_events:
                             events.append(event)
                             self.processed_events.add(event_id)
 
                     except json.JSONDecodeError as e:
-                        logger.warning(f"Failed to parse event at line {i}: {e}")
+                        logger.warning(
+                            f"Failed to parse event at line {i}: {e}")
 
             self.last_position = len(lines)
 
@@ -127,7 +136,8 @@ class CoordinationEventConsumer:
             except Exception as e:
                 logger.error(f"Error in event handler: {e}")
 
-    async def stream_events(self, poll_interval: float = 1.0) -> AsyncGenerator[CoordinationEvent, None]:
+    async def stream_events(
+            self, poll_interval: float = 1.0) -> AsyncGenerator[CoordinationEvent, None]:
         """Stream events as they arrive."""
         while True:
             events = await self.read_new_events()
@@ -147,6 +157,7 @@ class CoordinationEventConsumer:
             }
         }
 
+
 class CoordinationEventProcessor:
     """High-level event processor with built-in coordination logic."""
 
@@ -165,8 +176,10 @@ class CoordinationEventProcessor:
     def _setup_default_handlers(self):
         """Set up default coordination response handlers."""
         self.consumer.subscribe("COORDINATION_CRISIS", self._handle_crisis)
-        self.consumer.subscribe("DEADLINE_WARNING", self._handle_deadline_warning)
-        self.consumer.subscribe("AGENT_UNRESPONSIVE", self._handle_unresponsive_agent)
+        self.consumer.subscribe(
+            "DEADLINE_WARNING", self._handle_deadline_warning)
+        self.consumer.subscribe("AGENT_UNRESPONSIVE",
+                                self._handle_unresponsive_agent)
         self.consumer.subscribe("TASK_REASSIGNMENT", self._handle_reassignment)
         self.consumer.subscribe("ESCALATION_TRIGGER", self._handle_escalation)
 
@@ -249,7 +262,8 @@ class CoordinationEventProcessor:
         try:
             async for event in self.consumer.stream_events(poll_interval):
                 self.response_metrics["events_processed"] += 1
-                logger.info(f"📨 Processing: {event.event_type} for {event.task_id}")
+                logger.info(
+                    f"📨 Processing: {event.event_type} for {event.task_id}")
                 await self.consumer._process_single_event(event)
 
         except KeyboardInterrupt:
@@ -269,6 +283,7 @@ class CoordinationEventProcessor:
 
 # Convenience functions for easy integration
 
+
 async def consume_coordination_events(
     handler: Callable[[CoordinationEvent], None],
     event_types: Optional[List[str]] = None,
@@ -286,12 +301,16 @@ async def consume_coordination_events(
     async for event in consumer.stream_events():
         await consumer._process_single_event(event)
 
-def start_coordination_processor(alerts_file: str = "coordination_alerts.json"):
+
+def start_coordination_processor(
+        alerts_file: str = "coordination_alerts.json"):
     """Start the coordination event processor."""
     processor = CoordinationEventProcessor(alerts_file)
     return asyncio.run(processor.start_processing())
 
 # CLI interface for testing
+
+
 async def main():
     """Main CLI interface."""
     import argparse
@@ -325,7 +344,11 @@ async def main():
 
     elif args.mode == 'consume':
         def event_handler(event: CoordinationEvent):
-            print(f"📨 Event: {event.event_type} | Task: {event.task_id} | Agent: {event.agent_id}")
+            print(
+                f"📨 Event: {
+                    event.event_type} | Task: {
+                    event.task_id} | Agent: {
+                    event.agent_id}")
             print(f"   Time: {event.timestamp}")
             print(f"   Data: {json.dumps(event.data, indent=2)}")
             print("---")

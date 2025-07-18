@@ -6,14 +6,13 @@ Monitors agent activity across worktrees and GitHub issues.
 Provides tools to check agent status and resume inactive agents.
 """
 
+import argparse
+import json
 import os
 import subprocess
-import json
-import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import argparse
+from typing import Dict, List, Optional
 
 
 class AgentMonitor:
@@ -59,7 +58,7 @@ class AgentMonitor:
             if result.returncode == 0 and result.stdout.strip():
                 timestamp = int(result.stdout.strip())
                 return datetime.fromtimestamp(timestamp)
-        except:
+        except BaseException:
             pass
         return None
 
@@ -81,14 +80,15 @@ class AgentMonitor:
                 return None
 
             result = subprocess.run(
-                ["gh", "issue", "view", str(issue_num), "--json", "updatedAt,comments"],
+                ["gh", "issue", "view", str(
+                    issue_num), "--json", "updatedAt,comments"],
                 capture_output=True,
                 text=True
             )
 
             if result.returncode == 0:
                 return json.loads(result.stdout)
-        except:
+        except BaseException:
             pass
         return None
 
@@ -110,10 +110,11 @@ class AgentMonitor:
         # Check GitHub issue activity
         if github_activity:
             try:
-                updated_at = datetime.fromisoformat(github_activity["updatedAt"].replace("Z", "+00:00"))
+                updated_at = datetime.fromisoformat(
+                    github_activity["updatedAt"].replace("Z", "+00:00"))
                 if (now - updated_at.replace(tzinfo=None)) < timedelta(hours=2):
                     return "github_active"
-            except:
+            except BaseException:
                 pass
 
         # Check if agent has been idle for more than 4 hours
@@ -133,12 +134,14 @@ class AgentMonitor:
             report[agent_name] = {
                 "name": agent_name,
                 "status": status,
-                "path": str(agent_info["path"]),
+                "path": str(
+                    agent_info["path"]),
                 "last_activity": agent_info["last_activity"].isoformat() if agent_info["last_activity"] else None,
                 "github_issue": github_info is not None,
                 "github_updated": github_info["updatedAt"] if github_info else None,
-                "needs_attention": status in ["idle", "inactive"]
-            }
+                "needs_attention": status in [
+                    "idle",
+                    "inactive"]}
 
         return report
 
@@ -175,11 +178,12 @@ class AgentMonitor:
                 print(f"    Last activity: {info['last_activity']}")
             print(f"    Path: {info['path']}")
 
-        print(f"\n📊 Summary:")
+        print("\n📊 Summary:")
         print(f"  Total agents: {len(report)}")
         print(f"  Active: {len(active_agents)}")
         print(f"  Inactive: {len(inactive_agents)}")
-        print(f"  Needs attention: {len([a for a in report.values() if a['needs_attention']])}")
+        print(
+            f"  Needs attention: {len([a for a in report.values() if a['needs_attention']])}")
 
     def generate_resume_commands(self) -> List[str]:
         """Generate commands to resume inactive agents."""
@@ -201,7 +205,8 @@ class AgentMonitor:
 
         script_content = "#!/bin/bash\n"
         script_content += "# LeanVibe Agent Hive - Resume Inactive Agents\n"
-        script_content += f"# Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        script_content += f"# Generated: {
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
 
         for command in commands:
             script_content += command + "\n"
@@ -227,9 +232,9 @@ class AgentMonitor:
         print(f"📁 Path: {agent_path}")
 
         # Change to agent directory and show instructions
-        print(f"\n📋 To resume this agent, run:")
+        print("\n📋 To resume this agent, run:")
         print(f"  cd {agent_path}")
-        print(f"  claude --resume")
+        print("  claude --resume")
 
         return True
 
@@ -248,7 +253,8 @@ class AgentMonitor:
 
         for agent_name, issue_num in issue_mapping.items():
             try:
-                message = f"🔔 Agent Status Check - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                message = f"🔔 Agent Status Check - {
+                    datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
                 message += "This is an automated status check. Please respond with:\n"
                 message += "1. Current work status\n"
                 message += "2. Any blockers or issues\n"
@@ -256,7 +262,8 @@ class AgentMonitor:
                 message += "If you are not actively working, please update your status."
 
                 subprocess.run(
-                    ["gh", "issue", "comment", str(issue_num), "--body", message],
+                    ["gh", "issue", "comment", str(
+                        issue_num), "--body", message],
                     check=True
                 )
                 print(f"  ✅ Pinged {agent_name} (issue #{issue_num})")
@@ -265,12 +272,18 @@ class AgentMonitor:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Monitor and manage LeanVibe agents")
-    parser.add_argument("--status", action="store_true", help="Show agent status report")
-    parser.add_argument("--resume", metavar="AGENT", help="Resume specific agent")
-    parser.add_argument("--resume-all", action="store_true", help="Create script to resume all inactive agents")
-    parser.add_argument("--ping", action="store_true", help="Ping all agents via GitHub")
-    parser.add_argument("--json", action="store_true", help="Output status in JSON format")
+    parser = argparse.ArgumentParser(
+        description="Monitor and manage LeanVibe agents")
+    parser.add_argument("--status", action="store_true",
+                        help="Show agent status report")
+    parser.add_argument("--resume", metavar="AGENT",
+                        help="Resume specific agent")
+    parser.add_argument("--resume-all", action="store_true",
+                        help="Create script to resume all inactive agents")
+    parser.add_argument("--ping", action="store_true",
+                        help="Ping all agents via GitHub")
+    parser.add_argument("--json", action="store_true",
+                        help="Output status in JSON format")
 
     args = parser.parse_args()
 

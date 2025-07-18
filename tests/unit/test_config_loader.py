@@ -4,19 +4,20 @@ Unit tests for ConfigLoader component.
 Tests configuration loading with environment variable overrides.
 """
 
-import pytest
 import os
-import yaml
-from unittest.mock import patch, mock_open
-from pathlib import Path
 
 # Import the component under test
 import sys
+from pathlib import Path
+from unittest.mock import patch
+
+import pytest
+import yaml
+from config.config_loader import ConfigLoader, get_config
+
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
-
-from config.config_loader import ConfigLoader, get_config, reload_config
 
 
 class TestConfigLoader:
@@ -54,7 +55,8 @@ class TestConfigLoader:
         }
 
     @pytest.mark.unit
-    def test_config_loader_initialization_with_file(self, sample_config_data, temp_directory):
+    def test_config_loader_initialization_with_file(
+            self, sample_config_data, temp_directory):
         """Test ConfigLoader initializes with existing config file."""
         config_file = temp_directory / "config.yaml"
         with open(config_file, 'w') as f:
@@ -104,7 +106,8 @@ class TestConfigLoader:
         assert loader.get("task_queue.max_queue_size") == 1000
 
     @pytest.mark.unit
-    def test_environment_variable_overrides(self, sample_config_data, temp_directory):
+    def test_environment_variable_overrides(
+            self, sample_config_data, temp_directory):
         """Test environment variable overrides for config values."""
         config_file = temp_directory / "config.yaml"
         with open(config_file, 'w') as f:
@@ -128,7 +131,8 @@ class TestConfigLoader:
             assert loader.get("system.debug_mode") is False
 
     @pytest.mark.unit
-    def test_environment_variable_type_conversion(self, sample_config_data, temp_directory):
+    def test_environment_variable_type_conversion(
+            self, sample_config_data, temp_directory):
         """Test environment variable type conversion."""
         config_file = temp_directory / "config.yaml"
         with open(config_file, 'w') as f:
@@ -189,7 +193,8 @@ class TestConfigLoader:
         assert system_config["debug_mode"] is False
 
     @pytest.mark.unit
-    def test_development_mode_detection(self, sample_config_data, temp_directory):
+    def test_development_mode_detection(
+            self, sample_config_data, temp_directory):
         """Test development mode detection."""
         config_file = temp_directory / "config.yaml"
         with open(config_file, 'w') as f:
@@ -299,7 +304,11 @@ class TestConfigLoader:
 
     @pytest.mark.unit
     @pytest.mark.performance
-    def test_config_access_performance(self, sample_config_data, temp_directory, performance_thresholds):
+    def test_config_access_performance(
+            self,
+            sample_config_data,
+            temp_directory,
+            performance_thresholds):
         """Test configuration access performance."""
         config_file = temp_directory / "config.yaml"
         with open(config_file, 'w') as f:
@@ -321,7 +330,8 @@ class TestConfigLoader:
         avg_time = total_time / (iterations * 3)  # 3 calls per iteration
 
         # Config access should be fast
-        assert avg_time < performance_thresholds["config_load_max_time"], f"Config access too slow: {avg_time}s per call"
+        assert avg_time < performance_thresholds[
+            "config_load_max_time"], f"Config access too slow: {avg_time}s per call"
 
     @pytest.mark.unit
     def test_config_edge_cases(self, temp_directory):

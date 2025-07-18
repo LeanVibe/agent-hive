@@ -10,10 +10,11 @@ import signal
 import sys
 from pathlib import Path
 
+from scripts.accountability_framework import AccountabilityFramework
+
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from scripts.accountability_framework import AccountabilityFramework
 
 # Configure logging
 logging.basicConfig(

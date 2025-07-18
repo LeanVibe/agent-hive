@@ -9,18 +9,14 @@ import json
 import logging
 import sqlite3
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Callable
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import SGDRegressor
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-from .models import MLConfig, LearningMetrics
-
+from .models import LearningMetrics, MLConfig
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +32,10 @@ class AdaptiveLearning:
     - Continuous optimization based on historical data
     """
 
-    def __init__(self, config: Optional[MLConfig] = None, db_path: Optional[str] = None):
+    def __init__(
+            self,
+            config: Optional[MLConfig] = None,
+            db_path: Optional[str] = None):
         """Initialize AdaptiveLearning with configuration and database."""
         self.config = config or MLConfig()
         self.db_path = db_path or "adaptive_learning.db"
@@ -184,7 +183,8 @@ class AdaptiveLearning:
     ) -> str:
         """Start a new adaptive learning session."""
 
-        session_id = f"session_{model_type}_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
+        session_id = f"session_{model_type}_{
+            datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
 
         # Initialize session state
         self.learning_state['current_session'] = session_id
@@ -208,11 +208,13 @@ class AdaptiveLearning:
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (
                 session_id, model_type, datetime.now(), 0.5,  # Default initial performance
-                0, json.dumps(hyperparameters or {}), json.dumps(initial_context)
+                0, json.dumps(hyperparameters or {}
+                              ), json.dumps(initial_context)
             ))
             conn.commit()
 
-        logger.info(f"Started learning session: {session_id} for model: {model_type}")
+        logger.info(
+            f"Started learning session: {session_id} for model: {model_type}")
         return session_id
 
     def provide_feedback(
@@ -250,7 +252,8 @@ class AdaptiveLearning:
                 INSERT INTO feedback_data VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 feedback_id, session_id, feedback_type, feedback_value,
-                json.dumps(context), datetime.now(), source_agent, json.dumps({})
+                json.dumps(context), datetime.now(
+                ), source_agent, json.dumps({})
             ))
             conn.commit()
 
@@ -275,7 +278,8 @@ class AdaptiveLearning:
         scaler = self.scalers[model_type]
 
         # Measure performance before adaptation
-        before_performance = self._measure_model_performance(model_type, training_data, target_values)
+        before_performance = self._measure_model_performance(
+            model_type, training_data, target_values)
 
         # Prepare training data
         X, y = self._prepare_training_data(training_data, target_values)
@@ -287,7 +291,8 @@ class AdaptiveLearning:
         # Scale features
         if hasattr(model, 'partial_fit'):
             # Online learning for SGD models
-            X_scaled = scaler.partial_fit(X).transform(X) if not hasattr(scaler, 'mean_') else scaler.transform(X)
+            X_scaled = scaler.partial_fit(X).transform(X) if not hasattr(
+                scaler, 'mean_') else scaler.transform(X)
             model.partial_fit(X_scaled, y)
         else:
             # Batch learning for tree models
@@ -295,10 +300,12 @@ class AdaptiveLearning:
             model.fit(X_scaled, y)
 
         # Measure performance after adaptation
-        after_performance = self._measure_model_performance(model_type, training_data, target_values)
+        after_performance = self._measure_model_performance(
+            model_type, training_data, target_values)
 
         # Calculate improvement metrics
-        improvement_rate = (after_performance - before_performance) / max(before_performance, 0.001)
+        improvement_rate = (after_performance - before_performance) / \
+            max(before_performance, 0.001)
         accuracy_change = after_performance - before_performance
 
         # Update learning state
@@ -319,12 +326,14 @@ class AdaptiveLearning:
         )
 
         # Store adaptation in database
-        self._store_adaptation(session_id, model_type, before_performance, after_performance, metrics)
+        self._store_adaptation(session_id, model_type,
+                               before_performance, after_performance, metrics)
 
         # Check for convergence
         self._check_convergence(session_id, model_type)
 
-        logger.info(f"Adapted {model_type}: improvement={improvement_rate:.3f}")
+        logger.info(
+            f"Adapted {model_type}: improvement={improvement_rate:.3f}")
         return metrics
 
     def _prepare_training_data(
@@ -409,9 +418,10 @@ class AdaptiveLearning:
         if len(performance_history) < 3:
             return 0.0
 
-        # Find when performance stabilized (variance < threshold for last 3 measurements)
+        # Find when performance stabilized (variance < threshold for last 3
+        # measurements)
         for i in range(2, len(performance_history)):
-            recent_performance = performance_history[i-2:i+1]
+            recent_performance = performance_history[i - 2:i + 1]
             variance = np.var(recent_performance)
 
             if variance < 0.01:  # Convergence threshold
@@ -443,7 +453,8 @@ class AdaptiveLearning:
         ]:
             for feedback in feedback_list:
                 # Convert feedback context to feature vector
-                context_features = self._extract_features_from_context(feedback['context'])
+                context_features = self._extract_features_from_context(
+                    feedback['context'])
                 adaptation_data.append(context_features)
 
                 if feedback['type'] == 'performance':
@@ -458,7 +469,8 @@ class AdaptiveLearning:
             try:
                 # Determine which model to adapt based on feedback context
                 model_type = self._determine_model_from_feedback(session_id)
-                self.adapt_model(session_id, model_type, adaptation_data, target_values)
+                self.adapt_model(session_id, model_type,
+                                 adaptation_data, target_values)
 
                 # Clear processed feedback
                 for buffer in self.feedback_buffer.values():
@@ -467,7 +479,8 @@ class AdaptiveLearning:
             except Exception as e:
                 logger.error(f"Error processing feedback adaptation: {e}")
 
-    def _extract_features_from_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_features_from_context(
+            self, context: Dict[str, Any]) -> Dict[str, Any]:
         """Extract relevant features from feedback context."""
 
         # Standard feature extraction
@@ -481,8 +494,10 @@ class AdaptiveLearning:
         }
 
         # Add derived features
-        features['efficiency_score'] = features['success_rate'] / max(features['response_time'], 0.1)
-        features['load_factor'] = features['queue_size'] / max(features['agent_count'], 1)
+        features['efficiency_score'] = features['success_rate'] / \
+            max(features['response_time'], 0.1)
+        features['load_factor'] = features['queue_size'] / \
+            max(features['agent_count'], 1)
 
         return features
 
@@ -525,7 +540,8 @@ class AdaptiveLearning:
                 'convergence_variance': variance
             }
 
-            logger.info(f"Model {model_type} converged in session {session_id}")
+            logger.info(
+                f"Model {model_type} converged in session {session_id}")
 
         return converged
 
@@ -553,7 +569,8 @@ class AdaptiveLearning:
                 INSERT INTO model_adaptations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 adaptation_id, session_id, model_type, 'feedback_adaptation',
-                before_performance, after_performance, json.dumps(adaptation_details),
+                before_performance, after_performance, json.dumps(
+                    adaptation_details),
                 datetime.now(), after_performance > before_performance
             ))
 
@@ -596,15 +613,19 @@ class AdaptiveLearning:
             'session_id': session_id,
             'final_performance': final_performance,
             'total_adaptations': len(performance_history),
-            'converged': convergence_info.get('converged', False),
-            'convergence_time': convergence_info.get('convergence_time', 0),
+            'converged': convergence_info.get(
+                'converged',
+                False),
+            'convergence_time': convergence_info.get(
+                'convergence_time',
+                0),
             'improvement_trend': self._calculate_improvement_trend(performance_history),
-            'end_time': datetime.now()
-        }
+            'end_time': datetime.now()}
 
         # Update database
         with sqlite3.connect(self.db_path) as conn:
-            improvement_rate = self._calculate_session_improvement_rate(performance_history)
+            improvement_rate = self._calculate_session_improvement_rate(
+                performance_history)
             conn.execute("""
                 UPDATE learning_sessions
                 SET end_time = ?, final_performance = ?, improvement_rate = ?,
@@ -626,7 +647,8 @@ class AdaptiveLearning:
         logger.info(f"Ended learning session {session_id}: {session_summary}")
         return session_summary
 
-    def _calculate_improvement_trend(self, performance_history: List[float]) -> float:
+    def _calculate_improvement_trend(
+            self, performance_history: List[float]) -> float:
         """Calculate overall improvement trend for session."""
 
         if len(performance_history) < 2:
@@ -638,11 +660,13 @@ class AdaptiveLearning:
 
         # Calculate slope
         n = len(x)
-        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / (n * np.sum(x**2) - np.sum(x)**2)
+        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / \
+            (n * np.sum(x**2) - np.sum(x)**2)
 
         return float(slope)
 
-    def _calculate_session_improvement_rate(self, performance_history: List[float]) -> float:
+    def _calculate_session_improvement_rate(
+            self, performance_history: List[float]) -> float:
         """Calculate overall improvement rate for session."""
 
         if len(performance_history) < 2:
@@ -656,7 +680,8 @@ class AdaptiveLearning:
 
         return (final_performance - initial_performance) / initial_performance
 
-    def get_learning_insights(self, model_type: Optional[str] = None) -> Dict[str, Any]:
+    def get_learning_insights(
+            self, model_type: Optional[str] = None) -> Dict[str, Any]:
         """Get insights from adaptive learning patterns."""
 
         with sqlite3.connect(self.db_path) as conn:
@@ -711,21 +736,19 @@ class AdaptiveLearning:
                     'avg_improvement_rate': session_stats[1] if session_stats else 0,
                     'avg_final_performance': session_stats[2] if session_stats else 0,
                     'avg_convergence_time': session_stats[3] if session_stats else 0,
-                    'avg_samples_processed': session_stats[4] if session_stats else 0
-                },
+                    'avg_samples_processed': session_stats[4] if session_stats else 0},
                 'adaptation_statistics': adaptation_stats,
                 'recent_performance_7days': recent_performance,
                 'model_status': {
                     'current_session': self.learning_state['current_session'],
-                    'active_models': list(self.adaptive_models.keys()),
-                    'convergence_tracking': len(self.convergence_tracking)
-                },
+                    'active_models': list(
+                        self.adaptive_models.keys()),
+                    'convergence_tracking': len(
+                        self.convergence_tracking)},
                 'config': {
                     'learning_rate': self.config.learning_rate,
                     'update_frequency': self.config.update_frequency,
-                    'learning_enabled': self.config.learning_enabled
-                }
-            }
+                    'learning_enabled': self.config.learning_enabled}}
 
     def predict_with_adaptation(
         self,
@@ -742,7 +765,8 @@ class AdaptiveLearning:
         scaler = self.scalers[model_type]
 
         # Prepare feature vector
-        feature_vector = [features.get(key, 0.0) for key in sorted(features.keys())]
+        feature_vector = [features.get(key, 0.0)
+                          for key in sorted(features.keys())]
 
         try:
             if hasattr(scaler, 'mean_'):
@@ -750,7 +774,8 @@ class AdaptiveLearning:
                 prediction = model.predict(X_scaled)[0]
 
                 # Estimate prediction confidence
-                confidence = self._estimate_prediction_confidence(model_type, features)
+                confidence = self._estimate_prediction_confidence(
+                    model_type, features)
 
                 # Determine if adaptation needed
                 needs_adaptation = confidence < confidence_threshold
@@ -778,8 +803,10 @@ class AdaptiveLearning:
             if recent_performance:
                 base_confidence = float(recent_performance[-1])
                 # Adjust based on feature quality for active sessions
-                feature_completeness = min(1.0, len(features) / 3.0)  # Assuming 3 key features minimum
-                confidence = base_confidence * max(0.7, feature_completeness)  # Don't penalize too much
+                # Assuming 3 key features minimum
+                feature_completeness = min(1.0, len(features) / 3.0)
+                confidence = base_confidence * \
+                    max(0.7, feature_completeness)  # Don't penalize too much
             else:
                 confidence = 0.5
         else:
@@ -805,7 +832,8 @@ class AdaptiveLearning:
             })
 
         # Analyze convergence issues
-        slow_convergence = [s for s in recent_sessions if s.get('convergence_time', 0) > 1000]
+        slow_convergence = [s for s in recent_sessions if s.get(
+            'convergence_time', 0) > 1000]
         if slow_convergence:
             recommendations.append({
                 'type': 'convergence',
@@ -815,7 +843,8 @@ class AdaptiveLearning:
             })
 
         # Check for low improvement rates
-        low_improvement = [s for s in recent_sessions if s.get('improvement_rate', 0) < 0.1]
+        low_improvement = [s for s in recent_sessions if s.get(
+            'improvement_rate', 0) < 0.1]
         if low_improvement:
             recommendations.append({
                 'type': 'improvement',
@@ -825,7 +854,8 @@ class AdaptiveLearning:
             })
 
         # Check feedback utilization
-        total_feedback = sum(len(buffer) for buffer in self.feedback_buffer.values())
+        total_feedback = sum(len(buffer)
+                             for buffer in self.feedback_buffer.values())
         if total_feedback > 20:
             recommendations.append({
                 'type': 'feedback',
@@ -897,6 +927,7 @@ class AdaptiveLearning:
 
             conn.commit()
 
-        total_deleted = sessions_deleted + feedback_deleted + adaptations_deleted + history_deleted
+        total_deleted = sessions_deleted + feedback_deleted + \
+            adaptations_deleted + history_deleted
         logger.info(f"Cleaned up {total_deleted} learning records")
         return total_deleted

@@ -2,21 +2,14 @@
 Tests for EventStreaming component.
 """
 
-import pytest
-import asyncio
-import json
-import gzip
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
+
+import pytest
+
+from external_api.event_streaming import EventBuffer, EventStreaming
+from external_api.models import EventPriority, EventStreamConfig, StreamEvent
 
 pytestmark = pytest.mark.asyncio
-
-from external_api.event_streaming import EventStreaming, EventBuffer
-from external_api.models import (
-    EventStreamConfig,
-    StreamEvent,
-    EventPriority
-)
 
 
 class TestEventBuffer:
@@ -177,7 +170,8 @@ class TestEventStreaming:
             "status": "created"
         }
 
-    async def test_streaming_initialization(self, event_streaming, stream_config):
+    async def test_streaming_initialization(
+            self, event_streaming, stream_config):
         """Test event streaming initialization."""
         assert event_streaming.config == stream_config
         assert isinstance(event_streaming.buffer, EventBuffer)
@@ -207,7 +201,8 @@ class TestEventStreaming:
         await event_streaming.stop_streaming()  # Should not raise error
         assert not event_streaming.stream_active
 
-    async def test_publish_event_success(self, event_streaming, sample_event_data):
+    async def test_publish_event_success(
+            self, event_streaming, sample_event_data):
         """Test successful event publishing."""
         await event_streaming.start_streaming()
 
@@ -221,7 +216,8 @@ class TestEventStreaming:
         assert result is True
         assert event_streaming.stats["events_processed"] == 1
 
-    async def test_publish_event_stream_not_active(self, event_streaming, sample_event_data):
+    async def test_publish_event_stream_not_active(
+            self, event_streaming, sample_event_data):
         """Test publishing when streaming is not active."""
         result = await event_streaming.publish_event(
             event_type="task_created",
@@ -319,7 +315,8 @@ class TestEventStreaming:
         assert result is False
         assert event_streaming.stats["events_processed"] == 0
 
-    async def test_flush_events_to_consumers(self, event_streaming, sample_event_data):
+    async def test_flush_events_to_consumers(
+            self, event_streaming, sample_event_data):
         """Test event flushing to consumers."""
         consumed_batches = []
 
@@ -370,7 +367,8 @@ class TestEventStreaming:
             assert "original_size" in batch_data
             assert batch_data["compressed_size"] < batch_data["original_size"]
 
-    async def test_consumer_retry_logic(self, event_streaming, sample_event_data):
+    async def test_consumer_retry_logic(
+            self, event_streaming, sample_event_data):
         """Test consumer retry logic on failures."""
         attempt_count = 0
 

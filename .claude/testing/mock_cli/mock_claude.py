@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Mock Claude CLI for testing purposes."""
 
+import argparse
 import json
+import random
 import sys
 import time
-import random
-import argparse
 from datetime import datetime
 
 
@@ -44,10 +44,22 @@ def simulate_error_response(error_type: str = "generic") -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description="Mock Claude CLI")
-    parser.add_argument("-p", "--prompt", required=True, help="Prompt to process")
+    parser.add_argument(
+    "-p",
+    "--prompt",
+    required=True,
+     help="Prompt to process")
     parser.add_argument("--error-type", help="Simulate specific error type")
-    parser.add_argument("--delay", type=float, default=1.0, help="Response delay in seconds")
-    parser.add_argument("--fail-rate", type=float, default=0.0, help="Failure rate (0.0-1.0)")
+    parser.add_argument(
+    "--delay",
+    type=float,
+    default=1.0,
+     help="Response delay in seconds")
+    parser.add_argument(
+    "--fail-rate",
+    type=float,
+    default=0.0,
+     help="Failure rate (0.0-1.0)")
     parser.add_argument("--format", help="Output format (ignored)")
     parser.add_argument("--version", action="store_true", help="Show version")
 

@@ -8,19 +8,28 @@ to provide unified agent management and monitoring capabilities.
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from advanced_orchestration.models import (
+    AgentInfo,
+    CoordinatorConfig,
+    ResourceLimits,
+    TaskAssignment,
+)
+from advanced_orchestration.multi_agent_coordinator import (
+    MultiAgentCoordinator,
+)
+from dashboard.enhanced_server import EnhancedDashboardServer
+from dashboard.prompt_logger import prompt_logger
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
-from advanced_orchestration.models import CoordinatorConfig, AgentInfo, TaskAssignment, ResourceLimits
-from dashboard.enhanced_server import EnhancedDashboardServer
-from dashboard.prompt_logger import prompt_logger
 
 logger = logging.getLogger(__name__)
+
 
 class DashboardCoordinatorIntegration:
     """Integration layer between dashboard and multi-agent coordinator"""
@@ -44,7 +53,8 @@ class DashboardCoordinatorIntegration:
         )
 
         self.coordinator = MultiAgentCoordinator(self.coordinator_config)
-        self.dashboard_server = EnhancedDashboardServer(session_name, str(self.base_dir))
+        self.dashboard_server = EnhancedDashboardServer(
+            session_name, str(self.base_dir))
 
         # Integration state
         self.coordinator_running = False
@@ -98,7 +108,7 @@ class DashboardCoordinatorIntegration:
             for agent_name, agent_info in agents.items():
                 try:
                     # Register agent with coordinator
-                    registration = await self.coordinator.register_agent(
+                    await self.coordinator.register_agent(
                         agent_name,
                         {
                             'path': agent_info.path,
@@ -119,7 +129,8 @@ class DashboardCoordinatorIntegration:
                     )
 
                 except Exception as e:
-                    logger.warning(f"⚠️ Failed to register agent {agent_name}: {e}")
+                    logger.warning(
+                        f"⚠️ Failed to register agent {agent_name}: {e}")
 
         except Exception as e:
             logger.error(f"❌ Error discovering agents: {e}")
@@ -210,10 +221,13 @@ class DashboardCoordinatorIntegration:
         return {
             "coordinator_running": self.coordinator_running,
             "dashboard_running": self.dashboard_running,
-            "registered_agents": len(self.coordinator.agents) if self.coordinator_running else 0,
-            "pending_tasks": len(self.coordinator.pending_tasks) if self.coordinator_running else 0,
-            "assigned_tasks": len(self.coordinator.assigned_tasks) if self.coordinator_running else 0
-        }
+            "registered_agents": len(
+                self.coordinator.agents) if self.coordinator_running else 0,
+            "pending_tasks": len(
+                self.coordinator.pending_tasks) if self.coordinator_running else 0,
+            "assigned_tasks": len(
+                self.coordinator.assigned_tasks) if self.coordinator_running else 0}
+
 
 async def main():
     """Main function to run the integrated system"""
@@ -222,7 +236,8 @@ async def main():
     try:
         # Start integration
         if await integration.start_integration():
-            logger.info("🚀 Dashboard-Coordinator Integration started successfully")
+            logger.info(
+                "🚀 Dashboard-Coordinator Integration started successfully")
             logger.info("📊 Dashboard available at: http://localhost:8002")
 
             # Run dashboard server

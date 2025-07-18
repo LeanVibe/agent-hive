@@ -6,10 +6,9 @@ simplicity and reliability.
 """
 
 import logging
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
-from dataclasses import dataclass
-
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +53,14 @@ class SimpleServiceDiscovery:
         try:
             self.services[service.service_id] = service
             self.registered_at[service.service_id] = datetime.now()
-            logger.info(f"Registered service {service.service_id}: {service.endpoint()}")
+            logger.info(
+                f"Registered service {
+                    service.service_id}: {
+                    service.endpoint()}")
             return True
         except Exception as e:
-            logger.error(f"Failed to register service {service.service_id}: {e}")
+            logger.error(
+                f"Failed to register service {service.service_id}: {e}")
             return False
 
     def unregister(self, service_id: str) -> bool:
@@ -124,7 +127,8 @@ class SimpleServiceDiscovery:
         Returns:
             Statistics dictionary
         """
-        healthy = sum(1 for s in self.services.values() if s.status == "healthy")
+        healthy = sum(1 for s in self.services.values()
+                      if s.status == "healthy")
         return {
             "total_services": len(self.services),
             "healthy_services": healthy,

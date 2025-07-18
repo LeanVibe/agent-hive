@@ -3,17 +3,28 @@ Tests for the enhanced workflow coordinator.
 """
 
 import asyncio
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
-from advanced_orchestration.workflow_coordinator import WorkflowCoordinator
+import pytest
+
 from advanced_orchestration.models import (
-    WorkflowDefinition, EnhancedTaskAssignment, AgentCapabilities,
-    CoordinationMetrics, IntelligentRouting, QualityGate, WorkflowState,
-    TaskDependency, TaskStatus, TaskPriority, AgentSpecialization,
-    WorkflowType, DependencyType, CoordinatorConfig, ResourceLimits
+    AgentCapabilities,
+    AgentSpecialization,
+    CoordinationMetrics,
+    CoordinatorConfig,
+    DependencyType,
+    EnhancedTaskAssignment,
+    QualityGate,
+    ResourceLimits,
+    TaskDependency,
+    TaskPriority,
+    TaskStatus,
+    WorkflowDefinition,
+    WorkflowState,
+    WorkflowType,
 )
+from advanced_orchestration.workflow_coordinator import WorkflowCoordinator
 
 
 @pytest.fixture
@@ -72,7 +83,8 @@ def sample_agent_capabilities():
     return AgentCapabilities(
         specialization=AgentSpecialization.DOCUMENTATION,
         skill_level=0.8,
-        supported_workflows=[WorkflowType.DOCUMENTATION, WorkflowType.TUTORIAL],
+        supported_workflows=[
+            WorkflowType.DOCUMENTATION, WorkflowType.TUTORIAL],
         max_concurrent_tasks=2,
         preferred_task_types=["documentation", "writing"],
         performance_metrics={"speed": 0.9, "quality": 0.8},
@@ -110,10 +122,14 @@ class TestWorkflowCoordinator:
         assert workflow_coordinator.running is False
         workflow_coordinator.multi_agent_coordinator.stop.assert_called_once()
 
-    async def test_workflow_registration(self, workflow_coordinator, sample_workflow_definition):
+    async def test_workflow_registration(
+            self,
+            workflow_coordinator,
+            sample_workflow_definition):
         """Test workflow registration."""
         # Mock validation
-        workflow_coordinator._validate_workflow_definition = AsyncMock(return_value=True)
+        workflow_coordinator._validate_workflow_definition = AsyncMock(
+            return_value=True)
         workflow_coordinator._build_dependency_graph = AsyncMock()
 
         # Test registration
@@ -124,10 +140,12 @@ class TestWorkflowCoordinator:
         workflow_coordinator._validate_workflow_definition.assert_called_once()
         workflow_coordinator._build_dependency_graph.assert_called_once()
 
-    async def test_workflow_registration_failure(self, workflow_coordinator, sample_workflow_definition):
+    async def test_workflow_registration_failure(
+            self, workflow_coordinator, sample_workflow_definition):
         """Test workflow registration failure."""
         # Mock validation failure
-        workflow_coordinator._validate_workflow_definition = AsyncMock(return_value=False)
+        workflow_coordinator._validate_workflow_definition = AsyncMock(
+            return_value=False)
 
         # Test registration
         result = await workflow_coordinator.register_workflow(sample_workflow_definition)
@@ -135,7 +153,8 @@ class TestWorkflowCoordinator:
         assert result is False
         assert sample_workflow_definition.workflow_id not in workflow_coordinator.workflow_definitions
 
-    async def test_agent_capabilities_registration(self, workflow_coordinator, sample_agent_capabilities):
+    async def test_agent_capabilities_registration(
+            self, workflow_coordinator, sample_agent_capabilities):
         """Test agent capabilities registration."""
         agent_id = "test-agent"
 
@@ -146,10 +165,12 @@ class TestWorkflowCoordinator:
         assert agent_id in workflow_coordinator.agent_capabilities
         assert workflow_coordinator.agent_capabilities[agent_id] == sample_agent_capabilities
 
-    async def test_workflow_execution_initialization(self, workflow_coordinator, sample_workflow_definition):
+    async def test_workflow_execution_initialization(
+            self, workflow_coordinator, sample_workflow_definition):
         """Test workflow execution initialization."""
         # Setup
-        workflow_coordinator.workflow_definitions[sample_workflow_definition.workflow_id] = sample_workflow_definition
+        workflow_coordinator.workflow_definitions[
+            sample_workflow_definition.workflow_id] = sample_workflow_definition
         workflow_coordinator._create_enhanced_task_assignments = AsyncMock()
         workflow_coordinator._execute_workflow_phases = AsyncMock()
 
@@ -303,12 +324,14 @@ class TestWorkflowCoordinator:
         assert result is False
         assert workflow_coordinator.coordination_stats['quality_gates_failed'] == 1
 
-    async def test_workflow_definition_validation_success(self, workflow_coordinator, sample_workflow_definition):
+    async def test_workflow_definition_validation_success(
+            self, workflow_coordinator, sample_workflow_definition):
         """Test successful workflow definition validation."""
         result = await workflow_coordinator._validate_workflow_definition(sample_workflow_definition)
         assert result is True
 
-    async def test_workflow_definition_validation_no_tasks(self, workflow_coordinator):
+    async def test_workflow_definition_validation_no_tasks(
+            self, workflow_coordinator):
         """Test workflow definition validation with no tasks."""
         workflow_def = WorkflowDefinition(
             workflow_id="test-workflow",
@@ -324,7 +347,8 @@ class TestWorkflowCoordinator:
         result = await workflow_coordinator._validate_workflow_definition(workflow_def)
         assert result is False
 
-    async def test_workflow_definition_validation_invalid_dependency(self, workflow_coordinator):
+    async def test_workflow_definition_validation_invalid_dependency(
+            self, workflow_coordinator):
         """Test workflow definition validation with invalid dependency."""
         workflow_def = WorkflowDefinition(
             workflow_id="test-workflow",
@@ -426,17 +450,23 @@ class TestWorkflowCoordinator:
         result = await workflow_coordinator._is_task_ready(task_id)
         assert result is False
 
-    async def test_parallel_group_identification(self, workflow_coordinator, sample_workflow_definition):
+    async def test_parallel_group_identification(
+            self, workflow_coordinator, sample_workflow_definition):
         """Test parallel group identification."""
         await workflow_coordinator._build_dependency_graph(sample_workflow_definition)
 
         # Check parallel groups
-        parallel_groups = workflow_coordinator.parallel_execution_groups[sample_workflow_definition.workflow_id]
+        parallel_groups = workflow_coordinator.parallel_execution_groups[
+            sample_workflow_definition.workflow_id]
 
-        # task2 and task3 should be in the same parallel group (both depend on task1)
+        # task2 and task3 should be in the same parallel group (both depend on
+        # task1)
         assert len(parallel_groups) >= 0  # May vary based on implementation
 
-    async def test_ml_agent_selection(self, workflow_coordinator, sample_agent_capabilities):
+    async def test_ml_agent_selection(
+            self,
+            workflow_coordinator,
+            sample_agent_capabilities):
         """Test ML-based agent selection."""
         # Setup agent capabilities
         agent_id = "test-agent"
@@ -476,7 +506,8 @@ class TestWorkflowCoordinator:
             "agent3": MagicMock(active_tasks=3)
         }
 
-        workflow_coordinator.multi_agent_coordinator.get_coordinator_state = AsyncMock(return_value=mock_state)
+        workflow_coordinator.multi_agent_coordinator.get_coordinator_state = AsyncMock(
+            return_value=mock_state)
 
         # Create test task
         task = EnhancedTaskAssignment(
@@ -496,7 +527,8 @@ class TestWorkflowCoordinator:
 
         assert result == "agent2"  # Should select agent with least active tasks
 
-    async def test_coordination_metrics_calculation(self, workflow_coordinator):
+    async def test_coordination_metrics_calculation(
+            self, workflow_coordinator):
         """Test coordination metrics calculation."""
         # Setup workflow
         workflow_id = "test-workflow"
@@ -587,7 +619,8 @@ class TestWorkflowCoordinator:
         assert result.workflow_id == workflow_id
         assert result.status == "executing"
 
-    async def test_workflow_state_retrieval_not_found(self, workflow_coordinator):
+    async def test_workflow_state_retrieval_not_found(
+            self, workflow_coordinator):
         """Test workflow state retrieval for non-existent workflow."""
         result = await workflow_coordinator.get_workflow_state("non-existent-workflow")
         assert result is None
@@ -615,7 +648,8 @@ class TestWorkflowCoordinator:
         assert result.workflow_completion_rate == 0.8
         assert result.parallel_efficiency == 0.9
 
-    async def test_coordination_metrics_retrieval_not_found(self, workflow_coordinator):
+    async def test_coordination_metrics_retrieval_not_found(
+            self, workflow_coordinator):
         """Test coordination metrics retrieval for non-existent workflow."""
         result = await workflow_coordinator.get_coordination_metrics("non-existent-workflow")
         assert result is None
@@ -625,7 +659,11 @@ class TestWorkflowCoordinator:
 class TestWorkflowCoordinatorIntegration:
     """Integration tests for WorkflowCoordinator."""
 
-    async def test_full_workflow_execution_simulation(self, workflow_coordinator, sample_workflow_definition, sample_agent_capabilities):
+    async def test_full_workflow_execution_simulation(
+            self,
+            workflow_coordinator,
+            sample_workflow_definition,
+            sample_agent_capabilities):
         """Test full workflow execution simulation."""
         # Setup
         await workflow_coordinator.start()
@@ -668,7 +706,8 @@ class TestWorkflowCoordinatorIntegration:
         # Verify workflow state
         assert workflow_state.workflow_id == sample_workflow_definition.workflow_id
         assert workflow_state.status == "initializing"
-        assert len(workflow_coordinator.enhanced_tasks) == len(sample_workflow_definition.tasks)
+        assert len(workflow_coordinator.enhanced_tasks) == len(
+            sample_workflow_definition.tasks)
 
         # Cleanup
         await workflow_coordinator.stop()
@@ -676,7 +715,8 @@ class TestWorkflowCoordinatorIntegration:
         # Wait briefly for background tasks to complete
         await asyncio.sleep(0.1)
 
-    async def test_parallel_task_execution_coordination(self, workflow_coordinator):
+    async def test_parallel_task_execution_coordination(
+            self, workflow_coordinator):
         """Test parallel task execution coordination."""
         # Create workflow with parallel tasks
         workflow_def = WorkflowDefinition(
@@ -725,7 +765,8 @@ class TestWorkflowCoordinatorIntegration:
 
         await workflow_coordinator.stop()
 
-    async def test_quality_gate_integration(self, workflow_coordinator, sample_workflow_definition):
+    async def test_quality_gate_integration(
+            self, workflow_coordinator, sample_workflow_definition):
         """Test quality gate integration with workflow execution."""
         # Setup quality gate
         gate_id = "integration-gate"

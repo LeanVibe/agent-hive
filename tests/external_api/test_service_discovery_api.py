@@ -3,12 +3,13 @@ Tests for Service Discovery REST API.
 """
 
 import pytest
-import asyncio
-from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
-from external_api.service_discovery import ServiceDiscovery, ServiceInstance, ServiceStatus
-from external_api.service_discovery_api import ServiceDiscoveryAPI, create_service_discovery_api
+from external_api.service_discovery import ServiceDiscovery
+from external_api.service_discovery_api import (
+    ServiceDiscoveryAPI,
+    create_service_discovery_api,
+)
 
 
 class TestServiceDiscoveryAPI:
@@ -26,7 +27,8 @@ class TestServiceDiscoveryAPI:
     @pytest.fixture
     def service_discovery_api(self, service_discovery):
         """Create ServiceDiscoveryAPI instance."""
-        return ServiceDiscoveryAPI(service_discovery, host="127.0.0.1", port=8001)
+        return ServiceDiscoveryAPI(
+            service_discovery, host="127.0.0.1", port=8001)
 
     @pytest.fixture
     def test_client(self, service_discovery_api):
@@ -57,7 +59,8 @@ class TestServiceDiscoveryAPI:
 
     def test_register_service_success(self, test_client, sample_service_data):
         """Test successful service registration via API."""
-        response = test_client.post("/services/register", json=sample_service_data)
+        response = test_client.post(
+            "/services/register", json=sample_service_data)
         assert response.status_code == 200
 
         data = response.json()
@@ -83,7 +86,8 @@ class TestServiceDiscoveryAPI:
         test_client.post("/services/register", json=sample_service_data)
 
         # Get service by ID
-        response = test_client.get(f"/services/{sample_service_data['service_id']}")
+        response = test_client.get(
+            f"/services/{sample_service_data['service_id']}")
         assert response.status_code == 200
 
         data = response.json()
@@ -99,13 +103,15 @@ class TestServiceDiscoveryAPI:
         assert response.status_code == 404
         assert "Service not found" in response.json()["detail"]
 
-    def test_deregister_service_success(self, test_client, sample_service_data):
+    def test_deregister_service_success(
+            self, test_client, sample_service_data):
         """Test successful service deregistration via API."""
         # Register service first
         test_client.post("/services/register", json=sample_service_data)
 
         # Deregister service
-        response = test_client.delete(f"/services/{sample_service_data['service_id']}")
+        response = test_client.delete(
+            f"/services/{sample_service_data['service_id']}")
         assert response.status_code == 200
 
         data = response.json()
@@ -121,7 +127,8 @@ class TestServiceDiscoveryAPI:
     def test_discover_services(self, test_client, sample_service_data):
         """Test service discovery via API."""
         # Register service first
-        response = test_client.post("/services/register", json=sample_service_data)
+        response = test_client.post(
+            "/services/register", json=sample_service_data)
         assert response.status_code == 200
 
         # Wait briefly for service to be registered with health check
@@ -129,7 +136,8 @@ class TestServiceDiscoveryAPI:
         time.sleep(0.1)
 
         # Discover services - try both healthy and all services
-        response = test_client.get(f"/services/discover/{sample_service_data['service_name']}?healthy_only=false")
+        response = test_client.get(
+            f"/services/discover/{sample_service_data['service_name']}?healthy_only=false")
         assert response.status_code == 200
 
         data = response.json()
@@ -140,19 +148,22 @@ class TestServiceDiscoveryAPI:
         assert service["service_id"] == sample_service_data["service_id"]
         assert service["service_name"] == sample_service_data["service_name"]
 
-    def test_discover_services_healthy_only(self, test_client, sample_service_data):
+    def test_discover_services_healthy_only(
+            self, test_client, sample_service_data):
         """Test service discovery with healthy_only parameter."""
         # Register service first
         test_client.post("/services/register", json=sample_service_data)
 
         # Discover only healthy services
         response = test_client.get(
-            f"/services/discover/{sample_service_data['service_name']}?healthy_only=true"
+            f"/services/discover/{
+    sample_service_data['service_name']}?healthy_only=true"
         )
         assert response.status_code == 200
 
         data = response.json()
-        # Should include services even if starting (as they'll become healthy without health check URL in test)
+        # Should include services even if starting (as they'll become healthy
+        # without health check URL in test)
         assert data["total_count"] >= 0
 
     def test_service_heartbeat(self, test_client, sample_service_data):
@@ -161,7 +172,8 @@ class TestServiceDiscoveryAPI:
         test_client.post("/services/register", json=sample_service_data)
 
         # Send heartbeat
-        response = test_client.post(f"/services/{sample_service_data['service_id']}/heartbeat")
+        response = test_client.post(
+            f"/services/{sample_service_data['service_id']}/heartbeat")
         assert response.status_code == 200
 
         data = response.json()
@@ -219,7 +231,8 @@ class TestServiceDiscoveryAPI:
         test_client.post("/services/register", json=sample_service_data)
 
         # Get service status
-        response = test_client.get(f"/services/{sample_service_data['service_id']}/status")
+        response = test_client.get(
+            f"/services/{sample_service_data['service_id']}/status")
         assert response.status_code == 200
 
         data = response.json()
@@ -235,14 +248,16 @@ class TestServiceDiscoveryAPI:
 
     def test_get_healthy_instance(self, test_client, sample_service_data):
         """Test getting healthy instance via API."""
-        # Modify sample data to not have health check URL (will be marked as healthy)
+        # Modify sample data to not have health check URL (will be marked as
+        # healthy)
         sample_service_data["health_check_url"] = None
 
         # Register service first
         test_client.post("/services/register", json=sample_service_data)
 
         # Get healthy instance
-        response = test_client.get(f"/services/healthy/{sample_service_data['service_name']}")
+        response = test_client.get(
+            f"/services/healthy/{sample_service_data['service_name']}")
         assert response.status_code == 200
 
         data = response.json()
@@ -282,7 +297,8 @@ class TestServiceDiscoveryAPI:
     async def test_api_server_lifecycle(self, service_discovery_api):
         """Test API server start/stop lifecycle."""
         # Note: This test is simplified since we can't easily test the actual server
-        # in a unit test environment. In integration tests, we would test the full server.
+        # in a unit test environment. In integration tests, we would test the
+        # full server.
 
         # Test server configuration
         assert service_discovery_api.server is None
@@ -341,7 +357,8 @@ class TestServiceDiscoveryAPI:
 
         # Register all services
         for service_data in services_data:
-            response = test_client.post("/services/register", json=service_data)
+            response = test_client.post(
+                "/services/register", json=service_data)
             assert response.status_code == 200
 
         # Discover all services

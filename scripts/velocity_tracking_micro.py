@@ -7,12 +7,11 @@ This micro-component handles ONLY velocity tracking and trend analysis.
 Follows XP Small Releases principle: ≤300 lines, single responsibility.
 """
 
-import json
 import sqlite3
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
-from dataclasses import dataclass
 import statistics
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Dict, List
 
 
 @dataclass
@@ -53,8 +52,12 @@ class VelocityTrackingMicro:
             """)
             conn.commit()
 
-    def record_velocity(self, sprint_id: str, planned_points: int,
-                       completed_points: int, team_size: int = 3) -> VelocityRecord:
+    def record_velocity(
+            self,
+            sprint_id: str,
+            planned_points: int,
+            completed_points: int,
+            team_size: int = 3) -> VelocityRecord:
         """Record velocity for a sprint - micro-component core functionality."""
         velocity = completed_points / team_size if team_size > 0 else 0
 
@@ -81,16 +84,22 @@ class VelocityTrackingMicro:
     def save_velocity_record(self, record: VelocityRecord):
         """Save velocity record to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO velocity_records
                 (record_id, sprint_id, period_start, period_end,
                  planned_points, completed_points, velocity, team_size, recorded_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                record.record_id, record.sprint_id, record.period_start,
-                record.period_end, record.planned_points, record.completed_points,
-                record.velocity, record.team_size, datetime.now().isoformat()
-            ))
+            """,
+                (record.record_id,
+                 record.sprint_id,
+                 record.period_start,
+                 record.period_end,
+                 record.planned_points,
+                 record.completed_points,
+                 record.velocity,
+                 record.team_size,
+                 datetime.now().isoformat()))
             conn.commit()
 
     def get_current_velocity(self) -> float:
@@ -120,7 +129,10 @@ class VelocityTrackingMicro:
             records = cursor.fetchall()
 
         if not records:
-            return {"trend": "no_data", "current_velocity": 0.0, "avg_velocity": 0.0}
+            return {
+                "trend": "no_data",
+                "current_velocity": 0.0,
+                "avg_velocity": 0.0}
 
         velocities = [r[0] for r in records]
         current_velocity = velocities[0]
@@ -185,11 +197,16 @@ def main():
     if len(sys.argv) < 2:
         print("Velocity Tracking Micro-Component")
         print("Commands:")
-        print("  record <sprint_id> <planned> <completed> [team_size] - Record velocity")
-        print("  current                                              - Show current velocity")
-        print("  trend [periods]                                      - Show velocity trend")
-        print("  predict [team_size]                                  - Predict capacity")
-        print("  list [limit]                                         - List records")
+        print(
+            "  record <sprint_id> <planned> <completed> [team_size] - Record velocity")
+        print(
+            "  current                                              - Show current velocity")
+        print(
+            "  trend [periods]                                      - Show velocity trend")
+        print(
+            "  predict [team_size]                                  - Predict capacity")
+        print(
+            "  list [limit]                                         - List records")
         return
 
     tracker = VelocityTrackingMicro()
@@ -197,7 +214,8 @@ def main():
 
     if command == "record":
         if len(sys.argv) < 5:
-            print("Usage: record <sprint_id> <planned> <completed> [team_size]")
+            print(
+                "Usage: record <sprint_id> <planned> <completed> [team_size]")
             return
 
         sprint_id = sys.argv[2]
@@ -205,7 +223,8 @@ def main():
         completed = int(sys.argv[4])
         team_size = int(sys.argv[5]) if len(sys.argv) > 5 else 3
 
-        record = tracker.record_velocity(sprint_id, planned, completed, team_size)
+        record = tracker.record_velocity(
+            sprint_id, planned, completed, team_size)
         print(f"✅ Recorded velocity: {record.velocity:.1f} points/person")
         print(f"Sprint: {record.sprint_id}")
         print(f"Completed: {completed}/{planned} points")
@@ -229,7 +248,7 @@ def main():
         team_size = int(sys.argv[2]) if len(sys.argv) > 2 else 3
         prediction = tracker.predict_capacity(team_size)
 
-        print(f"Capacity Prediction:")
+        print("Capacity Prediction:")
         print(f"  Predicted Points: {prediction['predicted_points']}")
         print(f"  Confidence: {prediction['confidence_percentage']}%")
         print(f"  Based on Velocity: {prediction['based_on_velocity']:.1f}")

@@ -8,14 +8,13 @@ for all integration agent components and external services.
 import asyncio
 import json
 import logging
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Callable, Any, Set
-from dataclasses import dataclass, asdict
-from enum import Enum
 import uuid
-import psutil
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
+import psutil
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +149,8 @@ class MonitoringSystem:
         self._running = True
 
         # Start background tasks
-        self._collection_task = asyncio.create_task(self._metrics_collection_loop())
+        self._collection_task = asyncio.create_task(
+            self._metrics_collection_loop())
         self._alert_task = asyncio.create_task(self._alert_processing_loop())
         self._cleanup_task = asyncio.create_task(self._cleanup_loop())
 
@@ -174,8 +174,12 @@ class MonitoringSystem:
 
         logger.info("Monitoring system stopped")
 
-    def record_metric(self, name: str, value: float, metric_type: MetricType = MetricType.GAUGE,
-                     tags: Dict[str, str] = None) -> None:
+    def record_metric(self,
+                      name: str,
+                      value: float,
+                      metric_type: MetricType = MetricType.GAUGE,
+                      tags: Dict[str,
+                                 str] = None) -> None:
         """
         Record a metric value.
 
@@ -206,7 +210,8 @@ class MonitoringSystem:
 
         logger.debug(f"Recorded metric: {name} = {value}")
 
-    def increment_counter(self, name: str, value: float = 1, tags: Dict[str, str] = None) -> None:
+    def increment_counter(self, name: str, value: float = 1,
+                          tags: Dict[str, str] = None) -> None:
         """
         Increment a counter metric.
 
@@ -217,7 +222,8 @@ class MonitoringSystem:
         """
         self.record_metric(name, value, MetricType.COUNTER, tags)
 
-    def set_gauge(self, name: str, value: float, tags: Dict[str, str] = None) -> None:
+    def set_gauge(self, name: str, value: float,
+                  tags: Dict[str, str] = None) -> None:
         """
         Set a gauge metric value.
 
@@ -228,7 +234,8 @@ class MonitoringSystem:
         """
         self.record_metric(name, value, MetricType.GAUGE, tags)
 
-    def record_timer(self, name: str, duration_ms: float, tags: Dict[str, str] = None) -> None:
+    def record_timer(self, name: str, duration_ms: float,
+                     tags: Dict[str, str] = None) -> None:
         """
         Record a timer metric.
 
@@ -276,7 +283,7 @@ class MonitoringSystem:
         logger.info("Added alert handler")
 
     def get_metrics(self, name: str, start_time: Optional[datetime] = None,
-                   end_time: Optional[datetime] = None) -> List[MetricData]:
+                    end_time: Optional[datetime] = None) -> List[MetricData]:
         """
         Get metrics for a given name and time range.
 
@@ -353,7 +360,8 @@ class MonitoringSystem:
             return True
         return False
 
-    def update_component_health(self, component: str, health_data: Dict[str, Any]) -> None:
+    def update_component_health(
+            self, component: str, health_data: Dict[str, Any]) -> None:
         """
         Update health status for a component.
 
@@ -368,10 +376,12 @@ class MonitoringSystem:
 
         # Record health metrics
         if "healthy" in health_data:
-            self.set_gauge(f"{component}.health", 1.0 if health_data["healthy"] else 0.0)
+            self.set_gauge(f"{component}.health",
+                           1.0 if health_data["healthy"] else 0.0)
 
         if "response_time" in health_data:
-            self.record_timer(f"{component}.response_time", health_data["response_time"])
+            self.record_timer(f"{component}.response_time",
+                              health_data["response_time"])
 
     def get_component_health(self, component: str = None) -> Dict[str, Any]:
         """
@@ -496,7 +506,10 @@ class MonitoringSystem:
                 logger.error(f"Error in cleanup: {e}")
                 await asyncio.sleep(3600)
 
-    async def _check_metric_alerts(self, metric_name: str, value: float) -> None:
+    async def _check_metric_alerts(
+            self,
+            metric_name: str,
+            value: float) -> None:
         """Check if a metric triggers any alerts."""
         for rule in self.alert_rules.values():
             if rule.metric_name == metric_name and rule.enabled:
@@ -512,7 +525,10 @@ class MonitoringSystem:
                 if triggered:
                     await self._create_alert(rule, value)
 
-    async def _create_alert(self, rule: AlertRule, current_value: float) -> None:
+    async def _create_alert(
+            self,
+            rule: AlertRule,
+            current_value: float) -> None:
         """Create an alert based on a rule."""
         alert_id = str(uuid.uuid4())
 
@@ -520,13 +536,15 @@ class MonitoringSystem:
             id=alert_id,
             name=rule.name,
             severity=rule.severity,
-            message=f"{rule.name}: {rule.metric_name} = {current_value} (threshold: {rule.threshold})",
+            message=f"{
+                rule.name}: {
+                rule.metric_name} = {current_value} (threshold: {
+                rule.threshold})",
             component=rule.component,
             metric_name=rule.metric_name,
             threshold=rule.threshold,
             current_value=current_value,
-            timestamp=datetime.now()
-        )
+            timestamp=datetime.now())
 
         self.alerts[alert_id] = alert
 

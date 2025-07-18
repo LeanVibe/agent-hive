@@ -5,11 +5,11 @@ Agent Conversation History Viewer
 Views message history and conversations between agents.
 """
 
-import json
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
+
 
 class AgentConversationViewer:
     """View conversations between agents"""
@@ -36,8 +36,13 @@ class AgentConversationViewer:
         conn.commit()
         conn.close()
 
-    def log_message(self, from_agent: str, to_agent: str, message: str,
-                   message_type: str = "normal", thread_id: Optional[str] = None):
+    def log_message(
+            self,
+            from_agent: str,
+            to_agent: str,
+            message: str,
+            message_type: str = "normal",
+            thread_id: Optional[str] = None):
         """Log a message between agents"""
         conn = sqlite3.connect(self.db_path)
         conn.execute("""
@@ -55,7 +60,8 @@ class AgentConversationViewer:
         conn.commit()
         conn.close()
 
-    def get_conversation(self, agent1: str, agent2: str, hours: int = 24) -> List[Dict]:
+    def get_conversation(self, agent1: str, agent2: str,
+                         hours: int = 24) -> List[Dict]:
         """Get conversation between two agents"""
         since = datetime.now() - timedelta(hours=hours)
 
@@ -82,7 +88,10 @@ class AgentConversationViewer:
         conn.close()
         return messages
 
-    def get_agent_activity(self, agent_name: str, hours: int = 24) -> List[Dict]:
+    def get_agent_activity(
+            self,
+            agent_name: str,
+            hours: int = 24) -> List[Dict]:
         """Get all activity for a specific agent"""
         since = datetime.now() - timedelta(hours=hours)
 
@@ -176,7 +185,8 @@ class AgentConversationViewer:
             return
 
         for msg in messages:
-            timestamp = datetime.fromisoformat(msg['timestamp']).strftime('%H:%M:%S')
+            timestamp = datetime.fromisoformat(
+                msg['timestamp']).strftime('%H:%M:%S')
             from_agent = msg['from_agent']
             to_agent = msg['to_agent']
             message = msg['message']
@@ -207,7 +217,8 @@ class AgentConversationViewer:
             return
 
         for msg in messages:
-            timestamp = datetime.fromisoformat(msg['timestamp']).strftime('%H:%M:%S')
+            timestamp = datetime.fromisoformat(
+                msg['timestamp']).strftime('%H:%M:%S')
             from_agent = msg['from_agent']
             to_agent = msg['to_agent']
             message = msg['message']
@@ -241,7 +252,8 @@ class AgentConversationViewer:
             return
 
         for msg in messages:
-            timestamp = datetime.fromisoformat(msg['timestamp']).strftime('%H:%M:%S')
+            timestamp = datetime.fromisoformat(
+                msg['timestamp']).strftime('%H:%M:%S')
             from_agent = msg['from_agent']
             to_agent = msg['to_agent']
             message = msg['message']
@@ -249,6 +261,7 @@ class AgentConversationViewer:
             print(f"🆘 [{timestamp}] {from_agent} → {to_agent}")
             print(f"   {message}")
             print()
+
 
 def main():
     """Main CLI interface"""
@@ -258,9 +271,12 @@ def main():
 
     if len(sys.argv) < 2:
         print("Usage:")
-        print("  python view_agent_conversations.py --agents agent1,agent2 [--hours 24]")
-        print("  python view_agent_conversations.py --activity agent-name [--hours 24]")
-        print("  python view_agent_conversations.py --help-requests [--hours 24]")
+        print(
+            "  python view_agent_conversations.py --agents agent1,agent2 [--hours 24]")
+        print(
+            "  python view_agent_conversations.py --activity agent-name [--hours 24]")
+        print(
+            "  python view_agent_conversations.py --help-requests [--hours 24]")
         print("  python view_agent_conversations.py --recent [--hours 24]")
         return
 
@@ -302,13 +318,16 @@ def main():
         print("=" * 50)
 
         for msg in messages[:20]:  # Show last 20 messages
-            timestamp = datetime.fromisoformat(msg['timestamp']).strftime('%H:%M:%S')
+            timestamp = datetime.fromisoformat(
+                msg['timestamp']).strftime('%H:%M:%S')
             print(f"[{timestamp}] {msg['from_agent']} → {msg['to_agent']}")
-            print(f"   {msg['message'][:80]}{'...' if len(msg['message']) > 80 else ''}")
+            print(
+                f"   {msg['message'][:80]}{'...' if len(msg['message']) > 80 else ''}")
             print()
 
     else:
         print(f"Unknown command: {command}")
+
 
 if __name__ == "__main__":
     main()

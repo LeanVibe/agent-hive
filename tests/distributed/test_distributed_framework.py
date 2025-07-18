@@ -5,23 +5,18 @@ This module provides distributed testing capabilities for scaling test execution
 across multiple nodes, processes, and cloud environments.
 """
 
-import pytest
 import asyncio
-import subprocess
 import json
-import time
 import sys
-import multiprocessing
+import time
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-from unittest.mock import Mock, patch
+from typing import Any, Dict, List, Optional
+
+import pytest
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
-
-from state.state_manager import StateManager, AgentState, TaskState
 
 
 @dataclass
@@ -97,12 +92,15 @@ class TestNodeManager:
             del self.nodes[node_id]
             print(f"Unregistered node {node_id}")
 
-    def get_available_nodes(self, requirements: Dict[str, Any] = None) -> List[TestNode]:
+    def get_available_nodes(self,
+                            requirements: Dict[str,
+                                               Any] = None) -> List[TestNode]:
         """Get available nodes that match requirements."""
         available = []
 
         for node in self.nodes.values():
-            if node.status == "IDLE" and len(node.current_jobs) < node.max_concurrent_jobs:
+            if node.status == "IDLE" and len(
+                    node.current_jobs) < node.max_concurrent_jobs:
                 if requirements:
                     # Check if node meets requirements
                     if self._node_meets_requirements(node, requirements):
@@ -112,7 +110,8 @@ class TestNodeManager:
 
         return available
 
-    def _node_meets_requirements(self, node: TestNode, requirements: Dict[str, Any]) -> bool:
+    def _node_meets_requirements(
+            self, node: TestNode, requirements: Dict[str, Any]) -> bool:
         """Check if node meets job requirements."""
         # Check capabilities
         required_capabilities = requirements.get("capabilities", [])
@@ -132,14 +131,16 @@ class TestNodeManager:
 
     def assign_job_to_node(self, job: TestJob, node: TestNode) -> bool:
         """Assign a job to a specific node."""
-        if node.status == "IDLE" and len(node.current_jobs) < node.max_concurrent_jobs:
+        if node.status == "IDLE" and len(
+                node.current_jobs) < node.max_concurrent_jobs:
             job.node_id = node.node_id
             job.status = "ASSIGNED"
             node.current_jobs.append(job.job_id)
             return True
         return False
 
-    def update_node_status(self, node_id: str, status: str, resource_usage: Dict[str, float] = None):
+    def update_node_status(self, node_id: str, status: str,
+                           resource_usage: Dict[str, float] = None):
         """Update node status and resource usage."""
         if node_id in self.nodes:
             self.nodes[node_id].status = status
@@ -149,15 +150,20 @@ class TestNodeManager:
     def get_node_statistics(self) -> Dict[str, Any]:
         """Get statistics about all nodes."""
         stats = {
-            "total_nodes": len(self.nodes),
-            "idle_nodes": sum(1 for node in self.nodes.values() if node.status == "IDLE"),
-            "busy_nodes": sum(1 for node in self.nodes.values() if node.status == "BUSY"),
-            "offline_nodes": sum(1 for node in self.nodes.values() if node.status == "OFFLINE"),
-            "total_capacity": sum(node.max_concurrent_jobs for node in self.nodes.values()),
-            "current_load": sum(len(node.current_jobs) for node in self.nodes.values()),
-            "average_cpu_usage": sum(node.resource_usage.get("cpu", 0) for node in self.nodes.values()) / len(self.nodes) if self.nodes else 0,
-            "average_memory_usage": sum(node.resource_usage.get("memory", 0) for node in self.nodes.values()) / len(self.nodes) if self.nodes else 0
-        }
+            "total_nodes": len(
+                self.nodes), "idle_nodes": sum(
+                1 for node in self.nodes.values() if node.status == "IDLE"), "busy_nodes": sum(
+                1 for node in self.nodes.values() if node.status == "BUSY"), "offline_nodes": sum(
+                    1 for node in self.nodes.values() if node.status == "OFFLINE"), "total_capacity": sum(
+                        node.max_concurrent_jobs for node in self.nodes.values()), "current_load": sum(
+                            len(
+                                node.current_jobs) for node in self.nodes.values()), "average_cpu_usage": sum(
+                                    node.resource_usage.get(
+                                        "cpu", 0) for node in self.nodes.values()) / len(
+                                            self.nodes) if self.nodes else 0, "average_memory_usage": sum(
+                                                node.resource_usage.get(
+                                                    "memory", 0) for node in self.nodes.values()) / len(
+                                                        self.nodes) if self.nodes else 0}
         return stats
 
 
@@ -170,8 +176,12 @@ class DistributedTestExecutor:
         self.max_retries = 3
         self.retry_delay = 5  # seconds
 
-    def submit_test_job(self, test_pattern: str, test_type: str,
-                       priority: int = 5, requirements: Dict[str, Any] = None) -> str:
+    def submit_test_job(self,
+                        test_pattern: str,
+                        test_type: str,
+                        priority: int = 5,
+                        requirements: Dict[str,
+                                           Any] = None) -> str:
         """Submit a test job for execution."""
         self.job_counter += 1
         job_id = f"job_{self.job_counter:04d}"
@@ -181,7 +191,8 @@ class DistributedTestExecutor:
             test_pattern=test_pattern,
             test_type=test_type,
             priority=priority,
-            estimated_duration=self._estimate_duration(test_pattern, test_type),
+            estimated_duration=self._estimate_duration(
+                test_pattern, test_type),
             requirements=requirements or {}
         )
 
@@ -238,14 +249,16 @@ class DistributedTestExecutor:
 
             # Find suitable job for this node
             for i, job in enumerate(self.node_manager.job_queue):
-                if self.node_manager._node_meets_requirements(node, job.requirements):
+                if self.node_manager._node_meets_requirements(
+                        node, job.requirements):
                     # Assign job to node
                     if self.node_manager.assign_job_to_node(job, node):
                         self.node_manager.job_queue.pop(i)
                         self.node_manager.running_jobs[job.job_id] = job
 
                         # Start job execution
-                        asyncio.create_task(self._execute_job_on_node(job, node))
+                        asyncio.create_task(
+                            self._execute_job_on_node(job, node))
                         break
 
     async def _execute_job_on_node(self, job: TestJob, node: TestNode):
@@ -280,7 +293,8 @@ class DistributedTestExecutor:
             if job.job_id in self.node_manager.running_jobs:
                 del self.node_manager.running_jobs[job.job_id]
 
-    async def _run_test_on_node(self, job: TestJob, node: TestNode) -> Dict[str, Any]:
+    async def _run_test_on_node(
+            self, job: TestJob, node: TestNode) -> Dict[str, Any]:
         """Run test on a specific node."""
         # In a real implementation, this would execute tests remotely
         # For now, simulate with local execution
@@ -307,8 +321,8 @@ class DistributedTestExecutor:
                 "return_code": process.returncode,
                 "stdout": stdout.decode() if stdout else "",
                 "stderr": stderr.decode() if stderr else "",
-                "duration": job.end_time - job.start_time if job.end_time and job.start_time else 0
-            }
+                "duration": job.end_time -
+                job.start_time if job.end_time and job.start_time else 0}
 
             # Try to parse JSON results if available
             json_file = Path(f"test_results_{job.job_id}.json")
@@ -318,7 +332,7 @@ class DistributedTestExecutor:
                         json_results = json.load(f)
                         result.update(json_results)
                     json_file.unlink()  # Clean up
-                except:
+                except BaseException:
                     pass
 
             return result
@@ -338,15 +352,39 @@ class DistributedTestExecutor:
                     node_id=job.node_id,
                     test_pattern=job.test_pattern,
                     status=job.status,
-                    duration=job.end_time - job.start_time if job.end_time and job.start_time else 0,
-                    test_count=job.results.get("summary", {}).get("total", 0) if job.results else 0,
-                    passed=job.results.get("summary", {}).get("passed", 0) if job.results else 0,
-                    failed=job.results.get("summary", {}).get("failed", 0) if job.results else 0,
-                    errors=job.results.get("summary", {}).get("error", 0) if job.results else 0,
-                    skipped=job.results.get("summary", {}).get("skipped", 0) if job.results else 0,
-                    output=job.results.get("stdout", "") if job.results else "",
-                    error_output=job.results.get("stderr", "") if job.results else ""
-                )
+                    duration=job.end_time -
+                    job.start_time if job.end_time and job.start_time else 0,
+                    test_count=job.results.get(
+                        "summary",
+                        {}).get(
+                        "total",
+                        0) if job.results else 0,
+                    passed=job.results.get(
+                        "summary",
+                        {}).get(
+                        "passed",
+                        0) if job.results else 0,
+                    failed=job.results.get(
+                        "summary",
+                        {}).get(
+                            "failed",
+                            0) if job.results else 0,
+                    errors=job.results.get(
+                        "summary",
+                        {}).get(
+                        "error",
+                        0) if job.results else 0,
+                    skipped=job.results.get(
+                        "summary",
+                        {}).get(
+                        "skipped",
+                        0) if job.results else 0,
+                    output=job.results.get(
+                        "stdout",
+                        "") if job.results else "",
+                    error_output=job.results.get(
+                        "stderr",
+                        "") if job.results else "")
                 completed_results.append(result)
 
         return completed_results
@@ -373,9 +411,9 @@ class DistributedTestExecutor:
                 "node_id": job.node_id,
                 "start_time": job.start_time,
                 "end_time": job.end_time,
-                "duration": job.end_time - job.start_time if job.end_time and job.start_time else 0,
-                "results": job.results
-            }
+                "duration": job.end_time -
+                job.start_time if job.end_time and job.start_time else 0,
+                "results": job.results}
 
         # Check queue
         for job in self.node_manager.job_queue:
@@ -397,7 +435,8 @@ class DistributedTestExecutor:
                 self.node_manager.job_queue.pop(i)
                 return True
 
-        # Cancel running job (simplified - in real implementation would notify node)
+        # Cancel running job (simplified - in real implementation would notify
+        # node)
         if job_id in self.node_manager.running_jobs:
             job = self.node_manager.running_jobs[job_id]
             job.status = "CANCELLED"
@@ -422,7 +461,8 @@ class LocalProcessNodeSimulator:
                 node_id=f"node_{i:02d}",
                 host="localhost",
                 port=8000 + i,
-                capabilities=["python", "pytest", "unit_tests", "integration_tests"],
+                capabilities=["python", "pytest",
+                              "unit_tests", "integration_tests"],
                 status="IDLE",
                 current_jobs=[],
                 max_concurrent_jobs=2,
@@ -731,15 +771,20 @@ class TestDistributedFramework:
         executor = DistributedTestExecutor(manager)
 
         # Test different test types
-        unit_duration = executor._estimate_duration("tests/test_unit.py", "unit")
-        integration_duration = executor._estimate_duration("tests/test_integration.py", "integration")
-        performance_duration = executor._estimate_duration("tests/test_performance.py", "performance")
+        unit_duration = executor._estimate_duration(
+            "tests/test_unit.py", "unit")
+        integration_duration = executor._estimate_duration(
+            "tests/test_integration.py", "integration")
+        performance_duration = executor._estimate_duration(
+            "tests/test_performance.py", "performance")
 
         assert unit_duration < integration_duration
         assert integration_duration < performance_duration
 
         # Test pattern complexity
-        simple_duration = executor._estimate_duration("tests/test_specific.py", "unit")
-        complex_duration = executor._estimate_duration("tests/test_*.py", "unit")
+        simple_duration = executor._estimate_duration(
+            "tests/test_specific.py", "unit")
+        complex_duration = executor._estimate_duration(
+            "tests/test_*.py", "unit")
 
         assert simple_duration < complex_duration

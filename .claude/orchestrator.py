@@ -4,27 +4,32 @@
 
 import asyncio
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional
+from pathlib import Path
+from typing import Dict
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))
 
-from state.state_manager import StateManager
-from state.trigger_manager import TriggerManager
-from state.git_milestone_manager import GitMilestoneManager
-from context.smart_context_manager import SmartContextManager
-from learning.confidence_optimizer import ConfidenceOptimizer
-from dashboard.unified_views import UnifiedDashboard
-from xp.smart_xp import SmartXPEnforcer
-
-# New imports for Phase 1
-from task_queue_module.task_queue import TaskQueue, Task
 from agents.base_agent import BaseAgent
 from agents.claude_agent import ClaudeAgent
 from config.config_loader import get_config
-from utils.logging_config import get_logger, set_correlation_id, CorrelationContext
+from context.smart_context_manager import SmartContextManager
+from learning.confidence_optimizer import ConfidenceOptimizer
+
+# New imports for Phase 1
+from task_queue_module.task_queue import Task, TaskQueue
+from utils.logging_config import (
+    CorrelationContext,
+    get_logger,
+    set_correlation_id,
+)
+from xp.smart_xp import SmartXPEnforcer
+
+from dashboard.unified_views import UnifiedDashboard
+from state.git_milestone_manager import GitMilestoneManager
+from state.state_manager import StateManager
+from state.trigger_manager import TriggerManager
 
 logger = get_logger('orchestrator')
 
@@ -42,9 +47,11 @@ class LeanVibeOrchestrator:
         self.git_manager = GitMilestoneManager(self.state_manager)
 
         # Automatic trigger system
-        self.trigger_manager = TriggerManager(self.state_manager, self.git_manager)
+        self.trigger_manager = TriggerManager(
+            self.state_manager, self.git_manager)
 
-        # Legacy components (Phase 0) - TODO: Replace with StateManager equivalents
+        # Legacy components (Phase 0) - TODO: Replace with StateManager
+        # equivalents
         self.monitor = SmartContextManager()
         self.confidence = ConfidenceOptimizer()
         self.dashboard = UnifiedDashboard()
@@ -71,10 +78,15 @@ class LeanVibeOrchestrator:
             # Register agent with StateManager
             await self.state_manager.register_agent(
                 "claude-primary",
-                capabilities=["code_generation", "analysis", "refactoring", "testing"]
+                capabilities=[
+    "code_generation",
+    "analysis",
+    "refactoring",
+     "testing"]
             )
 
-            logger.info("Claude agent initialized and registered with StateManager")
+            logger.info(
+                "Claude agent initialized and registered with StateManager")
 
             # Future: Initialize other agents here
 
@@ -109,10 +121,12 @@ class LeanVibeOrchestrator:
                 work_item = await self.get_next_priority()
 
                 if not work_item:
-                    await asyncio.sleep(5)  # Reduced sleep time for better responsiveness
+                    # Reduced sleep time for better responsiveness
+                    await asyncio.sleep(5)
                     continue
 
-                # Check if we can handle autonomously using StateManager's ML components
+                # Check if we can handle autonomously using StateManager's ML
+                # components
                 context = {
                     "task_type": work_item.metadata.get("type", "general"),
                     "priority": work_item.priority,
@@ -121,7 +135,8 @@ class LeanVibeOrchestrator:
                     "complexity": work_item.metadata.get("complexity", "medium")
                 }
 
-                need_human, confidence = self.state_manager.confidence_tracker.should_involve_human(context)
+                need_human, confidence = self.state_manager.confidence_tracker.should_involve_human(
+                    context)
 
                 if not need_human:
                     await self.execute_autonomously(work_item)
@@ -132,7 +147,8 @@ class LeanVibeOrchestrator:
                 outcome = await self.get_execution_outcome(work_item)
                 decision_id = f"orchestrator_{work_item.task_id}"
                 self.state_manager.confidence_tracker.record_outcome(
-                    decision_id, context, need_human, outcome.get("status", "success")
+                    decision_id, context, need_human, outcome.get(
+                        "status", "success")
                 )
 
             except Exception as e:
@@ -147,8 +163,8 @@ class LeanVibeOrchestrator:
         # Legacy method - now handled by StateManager integration
         logger.info(f"Legacy execute_autonomously called for: {work_item}")
 
-        # This method is deprecated - use StateManager-based implementation instead
-        pass
+        # This method is deprecated - use StateManager-based implementation
+        # instead
 
     async def smart_error_handling(self, error):
         """Handle errors without always escalating using StateManager intelligence"""
@@ -192,7 +208,9 @@ class LeanVibeOrchestrator:
                     logger.warning("No active agents available")
 
                 if system_state.average_context_usage > 0.8:
-                    logger.warning(f"High average context usage: {system_state.average_context_usage:.1%}")
+                    logger.warning(
+    f"High average context usage: {
+        system_state.average_context_usage:.1%}")
 
                 await asyncio.sleep(120)  # Check every 2 minutes
 
@@ -218,7 +236,9 @@ class LeanVibeOrchestrator:
         for agent_id, agent, agent_state in available_agents:
             task_state = await self.state_manager.get_next_priority_task(agent_state.capabilities)
             if task_state:
-                logger.debug(f"Task {task_state.task_id} assigned to agent {agent_id}")
+                logger.debug(
+    f"Task {
+        task_state.task_id} assigned to agent {agent_id}")
                 return task_state
 
         return None
@@ -248,7 +268,9 @@ class LeanVibeOrchestrator:
                         break
 
             if not suitable_agent:
-                logger.error(f"No suitable agent found for task {work_item.task_id}")
+                logger.error(
+    f"No suitable agent found for task {
+        work_item.task_id}")
                 await self.state_manager.update_task_state(work_item.task_id, status="failed")
                 return
 
@@ -285,7 +307,9 @@ class LeanVibeOrchestrator:
                         status="idle",
                         current_task_id=None
                     )
-                    logger.info(f"Task {work_item.task_id} completed successfully")
+                    logger.info(
+    f"Task {
+        work_item.task_id} completed successfully")
                 else:
                     await self.state_manager.update_task_state(work_item.task_id, status="failed")
                     await self.state_manager.update_agent_state(
@@ -293,7 +317,10 @@ class LeanVibeOrchestrator:
                         status="idle",
                         current_task_id=None
                     )
-                    logger.warning(f"Task {work_item.task_id} failed: {result.error}")
+                    logger.warning(
+    f"Task {
+        work_item.task_id} failed: {
+            result.error}")
 
             except Exception as e:
                 logger.error(f"Error executing task {work_item.task_id}: {e}")
@@ -335,9 +362,11 @@ class LeanVibeOrchestrator:
                 if should_create:
                     checkpoint_id = await self.state_manager.create_checkpoint("auto")
                     if checkpoint_id:
-                        logger.info(f"Automatic checkpoint created: {checkpoint_id} - {reason}")
+                        logger.info(
+    f"Automatic checkpoint created: {checkpoint_id} - {reason}")
                     else:
-                        logger.warning(f"Failed to create checkpoint: {reason}")
+                        logger.warning(
+    f"Failed to create checkpoint: {reason}")
 
                 # Monitor individual agents for high context usage
                 for agent_id in self.agents.keys():
@@ -347,7 +376,8 @@ class LeanVibeOrchestrator:
                         if should_create_agent:
                             checkpoint_id = await self.state_manager.create_checkpoint("context_overflow", agent_id)
                             if checkpoint_id:
-                                logger.info(f"Agent checkpoint created: {checkpoint_id} - {agent_reason}")
+                                logger.info(
+    f"Agent checkpoint created: {checkpoint_id} - {agent_reason}")
 
                 await asyncio.sleep(300)  # Check every 5 minutes
 

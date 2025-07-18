@@ -4,8 +4,8 @@ Data models and types for advanced orchestration.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class AgentStatus(Enum):
@@ -219,27 +219,22 @@ class ResourceOptimization:
 
 class CoordinatorException(Exception):
     """Base exception for coordinator operations."""
-    pass
 
 
 class AgentRegistrationException(CoordinatorException):
     """Exception for agent registration failures."""
-    pass
 
 
 class ResourceAllocationException(CoordinatorException):
     """Exception for resource allocation failures."""
-    pass
 
 
 class TaskDistributionException(CoordinatorException):
     """Exception for task distribution failures."""
-    pass
 
 
 class ScalingException(CoordinatorException):
     """Exception for scaling operations."""
-    pass
 
 
 class WorkflowType(Enum):

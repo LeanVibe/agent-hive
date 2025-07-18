@@ -5,19 +5,17 @@ Provides advanced authentication mechanisms including JWT tokens,
 OAuth 2.0, API key validation, and role-based access control.
 """
 
-import asyncio
 import hashlib
 import hmac
 import json
 import logging
 import time
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Callable
-from enum import Enum
 import uuid
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
-from .models import ApiRequest, ApiResponse
-
+from .models import ApiRequest
 
 logger = logging.getLogger(__name__)
 
@@ -42,9 +40,13 @@ class Permission(Enum):
 class AuthResult:
     """Authentication result."""
 
-    def __init__(self, success: bool, user_id: Optional[str] = None,
+    def __init__(self,
+                 success: bool,
+                 user_id: Optional[str] = None,
                  permissions: Optional[List[Permission]] = None,
-                 error: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None):
+                 error: Optional[str] = None,
+                 metadata: Optional[Dict[str,
+                                         Any]] = None):
         self.success = success
         self.user_id = user_id
         self.permissions = permissions or []
@@ -68,7 +70,8 @@ class AuthenticationMiddleware:
             config: Authentication configuration
         """
         self.config = config
-        self.enabled_methods = config.get("enabled_methods", [AuthMethod.API_KEY])
+        self.enabled_methods = config.get(
+            "enabled_methods", [AuthMethod.API_KEY])
         self.jwt_secret = config.get("jwt_secret", "default-secret")
         self.jwt_algorithm = config.get("jwt_algorithm", "HS256")
         self.token_expiry = config.get("token_expiry_hours", 24)
@@ -95,7 +98,9 @@ class AuthenticationMiddleware:
         # Path-based permissions
         self.path_permissions: Dict[str, List[Permission]] = {}
 
-        logger.info(f"AuthenticationMiddleware initialized with methods: {self.enabled_methods}")
+        logger.info(
+            f"AuthenticationMiddleware initialized with methods: {
+                self.enabled_methods}")
 
     async def authenticate_request(self, request: ApiRequest) -> AuthResult:
         """
@@ -111,8 +116,7 @@ class AuthenticationMiddleware:
         if not await self._check_auth_rate_limit(request.client_ip):
             return AuthResult(
                 success=False,
-                error="Too many authentication attempts. Please try again later."
-            )
+                error="Too many authentication attempts. Please try again later.")
 
         # Try each enabled authentication method
         for method in self.enabled_methods:
@@ -154,7 +158,8 @@ class AuthenticationMiddleware:
 
     async def _authenticate_api_key(self, request: ApiRequest) -> AuthResult:
         """Authenticate using API key."""
-        api_key = request.headers.get("X-API-Key") or request.headers.get("Authorization", "").replace("Bearer ", "")
+        api_key = request.headers.get(
+            "X-API-Key") or request.headers.get("Authorization", "").replace("Bearer ", "")
 
         if not api_key:
             return AuthResult(success=False, error="API key not provided")
@@ -202,8 +207,10 @@ class AuthenticationMiddleware:
                 return AuthResult(success=False, error="JWT token has expired")
 
             # Check if token is blacklisted
-            if token in self.jwt_tokens and self.jwt_tokens[token].get("blacklisted"):
-                return AuthResult(success=False, error="JWT token is blacklisted")
+            if token in self.jwt_tokens and self.jwt_tokens[token].get(
+                    "blacklisted"):
+                return AuthResult(
+                    success=False, error="JWT token is blacklisted")
 
             return AuthResult(
                 success=True,
@@ -233,7 +240,8 @@ class AuthenticationMiddleware:
         if token_data.get("expires_at"):
             expires_at = datetime.fromisoformat(token_data["expires_at"])
             if datetime.now() > expires_at:
-                return AuthResult(success=False, error="OAuth token has expired")
+                return AuthResult(
+                    success=False, error="OAuth token has expired")
 
         return AuthResult(
             success=True,
@@ -246,32 +254,41 @@ class AuthenticationMiddleware:
         """Authenticate using basic authentication."""
         auth_header = request.headers.get("Authorization", "")
         if not auth_header.startswith("Basic "):
-            return AuthResult(success=False, error="Basic auth credentials not provided")
+            return AuthResult(success=False,
+                              error="Basic auth credentials not provided")
 
         try:
             # Decode basic auth credentials
             import base64
             encoded_credentials = auth_header[6:]  # Remove "Basic " prefix
-            decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
+            decoded_credentials = base64.b64decode(
+                encoded_credentials).decode('utf-8')
 
             if ':' not in decoded_credentials:
-                return AuthResult(success=False, error="Invalid basic auth format")
+                return AuthResult(
+                    success=False,
+                    error="Invalid basic auth format")
 
             username, password = decoded_credentials.split(':', 1)
 
             # Check if user exists in basic auth users
             if username not in self.basic_auth_users:
-                return AuthResult(success=False, error="Invalid username or password")
+                return AuthResult(
+                    success=False,
+                    error="Invalid username or password")
 
             user_data = self.basic_auth_users[username]
 
             # Verify password (in production, use proper password hashing)
             if user_data.get("password") != password:
-                return AuthResult(success=False, error="Invalid username or password")
+                return AuthResult(
+                    success=False,
+                    error="Invalid username or password")
 
             # Check if account is active
             if not user_data.get("active", True):
-                return AuthResult(success=False, error="Account is deactivated")
+                return AuthResult(
+                    success=False, error="Account is deactivated")
 
             # Update login statistics
             user_data["last_login"] = datetime.now().isoformat()
@@ -286,7 +303,8 @@ class AuthenticationMiddleware:
 
         except Exception as e:
             logger.error(f"Basic authentication failed: {e}")
-            return AuthResult(success=False, error="Invalid basic auth credentials")
+            return AuthResult(success=False,
+                              error="Invalid basic auth credentials")
 
     async def _authenticate_signature(self, request: ApiRequest) -> AuthResult:
         """Authenticate using request signature."""
@@ -294,7 +312,9 @@ class AuthenticationMiddleware:
         client_id = request.headers.get("X-Client-ID")
 
         if not signature or not client_id:
-            return AuthResult(success=False, error="Signature authentication requires X-Signature and X-Client-ID headers")
+            return AuthResult(
+                success=False,
+                error="Signature authentication requires X-Signature and X-Client-ID headers")
 
         if client_id not in self.signing_secrets:
             return AuthResult(success=False, error="Unknown client ID")
@@ -313,10 +333,16 @@ class AuthenticationMiddleware:
             metadata={"client_id": client_id}
         )
 
-    async def _generate_signature(self, request: ApiRequest, secret: str) -> str:
+    async def _generate_signature(
+            self,
+            request: ApiRequest,
+            secret: str) -> str:
         """Generate request signature."""
         # Create signature string
-        signature_string = f"{request.method}{request.path}{request.body or ''}"
+        signature_string = f"{
+            request.method}{
+            request.path}{
+            request.body or ''}"
 
         # Generate HMAC signature
         signature = hmac.new(
@@ -360,14 +386,20 @@ class AuthenticationMiddleware:
         # Check if under limit
         return len(self.auth_attempts[client_ip]) < self.max_auth_attempts
 
-    async def _record_auth_attempt(self, client_ip: str, success: bool) -> None:
+    async def _record_auth_attempt(
+            self,
+            client_ip: str,
+            success: bool) -> None:
         """Record authentication attempt."""
         if not success:
             if client_ip not in self.auth_attempts:
                 self.auth_attempts[client_ip] = []
             self.auth_attempts[client_ip].append(time.time())
 
-    async def _check_path_permissions(self, path: str, user_permissions: List[Permission]) -> bool:
+    async def _check_path_permissions(
+            self,
+            path: str,
+            user_permissions: List[Permission]) -> bool:
         """Check if user has permissions for the requested path."""
         if path not in self.path_permissions:
             return True  # No specific permissions required
@@ -384,7 +416,7 @@ class AuthenticationMiddleware:
     # Management methods
 
     def create_api_key(self, user_id: str, permissions: List[Permission],
-                      expires_in_hours: Optional[int] = None) -> str:
+                       expires_in_hours: Optional[int] = None) -> str:
         """Create a new API key."""
         api_key = str(uuid.uuid4())
 
@@ -413,10 +445,15 @@ class AuthenticationMiddleware:
             return True
         return False
 
-    def create_basic_auth_user(self, username: str, password: str, permissions: List[Permission],
-                              active: bool = True) -> bool:
+    def create_basic_auth_user(
+            self,
+            username: str,
+            password: str,
+            permissions: List[Permission],
+            active: bool = True) -> bool:
         """Create a basic auth user."""
-        # WARNING: In production, use proper password hashing (bcrypt, scrypt, etc.)
+        # WARNING: In production, use proper password hashing (bcrypt, scrypt,
+        # etc.)
         user_data = {
             "password": password,  # In production: hash this!
             "permissions": permissions,
@@ -431,9 +468,11 @@ class AuthenticationMiddleware:
 
         return True
 
-    def update_basic_auth_user(self, username: str, password: Optional[str] = None,
-                              permissions: Optional[List[Permission]] = None,
-                              active: Optional[bool] = None) -> bool:
+    def update_basic_auth_user(self,
+                               username: str,
+                               password: Optional[str] = None,
+                               permissions: Optional[List[Permission]] = None,
+                               active: Optional[bool] = None) -> bool:
         """Update a basic auth user."""
         if username not in self.basic_auth_users:
             return False
@@ -463,7 +502,7 @@ class AuthenticationMiddleware:
         return False
 
     def create_jwt_token(self, user_id: str, permissions: List[Permission],
-                        expires_in_hours: Optional[int] = None) -> str:
+                         expires_in_hours: Optional[int] = None) -> str:
         """Create a JWT token."""
         payload = {
             "user_id": user_id,
@@ -480,11 +519,15 @@ class AuthenticationMiddleware:
         import json
 
         header = {"alg": self.jwt_algorithm, "typ": "JWT"}
-        header_b64 = base64.b64encode(json.dumps(header).encode()).decode().rstrip('=')
-        payload_b64 = base64.b64encode(json.dumps(payload).encode()).decode().rstrip('=')
+        header_b64 = base64.b64encode(json.dumps(
+            header).encode()).decode().rstrip('=')
+        payload_b64 = base64.b64encode(json.dumps(
+            payload).encode()).decode().rstrip('=')
 
         # Simple signature (use proper JWT library in production)
-        signature = hashlib.sha256(f"{header_b64}.{payload_b64}.{self.jwt_secret}".encode()).hexdigest()
+        signature = hashlib.sha256(
+            f"{header_b64}.{payload_b64}.{
+                self.jwt_secret}".encode()).hexdigest()
 
         token = f"{header_b64}.{payload_b64}.{signature}"
 
@@ -501,11 +544,14 @@ class AuthenticationMiddleware:
         """Blacklist a JWT token."""
         if token in self.jwt_tokens:
             self.jwt_tokens[token]["blacklisted"] = True
-            logger.info(f"Blacklisted JWT token")
+            logger.info("Blacklisted JWT token")
             return True
         return False
 
-    def set_path_permissions(self, path: str, permissions: List[Permission]) -> None:
+    def set_path_permissions(
+            self,
+            path: str,
+            permissions: List[Permission]) -> None:
         """Set required permissions for a path."""
         self.path_permissions[path] = permissions
         logger.info(f"Set permissions for path {path}: {permissions}")
@@ -518,12 +564,16 @@ class AuthenticationMiddleware:
     def get_auth_stats(self) -> Dict[str, Any]:
         """Get authentication statistics."""
         return {
-            "total_api_keys": len(self.api_keys),
-            "active_api_keys": len([k for k in self.api_keys.values() if k.get("active", True)]),
-            "total_jwt_tokens": len(self.jwt_tokens),
-            "blacklisted_jwt_tokens": len([t for t in self.jwt_tokens.values() if t.get("blacklisted", False)]),
-            "oauth_tokens": len(self.oauth_tokens),
-            "signing_clients": len(self.signing_secrets),
-            "protected_paths": len(self.path_permissions),
-            "enabled_methods": [m.value for m in self.enabled_methods]
-        }
+            "total_api_keys": len(
+                self.api_keys), "active_api_keys": len(
+                [
+                    k for k in self.api_keys.values() if k.get(
+                        "active", True)]), "total_jwt_tokens": len(
+                self.jwt_tokens), "blacklisted_jwt_tokens": len(
+                            [
+                                t for t in self.jwt_tokens.values() if t.get(
+                                    "blacklisted", False)]), "oauth_tokens": len(
+                                        self.oauth_tokens), "signing_clients": len(
+                                            self.signing_secrets), "protected_paths": len(
+                                                self.path_permissions), "enabled_methods": [
+                                                    m.value for m in self.enabled_methods]}

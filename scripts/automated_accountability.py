@@ -13,12 +13,11 @@ URGENT PRIORITY: Fixes coordination system failure.
 """
 
 import json
-import time
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import Enum
+from typing import Dict, List, Optional
 
 
 class TaskStatus(Enum):
@@ -71,7 +70,8 @@ class AccountabilityTask:
     status: TaskStatus = TaskStatus.ASSIGNED
 
     # Evidence requirements
-    evidence_requirements: List[EvidenceRequirement] = field(default_factory=list)
+    evidence_requirements: List[EvidenceRequirement] = field(
+        default_factory=list)
     evidence_submitted: List[Dict] = field(default_factory=list)
 
     # Accountability tracking
@@ -97,8 +97,8 @@ class AccountabilityTask:
         if not self.evidence_requirements:
             return 0.0
 
-        completed = sum(1 for req in self.evidence_requirements
-                       if any(e['type'] == req.type for e in self.evidence_submitted))
+        completed = sum(1 for req in self.evidence_requirements if any(
+            e['type'] == req.type for e in self.evidence_submitted))
         return (completed / len(self.evidence_requirements)) * 100
 
     def to_dict(self) -> Dict:
@@ -109,7 +109,8 @@ class AccountabilityTask:
             'assigned_time': self.assigned_time.isoformat(),
             'deadline': self.deadline.isoformat(),
             'status': self.status.value,
-            'evidence_requirements': [req.to_dict() for req in self.evidence_requirements],
+            'evidence_requirements': [
+                req.to_dict() for req in self.evidence_requirements],
             'evidence_submitted': self.evidence_submitted,
             'last_update': self.last_update.isoformat(),
             'update_count': self.update_count,
@@ -117,10 +118,10 @@ class AccountabilityTask:
             'warnings_sent': self.warnings_sent,
             'escalations_sent': self.escalations_sent,
             'reassignment_count': self.reassignment_count,
-            'time_remaining': str(self.time_remaining()),
+            'time_remaining': str(
+                self.time_remaining()),
             'is_overdue': self.is_overdue(),
-            'progress_percentage': self.progress_percentage()
-        }
+            'progress_percentage': self.progress_percentage()}
 
 
 class AutomatedAccountability:
@@ -168,8 +169,13 @@ class AutomatedAccountability:
             'emergency_protocols': ['system-wide-alert', 'coordination-freeze']
         }
 
-    def assign_task(self, task_id: str, agent_id: str, description: str,
-                   deadline_hours: float, evidence_requirements: List[EvidenceRequirement]) -> AccountabilityTask:
+    def assign_task(
+            self,
+            task_id: str,
+            agent_id: str,
+            description: str,
+            deadline_hours: float,
+            evidence_requirements: List[EvidenceRequirement]) -> AccountabilityTask:
         """Assign task with accountability tracking."""
 
         deadline = datetime.now() + timedelta(hours=deadline_hours)
@@ -184,12 +190,13 @@ class AutomatedAccountability:
         )
 
         self.tasks[task_id] = task
-        self.logger.info(f"TASK ASSIGNED: {task_id} to {agent_id}, deadline: {deadline}")
+        self.logger.info(
+            f"TASK ASSIGNED: {task_id} to {agent_id}, deadline: {deadline}")
 
         return task
 
     def submit_evidence(self, task_id: str, evidence_type: str,
-                       evidence_data: Dict) -> bool:
+                        evidence_data: Dict) -> bool:
         """Submit evidence for task completion."""
 
         if task_id not in self.tasks:
@@ -199,9 +206,11 @@ class AutomatedAccountability:
         task = self.tasks[task_id]
 
         # Validate evidence against requirements
-        required_types = [req.type for req in task.evidence_requirements if req.required]
+        required_types = [
+            req.type for req in task.evidence_requirements if req.required]
         if evidence_type not in required_types:
-            self.logger.warning(f"EVIDENCE WARNING: {evidence_type} not required for {task_id}")
+            self.logger.warning(
+                f"EVIDENCE WARNING: {evidence_type} not required for {task_id}")
 
         # Add evidence with timestamp
         evidence_entry = {
@@ -220,14 +229,16 @@ class AutomatedAccountability:
         # Check if all evidence is complete
         if self._validate_all_evidence(task):
             task.status = TaskStatus.COMPLETED
-            self.logger.info(f"TASK COMPLETED: {task_id} - All evidence validated")
+            self.logger.info(
+                f"TASK COMPLETED: {task_id} - All evidence validated")
 
         return True
 
     def _validate_all_evidence(self, task: AccountabilityTask) -> bool:
         """Validate all required evidence is submitted."""
 
-        required_types = [req.type for req in task.evidence_requirements if req.required]
+        required_types = [
+            req.type for req in task.evidence_requirements if req.required]
         submitted_types = [e['type'] for e in task.evidence_submitted]
 
         return all(req_type in submitted_types for req_type in required_types)
@@ -277,14 +288,17 @@ class AutomatedAccountability:
         """Handle warning level escalation."""
 
         if task.warnings_sent < 3:  # Limit warnings
-            self.logger.warning(f"WARNING: Task {task.task_id} approaching deadline")
+            self.logger.warning(
+                f"WARNING: Task {task.task_id} approaching deadline")
             task.warnings_sent += 1
 
             # Send warning to agent
             self._send_accountability_message(
                 task.agent_id,
-                f"WARNING: Task {task.task_id} is {task.progress_percentage():.1f}% complete with {task.time_remaining()} remaining"
-            )
+                f"WARNING: Task {
+                    task.task_id} is {
+                    task.progress_percentage():.1f}% complete with {
+                    task.time_remaining()} remaining")
 
     def _handle_critical_escalation(self, task: AccountabilityTask):
         """Handle critical level escalation."""
@@ -296,8 +310,9 @@ class AutomatedAccountability:
         # Escalate to PM and human lead
         self._send_accountability_message(
             'pm-agent',
-            f"CRITICAL: Task {task.task_id} assigned to {task.agent_id} is overdue"
-        )
+            f"CRITICAL: Task {
+                task.task_id} assigned to {
+                task.agent_id} is overdue")
 
         # Require immediate evidence
         task.status = TaskStatus.EVIDENCE_REQUIRED
@@ -305,10 +320,12 @@ class AutomatedAccountability:
     def _handle_emergency_escalation(self, task: AccountabilityTask):
         """Handle emergency level escalation."""
 
-        self.logger.critical(f"EMERGENCY: Task {task.task_id} blocking coordination")
+        self.logger.critical(
+            f"EMERGENCY: Task {task.task_id} blocking coordination")
 
         # Auto-reassign if threshold exceeded
-        if task.time_remaining().total_seconds() < -self.escalation_rules['auto_reassign_threshold'] * 3600:
+        if task.time_remaining().total_seconds() < - \
+                self.escalation_rules['auto_reassign_threshold'] * 3600:
             self._auto_reassign_task(task)
 
         # System-wide alert
@@ -330,13 +347,14 @@ class AutomatedAccountability:
             task.assigned_time = datetime.now()
             task.deadline = datetime.now() + timedelta(hours=2)  # Emergency deadline
 
-            self.logger.critical(f"AUTO-REASSIGNED: Task {task.task_id} from {old_agent} to {new_agent}")
+            self.logger.critical(
+                f"AUTO-REASSIGNED: Task {task.task_id} from {old_agent} to {new_agent}")
 
             # Notify all parties
             self._send_accountability_message(
                 'pm-agent',
-                f"EMERGENCY REASSIGNMENT: Task {task.task_id} reassigned from {old_agent} to {new_agent}"
-            )
+                f"EMERGENCY REASSIGNMENT: Task {
+                    task.task_id} reassigned from {old_agent} to {new_agent}")
 
     def _trigger_system_alert(self, task: AccountabilityTask):
         """Trigger system-wide coordination alert."""
@@ -360,7 +378,7 @@ class AutomatedAccountability:
     def _send_accountability_message(self, recipient: str, message: str):
         """Send accountability message to agent/human."""
 
-        message_data = {
+        {
             'recipient': recipient,
             'message': message,
             'timestamp': datetime.now().isoformat(),
@@ -376,14 +394,15 @@ class AutomatedAccountability:
         report = self.check_accountability()
 
         summary = {
-            'total_tasks': len(self.tasks),
-            'on_track': len(report['on_track']),
-            'warnings': len(report['warnings']),
-            'critical': len(report['critical']),
-            'emergency': len(report['emergency']),
-            'completion_rate': len([t for t in self.tasks.values() if t.status == TaskStatus.COMPLETED]) / len(self.tasks) * 100 if self.tasks else 0,
-            'generated_at': datetime.now().isoformat()
-        }
+            'total_tasks': len(
+                self.tasks), 'on_track': len(
+                report['on_track']), 'warnings': len(
+                report['warnings']), 'critical': len(
+                    report['critical']), 'emergency': len(
+                        report['emergency']), 'completion_rate': len(
+                            [
+                                t for t in self.tasks.values() if t.status == TaskStatus.COMPLETED]) / len(
+                                    self.tasks) * 100 if self.tasks else 0, 'generated_at': datetime.now().isoformat()}
 
         full_report = {
             'summary': summary,
@@ -392,7 +411,8 @@ class AutomatedAccountability:
         }
 
         # Save report
-        report_file = f"accountability_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        report_file = f"accountability_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_file, 'w') as f:
             json.dump(full_report, f, indent=2)
 

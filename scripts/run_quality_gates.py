@@ -6,12 +6,12 @@ Runs strict quality gates for new worktrees to ensure high code quality
 and adherence to development standards.
 """
 
+import json
 import subprocess
 import sys
-import json
-import os
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict
+
 
 class QualityGatesRunner:
     """Runs quality gates for new development work"""
@@ -40,7 +40,8 @@ class QualityGatesRunner:
         try:
             with open(config_file, 'r') as f:
                 loaded_data = json.load(f)
-            return loaded_data if isinstance(loaded_data, dict) else {"quality_gates": {"max_pr_size": 500, "min_coverage": 85}}
+            return loaded_data if isinstance(loaded_data, dict) else {"quality_gates": {
+                "max_pr_size": 500, "min_coverage": 85}}
         except (json.JSONDecodeError, IOError):
             print("⚠️ Invalid quality gates configuration, using defaults")
             return {"quality_gates": {"max_pr_size": 500, "min_coverage": 85}}
@@ -101,12 +102,13 @@ class QualityGatesRunner:
             results["errors"].extend(complexity_result["errors"])
 
         # Generate summary
-        passed_checks = sum(1 for check in results["checks"].values() if check["passed"])
+        passed_checks = sum(
+            1 for check in results["checks"].values() if check["passed"])
         total_checks = len(results["checks"])
         results["summary"] = {
             "passed_checks": passed_checks,
             "total_checks": total_checks,
-            "success_rate": f"{(passed_checks/total_checks)*100:.1f}%"
+            "success_rate": f"{(passed_checks / total_checks) * 100:.1f}%"
         }
 
         return results
@@ -148,9 +150,9 @@ class QualityGatesRunner:
                     if changes > max_size:
                         return {
                             "passed": False,
-                            "errors": [f"PR size {changes} lines exceeds limit of {max_size} lines"],
-                            "details": f"Current: {changes}, Limit: {max_size}"
-                        }
+                            "errors": [
+                                f"PR size {changes} lines exceeds limit of {max_size} lines"],
+                            "details": f"Current: {changes}, Limit: {max_size}"}
                     else:
                         return {
                             "passed": True,
@@ -194,8 +196,8 @@ class QualityGatesRunner:
                     return {
                         "passed": True,
                         "errors": [],
-                        "details": f"Linting passed for {len(python_files)} Python files"
-                    }
+                        "details": f"Linting passed for {
+                            len(python_files)} Python files"}
                 else:
                     return {
                         "passed": False,
@@ -222,8 +224,8 @@ class QualityGatesRunner:
         try:
             # Look for test files
             test_files = list(self.worktree_path.glob("**/test_*.py")) + \
-                        list(self.worktree_path.glob("**/*_test.py")) + \
-                        list(self.worktree_path.glob("**/tests/**/*.py"))
+                list(self.worktree_path.glob("**/*_test.py")) + \
+                list(self.worktree_path.glob("**/tests/**/*.py"))
 
             if not test_files:
                 return {
@@ -254,20 +256,19 @@ class QualityGatesRunner:
                                         return {
                                             "passed": True,
                                             "errors": [],
-                                            "details": f"Test coverage: {coverage}% (≥{min_coverage}%)"
-                                        }
+                                            "details": f"Test coverage: {coverage}% (≥{min_coverage}%)"}
                                     else:
                                         return {
                                             "passed": False,
-                                            "errors": [f"Test coverage {coverage}% below minimum {min_coverage}%"],
-                                            "details": f"Coverage: {coverage}%, Required: {min_coverage}%"
-                                        }
+                                            "errors": [
+                                                f"Test coverage {coverage}% below minimum {min_coverage}%"],
+                                            "details": f"Coverage: {coverage}%, Required: {min_coverage}%"}
 
                     return {
                         "passed": True,
                         "errors": [],
-                        "details": f"Tests passed for {len(test_files)} test files"
-                    }
+                        "details": f"Tests passed for {
+                            len(test_files)} test files"}
                 else:
                     return {
                         "passed": False,
@@ -279,8 +280,7 @@ class QualityGatesRunner:
                 return {
                     "passed": False,
                     "errors": ["pytest not found - please install pytest and pytest-cov"],
-                    "details": "pytest not available"
-                }
+                    "details": "pytest not available"}
 
         except Exception as e:
             return {
@@ -294,7 +294,7 @@ class QualityGatesRunner:
         try:
             # Check for README files
             readme_files = list(self.worktree_path.glob("README*.md")) + \
-                          list(self.worktree_path.glob("readme*.md"))
+                list(self.worktree_path.glob("readme*.md"))
 
             # Check for docstrings in Python files
             python_files = list(self.worktree_path.glob("**/*.py"))
@@ -353,13 +353,17 @@ class QualityGatesRunner:
 
                         # Check for common security issues
                         if "eval(" in content:
-                            security_issues.append(f"eval() usage in {py_file}")
+                            security_issues.append(
+                                f"eval() usage in {py_file}")
                         if "exec(" in content:
-                            security_issues.append(f"exec() usage in {py_file}")
+                            security_issues.append(
+                                f"exec() usage in {py_file}")
                         if "shell=True" in content:
-                            security_issues.append(f"shell=True in subprocess call in {py_file}")
+                            security_issues.append(
+                                f"shell=True in subprocess call in {py_file}")
                         if "password" in content.lower() and "=" in content:
-                            security_issues.append(f"Potential hardcoded password in {py_file}")
+                            security_issues.append(
+                                f"Potential hardcoded password in {py_file}")
 
                 except (IOError, UnicodeDecodeError):
                     pass  # Skip files that can't be read
@@ -368,14 +372,14 @@ class QualityGatesRunner:
                 return {
                     "passed": False,
                     "errors": security_issues,
-                    "details": f"Found {len(security_issues)} potential security issues"
-                }
+                    "details": f"Found {
+                        len(security_issues)} potential security issues"}
 
             return {
                 "passed": True,
                 "errors": [],
-                "details": f"Security check passed for {len(python_files)} Python files"
-            }
+                "details": f"Security check passed for {
+                    len(python_files)} Python files"}
 
         except Exception as e:
             return {
@@ -400,27 +404,29 @@ class QualityGatesRunner:
                     for line in lines:
                         if line.strip():
                             indent = len(line) - len(line.lstrip())
-                            max_indent = max(max_indent, indent // 4)  # Assuming 4-space indentation
+                            # Assuming 4-space indentation
+                            max_indent = max(max_indent, indent // 4)
 
                     max_complexity = self.quality_config["quality_gates"]["max_complexity"]
                     if max_indent > max_complexity:
-                        complex_files.append(f"{py_file} (complexity: {max_indent})")
+                        complex_files.append(
+                            f"{py_file} (complexity: {max_indent})")
 
                 except (IOError, UnicodeDecodeError):
                     pass  # Skip files that can't be read
 
             if complex_files:
                 return {
-                    "passed": False,
-                    "errors": [f"High complexity files: {', '.join(complex_files)}"],
-                    "details": f"Found {len(complex_files)} files with high complexity"
-                }
+                    "passed": False, "errors": [
+                        f"High complexity files: {
+                            ', '.join(complex_files)}"], "details": f"Found {
+                        len(complex_files)} files with high complexity"}
 
             return {
                 "passed": True,
                 "errors": [],
-                "details": f"Complexity check passed for {len(python_files)} Python files"
-            }
+                "details": f"Complexity check passed for {
+                    len(python_files)} Python files"}
 
         except Exception as e:
             return {
@@ -445,7 +451,11 @@ class QualityGatesRunner:
 
         print("\n" + "-" * 50)
         summary = results["summary"]
-        print(f"📈 Summary: {summary['passed_checks']}/{summary['total_checks']} checks passed ({summary['success_rate']})")
+        print(
+            f"📈 Summary: {
+                summary['passed_checks']}/{
+                summary['total_checks']} checks passed ({
+                summary['success_rate']})")
 
         if results["success"]:
             print("🎉 ALL QUALITY GATES PASSED!")
@@ -454,6 +464,7 @@ class QualityGatesRunner:
             print("\nErrors to fix:")
             for error in results["errors"]:
                 print(f"  - {error}")
+
 
 def main() -> None:
     """Main entry point"""
@@ -466,6 +477,7 @@ def main() -> None:
 
     # Exit with appropriate code
     sys.exit(0 if results["success"] else 1)
+
 
 if __name__ == "__main__":
     main()

@@ -10,15 +10,10 @@ Components:
 - AdaptiveLearning: Self-improving learning system with continuous optimization
 """
 
+from .adaptive_learning import AdaptiveLearning
+from .models import AnalyticsResult, LearningMetrics, MLConfig, PatternData
 from .pattern_optimizer import PatternOptimizer
 from .predictive_analytics import PredictiveAnalytics
-from .adaptive_learning import AdaptiveLearning
-from .models import (
-    MLConfig,
-    PatternData,
-    AnalyticsResult,
-    LearningMetrics
-)
 
 __all__ = [
     'PatternOptimizer',

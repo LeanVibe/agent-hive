@@ -6,24 +6,26 @@ all ML components, decision-making, and agent intelligence capabilities.
 """
 
 import asyncio
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import json
+import logging
 import sqlite3
-from pathlib import Path
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
-from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
 from advanced_orchestration.models import (
-    CoordinatorConfig, AgentInfo, TaskAssignment, CoordinatorState
+    AgentInfo,
+    CoordinatorConfig,
+    CoordinatorState,
+)
+from advanced_orchestration.multi_agent_coordinator import (
+    MultiAgentCoordinator,
 )
 from ml_enhancements.adaptive_learning import AdaptiveLearning
-from ml_enhancements.predictive_analytics import PredictiveAnalytics
+from ml_enhancements.models import MLConfig
 from ml_enhancements.pattern_optimizer import PatternOptimizer
-from ml_enhancements.models import MLConfig, LearningMetrics, AnalyticsResult
-
+from ml_enhancements.predictive_analytics import PredictiveAnalytics
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +60,8 @@ class IntelligenceConfig:
 
     # ML component configurations
     ml_config: MLConfig = field(default_factory=MLConfig)
-    coordinator_config: CoordinatorConfig = field(default_factory=CoordinatorConfig)
+    coordinator_config: CoordinatorConfig = field(
+        default_factory=CoordinatorConfig)
 
     # Database settings
     db_path: str = "intelligence_framework.db"
@@ -138,7 +141,8 @@ class IntelligenceFramework:
         self.logger = logging.getLogger(__name__)
 
         # Initialize components
-        self.coordinator = MultiAgentCoordinator(self.config.coordinator_config)
+        self.coordinator = MultiAgentCoordinator(
+            self.config.coordinator_config)
         self.adaptive_learning = AdaptiveLearning(self.config.ml_config)
         self.predictive_analytics = PredictiveAnalytics(self.config.ml_config)
         self.pattern_optimizer = PatternOptimizer(self.config.ml_config)
@@ -165,12 +169,14 @@ class IntelligenceFramework:
         self.running = False
         self.background_tasks = []
 
-        self.logger.info(f"Intelligence Framework initialized with level: {self.config.intelligence_level}")
+        self.logger.info(
+            f"Intelligence Framework initialized with level: {
+                self.config.intelligence_level}")
 
     def _init_database(self) -> None:
         """Initialize SQLite database for intelligence data."""
         with sqlite3.connect(self.config.db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             # Intelligence decisions table
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS intelligence_decisions (
@@ -336,11 +342,15 @@ class IntelligenceFramework:
             # Update metrics
             self.performance_metrics['total_decisions'] += 1
 
-            self.logger.info(f"Decision made: {decision_type.value} with confidence {confidence:.3f}")
+            self.logger.info(
+                f"Decision made: {
+                    decision_type.value} with confidence {
+                    confidence:.3f}")
             return decision
 
         except Exception as e:
-            self.logger.error(f"Decision making failed for {decision_type.value}: {e}")
+            self.logger.error(
+                f"Decision making failed for {decision_type.value}: {e}")
 
             # Return fallback decision
             return IntelligenceDecision(
@@ -352,7 +362,8 @@ class IntelligenceFramework:
                 metadata={'error': str(e)}
             )
 
-    async def assess_agent_intelligence(self, agent_id: str) -> AgentIntelligence:
+    async def assess_agent_intelligence(
+            self, agent_id: str) -> AgentIntelligence:
         """
         Assess and update an agent's intelligence profile.
 
@@ -395,11 +406,14 @@ class IntelligenceFramework:
             self.agent_intelligence[agent_id] = intelligence
             await self._store_agent_intelligence(intelligence)
 
-            self.logger.info(f"Agent {agent_id} intelligence assessed: {intelligence_level.value}")
+            self.logger.info(
+                f"Agent {agent_id} intelligence assessed: {
+                    intelligence_level.value}")
             return intelligence
 
         except Exception as e:
-            self.logger.error(f"Intelligence assessment failed for agent {agent_id}: {e}")
+            self.logger.error(
+                f"Intelligence assessment failed for agent {agent_id}: {e}")
 
             # Return default intelligence profile
             return AgentIntelligence(
@@ -423,7 +437,7 @@ class IntelligenceFramework:
             coordinator_state = await self.coordinator.get_coordinator_state()
 
             # Analyze performance patterns
-            patterns = await self.pattern_optimizer.analyze_patterns()
+            await self.pattern_optimizer.analyze_patterns()
 
             # Generate predictions
             performance_prediction = await self.predictive_analytics.predict_performance(
@@ -452,7 +466,8 @@ class IntelligenceFramework:
                 })
 
             # Learning optimization
-            if len(self.active_learning_sessions) < len(coordinator_state.active_agents) * 0.5:
+            if len(self.active_learning_sessions) < len(
+                    coordinator_state.active_agents) * 0.5:
                 recommendations.append({
                     'type': 'learning_optimization',
                     'priority': 'medium',
@@ -466,13 +481,15 @@ class IntelligenceFramework:
                 'performance_trend': self._calculate_performance_trend(),
                 'recommendations': recommendations,
                 'system_health': self._assess_system_health(coordinator_state),
-                'optimization_priority': self._prioritize_optimizations(recommendations)
-            }
+                'optimization_priority': self._prioritize_optimizations(recommendations)}
 
             # Update metrics
-            self.performance_metrics['optimization_improvements'] += len(recommendations)
+            self.performance_metrics['optimization_improvements'] += len(
+                recommendations)
 
-            self.logger.info(f"System optimization completed with {len(recommendations)} recommendations")
+            self.logger.info(
+                f"System optimization completed with {
+                    len(recommendations)} recommendations")
             return optimization_results
 
         except Exception as e:
@@ -549,9 +566,9 @@ class IntelligenceFramework:
         else:
             return {
                 'action': 'default',
-                'reason': f'No specific recommendation for {decision_type.value}',
-                'confidence': 0.5
-            }
+                'reason': f'No specific recommendation for {
+                    decision_type.value}',
+                'confidence': 0.5}
 
     async def _recommend_task_allocation(
         self,
@@ -652,8 +669,8 @@ class IntelligenceFramework:
         return {
             'action': 'optimize_resources',
             'recommendations': recommendations,
-            'priority': 'high' if any(r['priority'] == 'high' for r in recommendations) else 'medium'
-        }
+            'priority': 'high' if any(
+                r['priority'] == 'high' for r in recommendations) else 'medium'}
 
     async def _recommend_scaling_decision(
         self,
@@ -670,10 +687,11 @@ class IntelligenceFramework:
         if queue_depth > 10 and current_agents < self.config.coordinator_config.max_agents:
             return {
                 'action': 'scale_up',
-                'target_agents': min(current_agents + 2, self.config.coordinator_config.max_agents),
+                'target_agents': min(
+                    current_agents + 2,
+                    self.config.coordinator_config.max_agents),
                 'reason': f'High queue depth ({queue_depth}) requires more agents',
-                'priority': 'high'
-            }
+                'priority': 'high'}
 
         # Scale down conditions
         if queue_depth == 0 and current_agents > self.config.coordinator_config.min_agents:
@@ -684,10 +702,12 @@ class IntelligenceFramework:
             if avg_utilization < 1.0:
                 return {
                     'action': 'scale_down',
-                    'target_agents': max(current_agents - 1, self.config.coordinator_config.min_agents),
-                    'reason': f'Low utilization ({avg_utilization:.1f}) allows scaling down',
-                    'priority': 'low'
-                }
+                    'target_agents': max(
+                        current_agents - 1,
+                        self.config.coordinator_config.min_agents),
+                    'reason': f'Low utilization ({
+                        avg_utilization:.1f}) allows scaling down',
+                    'priority': 'low'}
 
         return {
             'action': 'maintain',
@@ -707,8 +727,7 @@ class IntelligenceFramework:
             'action': 'coordinate_agents',
             'strategy': 'intelligent_collaboration',
             'coordination_type': 'dynamic',
-            'reason': 'Enable intelligent agent collaboration based on capabilities'
-        }
+            'reason': 'Enable intelligent agent collaboration based on capabilities'}
 
     async def _recommend_performance_tuning(
         self,
@@ -781,7 +800,8 @@ class IntelligenceFramework:
 
         # Base reasoning
         reasoning_parts.append(f"Decision type: {decision_type.value}")
-        reasoning_parts.append(f"Recommended action: {recommendation.get('action', 'unknown')}")
+        reasoning_parts.append(
+            f"Recommended action: {recommendation.get('action', 'unknown')}")
 
         # Context-based reasoning
         if 'reason' in recommendation:
@@ -789,7 +809,8 @@ class IntelligenceFramework:
 
         # Analysis-based reasoning
         if analysis.get('predictive_insights'):
-            reasoning_parts.append("Incorporates predictive analytics insights")
+            reasoning_parts.append(
+                "Incorporates predictive analytics insights")
 
         if analysis.get('historical_patterns'):
             reasoning_parts.append("Based on historical pattern analysis")
@@ -815,7 +836,8 @@ class IntelligenceFramework:
             ))
             conn.commit()
 
-    async def _store_agent_intelligence(self, intelligence: AgentIntelligence) -> None:
+    async def _store_agent_intelligence(
+            self, intelligence: AgentIntelligence) -> None:
         """Store agent intelligence in database."""
 
         with sqlite3.connect(self.config.db_path) as conn:
@@ -865,7 +887,8 @@ class IntelligenceFramework:
                         )
                         self.active_learning_sessions[agent_id] = session_id
 
-                        self.logger.info(f"Started learning session for agent {agent_id}")
+                        self.logger.info(
+                            f"Started learning session for agent {agent_id}")
 
             except Exception as e:
                 self.logger.error(f"Learning coordination error: {e}")
@@ -916,7 +939,8 @@ class IntelligenceFramework:
             self.performance_metrics['decision_accuracy'] = accuracy
             self.performance_metrics['successful_decisions'] = successful_decisions
 
-            self.logger.info(f"Decision accuracy: {accuracy:.3f} ({successful_decisions}/{len(decisions)})")
+            self.logger.info(
+                f"Decision accuracy: {accuracy:.3f} ({successful_decisions}/{len(decisions)})")
 
     def _calculate_context_complexity(self, context: Dict[str, Any]) -> float:
         """Calculate complexity of decision context."""
@@ -942,13 +966,14 @@ class IntelligenceFramework:
             return 0.5
 
         # Calculate performance based on error rate and task completion
-        error_rate = agent_info.error_count / max(1, agent_info.active_tasks + agent_info.error_count)
+        error_rate = agent_info.error_count / \
+            max(1, agent_info.active_tasks + agent_info.error_count)
         performance = 1.0 - error_rate
 
         # Adjust based on resource utilization
         if agent_info.current_usage:
             utilization = (agent_info.current_usage.cpu_percent +
-                          agent_info.current_usage.memory_percent) / 2.0
+                           agent_info.current_usage.memory_percent) / 2.0
             # Optimal utilization is around 60-70%
             utilization_factor = 1.0 - abs(utilization - 0.65) * 2
             performance *= max(0.5, utilization_factor)
@@ -969,7 +994,8 @@ class IntelligenceFramework:
                 ORDER BY end_time DESC LIMIT 5
             """, (agent_id,))
 
-            scores = [row[0] for row in cursor.fetchall() if row[0] is not None]
+            scores = [row[0]
+                      for row in cursor.fetchall() if row[0] is not None]
 
         if scores:
             return min(1.0, sum(scores) / len(scores))
@@ -990,7 +1016,8 @@ class IntelligenceFramework:
     ) -> IntelligenceLevel:
         """Determine intelligence level based on scores."""
 
-        overall_score = (performance_score + learning_progress + decision_accuracy) / 3.0
+        overall_score = (performance_score + learning_progress +
+                         decision_accuracy) / 3.0
 
         if overall_score >= 0.9:
             return IntelligenceLevel.EXPERT
@@ -1010,14 +1037,16 @@ class IntelligenceFramework:
 
         # Add specializations based on performance metrics
         if agent_info.performance_metrics:
-            if agent_info.performance_metrics.get('task_completion_rate', 0) > 0.9:
+            if agent_info.performance_metrics.get(
+                    'task_completion_rate', 0) > 0.9:
                 specializations.append('high_throughput')
             if agent_info.performance_metrics.get('error_rate', 1) < 0.1:
                 specializations.append('high_reliability')
 
         return list(set(specializations))  # Remove duplicates
 
-    def _extract_system_features(self, coordinator_state: CoordinatorState) -> Dict[str, float]:
+    def _extract_system_features(
+            self, coordinator_state: CoordinatorState) -> Dict[str, float]:
         """Extract system features for analysis."""
         return {
             'active_agents': len(coordinator_state.active_agents),
@@ -1037,34 +1066,48 @@ class IntelligenceFramework:
         # This would analyze historical performance data
         return "stable"  # Default trend
 
-    def _assess_system_health(self, coordinator_state: CoordinatorState) -> Dict[str, Any]:
+    def _assess_system_health(
+            self, coordinator_state: CoordinatorState) -> Dict[str, Any]:
         """Assess overall system health."""
         return {
             'status': 'healthy',
-            'active_agents': len(coordinator_state.active_agents),
+            'active_agents': len(
+                coordinator_state.active_agents),
             'resource_utilization': {
                 'cpu': coordinator_state.resource_usage.cpu_percent,
                 'memory': coordinator_state.resource_usage.memory_percent,
-                'network': coordinator_state.resource_usage.network_percent
-            },
-            'queue_status': 'normal' if len(coordinator_state.pending_tasks) < 10 else 'high',
-            'error_rate': coordinator_state.scaling_metrics.error_rate
-        }
+                'network': coordinator_state.resource_usage.network_percent},
+            'queue_status': 'normal' if len(
+                coordinator_state.pending_tasks) < 10 else 'high',
+            'error_rate': coordinator_state.scaling_metrics.error_rate}
 
-    def _prioritize_optimizations(self, recommendations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _prioritize_optimizations(
+            self, recommendations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Prioritize optimization recommendations."""
         # Sort by priority (high -> medium -> low)
         priority_order = {'high': 0, 'medium': 1, 'low': 2}
-        return sorted(recommendations, key=lambda x: priority_order.get(x.get('priority', 'medium'), 1))
+        return sorted(
+            recommendations,
+            key=lambda x: priority_order.get(
+                x.get(
+                    'priority',
+                    'medium'),
+                1))
 
-    async def _analyze_resource_impact(self, resource_requirements: Dict[str, Any]) -> Dict[str, Any]:
+    async def _analyze_resource_impact(
+            self, resource_requirements: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze resource impact of a decision."""
         return {
-            'cpu_impact': resource_requirements.get('cpu_cores', 0) * 0.1,
-            'memory_impact': resource_requirements.get('memory_mb', 0) * 0.001,
-            'network_impact': resource_requirements.get('network_mbps', 0) * 0.01,
-            'overall_impact': 'low'
-        }
+            'cpu_impact': resource_requirements.get(
+                'cpu_cores',
+                0) * 0.1,
+            'memory_impact': resource_requirements.get(
+                'memory_mb',
+                0) * 0.001,
+            'network_impact': resource_requirements.get(
+                'network_mbps',
+                0) * 0.01,
+            'overall_impact': 'low'}
 
     def get_intelligence_summary(self) -> Dict[str, Any]:
         """Get summary of intelligence framework status."""
@@ -1077,7 +1120,7 @@ class IntelligenceFramework:
             'decision_history_count': len(self.decision_history),
             'agent_intelligence_levels': {
                 level.value: sum(1 for ai in self.agent_intelligence.values()
-                               if ai.intelligence_level == level)
+                                 if ai.intelligence_level == level)
                 for level in IntelligenceLevel
             }
         }

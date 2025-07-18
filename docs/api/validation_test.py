@@ -13,16 +13,23 @@ from pathlib import Path
 # Add the project root to the path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+
 async def test_advanced_orchestration():
     """Test Advanced Orchestration APIs"""
     print("🔄 Testing Advanced Orchestration APIs...")
 
     try:
         # Test imports
-        from advanced_orchestration import MultiAgentCoordinator, ResourceManager, ScalingManager
+        from advanced_orchestration import (
+            MultiAgentCoordinator,
+            ResourceManager,
+            ScalingManager,
+        )
         from advanced_orchestration.models import (
-            CoordinatorConfig, ResourceLimits, ResourceRequirements,
-            LoadBalancingStrategy
+            CoordinatorConfig,
+            LoadBalancingStrategy,
+            ResourceLimits,
+            ResourceRequirements,
         )
         print("✅ Advanced Orchestration imports successful")
 
@@ -32,7 +39,7 @@ async def test_advanced_orchestration():
             load_balancing_strategy=LoadBalancingStrategy.LEAST_CONNECTIONS,
             health_check_interval=30
         )
-        coordinator = MultiAgentCoordinator(config)
+        MultiAgentCoordinator(config)
         print("✅ MultiAgentCoordinator initialization successful")
 
         # Test ResourceManager initialization
@@ -42,15 +49,15 @@ async def test_advanced_orchestration():
             max_disk_mb=102400,
             max_network_mbps=1000
         )
-        resource_manager = ResourceManager(resource_limits)
+        ResourceManager(resource_limits)
         print("✅ ResourceManager initialization successful")
 
         # Test ScalingManager initialization
-        scaling_manager = ScalingManager(resource_limits)
+        ScalingManager(resource_limits)
         print("✅ ScalingManager initialization successful")
 
         # Test ResourceRequirements
-        requirements = ResourceRequirements(
+        ResourceRequirements(
             cpu_cores=2,
             memory_mb=1024,
             disk_mb=500,
@@ -66,14 +73,19 @@ async def test_advanced_orchestration():
         traceback.print_exc()
         return False
 
+
 async def test_external_api():
     """Test External API Integration"""
     print("🔄 Testing External API Integration...")
 
     try:
         # Test imports
-        from external_api import WebhookServer, ApiGateway, EventStreaming
-        from external_api.models import WebhookConfig, ApiGatewayConfig, EventStreamConfig
+        from external_api import ApiGateway, EventStreaming, WebhookServer
+        from external_api.models import (
+            ApiGatewayConfig,
+            EventStreamConfig,
+            WebhookConfig,
+        )
         print("✅ External API imports successful")
 
         # Test WebhookServer initialization
@@ -83,7 +95,7 @@ async def test_external_api():
             rate_limit_requests=50,
             max_payload_size=1024000
         )
-        webhook_server = WebhookServer(webhook_config)
+        WebhookServer(webhook_config)
         print("✅ WebhookServer initialization successful")
 
         # Test ApiGateway initialization
@@ -93,7 +105,7 @@ async def test_external_api():
             enable_cors=True,
             rate_limit_requests=100
         )
-        api_gateway = ApiGateway(gateway_config)
+        ApiGateway(gateway_config)
         print("✅ ApiGateway initialization successful")
 
         # Test EventStreaming initialization
@@ -102,7 +114,7 @@ async def test_external_api():
             batch_size=100,
             flush_interval=5  # seconds
         )
-        event_streaming = EventStreaming(stream_config)
+        EventStreaming(stream_config)
         print("✅ EventStreaming initialization successful")
 
         return True
@@ -113,13 +125,18 @@ async def test_external_api():
         traceback.print_exc()
         return False
 
+
 async def test_ml_enhancements():
     """Test ML Enhancement APIs"""
     print("🔄 Testing ML Enhancement APIs...")
 
     try:
         # Test imports
-        from ml_enhancements import AdaptiveLearning, PatternOptimizer, PredictiveAnalytics
+        from ml_enhancements import (
+            AdaptiveLearning,
+            PatternOptimizer,
+            PredictiveAnalytics,
+        )
         from ml_enhancements.models import MLConfig
         print("✅ ML Enhancement imports successful")
 
@@ -129,19 +146,19 @@ async def test_ml_enhancements():
             confidence_threshold=0.8,
             update_frequency=100
         )
-        adaptive_learning = AdaptiveLearning(ml_config)
+        AdaptiveLearning(ml_config)
         print("✅ AdaptiveLearning initialization successful")
 
         # Test PatternOptimizer initialization
-        pattern_optimizer = PatternOptimizer(ml_config)
+        PatternOptimizer(ml_config)
         print("✅ PatternOptimizer initialization successful")
 
         # Test PredictiveAnalytics initialization
-        predictive_analytics = PredictiveAnalytics(ml_config)
+        PredictiveAnalytics(ml_config)
         print("✅ PredictiveAnalytics initialization successful")
 
         # Test feedback data creation
-        feedback_data = {
+        {
             "task_id": "task-123",
             "outcome": "success",
             "confidence_score": 0.85,
@@ -158,6 +175,7 @@ async def test_ml_enhancements():
         traceback.print_exc()
         return False
 
+
 async def test_cli_integration():
     """Test CLI integration examples"""
     print("🔄 Testing CLI integration...")
@@ -168,7 +186,7 @@ async def test_cli_integration():
         print("✅ CLI imports successful")
 
         # Test CLI initialization
-        cli = LeanVibeCLI()
+        LeanVibeCLI()
         print("✅ CLI initialization successful")
 
         return True
@@ -178,6 +196,7 @@ async def test_cli_integration():
         import traceback
         traceback.print_exc()
         return False
+
 
 async def main():
     """Run all validation tests"""

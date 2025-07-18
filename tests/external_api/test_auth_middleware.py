@@ -2,13 +2,18 @@
 Tests for AuthenticationMiddleware component.
 """
 
-import pytest
 import base64
-import time
 from datetime import datetime
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-from external_api.auth_middleware import AuthenticationMiddleware, AuthMethod, Permission, AuthResult
+import pytest
+
+from external_api.auth_middleware import (
+    AuthenticationMiddleware,
+    AuthMethod,
+    AuthResult,
+    Permission,
+)
 from external_api.models import ApiRequest
 
 
@@ -128,7 +133,8 @@ class TestAuthenticationMiddleware:
         assert result is False
 
     @pytest.mark.asyncio
-    async def test_api_key_authentication_success(self, auth_middleware, sample_request):
+    async def test_api_key_authentication_success(
+            self, auth_middleware, sample_request):
         """Test successful API key authentication."""
         # Create API key
         api_key = auth_middleware.create_api_key(
@@ -152,7 +158,8 @@ class TestAuthenticationMiddleware:
         assert auth_middleware.api_keys[api_key]["usage_count"] == 1
 
     @pytest.mark.asyncio
-    async def test_api_key_authentication_failure(self, auth_middleware, sample_request):
+    async def test_api_key_authentication_failure(
+            self, auth_middleware, sample_request):
         """Test API key authentication failures."""
         # Test missing API key
         result = await auth_middleware.authenticate_request(sample_request)
@@ -166,7 +173,8 @@ class TestAuthenticationMiddleware:
         assert "Authentication failed" in result.error
 
         # Test revoked API key
-        api_key = auth_middleware.create_api_key("test_user", [Permission.READ])
+        api_key = auth_middleware.create_api_key(
+            "test_user", [Permission.READ])
         auth_middleware.revoke_api_key(api_key)
         sample_request.headers["X-API-Key"] = api_key
         result = await auth_middleware.authenticate_request(sample_request)
@@ -174,7 +182,8 @@ class TestAuthenticationMiddleware:
         assert "Authentication failed" in result.error
 
     @pytest.mark.asyncio
-    async def test_basic_auth_authentication_success(self, auth_middleware, sample_request):
+    async def test_basic_auth_authentication_success(
+            self, auth_middleware, sample_request):
         """Test successful basic authentication."""
         # Create basic auth user
         auth_middleware.create_basic_auth_user(
@@ -203,7 +212,8 @@ class TestAuthenticationMiddleware:
         assert user_data["last_login"] is not None
 
     @pytest.mark.asyncio
-    async def test_basic_auth_authentication_failure(self, auth_middleware, sample_request):
+    async def test_basic_auth_authentication_failure(
+            self, auth_middleware, sample_request):
         """Test basic authentication failures."""
         # Test missing basic auth header
         result = await auth_middleware.authenticate_request(sample_request)
@@ -224,7 +234,8 @@ class TestAuthenticationMiddleware:
         assert "Authentication failed" in result.error
 
         # Test deactivated user
-        auth_middleware.create_basic_auth_user("testuser", "testpass", [Permission.READ], active=False)
+        auth_middleware.create_basic_auth_user(
+            "testuser", "testpass", [Permission.READ], active=False)
         credentials = base64.b64encode(b"testuser:testpass").decode('utf-8')
         sample_request.headers["Authorization"] = f"Basic {credentials}"
         result = await auth_middleware.authenticate_request(sample_request)
@@ -232,7 +243,8 @@ class TestAuthenticationMiddleware:
         assert "Authentication failed" in result.error
 
     @pytest.mark.asyncio
-    async def test_jwt_token_authentication(self, auth_middleware, sample_request):
+    async def test_jwt_token_authentication(
+            self, auth_middleware, sample_request):
         """Test JWT token authentication."""
         # Create JWT token
         jwt_token = auth_middleware.create_jwt_token(
@@ -255,7 +267,8 @@ class TestAuthenticationMiddleware:
             assert Permission.WRITE in result.permissions
 
     @pytest.mark.asyncio
-    async def test_oauth2_authentication(self, auth_middleware, sample_request):
+    async def test_oauth2_authentication(
+            self, auth_middleware, sample_request):
         """Test OAuth 2.0 authentication."""
         # Enable OAuth2 method first
         auth_middleware.enabled_methods.append(AuthMethod.OAUTH2)
@@ -281,7 +294,8 @@ class TestAuthenticationMiddleware:
         assert Permission.WRITE in result.permissions
 
     @pytest.mark.asyncio
-    async def test_signature_authentication(self, auth_middleware, sample_request):
+    async def test_signature_authentication(
+            self, auth_middleware, sample_request):
         """Test signature-based authentication."""
         # Enable signature method first
         auth_middleware.enabled_methods.append(AuthMethod.SIGNATURE)
@@ -307,11 +321,13 @@ class TestAuthenticationMiddleware:
             assert result.metadata["client_id"] == client_id
 
     @pytest.mark.asyncio
-    async def test_authentication_method_priority(self, auth_middleware, sample_request):
+    async def test_authentication_method_priority(
+            self, auth_middleware, sample_request):
         """Test that authentication methods are tried in correct order."""
         # Set up multiple authentication methods
         api_key = auth_middleware.create_api_key("api_user", [Permission.READ])
-        auth_middleware.create_basic_auth_user("basic_user", "password", [Permission.WRITE])
+        auth_middleware.create_basic_auth_user(
+            "basic_user", "password", [Permission.WRITE])
 
         # Add both API key and basic auth headers
         sample_request.headers["X-API-Key"] = api_key
@@ -326,7 +342,8 @@ class TestAuthenticationMiddleware:
         assert Permission.READ in result.permissions
 
     @pytest.mark.asyncio
-    async def test_rate_limiting_auth_attempts(self, auth_middleware, sample_request):
+    async def test_rate_limiting_auth_attempts(
+            self, auth_middleware, sample_request):
         """Test rate limiting of authentication attempts."""
         # Make multiple failed authentication attempts
         sample_request.headers["X-API-Key"] = "invalid-key"
@@ -358,7 +375,8 @@ class TestAuthenticationMiddleware:
         """Test path-based permission storage."""
         # Set path permissions
         auth_middleware.path_permissions["/admin/*"] = [Permission.ADMIN]
-        auth_middleware.path_permissions["/api/v1/*"] = [Permission.READ, Permission.WRITE]
+        auth_middleware.path_permissions["/api/v1/*"] = [
+            Permission.READ, Permission.WRITE]
 
         # Test that permissions are stored correctly
         assert "/admin/*" in auth_middleware.path_permissions
@@ -400,12 +418,14 @@ class TestAuthenticationMiddleware:
         assert middleware.config == config
 
     @pytest.mark.asyncio
-    async def test_concurrent_authentication(self, auth_middleware, sample_request):
+    async def test_concurrent_authentication(
+            self, auth_middleware, sample_request):
         """Test concurrent authentication requests."""
         import asyncio
 
         # Create API key
-        api_key = auth_middleware.create_api_key("test_user", [Permission.READ])
+        api_key = auth_middleware.create_api_key(
+            "test_user", [Permission.READ])
 
         # Create multiple concurrent requests
         async def auth_request(request_id):

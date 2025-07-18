@@ -12,26 +12,28 @@ MultiAgentCoordinator and WorkflowCoordinator to implement:
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any, Set
-from collections import defaultdict, deque
-import json
-import uuid
 import statistics
+from collections import defaultdict, deque
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
 
-from .models import (
-    AgentInfo, AgentStatus, TaskStatus, TaskPriority, EnhancedTaskAssignment,
-    WorkflowDefinition, WorkflowState, CoordinationMetrics, IntelligentRouting,
-    QualityGate, TaskDependency, DependencyType, AgentSpecialization,
-    AgentCapabilities, LoadBalancingStrategy, CoordinatorConfig,
-    TaskDistributionException, CoordinatorException
-)
-from .multi_agent_coordinator import MultiAgentCoordinator
-from .workflow_coordinator import WorkflowCoordinator
-from .performance_monitor import PerformanceMonitor, PerformanceMetric, PerformanceMetricType
-from .analytics_dashboard import AnalyticsDashboard, DashboardView
+from .analytics_dashboard import AnalyticsDashboard
 from .continuous_improvement import ContinuousImprovementEngine
 from .feedback_loops import RealTimeFeedbackEngine
+from .models import (
+    AgentStatus,
+    CoordinationMetrics,
+    CoordinatorConfig,
+    CoordinatorException,
+    DependencyType,
+    EnhancedTaskAssignment,
+    IntelligentRouting,
+    WorkflowDefinition,
+    WorkflowState,
+)
+from .multi_agent_coordinator import MultiAgentCoordinator
+from .performance_monitor import PerformanceMonitor
+from .workflow_coordinator import WorkflowCoordinator
 
 
 class EnhancedCoordinationProtocol:
@@ -75,13 +77,15 @@ class EnhancedCoordinationProtocol:
         )
 
         # Enhanced coordination state
-        self.coordination_history: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        self.coordination_history: Dict[str,
+                                        List[Dict[str, Any]]] = defaultdict(list)
         self.intelligent_routing_cache: Dict[str, Tuple[str, float]] = {}
         self.dependency_resolution_cache: Dict[str, List[str]] = {}
         self.parallel_execution_analytics: Dict[str, Dict[str, Any]] = {}
 
         # Performance tracking
-        self.agent_performance_history: Dict[str, deque] = defaultdict(lambda: deque(maxlen=100))
+        self.agent_performance_history: Dict[str, deque] = defaultdict(
+            lambda: deque(maxlen=100))
         self.task_completion_times: Dict[str, List[float]] = defaultdict(list)
         self.coordination_efficiency_metrics: Dict[str, float] = {}
 
@@ -164,7 +168,8 @@ class EnhancedCoordinationProtocol:
             )
 
             # Start enhanced monitoring for this workflow
-            asyncio.create_task(self._monitor_workflow_execution(workflow_def.workflow_id))
+            asyncio.create_task(
+                self._monitor_workflow_execution(workflow_def.workflow_id))
 
             # Log coordination event
             await self._log_coordination_event("workflow_started", {
@@ -174,19 +179,24 @@ class EnhancedCoordinationProtocol:
             })
 
             # Record coordination event for improvement engine
-            self.continuous_improvement.record_coordination_event({
-                "event_type": "workflow_started",
-                "workflow_id": workflow_def.workflow_id,
-                "task_count": len(workflow_def.tasks),
-                "parallel_execution": workflow_def.parallel_execution,
-                "agents_involved": len(workflow_def.agent_assignments) if hasattr(workflow_def, 'agent_assignments') else 0
-            })
+            self.continuous_improvement.record_coordination_event(
+                {
+                    "event_type": "workflow_started",
+                    "workflow_id": workflow_def.workflow_id,
+                    "task_count": len(
+                        workflow_def.tasks),
+                    "parallel_execution": workflow_def.parallel_execution,
+                    "agents_involved": len(
+                        workflow_def.agent_assignments) if hasattr(
+                        workflow_def,
+                        'agent_assignments') else 0})
 
             return workflow_state
 
         except Exception as e:
             self.logger.error(f"Enhanced workflow execution failed: {e}")
-            raise CoordinatorException(f"Enhanced workflow execution failed: {e}")
+            raise CoordinatorException(
+                f"Enhanced workflow execution failed: {e}")
 
     async def intelligent_task_routing(
         self,
@@ -225,7 +235,8 @@ class EnhancedCoordinationProtocol:
             best_score = agent_scores[best_agent]
 
             # Cache the result
-            self.intelligent_routing_cache[cache_key] = (best_agent, best_score)
+            self.intelligent_routing_cache[cache_key] = (
+                best_agent, best_score)
 
             # Log routing decision
             await self._log_coordination_event("intelligent_routing", {
@@ -268,7 +279,8 @@ class EnhancedCoordinationProtocol:
                 return []
 
             # Get workflow definition
-            workflow_def = self.workflow_coordinator.workflow_definitions.get(workflow_id)
+            workflow_def = self.workflow_coordinator.workflow_definitions.get(
+                workflow_id)
             if not workflow_def:
                 return []
 
@@ -314,7 +326,8 @@ class EnhancedCoordinationProtocol:
         """
         try:
             # Get workflow performance history
-            workflow_analytics = self.parallel_execution_analytics.get(workflow_id, {})
+            self.parallel_execution_analytics.get(
+                workflow_id, {})
 
             # Analyze current groups
             group_analysis = await self._analyze_parallel_groups(workflow_id, task_groups)
@@ -334,8 +347,9 @@ class EnhancedCoordinationProtocol:
                 "original_groups": len(task_groups),
                 "optimized_groups": len(resource_optimized_groups),
                 "optimization_time": datetime.now(),
-                "expected_improvement": group_analysis.get("expected_improvement", 0.0)
-            }
+                "expected_improvement": group_analysis.get(
+                    "expected_improvement",
+                    0.0)}
 
             # Log optimization
             await self._log_coordination_event("parallel_optimization", {
@@ -360,7 +374,7 @@ class EnhancedCoordinationProtocol:
         """
         try:
             # Get current coordinator state
-            coordinator_state = await self.multi_agent_coordinator.get_coordinator_state()
+            await self.multi_agent_coordinator.get_coordinator_state()
 
             # Calculate enhanced metrics
             workflow_completion_rate = await self._calculate_workflow_completion_rate()
@@ -417,7 +431,8 @@ class EnhancedCoordinationProtocol:
             score = 0.0
 
             # Get agent capabilities
-            agent_capabilities = self.workflow_coordinator.agent_capabilities.get(agent_id)
+            agent_capabilities = self.workflow_coordinator.agent_capabilities.get(
+                agent_id)
             if agent_capabilities:
                 # Specialization match
                 if agent_capabilities.specialization == task.agent_specialization:
@@ -428,7 +443,8 @@ class EnhancedCoordinationProtocol:
 
                 # Performance history
                 if agent_id in self.agent_performance_history:
-                    recent_performance = list(self.agent_performance_history[agent_id])
+                    recent_performance = list(
+                        self.agent_performance_history[agent_id])
                     if recent_performance:
                         avg_performance = statistics.mean(recent_performance)
                         score += avg_performance * 0.3
@@ -437,7 +453,8 @@ class EnhancedCoordinationProtocol:
             coordinator_state = await self.multi_agent_coordinator.get_coordinator_state()
             if agent_id in coordinator_state.active_agents:
                 agent_info = coordinator_state.active_agents[agent_id]
-                load_factor = 1.0 - (agent_info.active_tasks / max(1, 10))  # Normalize to 0-1
+                load_factor = 1.0 - (agent_info.active_tasks /
+                                     max(1, 10))  # Normalize to 0-1
                 score *= load_factor
 
             agent_scores[agent_id] = score
@@ -474,7 +491,7 @@ class EnhancedCoordinationProtocol:
         for dep in dependencies:
             # Check if dependency is truly blocking
             dep_obj = next((d for d in workflow_def.dependencies
-                          if d.task_id == task_id and d.depends_on == dep), None)
+                            if d.task_id == task_id and d.depends_on == dep), None)
 
             if dep_obj and dep_obj.dependency_type == DependencyType.SOFT:
                 # Soft dependencies can be optimized
@@ -492,18 +509,22 @@ class EnhancedCoordinationProtocol:
         """Analyze parallel execution groups."""
         analysis = {
             "group_count": len(task_groups),
-            "total_tasks": sum(len(group) for group in task_groups),
-            "max_group_size": max(len(group) for group in task_groups) if task_groups else 0,
-            "min_group_size": min(len(group) for group in task_groups) if task_groups else 0,
-            "expected_improvement": 0.0
-        }
+            "total_tasks": sum(
+                len(group) for group in task_groups),
+            "max_group_size": max(
+                len(group) for group in task_groups) if task_groups else 0,
+            "min_group_size": min(
+                len(group) for group in task_groups) if task_groups else 0,
+            "expected_improvement": 0.0}
 
         # Calculate potential improvement
         if task_groups:
-            current_parallel_efficiency = len(task_groups) / analysis["total_tasks"]
+            current_parallel_efficiency = len(
+                task_groups) / analysis["total_tasks"]
             optimal_parallel_efficiency = min(1.0, analysis["total_tasks"] /
-                                            self.config.max_agents)
-            analysis["expected_improvement"] = optimal_parallel_efficiency - current_parallel_efficiency
+                                              self.config.max_agents)
+            analysis["expected_improvement"] = optimal_parallel_efficiency - \
+                current_parallel_efficiency
 
         return analysis
 
@@ -525,22 +546,23 @@ class EnhancedCoordinationProtocol:
         """Optimize groups based on available resources."""
         # Get current resource utilization
         coordinator_state = await self.multi_agent_coordinator.get_coordinator_state()
-        available_agents = len([agent for agent in coordinator_state.active_agents.values()
-                              if agent.status == AgentStatus.HEALTHY])
+        available_agents = len([agent for agent in coordinator_state.active_agents.values(
+        ) if agent.status == AgentStatus.HEALTHY])
 
         # Limit parallel groups to available agents
         if len(task_groups) > available_agents:
             # Merge smaller groups
             optimized_groups = []
-            current_group = []
 
             for group in sorted(task_groups, key=len, reverse=True):
                 if len(optimized_groups) < available_agents:
                     optimized_groups.append(group)
                 else:
                     # Merge with existing groups
-                    smallest_group_idx = min(range(len(optimized_groups)),
-                                           key=lambda i: len(optimized_groups[i]))
+                    smallest_group_idx = min(
+                        range(
+                            len(optimized_groups)), key=lambda i: len(
+                            optimized_groups[i]))
                     optimized_groups[smallest_group_idx].extend(group)
 
             return optimized_groups
@@ -554,7 +576,7 @@ class EnhancedCoordinationProtocol:
             return 1.0
 
         completed_workflows = len([w for w in self.workflow_coordinator.active_workflows.values()
-                                 if w.status == "completed"])
+                                   if w.status == "completed"])
         return completed_workflows / active_workflows
 
     async def _calculate_parallel_efficiency(self) -> float:
@@ -576,7 +598,8 @@ class EnhancedCoordinationProtocol:
         if not coordinator_state.active_agents:
             return 1.0
 
-        task_counts = [agent.active_tasks for agent in coordinator_state.active_agents.values()]
+        task_counts = [
+            agent.active_tasks for agent in coordinator_state.active_agents.values()]
         if not task_counts:
             return 1.0
 
@@ -584,7 +607,8 @@ class EnhancedCoordinationProtocol:
         if mean_tasks == 0:
             return 1.0
 
-        variance = statistics.variance(task_counts) if len(task_counts) > 1 else 0
+        variance = statistics.variance(
+            task_counts) if len(task_counts) > 1 else 0
         return 1.0 / (1.0 + variance / mean_tasks)
 
     async def _calculate_quality_consistency(self) -> float:
@@ -629,10 +653,12 @@ class EnhancedCoordinationProtocol:
 
     async def _calculate_coordination_overhead(self) -> float:
         """Calculate coordination overhead."""
-        # Simplified calculation - in production, this would measure actual overhead
+        # Simplified calculation - in production, this would measure actual
+        # overhead
         return 0.1  # 10% overhead
 
-    async def _analyze_workflow_structure(self, workflow_def: WorkflowDefinition) -> None:
+    async def _analyze_workflow_structure(
+            self, workflow_def: WorkflowDefinition) -> None:
         """Analyze workflow structure for optimization opportunities."""
         # Create dependency graph
         dependency_graph = defaultdict(set)
@@ -670,7 +696,8 @@ class EnhancedCoordinationProtocol:
                 await asyncio.sleep(30)  # Check every 30 seconds
 
             except Exception as e:
-                self.logger.error(f"Workflow monitoring error for {workflow_id}: {e}")
+                self.logger.error(
+                    f"Workflow monitoring error for {workflow_id}: {e}")
                 break
 
     async def _update_workflow_performance_metrics(
@@ -702,12 +729,15 @@ class EnhancedCoordinationProtocol:
                 "type": "workflow_stalled",
                 "workflow_id": workflow_id,
                 "progress": workflow_state.progress_percentage,
-                "duration": (datetime.now() - workflow_state.started_at).total_seconds() / 3600,
-                "timestamp": datetime.now()
-            }
+                "duration": (
+                    datetime.now() -
+                    workflow_state.started_at).total_seconds() /
+                3600,
+                "timestamp": datetime.now()}
             self.performance_alerts.append(alert)
 
-    async def _log_coordination_event(self, event_type: str, data: Dict[str, Any]) -> None:
+    async def _log_coordination_event(
+            self, event_type: str, data: Dict[str, Any]) -> None:
         """Log coordination event."""
         event = {
             "type": event_type,
@@ -729,7 +759,8 @@ class EnhancedCoordinationProtocol:
                 await self._identify_optimization_opportunities()
 
             except Exception as e:
-                self.logger.error(f"Enhanced coordination monitoring error: {e}")
+                self.logger.error(
+                    f"Enhanced coordination monitoring error: {e}")
 
     async def _intelligent_routing_optimizer(self) -> None:
         """Intelligent routing optimizer."""
@@ -738,16 +769,14 @@ class EnhancedCoordinationProtocol:
                 await asyncio.sleep(60)
 
                 # Clear old cache entries
-                current_time = datetime.now()
-                cache_ttl = timedelta(minutes=30)
-
                 # This would clear cache entries older than TTL
                 # For now, we'll just clear the entire cache periodically
                 if len(self.intelligent_routing_cache) > 1000:
                     self.intelligent_routing_cache.clear()
 
             except Exception as e:
-                self.logger.error(f"Intelligent routing optimization error: {e}")
+                self.logger.error(
+                    f"Intelligent routing optimization error: {e}")
 
     async def _dependency_resolution_optimizer(self) -> None:
         """Dependency resolution optimizer."""
@@ -760,7 +789,8 @@ class EnhancedCoordinationProtocol:
                     self.dependency_resolution_cache.clear()
 
             except Exception as e:
-                self.logger.error(f"Dependency resolution optimization error: {e}")
+                self.logger.error(
+                    f"Dependency resolution optimization error: {e}")
 
     async def _performance_analytics_processor(self) -> None:
         """Performance analytics processor."""
@@ -772,7 +802,8 @@ class EnhancedCoordinationProtocol:
                 await self._process_performance_analytics()
 
             except Exception as e:
-                self.logger.error(f"Performance analytics processing error: {e}")
+                self.logger.error(
+                    f"Performance analytics processing error: {e}")
 
     async def _process_performance_analytics(self) -> None:
         """Process performance analytics."""
@@ -782,8 +813,9 @@ class EnhancedCoordinationProtocol:
         for agent_id, agent_info in coordinator_state.active_agents.items():
             if agent_info.current_usage:
                 performance_score = 1.0 - (agent_info.current_usage.cpu_percent +
-                                         agent_info.current_usage.memory_percent) / 2.0
-                self.agent_performance_history[agent_id].append(performance_score)
+                                           agent_info.current_usage.memory_percent) / 2.0
+                self.agent_performance_history[agent_id].append(
+                    performance_score)
 
     async def _identify_optimization_opportunities(self) -> None:
         """Identify coordination optimization opportunities."""

@@ -1,16 +1,16 @@
 # .claude/utils/logging_config.py
 """Structured logging configuration for LeanVibe orchestration system."""
 
+import json
 import logging
 import logging.handlers
 import sys
+import traceback
 import uuid
+from contextvars import ContextVar
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
-import json
-import traceback
-from contextvars import ContextVar
+from typing import Any, Dict, Optional
 
 from config.config_loader import get_config
 
@@ -90,10 +90,15 @@ class HumanReadableFormatter(logging.Formatter):
         context_str = f"[{', '.join(context_parts)}]" if context_parts else ""
 
         # Format timestamp
-        timestamp = datetime.fromtimestamp(record.created).strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.fromtimestamp(
+    record.created).strftime('%Y-%m-%d %H:%M:%S')
 
         # Build log line
-        log_line = f"{timestamp} {record.levelname:8} {record.name:20} {context_str:30} {record.getMessage()}"
+        log_line = f"{timestamp} {
+    record.levelname:8} {
+        record.name:20} {
+            context_str:30} {
+                record.getMessage()}"
 
         # Add exception info if present
         if record.exc_info:
@@ -233,7 +238,8 @@ def clear_context():
     agent_id_var.set('')
 
 
-def log_performance(operation: str, duration: float, extra_data: Dict[str, Any] = None):
+def log_performance(operation: str, duration: float,
+                    extra_data: Dict[str, Any] = None):
     """Log performance metrics.
 
     Args:
@@ -252,10 +258,14 @@ def log_performance(operation: str, duration: float, extra_data: Dict[str, Any] 
     if extra_data:
         perf_data.update(extra_data)
 
-    logger.info(f"Performance: {operation} took {duration:.3f}s", extra=perf_data)
+    logger.info(
+    f"Performance: {operation} took {
+        duration:.3f}s",
+         extra=perf_data)
 
 
-def log_error(error: Exception, context: str = None, extra_data: Dict[str, Any] = None):
+def log_error(error: Exception, context: str = None,
+              extra_data: Dict[str, Any] = None):
     """Log error with structured information.
 
     Args:
@@ -274,7 +284,10 @@ def log_error(error: Exception, context: str = None, extra_data: Dict[str, Any] 
     if extra_data:
         error_data.update(extra_data)
 
-    logger.error(f"Error in {context}: {error}", exc_info=True, extra=error_data)
+    logger.error(
+    f"Error in {context}: {error}",
+    exc_info=True,
+     extra=error_data)
 
 
 # Context manager for correlation tracking

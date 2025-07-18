@@ -5,27 +5,19 @@ This module provides advanced task allocation and prioritization capabilities
 using machine learning and intelligent decision-making algorithms.
 """
 
-import asyncio
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple, Set
-from dataclasses import dataclass, field
-from enum import Enum
 import json
+import logging
 import sqlite3
-import numpy as np
-from collections import defaultdict, deque
-import heapq
 import uuid
+from collections import defaultdict
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
-from advanced_orchestration.models import (
-    AgentInfo, TaskAssignment, TaskStatus, AgentStatus, ResourceRequirements
-)
-from ml_enhancements.models import MLConfig
-from agent_coordination_protocols import (
-    AgentCoordinationProtocols, MessageType, Priority, CoordinationStrategy
-)
+import numpy as np
 
+from advanced_orchestration.models import AgentInfo, ResourceRequirements
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +77,7 @@ class TaskMetrics:
             'quality_score': self.quality_score,
             'error_count': self.error_count,
             'retry_count': self.retry_count,
-            'success': self.success
-        }
+            'success': self.success}
 
 
 @dataclass
@@ -190,12 +181,16 @@ class AgentPerformanceProfile:
         # Calculate performance trend
         if len(self.recent_performance) >= 5:
             recent_avg = np.mean(self.recent_performance[-5:])
-            older_avg = np.mean(self.recent_performance[:-5]) if len(self.recent_performance) > 5 else recent_avg
+            older_avg = np.mean(
+                self.recent_performance[:-5]) if len(self.recent_performance) > 5 else recent_avg
             self.performance_trend = recent_avg - older_avg
 
         self.last_updated = datetime.now()
 
-    def get_performance_score(self, task_type: str, complexity: TaskComplexity) -> float:
+    def get_performance_score(
+            self,
+            task_type: str,
+            complexity: TaskComplexity) -> float:
         """Get performance score for a specific task type and complexity."""
         base_score = self.task_types.get(task_type, 0.5)
         complexity_factor = self.complexity_handling.get(complexity, 0.5)
@@ -213,7 +208,9 @@ class AgentPerformanceProfile:
         return {
             'agent_id': self.agent_id,
             'task_types': self.task_types,
-            'complexity_handling': {k.value: v for k, v in self.complexity_handling.items()},
+            'complexity_handling': {
+                k.value: v for k,
+                v in self.complexity_handling.items()},
             'resource_efficiency': self.resource_efficiency,
             'reliability_score': self.reliability_score,
             'throughput_score': self.throughput_score,
@@ -226,8 +223,7 @@ class AgentPerformanceProfile:
             'average_quality': self.average_quality,
             'recent_performance': self.recent_performance,
             'performance_trend': self.performance_trend,
-            'last_updated': self.last_updated.isoformat()
-        }
+            'last_updated': self.last_updated.isoformat()}
 
 
 class IntelligentTaskAllocator:
@@ -413,7 +409,8 @@ class IntelligentTaskAllocator:
         # Learn from task submission pattern
         await self._learn_task_pattern(task)
 
-        self.logger.info(f"Task {task_id} submitted with priority {priority.name}")
+        self.logger.info(
+            f"Task {task_id} submitted with priority {priority.name}")
         return task
 
     async def allocate_task(
@@ -438,21 +435,24 @@ class IntelligentTaskAllocator:
         try:
             # Check dependencies
             if not await self._check_dependencies(task):
-                self.logger.debug(f"Task {task.task_id} dependencies not satisfied")
+                self.logger.debug(
+                    f"Task {task.task_id} dependencies not satisfied")
                 return None
 
             # Filter suitable agents
             suitable_agents = await self._filter_suitable_agents(task, available_agents)
 
             if not suitable_agents:
-                self.logger.warning(f"No suitable agents found for task {task.task_id}")
+                self.logger.warning(
+                    f"No suitable agents found for task {task.task_id}")
                 return None
 
             # Select best agent using strategy
             selected_agent = await self._select_best_agent(task, suitable_agents, strategy)
 
             if not selected_agent:
-                self.logger.warning(f"No agent selected for task {task.task_id}")
+                self.logger.warning(
+                    f"No agent selected for task {task.task_id}")
                 return None
 
             # Perform allocation
@@ -463,14 +463,18 @@ class IntelligentTaskAllocator:
                 allocation_time = (datetime.now() - start_time).total_seconds()
                 await self._update_allocation_metrics(task, selected_agent.agent_id, allocation_time, True)
 
-                self.logger.info(f"Task {task.task_id} allocated to agent {selected_agent.agent_id}")
+                self.logger.info(
+                    f"Task {
+                        task.task_id} allocated to agent {
+                        selected_agent.agent_id}")
                 return selected_agent.agent_id
             else:
                 await self._update_allocation_metrics(task, selected_agent.agent_id, 0, False)
                 return None
 
         except Exception as e:
-            self.logger.error(f"Task allocation failed for {task.task_id}: {e}")
+            self.logger.error(
+                f"Task allocation failed for {task.task_id}: {e}")
             await self._update_allocation_metrics(task, "", 0, False)
             return None
 
@@ -528,12 +532,14 @@ class IntelligentTaskAllocator:
         await self._learn_from_completion(task, task_metrics)
 
         # Update workload
-        self.agent_workloads[agent_id] = max(0, self.agent_workloads[agent_id] - 1)
+        self.agent_workloads[agent_id] = max(
+            0, self.agent_workloads[agent_id] - 1)
 
         # Store in database
         await self._store_task_completion(task_metrics)
 
-        self.logger.info(f"Task {task_id} completed by agent {agent_id} (success: {success})")
+        self.logger.info(
+            f"Task {task_id} completed by agent {agent_id} (success: {success})")
 
     async def get_task_recommendations(
         self,
@@ -587,12 +593,15 @@ class IntelligentTaskAllocator:
             strategy_performance[strategy] = performance
 
         # Select best performing strategy
-        best_strategy = max(strategy_performance, key=lambda s: strategy_performance[s]['overall_score'])
+        best_strategy = max(
+            strategy_performance,
+            key=lambda s: strategy_performance[s]['overall_score'])
 
         self.logger.info(f"Optimal allocation strategy: {best_strategy.name}")
         return best_strategy
 
-    async def rebalance_workloads(self, agents: List[AgentInfo]) -> Dict[str, List[str]]:
+    async def rebalance_workloads(
+            self, agents: List[AgentInfo]) -> Dict[str, List[str]]:
         """
         Rebalance workloads across agents for optimal performance.
 
@@ -611,8 +620,14 @@ class IntelligentTaskAllocator:
 
         # Identify overloaded and underloaded agents
         avg_load = sum(agent_loads.values()) / len(agent_loads)
-        overloaded_agents = [aid for aid, load in agent_loads.items() if load > avg_load * 1.5]
-        underloaded_agents = [aid for aid, load in agent_loads.items() if load < avg_load * 0.5]
+        overloaded_agents = [
+            aid for aid,
+            load in agent_loads.items() if load > avg_load *
+            1.5]
+        underloaded_agents = [
+            aid for aid,
+            load in agent_loads.items() if load < avg_load *
+            0.5]
 
         # Plan task reassignments
         for overloaded_agent in overloaded_agents:
@@ -675,8 +690,9 @@ class IntelligentTaskAllocator:
             'success_probability': success_probability,
             'predicted_quality': predicted_quality,
             'predicted_resources': predicted_resources,
-            'confidence': self._calculate_prediction_confidence(task, agent_profile)
-        }
+            'confidence': self._calculate_prediction_confidence(
+                task,
+                agent_profile)}
 
     async def _add_to_queue(self, task: IntelligentTask) -> None:
         """Add task to the priority queue."""
@@ -717,7 +733,8 @@ class IntelligentTaskAllocator:
                 continue
 
             # Check resource requirements
-            if not self._check_resource_compatibility(task.requirements, agent):
+            if not self._check_resource_compatibility(
+                    task.requirements, agent):
                 continue
 
             # Check agent capabilities
@@ -758,28 +775,32 @@ class IntelligentTaskAllocator:
         else:
             return suitable_agents[0] if suitable_agents else None
 
-    async def _select_round_robin(self, suitable_agents: List[AgentInfo]) -> Optional[AgentInfo]:
+    async def _select_round_robin(
+            self, suitable_agents: List[AgentInfo]) -> Optional[AgentInfo]:
         """Select agent using round-robin strategy."""
         if not suitable_agents:
             return None
 
         # Simple round-robin based on allocation count
-        agent_allocations = {agent.agent_id: self.agent_workloads[agent.agent_id] for agent in suitable_agents}
+        agent_allocations = {
+            agent.agent_id: self.agent_workloads[agent.agent_id] for agent in suitable_agents}
         min_allocations = min(agent_allocations.values())
 
         # Find agents with minimum allocations
         candidates = [agent for agent in suitable_agents
-                     if agent_allocations[agent.agent_id] == min_allocations]
+                      if agent_allocations[agent.agent_id] == min_allocations]
 
         return candidates[0]
 
-    async def _select_load_balanced(self, suitable_agents: List[AgentInfo]) -> Optional[AgentInfo]:
+    async def _select_load_balanced(
+            self, suitable_agents: List[AgentInfo]) -> Optional[AgentInfo]:
         """Select agent using load balancing strategy."""
         if not suitable_agents:
             return None
 
         # Select agent with lowest current workload
-        return min(suitable_agents, key=lambda a: self.agent_workloads[a.agent_id])
+        return min(suitable_agents,
+                   key=lambda a: self.agent_workloads[a.agent_id])
 
     async def _select_capability_based(
         self,
@@ -817,7 +838,8 @@ class IntelligentTaskAllocator:
         for agent in suitable_agents:
             if agent.agent_id in self.agent_profiles:
                 profile = self.agent_profiles[agent.agent_id]
-                score = profile.get_performance_score(task.task_type, task.complexity)
+                score = profile.get_performance_score(
+                    task.task_type, task.complexity)
                 agent_scores.append((agent, score))
 
         if not agent_scores:
@@ -851,14 +873,17 @@ class IntelligentTaskAllocator:
             # Performance score
             if agent.agent_id in self.agent_profiles:
                 profile = self.agent_profiles[agent.agent_id]
-                score_components['performance'] = profile.get_performance_score(task.task_type, task.complexity)
+                score_components['performance'] = profile.get_performance_score(
+                    task.task_type, task.complexity)
 
             # Capability score
             score_components['capability'] = await self._calculate_capability_score(task, agent)
 
             # Load score (inverse of current workload)
-            max_load = max(self.agent_workloads.values()) if self.agent_workloads else 1
-            max_load = max(max_load, 1)  # Ensure max_load is at least 1 to avoid division by zero
+            max_load = max(self.agent_workloads.values()
+                           ) if self.agent_workloads else 1
+            # Ensure max_load is at least 1 to avoid division by zero
+            max_load = max(max_load, 1)
             current_load = self.agent_workloads.get(agent.agent_id, 0)
             score_components['load'] = 1.0 - (current_load / max_load)
 
@@ -881,7 +906,10 @@ class IntelligentTaskAllocator:
 
         return agent_scores[0][0]
 
-    async def _perform_allocation(self, task: IntelligentTask, agent: AgentInfo) -> bool:
+    async def _perform_allocation(
+            self,
+            task: IntelligentTask,
+            agent: AgentInfo) -> bool:
         """Perform the actual task allocation."""
         try:
             # Move task to active tasks
@@ -906,20 +934,27 @@ class IntelligentTaskAllocator:
             return True
 
         except Exception as e:
-            self.logger.error(f"Allocation failed for task {task.task_id} to agent {agent.agent_id}: {e}")
+            self.logger.error(
+                f"Allocation failed for task {
+                    task.task_id} to agent {
+                    agent.agent_id}: {e}")
             return False
 
-    async def _estimate_task_duration(self, task_type: str, complexity: TaskComplexity) -> float:
+    async def _estimate_task_duration(
+            self,
+            task_type: str,
+            complexity: TaskComplexity) -> float:
         """Estimate task duration based on historical data."""
         # Get historical data for similar tasks
         similar_tasks = [
-            metrics for metrics in self.completed_tasks.values()
-            if metrics.task_id in [t.task_id for t in self.task_queue + list(self.active_tasks.values())
-                                  if t.task_type == task_type and t.complexity == complexity]
-        ]
+            metrics for metrics in self.completed_tasks.values() if metrics.task_id in [
+                t.task_id for t in self.task_queue +
+                list(
+                    self.active_tasks.values()) if t.task_type == task_type and t.complexity == complexity]]
 
         if similar_tasks:
-            durations = [t.execution_duration for t in similar_tasks if t.execution_duration]
+            durations = [
+                t.execution_duration for t in similar_tasks if t.execution_duration]
             if durations:
                 return np.mean(durations)
 
@@ -935,7 +970,10 @@ class IntelligentTaskAllocator:
 
     async def _learn_task_pattern(self, task: IntelligentTask) -> None:
         """Learn from task submission patterns."""
-        pattern_key = f"{task.task_type}_{task.complexity.value}_{task.priority.value}"
+        pattern_key = f"{
+            task.task_type}_{
+            task.complexity.value}_{
+            task.priority.value}"
 
         pattern_data = {
             'task_type': task.task_type,
@@ -988,7 +1026,8 @@ class IntelligentTaskAllocator:
         )
 
         # Update complexity handling
-        complexity_score = profile.complexity_handling.get(task.complexity, 0.5)
+        complexity_score = profile.complexity_handling.get(
+            task.complexity, 0.5)
         profile.complexity_handling[task.complexity] = (
             complexity_score * (1 - learning_rate) + task_score * learning_rate
         )
@@ -997,9 +1036,11 @@ class IntelligentTaskAllocator:
         for resource, utilization in task_metrics.resource_utilization.items():
             current_efficiency = profile.resource_efficiency.get(resource, 0.5)
             # Lower utilization with success = higher efficiency
-            efficiency_score = (1.0 - utilization) * task_score if task_score > 0 else 0.0
+            efficiency_score = (1.0 - utilization) * \
+                task_score if task_score > 0 else 0.0
             profile.resource_efficiency[resource] = (
-                current_efficiency * (1 - learning_rate) + efficiency_score * learning_rate
+                current_efficiency * (1 - learning_rate) +
+                efficiency_score * learning_rate
             )
 
         # Update quality score
@@ -1008,7 +1049,10 @@ class IntelligentTaskAllocator:
             task_metrics.quality_score * learning_rate
         )
 
-    async def _learn_from_completion(self, task: IntelligentTask, task_metrics: TaskMetrics) -> None:
+    async def _learn_from_completion(
+            self,
+            task: IntelligentTask,
+            task_metrics: TaskMetrics) -> None:
         """Learn from task completion."""
         # Update task preferences
         if task_metrics.success and task_metrics.quality_score > 0.8:
@@ -1019,9 +1063,11 @@ class IntelligentTaskAllocator:
                     if t.task_type == task.task_type and t.complexity == task.complexity
                 ]
 
-                for similar_task in similar_tasks[:5]:  # Limit to 5 similar tasks
+                # Limit to 5 similar tasks
+                for similar_task in similar_tasks[:5]:
                     if task_metrics.allocated_agent not in similar_task.preferred_agents:
-                        similar_task.preferred_agents.append(task_metrics.allocated_agent)
+                        similar_task.preferred_agents.append(
+                            task_metrics.allocated_agent)
 
         elif not task_metrics.success or task_metrics.quality_score < 0.3:
             # Add to blacklisted agents for similar tasks
@@ -1032,7 +1078,8 @@ class IntelligentTaskAllocator:
 
             for similar_task in similar_tasks[:5]:
                 if task_metrics.allocated_agent not in similar_task.blacklisted_agents:
-                    similar_task.blacklisted_agents.append(task_metrics.allocated_agent)
+                    similar_task.blacklisted_agents.append(
+                        task_metrics.allocated_agent)
 
     async def _update_allocation_metrics(
         self,
@@ -1054,7 +1101,8 @@ class IntelligentTaskAllocator:
         current_avg = self.allocation_metrics['average_allocation_time']
         if total_allocations > 0:
             self.allocation_metrics['average_allocation_time'] = (
-                (current_avg * (total_allocations - 1) + allocation_time) / total_allocations
+                (current_avg * (total_allocations - 1) +
+                 allocation_time) / total_allocations
             )
 
     async def _store_task_completion(self, task_metrics: TaskMetrics) -> None:
@@ -1078,7 +1126,10 @@ class IntelligentTaskAllocator:
             ))
             conn.commit()
 
-    def _compare_task_priority(self, task1: IntelligentTask, task2: IntelligentTask) -> bool:
+    def _compare_task_priority(
+            self,
+            task1: IntelligentTask,
+            task2: IntelligentTask) -> bool:
         """Compare task priorities for queue ordering."""
         # Higher priority comes first
         if task1.priority.value != task2.priority.value:
@@ -1113,7 +1164,10 @@ class IntelligentTaskAllocator:
             allocation.allocated_network >= requirements.network_mbps
         )
 
-    def _check_capability_match(self, task: IntelligentTask, agent: AgentInfo) -> bool:
+    def _check_capability_match(
+            self,
+            task: IntelligentTask,
+            agent: AgentInfo) -> bool:
         """Check if agent capabilities match task requirements."""
         if not agent.registration.capabilities:
             return True  # Assume compatible if no capability info
@@ -1123,9 +1177,13 @@ class IntelligentTaskAllocator:
         if not task_capabilities:
             return True
 
-        return any(cap in agent.registration.capabilities for cap in task_capabilities)
+        return any(
+            cap in agent.registration.capabilities for cap in task_capabilities)
 
-    async def _calculate_capability_score(self, task: IntelligentTask, agent: AgentInfo) -> float:
+    async def _calculate_capability_score(
+            self,
+            task: IntelligentTask,
+            agent: AgentInfo) -> float:
         """Calculate capability match score."""
         if not agent.registration.capabilities:
             return 0.5  # Default score
@@ -1151,7 +1209,8 @@ class IntelligentTaskAllocator:
     ) -> float:
         """Calculate recommendation score for a task-agent pair."""
         # Base performance score
-        performance_score = agent_profile.get_performance_score(task.task_type, task.complexity)
+        performance_score = agent_profile.get_performance_score(
+            task.task_type, task.complexity)
 
         # Adjust for agent preference
         preference_bonus = 0.2 if agent_profile.agent_id in task.preferred_agents else 0.0
@@ -1168,10 +1227,12 @@ class IntelligentTaskAllocator:
             elif time_to_deadline < 7200:  # Less than 2 hours
                 deadline_bonus = 0.1
 
-        total_score = performance_score + preference_bonus - workload_penalty + deadline_bonus
+        total_score = performance_score + preference_bonus - \
+            workload_penalty + deadline_bonus
         return max(0.0, min(1.0, total_score))
 
-    async def _analyze_strategy_performance(self, strategy: AllocationStrategy) -> Dict[str, float]:
+    async def _analyze_strategy_performance(
+            self, strategy: AllocationStrategy) -> Dict[str, float]:
         """Analyze performance of an allocation strategy."""
         # This would analyze historical allocation data
         # For now, return default scores
@@ -1187,9 +1248,9 @@ class IntelligentTaskAllocator:
         """Identify tasks that can be reassigned from an overloaded agent."""
         # Find active tasks for this agent
         agent_tasks = [
-            task_id for task_id, task in self.active_tasks.items()
-            if task_id in [t.task_id for t in self.task_queue if hasattr(t, 'allocated_agent') and t.allocated_agent == agent_id]
-        ]
+            task_id for task_id, task in self.active_tasks.items() if task_id in [
+                t.task_id for t in self.task_queue if hasattr(
+                    t, 'allocated_agent') and t.allocated_agent == agent_id]]
 
         # Return tasks that can be reassigned (e.g., not started yet)
         return agent_tasks[:min(2, len(agent_tasks))]  # Limit reassignments
@@ -1212,7 +1273,8 @@ class IntelligentTaskAllocator:
         for agent_id in candidate_agents:
             if agent_id in self.agent_profiles:
                 profile = self.agent_profiles[agent_id]
-                score = profile.get_performance_score(task.task_type, task.complexity)
+                score = profile.get_performance_score(
+                    task.task_type, task.complexity)
 
                 if score > best_score:
                     best_score = score
@@ -1230,7 +1292,8 @@ class IntelligentTaskAllocator:
         base_duration = task.estimated_duration
 
         # Adjust based on agent performance
-        performance_factor = agent_profile.get_performance_score(task.task_type, task.complexity)
+        performance_factor = agent_profile.get_performance_score(
+            task.task_type, task.complexity)
 
         # Better performance = faster execution
         adjusted_duration = base_duration * (2.0 - performance_factor)
@@ -1244,7 +1307,8 @@ class IntelligentTaskAllocator:
     ) -> float:
         """Predict probability of task success."""
         # Base probability from agent performance
-        base_probability = agent_profile.get_performance_score(task.task_type, task.complexity)
+        base_probability = agent_profile.get_performance_score(
+            task.task_type, task.complexity)
 
         # Adjust based on agent reliability
         reliability_factor = agent_profile.reliability_score
@@ -1291,7 +1355,8 @@ class IntelligentTaskAllocator:
         for resource, base_util in base_utilization.items():
             efficiency = agent_profile.resource_efficiency.get(resource, 0.5)
             # Higher efficiency = lower utilization
-            predicted_utilization[resource] = base_util * (1.0 - efficiency * 0.3)
+            predicted_utilization[resource] = base_util * \
+                (1.0 - efficiency * 0.3)
 
         return predicted_utilization
 

@@ -6,14 +6,14 @@ across multiple agents while maintaining quality gates and coordination protocol
 """
 
 import asyncio
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import json
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
-from ..feedback_loops import FeedbackSignal, FeedbackType, FeedbackPriority
+from ..feedback_loops import FeedbackPriority, FeedbackSignal, FeedbackType
 
 
 class ComponentStatus(Enum):
@@ -124,9 +124,14 @@ class ComponentWorkflowManager:
 
         self.logger.info("ComponentWorkflowManager initialized")
 
-    def create_pr_breakdown_workflow(self, original_pr_info: Dict[str, Any]) -> Dict[str, Any]:
+    def create_pr_breakdown_workflow(
+            self, original_pr_info: Dict[str, Any]) -> Dict[str, Any]:
         """Create a structured workflow for breaking down a large PR."""
-        workflow_id = f"pr_breakdown_{original_pr_info.get('number', 'unknown')}_{int(datetime.now().timestamp())}"
+        workflow_id = f"pr_breakdown_{
+            original_pr_info.get(
+                'number', 'unknown')}_{
+            int(
+                datetime.now().timestamp())}"
 
         # Analyze PR content for component breakdown
         components = self._analyze_pr_for_components(original_pr_info)
@@ -137,12 +142,20 @@ class ComponentWorkflowManager:
                 id=component_info["id"],
                 name=component_info["name"],
                 description=component_info["description"],
-                priority=ComponentPriority(component_info["priority"]),
+                priority=ComponentPriority(
+                    component_info["priority"]),
                 estimated_lines=component_info["estimated_lines"],
-                dependencies=component_info.get("dependencies", []),
-                responsible_agent=component_info.get("responsible_agent", ""),
-                target_pr_number=f"{original_pr_info.get('number', 'unknown')}.{component_info['sequence']}"
-            )
+                dependencies=component_info.get(
+                    "dependencies",
+                    []),
+                responsible_agent=component_info.get(
+                    "responsible_agent",
+                    ""),
+                target_pr_number=f"{
+                    original_pr_info.get(
+                        'number',
+                        'unknown')}.{
+                            component_info['sequence']}")
             self.components[component.id] = component
 
         # Create milestones
@@ -173,65 +186,57 @@ class ComponentWorkflowManager:
             "parallel_tracks": self._identify_parallel_tracks(components)
         }
 
-    def _analyze_pr_for_components(self, pr_info: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _analyze_pr_for_components(
+            self, pr_info: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Analyze PR content to identify natural component boundaries."""
         # This would normally analyze the actual PR content
         # For now, return the structured breakdown from the coordination alert
 
-        return [
-            {
-                "id": "api_gateway",
-                "name": "API Gateway Foundation",
-                "description": "Core gateway logic with routing and middleware",
-                "priority": "critical",
-                "estimated_lines": 800,
-                "dependencies": [],
-                "responsible_agent": "integration_agent",
-                "sequence": 1
-            },
-            {
-                "id": "service_discovery",
-                "name": "Service Discovery System",
-                "description": "Discovery mechanisms and service registration",
-                "priority": "high",
-                "estimated_lines": 600,
-                "dependencies": ["api_gateway"],
-                "responsible_agent": "integration_agent",
-                "sequence": 2
-            },
-            {
-                "id": "github_integration",
-                "name": "GitHub Integration",
-                "description": "GitHub API wrapper with webhooks and authentication",
-                "priority": "high",
-                "estimated_lines": 800,
-                "dependencies": ["api_gateway"],
-                "responsible_agent": "integration_agent",
-                "sequence": 3
-            },
-            {
-                "id": "slack_integration",
-                "name": "Slack Integration",
-                "description": "Slack API integration with bot functionality",
-                "priority": "medium",
-                "estimated_lines": 700,
-                "dependencies": ["api_gateway"],
-                "responsible_agent": "integration_agent",
-                "sequence": 4
-            },
-            {
-                "id": "integration_manager",
-                "name": "Integration Manager",
-                "description": "Coordination logic and workflow management",
-                "priority": "high",
-                "estimated_lines": 1000,
-                "dependencies": ["service_discovery", "github_integration", "slack_integration"],
-                "responsible_agent": "integration_agent",
-                "sequence": 5
-            }
-        ]
+        return [{"id": "api_gateway",
+                 "name": "API Gateway Foundation",
+                 "description": "Core gateway logic with routing and middleware",
+                 "priority": "critical",
+                 "estimated_lines": 800,
+                 "dependencies": [],
+                 "responsible_agent": "integration_agent",
+                 "sequence": 1},
+                {"id": "service_discovery",
+                 "name": "Service Discovery System",
+                 "description": "Discovery mechanisms and service registration",
+                 "priority": "high",
+                 "estimated_lines": 600,
+                 "dependencies": ["api_gateway"],
+                 "responsible_agent": "integration_agent",
+                 "sequence": 2},
+                {"id": "github_integration",
+                 "name": "GitHub Integration",
+                 "description": "GitHub API wrapper with webhooks and authentication",
+                 "priority": "high",
+                 "estimated_lines": 800,
+                 "dependencies": ["api_gateway"],
+                 "responsible_agent": "integration_agent",
+                 "sequence": 3},
+                {"id": "slack_integration",
+                 "name": "Slack Integration",
+                 "description": "Slack API integration with bot functionality",
+                 "priority": "medium",
+                 "estimated_lines": 700,
+                 "dependencies": ["api_gateway"],
+                 "responsible_agent": "integration_agent",
+                 "sequence": 4},
+                {"id": "integration_manager",
+                 "name": "Integration Manager",
+                 "description": "Coordination logic and workflow management",
+                 "priority": "high",
+                 "estimated_lines": 1000,
+                 "dependencies": ["service_discovery",
+                                  "github_integration",
+                                  "slack_integration"],
+                 "responsible_agent": "integration_agent",
+                 "sequence": 5}]
 
-    def _create_workflow_milestones(self, components: List[Dict[str, Any]]) -> List[WorkflowMilestone]:
+    def _create_workflow_milestones(
+            self, components: List[Dict[str, Any]]) -> List[WorkflowMilestone]:
         """Create workflow milestones based on component dependencies."""
         milestones = []
 
@@ -282,7 +287,8 @@ class ComponentWorkflowManager:
 
         return milestones
 
-    def _create_quality_gates(self, components: List[Dict[str, Any]]) -> List[QualityGate]:
+    def _create_quality_gates(
+            self, components: List[Dict[str, Any]]) -> List[QualityGate]:
         """Create quality gates for component validation."""
         gates = []
 
@@ -352,7 +358,8 @@ class ComponentWorkflowManager:
 
         return gates
 
-    def _estimate_workflow_duration(self, components: List[Dict[str, Any]]) -> timedelta:
+    def _estimate_workflow_duration(
+            self, components: List[Dict[str, Any]]) -> timedelta:
         """Estimate total workflow duration based on components."""
         # Calculate based on dependencies and parallel processing
         dependency_chains = self._analyze_dependency_chains(components)
@@ -362,7 +369,8 @@ class ComponentWorkflowManager:
         for chain in dependency_chains:
             chain_duration = timedelta(0)
             for component_id in chain:
-                component = next(c for c in components if c["id"] == component_id)
+                component = next(
+                    c for c in components if c["id"] == component_id)
                 # Estimate 1 week per 500 lines of code
                 estimated_weeks = max(1, component["estimated_lines"] // 500)
                 chain_duration += timedelta(weeks=estimated_weeks)
@@ -371,7 +379,8 @@ class ComponentWorkflowManager:
 
         return max_duration
 
-    def _identify_parallel_tracks(self, components: List[Dict[str, Any]]) -> List[List[str]]:
+    def _identify_parallel_tracks(
+            self, components: List[Dict[str, Any]]) -> List[List[str]]:
         """Identify components that can be developed in parallel."""
         parallel_tracks = []
 
@@ -384,7 +393,8 @@ class ComponentWorkflowManager:
 
         return parallel_tracks
 
-    def _analyze_dependency_chains(self, components: List[Dict[str, Any]]) -> List[List[str]]:
+    def _analyze_dependency_chains(
+            self, components: List[Dict[str, Any]]) -> List[List[str]]:
         """Analyze dependency chains to identify critical paths."""
         chains = []
 
@@ -416,7 +426,8 @@ class ComponentWorkflowManager:
 
         return chains
 
-    def _group_by_dependencies(self, components: List[Dict[str, Any]]) -> List[List[Dict[str, Any]]]:
+    def _group_by_dependencies(
+            self, components: List[Dict[str, Any]]) -> List[List[Dict[str, Any]]]:
         """Group components that can be developed in parallel."""
         groups = []
 
@@ -434,13 +445,17 @@ class ComponentWorkflowManager:
             dependency_patterns[deps].append(component)
 
         for pattern, group in dependency_patterns.items():
-            if pattern and len(group) > 1:  # Skip empty dependencies and single components
+            # Skip empty dependencies and single components
+            if pattern and len(group) > 1:
                 groups.append(group)
 
         return groups
 
-    def update_component_status(self, component_id: str, status: ComponentStatus,
-                              progress_data: Dict[str, Any] = None) -> None:
+    def update_component_status(self,
+                                component_id: str,
+                                status: ComponentStatus,
+                                progress_data: Dict[str,
+                                                    Any] = None) -> None:
         """Update component status and progress."""
         if component_id not in self.components:
             raise ValueError(f"Component {component_id} not found")
@@ -452,11 +467,16 @@ class ComponentWorkflowManager:
         component.updated_at = datetime.now()
 
         if progress_data:
-            component.implementation_progress = progress_data.get("implementation_progress", component.implementation_progress)
-            component.testing_progress = progress_data.get("testing_progress", component.testing_progress)
-            component.documentation_progress = progress_data.get("documentation_progress", component.documentation_progress)
-            component.actual_lines = progress_data.get("actual_lines", component.actual_lines)
-            component.test_coverage = progress_data.get("test_coverage", component.test_coverage)
+            component.implementation_progress = progress_data.get(
+                "implementation_progress", component.implementation_progress)
+            component.testing_progress = progress_data.get(
+                "testing_progress", component.testing_progress)
+            component.documentation_progress = progress_data.get(
+                "documentation_progress", component.documentation_progress)
+            component.actual_lines = progress_data.get(
+                "actual_lines", component.actual_lines)
+            component.test_coverage = progress_data.get(
+                "test_coverage", component.test_coverage)
 
         if status == ComponentStatus.COMPLETED:
             component.completed_at = datetime.now()
@@ -472,7 +492,8 @@ class ComponentWorkflowManager:
         # Check if this triggers any milestone completion
         self._check_milestone_completion()
 
-    def validate_quality_gate(self, gate_id: str, validation_results: Dict[str, Any]) -> bool:
+    def validate_quality_gate(
+            self, gate_id: str, validation_results: Dict[str, Any]) -> bool:
         """Validate a quality gate with provided results."""
         if gate_id not in self.quality_gates:
             raise ValueError(f"Quality gate {gate_id} not found")
@@ -488,7 +509,8 @@ class ComponentWorkflowManager:
         # Check manual review if required
         manual_passed = True
         if gate.manual_review_required:
-            manual_passed = validation_results.get("manual_review_passed", False)
+            manual_passed = validation_results.get(
+                "manual_review_passed", False)
 
         # Overall validation result
         gate_passed = automated_passed and manual_passed
@@ -537,7 +559,8 @@ class ComponentWorkflowManager:
                     "duration_variance": (milestone.actual_completion - milestone.target_date).days
                 })
 
-    def _log_workflow_event(self, event_type: str, event_data: Dict[str, Any]) -> None:
+    def _log_workflow_event(self, event_type: str,
+                            event_data: Dict[str, Any]) -> None:
         """Log workflow event for tracking and analysis."""
         event = {
             "timestamp": datetime.now().isoformat(),
@@ -563,7 +586,8 @@ class ComponentWorkflowManager:
         # Milestone status summary
         milestone_status = {}
         for milestone in self.milestones.values():
-            milestone_status[milestone.status] = milestone_status.get(milestone.status, 0) + 1
+            milestone_status[milestone.status] = milestone_status.get(
+                milestone.status, 0) + 1
 
         # Quality gate status summary
         gate_status = {}
@@ -572,8 +596,10 @@ class ComponentWorkflowManager:
 
         # Overall progress
         total_components = len(self.components)
-        completed_components = len([c for c in self.components.values() if c.status == ComponentStatus.COMPLETED])
-        overall_progress = (completed_components / total_components) * 100 if total_components > 0 else 0
+        completed_components = len(
+            [c for c in self.components.values() if c.status == ComponentStatus.COMPLETED])
+        overall_progress = (completed_components / total_components) * \
+            100 if total_components > 0 else 0
 
         return {
             "overall_progress": overall_progress,
@@ -640,18 +666,22 @@ class ComponentWorkflowManager:
         workflow_status = self.get_workflow_status()
 
         # Calculate timing metrics
-        started_components = [c for c in self.components.values() if c.status != ComponentStatus.PLANNED]
+        started_components = [c for c in self.components.values(
+        ) if c.status != ComponentStatus.PLANNED]
         avg_completion_time = None
 
         if started_components:
             completion_times = []
             for component in started_components:
                 if component.completed_at:
-                    duration = (component.completed_at - component.created_at).total_seconds() / 3600  # hours
+                    duration = (component.completed_at -
+                                # hours
+                                component.created_at).total_seconds() / 3600
                     completion_times.append(duration)
 
             if completion_times:
-                avg_completion_time = sum(completion_times) / len(completion_times)
+                avg_completion_time = sum(
+                    completion_times) / len(completion_times)
 
         # Identify bottlenecks
         bottlenecks = []
@@ -679,7 +709,8 @@ class ComponentWorkflowManager:
 
     def _calculate_milestone_adherence(self) -> float:
         """Calculate milestone adherence percentage."""
-        completed_milestones = [m for m in self.milestones.values() if m.status == "completed"]
+        completed_milestones = [
+            m for m in self.milestones.values() if m.status == "completed"]
 
         if not completed_milestones:
             return 0.0
@@ -696,9 +727,12 @@ class ComponentWorkflowManager:
         recommendations = []
 
         # Check for blocked components
-        blocked_components = [c for c in self.components.values() if c.status == ComponentStatus.BLOCKED]
+        blocked_components = [c for c in self.components.values(
+        ) if c.status == ComponentStatus.BLOCKED]
         if blocked_components:
-            recommendations.append(f"Address {len(blocked_components)} blocked components to improve workflow velocity")
+            recommendations.append(
+                f"Address {
+                    len(blocked_components)} blocked components to improve workflow velocity")
 
         # Check for low test coverage
         low_coverage_components = [
@@ -706,7 +740,9 @@ class ComponentWorkflowManager:
             if c.test_coverage and c.test_coverage < self.min_test_coverage
         ]
         if low_coverage_components:
-            recommendations.append(f"Improve test coverage for {len(low_coverage_components)} components")
+            recommendations.append(
+                f"Improve test coverage for {
+                    len(low_coverage_components)} components")
 
         # Check for oversized components
         oversized_components = [
@@ -714,7 +750,9 @@ class ComponentWorkflowManager:
             if c.actual_lines and c.actual_lines > self.max_component_lines
         ]
         if oversized_components:
-            recommendations.append(f"Consider further breaking down {len(oversized_components)} oversized components")
+            recommendations.append(
+                f"Consider further breaking down {
+                    len(oversized_components)} oversized components")
 
         # Check for milestone delays
         delayed_milestones = [
@@ -722,6 +760,7 @@ class ComponentWorkflowManager:
             if m.target_date < datetime.now() and m.status != "completed"
         ]
         if delayed_milestones:
-            recommendations.append(f"Address {len(delayed_milestones)} delayed milestones")
+            recommendations.append(
+                f"Address {len(delayed_milestones)} delayed milestones")
 
         return recommendations

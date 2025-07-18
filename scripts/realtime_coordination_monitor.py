@@ -5,19 +5,18 @@ Monitors coordination_alerts.json for events and triggers appropriate responses
 Event-driven coordination system built on existing accountability infrastructure
 """
 
-import os
-import json
-import time
 import asyncio
+import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
-from watchdog.observers import Observer
+from typing import Any, Dict
+
 from watchdog.events import FileSystemEventHandler
-import subprocess
+from watchdog.observers import Observer
 
 logger = logging.getLogger(__name__)
+
 
 class CoordinationEventHandler(FileSystemEventHandler):
     """Event handler for coordination alerts file changes."""
@@ -30,6 +29,7 @@ class CoordinationEventHandler(FileSystemEventHandler):
         """Handle file modification events."""
         if event.src_path.endswith('coordination_alerts.json'):
             asyncio.create_task(self.monitor.process_new_events())
+
 
 class RealTimeCoordinationMonitor:
     """Real-time coordination event monitor and response system."""
@@ -61,7 +61,8 @@ class RealTimeCoordinationMonitor:
         logger.info("🚀 Starting real-time coordination event monitoring...")
 
         if not self.alerts_file.exists():
-            logger.warning(f"Alerts file {self.alerts_file} does not exist - creating it")
+            logger.warning(
+                f"Alerts file {self.alerts_file} does not exist - creating it")
             self.alerts_file.touch()
 
         self.running = True
@@ -69,10 +70,13 @@ class RealTimeCoordinationMonitor:
         # Set up file system watcher
         event_handler = CoordinationEventHandler(self)
         self.observer = Observer()
-        self.observer.schedule(event_handler, str(self.alerts_file.parent), recursive=False)
+        self.observer.schedule(event_handler, str(
+            self.alerts_file.parent), recursive=False)
         self.observer.start()
 
-        logger.info(f"📡 Monitoring {self.alerts_file} for real-time coordination events")
+        logger.info(
+            f"📡 Monitoring {
+                self.alerts_file} for real-time coordination events")
 
         # Process any existing events
         await self.process_new_events()
@@ -131,7 +135,16 @@ class RealTimeCoordinationMonitor:
 
     def _get_event_id(self, event: Dict[str, Any]) -> str:
         """Generate unique event ID."""
-        return f"{event.get('type', 'unknown')}_{event.get('timestamp', '')}_{event.get('task_id', '')}"
+        return f"{
+            event.get(
+                'type',
+                'unknown')}_{
+            event.get(
+                'timestamp',
+                '')}_{
+                    event.get(
+                        'task_id',
+                        '')}"
 
     async def _process_event(self, event: Dict[str, Any]):
         """Process a single coordination event."""
@@ -156,7 +169,8 @@ class RealTimeCoordinationMonitor:
         agent_id = event.get('agent_id', 'unknown')
         escalation_level = event.get('escalation_level', 'unknown')
 
-        logger.warning(f"🚨 COORDINATION CRISIS: Task {task_id}, Agent {agent_id}, Level {escalation_level}")
+        logger.warning(
+            f"🚨 COORDINATION CRISIS: Task {task_id}, Agent {agent_id}, Level {escalation_level}")
 
         # Immediate actions for coordination crisis
         actions = []
@@ -164,14 +178,16 @@ class RealTimeCoordinationMonitor:
         if escalation_level == 'red':
             # Critical escalation - immediate intervention
             actions.extend([
-                self._notify_pm_agent(f"CRITICAL: Coordination crisis for task {task_id}"),
+                self._notify_pm_agent(
+                    f"CRITICAL: Coordination crisis for task {task_id}"),
                 self._attempt_agent_ping(agent_id),
                 self._trigger_emergency_reassignment(task_id, agent_id)
             ])
         elif escalation_level in ['orange', 'yellow']:
             # Warning escalation - monitoring and gentle intervention
             actions.extend([
-                self._notify_pm_agent(f"WARNING: Coordination issue for task {task_id}"),
+                self._notify_pm_agent(
+                    f"WARNING: Coordination issue for task {task_id}"),
                 self._send_agent_reminder(agent_id, task_id)
             ])
 
@@ -184,7 +200,8 @@ class RealTimeCoordinationMonitor:
         agent_id = event.get('agent_id', 'unknown')
         time_remaining = event.get('time_remaining', 'unknown')
 
-        logger.warning(f"⏰ DEADLINE WARNING: Task {task_id}, Agent {agent_id}, Time: {time_remaining}")
+        logger.warning(
+            f"⏰ DEADLINE WARNING: Task {task_id}, Agent {agent_id}, Time: {time_remaining}")
 
         await asyncio.gather(
             self._notify_pm_agent(f"Deadline approaching for task {task_id}"),
@@ -197,7 +214,8 @@ class RealTimeCoordinationMonitor:
         agent_id = event.get('agent_id', 'unknown')
         last_activity = event.get('last_activity', 'unknown')
 
-        logger.warning(f"😴 AGENT UNRESPONSIVE: {agent_id}, Last activity: {last_activity}")
+        logger.warning(
+            f"😴 AGENT UNRESPONSIVE: {agent_id}, Last activity: {last_activity}")
 
         await asyncio.gather(
             self._attempt_agent_ping(agent_id),
@@ -211,10 +229,12 @@ class RealTimeCoordinationMonitor:
         old_agent = event.get('old_agent', 'unknown')
         new_agent = event.get('new_agent', 'unknown')
 
-        logger.info(f"🔄 TASK REASSIGNMENT: {task_id} from {old_agent} to {new_agent}")
+        logger.info(
+            f"🔄 TASK REASSIGNMENT: {task_id} from {old_agent} to {new_agent}")
 
         await asyncio.gather(
-            self._notify_pm_agent(f"Task {task_id} reassigned from {old_agent} to {new_agent}"),
+            self._notify_pm_agent(
+                f"Task {task_id} reassigned from {old_agent} to {new_agent}"),
             self._notify_agent_assignment(new_agent, task_id),
             return_exceptions=True
         )
@@ -224,7 +244,8 @@ class RealTimeCoordinationMonitor:
         escalation_level = event.get('escalation_level', 'unknown')
         reason = event.get('reason', 'No reason provided')
 
-        logger.warning(f"📈 ESCALATION TRIGGER: Level {escalation_level} - {reason}")
+        logger.warning(
+            f"📈 ESCALATION TRIGGER: Level {escalation_level} - {reason}")
 
         await self._notify_pm_agent(f"Escalation triggered: {escalation_level} - {reason}")
 
@@ -237,7 +258,8 @@ class RealTimeCoordinationMonitor:
 
         # Emergency protocols require immediate PM agent notification
         await self._notify_pm_agent(
-            f"EMERGENCY: Protocol {protocol} activated. Details: {json.dumps(details)}"
+            f"EMERGENCY: Protocol {protocol} activated. Details: {
+    json.dumps(details)}"
         )
 
     async def _notify_pm_agent(self, message: str):
@@ -284,7 +306,8 @@ class RealTimeCoordinationMonitor:
             if process.returncode == 0:
                 logger.info(f"✅ Reminder sent to {agent_id}")
             else:
-                logger.warning(f"⚠️ Could not reach agent {agent_id}: {stderr.decode()}")
+                logger.warning(
+                    f"⚠️ Could not reach agent {agent_id}: {stderr.decode()}")
 
         except Exception as e:
             logger.error(f"Error sending reminder to {agent_id}: {e}")
@@ -292,7 +315,8 @@ class RealTimeCoordinationMonitor:
     async def _attempt_agent_ping(self, agent_id: str):
         """Attempt to ping agent for responsiveness check."""
         try:
-            ping_message = f"[PING {datetime.now().strftime('%H:%M:%S')}] Health check - please respond with your current status"
+            ping_message = f"[PING {
+                datetime.now().strftime('%H:%M:%S')}] Health check - please respond with your current status"
 
             process = await asyncio.create_subprocess_exec(
                 'python3', 'scripts/fixed_agent_communication.py',
@@ -312,10 +336,12 @@ class RealTimeCoordinationMonitor:
         except Exception as e:
             logger.error(f"Error pinging {agent_id}: {e}")
 
-    async def _trigger_emergency_reassignment(self, task_id: str, failed_agent_id: str):
+    async def _trigger_emergency_reassignment(
+            self, task_id: str, failed_agent_id: str):
         """Trigger emergency task reassignment."""
         try:
-            logger.warning(f"🔄 Triggering emergency reassignment for task {task_id}")
+            logger.warning(
+                f"🔄 Triggering emergency reassignment for task {task_id}")
 
             # Use accountability system for reassignment
             process = await asyncio.create_subprocess_exec(
@@ -329,9 +355,11 @@ class RealTimeCoordinationMonitor:
             stdout, stderr = await process.communicate()
 
             if process.returncode == 0:
-                logger.info(f"✅ Emergency reassignment initiated for {task_id}")
+                logger.info(
+                    f"✅ Emergency reassignment initiated for {task_id}")
             else:
-                logger.error(f"❌ Emergency reassignment failed: {stderr.decode()}")
+                logger.error(
+                    f"❌ Emergency reassignment failed: {stderr.decode()}")
 
         except Exception as e:
             logger.error(f"Error triggering emergency reassignment: {e}")
@@ -354,7 +382,8 @@ class RealTimeCoordinationMonitor:
             if process.returncode == 0:
                 logger.info(f"✅ Assignment notification sent to {agent_id}")
             else:
-                logger.warning(f"⚠️ Assignment notification failed for {agent_id}")
+                logger.warning(
+                    f"⚠️ Assignment notification failed for {agent_id}")
 
         except Exception as e:
             logger.error(f"Error notifying assignment to {agent_id}: {e}")
@@ -370,11 +399,13 @@ class RealTimeCoordinationMonitor:
             "start_time": getattr(self, 'start_time', None)
         }
 
+
 async def main():
     """Main entry point for the coordination monitor."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Real-time Coordination Event Monitor")
+    parser = argparse.ArgumentParser(
+        description="Real-time Coordination Event Monitor")
     parser.add_argument(
         '--alerts-file',
         default='coordination_alerts.json',

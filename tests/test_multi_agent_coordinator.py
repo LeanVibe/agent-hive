@@ -12,20 +12,29 @@ This test suite covers:
 """
 
 import asyncio
-import pytest
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from datetime import datetime, timedelta
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
+from unittest.mock import AsyncMock, Mock
+
+import pytest
+
+from advanced_orchestration.models import (
+    AgentMetadata,
+    AgentRegistration,
+    AgentStatus,
+    CoordinatorConfig,
+    LoadBalancingStrategy,
+    ResourceLimits,
+    ResourceRequirements,
+    TaskStatus,
+)
+from advanced_orchestration.multi_agent_coordinator import (
+    MultiAgentCoordinator,
+)
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
-from advanced_orchestration.models import (
-    CoordinatorConfig, ResourceLimits, AgentRegistration, AgentMetadata,
-    ResourceRequirements, TaskStatus, AgentStatus, LoadBalancingStrategy
-)
 
 
 class TestMultiAgentCoordinator:
@@ -114,10 +123,12 @@ class TestMultiAgentCoordinator:
         assert coordinator.running is False
 
     @pytest.mark.asyncio
-    async def test_agent_registration_success(self, coordinator, sample_agent_registration):
+    async def test_agent_registration_success(
+            self, coordinator, sample_agent_registration):
         """Test successful agent registration"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent
         result = await coordinator.register_agent(sample_agent_registration)
@@ -131,10 +142,12 @@ class TestMultiAgentCoordinator:
         assert agent_info.active_tasks == 0
 
     @pytest.mark.asyncio
-    async def test_agent_registration_duplicate(self, coordinator, sample_agent_registration):
+    async def test_agent_registration_duplicate(
+            self, coordinator, sample_agent_registration):
         """Test duplicate agent registration fails"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent first time
         await coordinator.register_agent(sample_agent_registration)
@@ -144,10 +157,12 @@ class TestMultiAgentCoordinator:
             await coordinator.register_agent(sample_agent_registration)
 
     @pytest.mark.asyncio
-    async def test_agent_registration_max_capacity(self, coordinator, sample_agent_registration):
+    async def test_agent_registration_max_capacity(
+            self, coordinator, sample_agent_registration):
         """Test agent registration at max capacity"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register maximum number of agents
         for i in range(coordinator.config.max_agents):
@@ -171,11 +186,14 @@ class TestMultiAgentCoordinator:
             await coordinator.register_agent(sample_agent_registration)
 
     @pytest.mark.asyncio
-    async def test_agent_unregistration(self, coordinator, sample_agent_registration):
+    async def test_agent_unregistration(
+            self, coordinator, sample_agent_registration):
         """Test agent unregistration"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
-        coordinator.resource_manager.deallocate_resources = AsyncMock(return_value=True)
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
+        coordinator.resource_manager.deallocate_resources = AsyncMock(
+            return_value=True)
 
         # Register agent
         await coordinator.register_agent(sample_agent_registration)
@@ -187,7 +205,8 @@ class TestMultiAgentCoordinator:
         assert sample_agent_registration.agent_id not in coordinator.agents
 
     @pytest.mark.asyncio
-    async def test_task_distribution_no_agents(self, coordinator, sample_task_data):
+    async def test_task_distribution_no_agents(
+            self, coordinator, sample_task_data):
         """Test task distribution when no agents available"""
         # Distribute task
         assignment = await coordinator.distribute_task(sample_task_data, priority=5)
@@ -199,10 +218,12 @@ class TestMultiAgentCoordinator:
         assert len(coordinator.pending_tasks) == 1
 
     @pytest.mark.asyncio
-    async def test_task_distribution_with_agents(self, coordinator, sample_agent_registration, sample_task_data):
+    async def test_task_distribution_with_agents(
+            self, coordinator, sample_agent_registration, sample_task_data):
         """Test task distribution with available agents"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent
         await coordinator.register_agent(sample_agent_registration)
@@ -218,10 +239,15 @@ class TestMultiAgentCoordinator:
         assert coordinator.agents[sample_agent_registration.agent_id].active_tasks == 1
 
     @pytest.mark.asyncio
-    async def test_task_completion_success(self, coordinator, sample_agent_registration, sample_task_data):
+    async def test_task_completion_success(
+            self,
+            coordinator,
+            sample_agent_registration,
+            sample_task_data):
         """Test successful task completion"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent and distribute task
         await coordinator.register_agent(sample_agent_registration)
@@ -238,10 +264,15 @@ class TestMultiAgentCoordinator:
         assert coordinator.performance_metrics['tasks_completed'] == 1
 
     @pytest.mark.asyncio
-    async def test_task_completion_failure(self, coordinator, sample_agent_registration, sample_task_data):
+    async def test_task_completion_failure(
+            self,
+            coordinator,
+            sample_agent_registration,
+            sample_task_data):
         """Test failed task completion"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent and distribute task
         await coordinator.register_agent(sample_agent_registration)
@@ -259,10 +290,12 @@ class TestMultiAgentCoordinator:
         assert coordinator.performance_metrics['tasks_failed'] == 1
 
     @pytest.mark.asyncio
-    async def test_get_agent_status(self, coordinator, sample_agent_registration):
+    async def test_get_agent_status(
+            self, coordinator, sample_agent_registration):
         """Test getting agent status"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent
         await coordinator.register_agent(sample_agent_registration)
@@ -275,11 +308,14 @@ class TestMultiAgentCoordinator:
         assert status.status == AgentStatus.HEALTHY
 
     @pytest.mark.asyncio
-    async def test_get_coordinator_state(self, coordinator, sample_agent_registration):
+    async def test_get_coordinator_state(
+            self, coordinator, sample_agent_registration):
         """Test getting coordinator state"""
         # Mock resource manager and related methods
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
-        coordinator.resource_manager.get_resource_usage = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
+        coordinator.resource_manager.get_resource_usage = AsyncMock(
+            return_value=Mock())
 
         # Register agent
         await coordinator.register_agent(sample_agent_registration)
@@ -298,7 +334,8 @@ class TestMultiAgentCoordinator:
     async def test_load_balancing_round_robin(self, coordinator):
         """Test round-robin load balancing"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Set strategy to round-robin
         coordinator.config.load_balancing_strategy = LoadBalancingStrategy.ROUND_ROBIN
@@ -338,7 +375,8 @@ class TestMultiAgentCoordinator:
     async def test_load_balancing_least_connections(self, coordinator):
         """Test least connections load balancing"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Set strategy to least connections
         coordinator.config.load_balancing_strategy = LoadBalancingStrategy.LEAST_CONNECTIONS
@@ -374,10 +412,12 @@ class TestMultiAgentCoordinator:
             assert coordinator.agents[agent_id].active_tasks == 1
 
     @pytest.mark.asyncio
-    async def test_agent_failure_handling(self, coordinator, sample_agent_registration):
+    async def test_agent_failure_handling(
+            self, coordinator, sample_agent_registration):
         """Test agent failure handling"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent
         await coordinator.register_agent(sample_agent_registration)
@@ -392,10 +432,12 @@ class TestMultiAgentCoordinator:
         assert coordinator.performance_metrics['agent_failures'] == 1
 
     @pytest.mark.asyncio
-    async def test_agent_failure_task_reassignment(self, coordinator, sample_agent_registration, sample_task_data):
+    async def test_agent_failure_task_reassignment(
+            self, coordinator, sample_agent_registration, sample_task_data):
         """Test task reassignment when agent fails"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent and distribute task
         await coordinator.register_agent(sample_agent_registration)
@@ -410,11 +452,14 @@ class TestMultiAgentCoordinator:
         assert assignment.status == TaskStatus.PENDING
 
     @pytest.mark.asyncio
-    async def test_agent_removal_on_threshold(self, coordinator, sample_agent_registration):
+    async def test_agent_removal_on_threshold(
+            self, coordinator, sample_agent_registration):
         """Test agent removal when error threshold exceeded"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
-        coordinator.resource_manager.deallocate_resources = AsyncMock(return_value=True)
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
+        coordinator.resource_manager.deallocate_resources = AsyncMock(
+            return_value=True)
 
         # Register agent
         await coordinator.register_agent(sample_agent_registration)
@@ -430,7 +475,8 @@ class TestMultiAgentCoordinator:
     async def test_rebalance_load(self, coordinator):
         """Test load rebalancing"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agents
         for i in range(2):
@@ -462,10 +508,12 @@ class TestMultiAgentCoordinator:
         assert coordinator.last_load_balance is not None
 
     @pytest.mark.asyncio
-    async def test_heartbeat_update(self, coordinator, sample_agent_registration):
+    async def test_heartbeat_update(
+            self, coordinator, sample_agent_registration):
         """Test agent heartbeat update"""
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
 
         # Register agent
         await coordinator.register_agent(sample_agent_registration)
@@ -500,7 +548,8 @@ class TestMultiAgentCoordinator:
     async def test_scaling_integration(self, coordinator):
         """Test scaling manager integration"""
         # Mock scaling manager
-        coordinator.scaling_manager.check_scaling_needs = AsyncMock(return_value=None)
+        coordinator.scaling_manager.check_scaling_needs = AsyncMock(
+            return_value=None)
 
         # Start coordinator to trigger scaling monitor
         await coordinator.start()
@@ -558,9 +607,12 @@ class TestMultiAgentCoordinatorIntegration:
         coordinator = MultiAgentCoordinator(config)
 
         # Mock resource manager
-        coordinator.resource_manager.allocate_resources = AsyncMock(return_value=Mock())
-        coordinator.resource_manager.deallocate_resources = AsyncMock(return_value=True)
-        coordinator.resource_manager.get_resource_usage = AsyncMock(return_value=Mock())
+        coordinator.resource_manager.allocate_resources = AsyncMock(
+            return_value=Mock())
+        coordinator.resource_manager.deallocate_resources = AsyncMock(
+            return_value=True)
+        coordinator.resource_manager.get_resource_usage = AsyncMock(
+            return_value=Mock())
 
         # Start coordinator
         await coordinator.start()

@@ -7,14 +7,11 @@ This micro-component handles ONLY Test-Driven Development (TDD) enforcement.
 Follows XP Small Releases principle: ≤400 lines, single responsibility.
 """
 
-import json
 import sqlite3
-import subprocess
-import os
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -79,10 +76,13 @@ class TDDEnforcementMicro:
             """)
             conn.commit()
 
-    def scan_tdd_compliance(self, include_patterns: List[str] = None) -> TDDMetric:
+    def scan_tdd_compliance(
+            self,
+            include_patterns: List[str] = None) -> TDDMetric:
         """Scan project for TDD compliance - core functionality."""
         if include_patterns is None:
-            include_patterns = ["*.py", "*.js", "*.ts", "*.java", "*.rb", "*.go"]
+            include_patterns = ["*.py", "*.js",
+                                "*.ts", "*.java", "*.rb", "*.go"]
 
         source_files = self._find_source_files(include_patterns)
         test_files = self._find_test_files()
@@ -101,8 +101,10 @@ class TDDEnforcementMicro:
                 total_violations += 1
 
         # Calculate metrics
-        coverage_percentage = (files_with_tests / total_files * 100) if total_files > 0 else 0
-        tdd_compliance_score = self._calculate_tdd_score(files_with_tests, total_files, total_violations)
+        coverage_percentage = (files_with_tests / total_files *
+                               100) if total_files > 0 else 0
+        tdd_compliance_score = self._calculate_tdd_score(
+            files_with_tests, total_files, total_violations)
 
         metric = TDDMetric(
             metric_id=f"tdd-scan-{datetime.now().strftime('%Y%m%d_%H%M%S')}",
@@ -150,7 +152,10 @@ class TDDEnforcementMicro:
 
         return compliance_data
 
-    def get_tdd_violations(self, severity: str = None, limit: int = 50) -> List[TDDViolation]:
+    def get_tdd_violations(
+            self,
+            severity: str = None,
+            limit: int = 50) -> List[TDDViolation]:
         """Get TDD violations - core functionality."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -194,16 +199,20 @@ class TDDEnforcementMicro:
     def save_violation(self, violation: TDDViolation):
         """Save TDD violation to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO tdd_violations
                 (violation_id, file_path, violation_type, severity,
                  line_count, test_coverage, timestamp, resolved)
                 VALUES (?, ?, ?, ?, ?, ?, ?, FALSE)
-            """, (
-                violation.violation_id, violation.file_path, violation.violation_type,
-                violation.severity, violation.line_count, violation.test_coverage,
-                violation.timestamp
-            ))
+            """,
+                (violation.violation_id,
+                 violation.file_path,
+                 violation.violation_type,
+                 violation.severity,
+                 violation.line_count,
+                 violation.test_coverage,
+                 violation.timestamp))
             conn.commit()
 
     def save_metric(self, metric: TDDMetric):
@@ -231,8 +240,13 @@ class TDDEnforcementMicro:
         filtered_files = []
         for file_path in source_files:
             path_str = str(file_path)
-            if not any(exclude in path_str.lower() for exclude in
-                      ['test', 'spec', '__pycache__', '.git', 'node_modules']):
+            if not any(
+                exclude in path_str.lower() for exclude in [
+                    'test',
+                    'spec',
+                    '__pycache__',
+                    '.git',
+                    'node_modules']):
                 filtered_files.append(path_str)
 
         return filtered_files
@@ -240,7 +254,7 @@ class TDDEnforcementMicro:
     def _find_test_files(self) -> List[str]:
         """Find test files in project."""
         test_patterns = ["**/test_*.py", "**/tests/**/*.py", "**/*_test.py",
-                        "**/*_spec.py", "**/spec/**/*.py"]
+                         "**/*_spec.py", "**/spec/**/*.py"]
         test_files = []
 
         for pattern in test_patterns:
@@ -248,20 +262,23 @@ class TDDEnforcementMicro:
 
         return [str(f) for f in test_files]
 
-    def _has_corresponding_test(self, source_file: str, test_files: List[str]) -> bool:
+    def _has_corresponding_test(
+            self,
+            source_file: str,
+            test_files: List[str]) -> bool:
         """Check if source file has corresponding test."""
         source_name = Path(source_file).stem
         source_dir = Path(source_file).parent.name
 
         for test_file in test_files:
             test_name = Path(test_file).stem
-            test_dir = Path(test_file).parent.name
+            Path(test_file).parent.name
 
             # Various test naming conventions
             if (f"test_{source_name}" in test_name or
                 f"{source_name}_test" in test_name or
                 f"{source_name}_spec" in test_name or
-                (source_name in test_name and source_dir in test_file)):
+                    (source_name in test_name and source_dir in test_file)):
                 return True
 
         return False
@@ -271,7 +288,9 @@ class TDDEnforcementMicro:
         line_count = self._count_lines(file_path)
 
         return TDDViolation(
-            violation_id=f"no-test-{Path(file_path).stem}-{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            violation_id=f"no-test-{
+    Path(file_path).stem}-{
+        datetime.now().strftime('%Y%m%d_%H%M%S')}",
             file_path=file_path,
             violation_type="no_test",
             severity="critical" if line_count > 100 else "warning",
@@ -288,7 +307,11 @@ class TDDEnforcementMicro:
         except Exception:
             return 0
 
-    def _calculate_tdd_score(self, files_with_tests: int, total_files: int, violations: int) -> float:
+    def _calculate_tdd_score(
+            self,
+            files_with_tests: int,
+            total_files: int,
+            violations: int) -> float:
         """Calculate TDD compliance score (0-100)."""
         if total_files == 0:
             return 100.0
@@ -306,7 +329,8 @@ def main():
     if len(sys.argv) < 2:
         print("TDD Enforcement Micro-Component")
         print("Commands:")
-        print("  scan [patterns]                      - Scan project for TDD compliance")
+        print(
+            "  scan [patterns]                      - Scan project for TDD compliance")
         print("  check <file_path>                    - Check single file TDD compliance")
         print("  violations [severity] [limit]        - List TDD violations")
         print("  metric                               - Show latest TDD compliance metric")
@@ -319,7 +343,7 @@ def main():
         patterns = sys.argv[2:] if len(sys.argv) > 2 else None
         metric = tdd_enforcer.scan_tdd_compliance(patterns)
 
-        print(f"TDD Compliance Scan Results:")
+        print("TDD Compliance Scan Results:")
         print(f"  Total Files: {metric.total_files}")
         print(f"  Files with Tests: {metric.files_with_tests}")
         print(f"  Coverage: {metric.coverage_percentage:.1f}%")
@@ -355,13 +379,17 @@ def main():
 
         print(f"TDD Violations (last {limit}):")
         for violation in violations:
-            print(f"  {violation.file_path}: {violation.violation_type} [{violation.severity}]")
+            print(
+                f"  {
+                    violation.file_path}: {
+                    violation.violation_type} [{
+                    violation.severity}]")
 
     elif command == "metric":
         metric = tdd_enforcer.get_latest_tdd_metric()
 
         if metric:
-            print(f"Latest TDD Compliance Metric:")
+            print("Latest TDD Compliance Metric:")
             print(f"  Score: {metric.tdd_compliance_score:.1f}/100")
             print(f"  Coverage: {metric.coverage_percentage:.1f}%")
             print(f"  Files: {metric.files_with_tests}/{metric.total_files}")

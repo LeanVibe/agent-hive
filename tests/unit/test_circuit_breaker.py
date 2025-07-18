@@ -4,19 +4,17 @@ Unit tests for CircuitBreaker component.
 Tests the circuit breaker pattern implementation used for CLI resilience.
 """
 
-import pytest
-import asyncio
-import time
-from unittest.mock import AsyncMock
-
 # Import the component under test
 import sys
+import time
 from pathlib import Path
+
+import pytest
+from agents.claude_agent import CircuitBreaker
+
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
-
-from agents.claude_agent import CircuitBreaker
 
 
 class TestCircuitBreaker:
@@ -82,7 +80,8 @@ class TestCircuitBreaker:
         assert cb.state == 'HALF_OPEN'
 
     @pytest.mark.unit
-    def test_circuit_breaker_half_open_success_closes(self, circuit_breaker_config):
+    def test_circuit_breaker_half_open_success_closes(
+            self, circuit_breaker_config):
         """Test circuit breaker closes from half-open on success."""
         config = circuit_breaker_config.copy()
         config["recovery_timeout"] = 0.1
@@ -103,7 +102,8 @@ class TestCircuitBreaker:
         assert cb.failure_count == 0
 
     @pytest.mark.unit
-    def test_circuit_breaker_half_open_failure_opens(self, circuit_breaker_config):
+    def test_circuit_breaker_half_open_failure_opens(
+            self, circuit_breaker_config):
         """Test circuit breaker reopens from half-open on failure."""
         config = circuit_breaker_config.copy()
         config["recovery_timeout"] = 0.1
@@ -124,7 +124,8 @@ class TestCircuitBreaker:
         assert cb.can_execute() is False
 
     @pytest.mark.unit
-    async def test_circuit_breaker_execute_success(self, circuit_breaker_config):
+    async def test_circuit_breaker_execute_success(
+            self, circuit_breaker_config):
         """Test circuit breaker execute method with successful function."""
         cb = CircuitBreaker(**circuit_breaker_config)
 
@@ -137,7 +138,8 @@ class TestCircuitBreaker:
         assert cb.state == CircuitBreakerState.CLOSED
 
     @pytest.mark.unit
-    async def test_circuit_breaker_execute_failure(self, circuit_breaker_config):
+    async def test_circuit_breaker_execute_failure(
+            self, circuit_breaker_config):
         """Test circuit breaker execute method with failing function."""
         cb = CircuitBreaker(**circuit_breaker_config)
 
@@ -151,7 +153,8 @@ class TestCircuitBreaker:
         assert cb.state == CircuitBreakerState.CLOSED
 
     @pytest.mark.unit
-    async def test_circuit_breaker_execute_blocked_when_open(self, circuit_breaker_config):
+    async def test_circuit_breaker_execute_blocked_when_open(
+            self, circuit_breaker_config):
         """Test circuit breaker blocks execution when open."""
         cb = CircuitBreaker(**circuit_breaker_config)
 
@@ -205,7 +208,8 @@ class TestCircuitBreaker:
 
     @pytest.mark.unit
     @pytest.mark.performance
-    async def test_circuit_breaker_performance(self, circuit_breaker_config, performance_thresholds):
+    async def test_circuit_breaker_performance(
+            self, circuit_breaker_config, performance_thresholds):
         """Test circuit breaker overhead is minimal."""
         cb = CircuitBreaker(**circuit_breaker_config)
 
@@ -226,7 +230,8 @@ class TestCircuitBreaker:
         assert avg_time_per_call < 0.001, f"Circuit breaker overhead too high: {avg_time_per_call}s per call"
 
     @pytest.mark.unit
-    def test_circuit_breaker_thread_safety_simulation(self, circuit_breaker_config):
+    def test_circuit_breaker_thread_safety_simulation(
+            self, circuit_breaker_config):
         """Test circuit breaker behavior under simulated concurrent access."""
         cb = CircuitBreaker(**circuit_breaker_config)
 

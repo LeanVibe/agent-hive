@@ -13,20 +13,17 @@ Usage:
 """
 
 import argparse
-import asyncio
 import importlib
 import inspect
-import json
-import os
 import re
 import subprocess
 import sys
-import tempfile
-import traceback
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import List, Optional
+
 import yaml
+
 
 @dataclass
 class ValidationResult:
@@ -37,6 +34,7 @@ class ValidationResult:
     status: str  # "pass", "fail", "warning", "skip"
     message: str
     details: Optional[str] = None
+
 
 class DocumentationValidator:
     """Comprehensive documentation validation framework."""
@@ -50,8 +48,10 @@ class DocumentationValidator:
         """Add project directories to Python path for imports."""
         if not self.python_path_added:
             sys.path.insert(0, str(self.project_root))
-            sys.path.insert(0, str(self.project_root / "advanced_orchestration"))
-            sys.path.insert(0, str(self.project_root / "intelligence_framework"))
+            sys.path.insert(
+                0, str(self.project_root / "advanced_orchestration"))
+            sys.path.insert(
+                0, str(self.project_root / "intelligence_framework"))
             sys.path.insert(0, str(self.project_root / "external_api"))
             sys.path.insert(0, str(self.project_root / "ml_enhancements"))
             self.python_path_added = True
@@ -69,7 +69,8 @@ class DocumentationValidator:
             ("intelligence_framework", "IntelligenceFramework"),
             ("intelligent_task_allocation", "IntelligentTaskAllocator"),
             ("agent_coordination_protocols", "AgentCoordinationProtocols"),
-            ("performance_monitoring_optimization", "PerformanceMonitoringOptimization"),
+            ("performance_monitoring_optimization",
+             "PerformanceMonitoringOptimization"),
             ("external_api", "WebhookServer"),
             ("external_api", "ApiGateway"),
             ("external_api", "EventStreaming"),
@@ -89,23 +90,24 @@ class DocumentationValidator:
                 module = importlib.import_module(module_name)
                 if hasattr(module, class_name):
                     cls = getattr(module, class_name)
-                    # Verify it's actually a class and can be instantiated (basic check)
+                    # Verify it's actually a class and can be instantiated
+                    # (basic check)
                     if inspect.isclass(cls):
-                        results.append(ValidationResult(
-                            file="API_REFERENCE.md",
-                            section="Imports",
-                            check_type="import_validation",
-                            status="pass",
-                            message=f"✅ {module_name}.{class_name} imports successfully"
-                        ))
+                        results.append(
+                            ValidationResult(
+                                file="API_REFERENCE.md",
+                                section="Imports",
+                                check_type="import_validation",
+                                status="pass",
+                                message=f"✅ {module_name}.{class_name} imports successfully"))
                     else:
-                        results.append(ValidationResult(
-                            file="API_REFERENCE.md",
-                            section="Imports",
-                            check_type="import_validation",
-                            status="fail",
-                            message=f"❌ {module_name}.{class_name} is not a class"
-                        ))
+                        results.append(
+                            ValidationResult(
+                                file="API_REFERENCE.md",
+                                section="Imports",
+                                check_type="import_validation",
+                                status="fail",
+                                message=f"❌ {module_name}.{class_name} is not a class"))
                 else:
                     results.append(ValidationResult(
                         file="API_REFERENCE.md",
@@ -123,13 +125,14 @@ class DocumentationValidator:
                     message=f"❌ Cannot import {module_name}: {str(e)}"
                 ))
             except Exception as e:
-                results.append(ValidationResult(
-                    file="API_REFERENCE.md",
-                    section="Imports",
-                    check_type="import_validation",
-                    status="fail",
-                    message=f"❌ Error validating {module_name}.{class_name}: {str(e)}"
-                ))
+                results.append(
+                    ValidationResult(
+                        file="API_REFERENCE.md",
+                        section="Imports",
+                        check_type="import_validation",
+                        status="fail",
+                        message=f"❌ Error validating {module_name}.{class_name}: {
+                            str(e)}"))
 
         return results
 
@@ -221,13 +224,15 @@ class DocumentationValidator:
                         message=f"✅ Command '{cmd_args[0]}' help works"
                     ))
                 else:
-                    results.append(ValidationResult(
-                        file="CLI Commands",
-                        section=cmd_args[0],
-                        check_type="cli_validation",
-                        status="fail",
-                        message=f"❌ Command '{cmd_args[0]}' help failed: {result.stderr}"
-                    ))
+                    results.append(
+                        ValidationResult(
+                            file="CLI Commands",
+                            section=cmd_args[0],
+                            check_type="cli_validation",
+                            status="fail",
+                            message=f"❌ Command '{
+                                cmd_args[0]}' help failed: {
+                                result.stderr}"))
             except subprocess.TimeoutExpired:
                 results.append(ValidationResult(
                     file="CLI Commands",
@@ -255,7 +260,8 @@ class DocumentationValidator:
         test_files = list(self.project_root.glob("test_*.py"))
         test_files.extend(list(self.project_root.glob("tests/**/*.py")))
 
-        actual_test_count = len([f for f in test_files if f.name.startswith("test_")])
+        actual_test_count = len(
+            [f for f in test_files if f.name.startswith("test_")])
 
         # Check documented test counts in README.md
         readme_path = self.project_root / "README.md"
@@ -263,26 +269,27 @@ class DocumentationValidator:
             content = readme_path.read_text()
 
             # Look for test count mentions
-            test_mentions = re.findall(r'(\d+)\s*(?:comprehensive\s*)?tests?', content, re.IGNORECASE)
+            test_mentions = re.findall(
+                r'(\d+)\s*(?:comprehensive\s*)?tests?', content, re.IGNORECASE)
             if test_mentions:
                 documented_count = max(int(count) for count in test_mentions)
 
                 if actual_test_count >= documented_count * 0.9:  # Allow 10% tolerance
-                    results.append(ValidationResult(
-                        file="README.md",
-                        section="Test Counts",
-                        check_type="test_validation",
-                        status="pass",
-                        message=f"✅ Test count reasonable: {actual_test_count} actual vs {documented_count} documented"
-                    ))
+                    results.append(
+                        ValidationResult(
+                            file="README.md",
+                            section="Test Counts",
+                            check_type="test_validation",
+                            status="pass",
+                            message=f"✅ Test count reasonable: {actual_test_count} actual vs {documented_count} documented"))
                 else:
-                    results.append(ValidationResult(
-                        file="README.md",
-                        section="Test Counts",
-                        check_type="test_validation",
-                        status="warning",
-                        message=f"⚠️ Test count mismatch: {actual_test_count} actual vs {documented_count} documented"
-                    ))
+                    results.append(
+                        ValidationResult(
+                            file="README.md",
+                            section="Test Counts",
+                            check_type="test_validation",
+                            status="warning",
+                            message=f"⚠️ Test count mismatch: {actual_test_count} actual vs {documented_count} documented"))
             else:
                 results.append(ValidationResult(
                     file="README.md",
@@ -313,7 +320,8 @@ class DocumentationValidator:
             content = doc_file.read_text()
 
             # Extract Python code blocks
-            python_blocks = re.findall(r'```(?:python|py)\n(.*?)\n```', content, re.DOTALL)
+            python_blocks = re.findall(
+                r'```(?:python|py)\n(.*?)\n```', content, re.DOTALL)
 
             for i, code_block in enumerate(python_blocks):
                 # Skip examples that are clearly just imports or configuration
@@ -332,19 +340,20 @@ class DocumentationValidator:
                     compile(code_block, f"<{doc_file.name}_block_{i}>", "exec")
                     results.append(ValidationResult(
                         file=doc_file.name,
-                        section=f"Code Block {i+1}",
+                        section=f"Code Block {i + 1}",
                         check_type="code_validation",
                         status="pass",
-                        message=f"✅ Python syntax valid"
+                        message="✅ Python syntax valid"
                     ))
                 except SyntaxError as e:
                     results.append(ValidationResult(
                         file=doc_file.name,
-                        section=f"Code Block {i+1}",
+                        section=f"Code Block {i + 1}",
                         check_type="code_validation",
                         status="fail",
                         message=f"❌ Python syntax error: {str(e)}",
-                        details=code_block[:200] + "..." if len(code_block) > 200 else code_block
+                        details=code_block[:200] +
+                        "..." if len(code_block) > 200 else code_block
                     ))
 
         return results
@@ -368,7 +377,8 @@ class DocumentationValidator:
             content = doc_file.read_text()
 
             # Find internal file references
-            file_refs = re.findall(r'\[([^\]]+)\]\(([^)]+\.md[^)]*)\)', content)
+            file_refs = re.findall(
+                r'\[([^\]]+)\]\(([^)]+\.md[^)]*)\)', content)
 
             for link_text, file_path in file_refs:
                 # Check if referenced file exists
@@ -385,13 +395,13 @@ class DocumentationValidator:
                         message=f"✅ Link to {file_path} exists"
                     ))
                 else:
-                    results.append(ValidationResult(
-                        file=doc_file.name,
-                        section="Internal Links",
-                        check_type="link_validation",
-                        status="fail",
-                        message=f"❌ Link to {file_path} broken - file not found"
-                    ))
+                    results.append(
+                        ValidationResult(
+                            file=doc_file.name,
+                            section="Internal Links",
+                            check_type="link_validation",
+                            status="fail",
+                            message=f"❌ Link to {file_path} broken - file not found"))
 
         return results
 
@@ -413,14 +423,15 @@ class DocumentationValidator:
         content = deployment_file.read_text()
 
         # Check for YAML configuration blocks
-        yaml_blocks = re.findall(r'```(?:yaml|yml)\n(.*?)\n```', content, re.DOTALL)
+        yaml_blocks = re.findall(
+            r'```(?:yaml|yml)\n(.*?)\n```', content, re.DOTALL)
 
         for i, yaml_block in enumerate(yaml_blocks):
             try:
                 yaml.safe_load(yaml_block)
                 results.append(ValidationResult(
                     file="DEPLOYMENT.md",
-                    section=f"YAML Block {i+1}",
+                    section=f"YAML Block {i + 1}",
                     check_type="deployment_validation",
                     status="pass",
                     message="✅ YAML syntax valid"
@@ -428,11 +439,12 @@ class DocumentationValidator:
             except yaml.YAMLError as e:
                 results.append(ValidationResult(
                     file="DEPLOYMENT.md",
-                    section=f"YAML Block {i+1}",
+                    section=f"YAML Block {i + 1}",
                     check_type="deployment_validation",
                     status="fail",
                     message=f"❌ YAML syntax error: {str(e)}",
-                    details=yaml_block[:200] + "..." if len(yaml_block) > 200 else yaml_block
+                    details=yaml_block[:200] +
+                    "..." if len(yaml_block) > 200 else yaml_block
                 ))
 
         return results
@@ -477,17 +489,20 @@ class DocumentationValidator:
         # Generate report
         report = []
         report.append("=" * 80)
-        report.append("📋 LEANVIBE AGENT HIVE - DOCUMENTATION VALIDATION REPORT")
+        report.append(
+            "📋 LEANVIBE AGENT HIVE - DOCUMENTATION VALIDATION REPORT")
         report.append("=" * 80)
         report.append("")
 
         # Summary
         total_checks = len(self.results)
-        pass_rate = (status_counts["pass"] / total_checks * 100) if total_checks > 0 else 0
+        pass_rate = (status_counts["pass"] / total_checks *
+                     100) if total_checks > 0 else 0
 
-        report.append(f"📊 VALIDATION SUMMARY:")
+        report.append("📊 VALIDATION SUMMARY:")
         report.append(f"   Total Checks: {total_checks}")
-        report.append(f"   ✅ Passed: {status_counts['pass']} ({pass_rate:.1f}%)")
+        report.append(
+            f"   ✅ Passed: {status_counts['pass']} ({pass_rate:.1f}%)")
         report.append(f"   ❌ Failed: {status_counts['fail']}")
         report.append(f"   ⚠️ Warnings: {status_counts['warning']}")
         report.append(f"   ⏭️ Skipped: {status_counts['skip']}")
@@ -495,13 +510,16 @@ class DocumentationValidator:
 
         # Overall status
         if status_counts["fail"] == 0 and status_counts["warning"] <= 2:
-            report.append("🎉 OVERALL STATUS: EXCELLENT - Documentation is highly accurate!")
+            report.append(
+                "🎉 OVERALL STATUS: EXCELLENT - Documentation is highly accurate!")
         elif status_counts["fail"] <= 2:
             report.append("✅ OVERALL STATUS: GOOD - Minor issues to address")
         elif status_counts["fail"] <= 5:
-            report.append("⚠️ OVERALL STATUS: NEEDS ATTENTION - Several issues found")
+            report.append(
+                "⚠️ OVERALL STATUS: NEEDS ATTENTION - Several issues found")
         else:
-            report.append("❌ OVERALL STATUS: CRITICAL - Major documentation issues")
+            report.append(
+                "❌ OVERALL STATUS: CRITICAL - Major documentation issues")
 
         report.append("")
 
@@ -527,20 +545,30 @@ class DocumentationValidator:
         if status_counts["warning"] > 0:
             report.append("   2. Review and address warning items")
         if pass_rate < 90:
-            report.append("   3. Improve documentation accuracy to achieve >90% pass rate")
-        report.append("   4. Run validation checks before committing documentation changes")
-        report.append("   5. Consider adding this validation to CI/CD pipeline")
+            report.append(
+                "   3. Improve documentation accuracy to achieve >90% pass rate")
+        report.append(
+            "   4. Run validation checks before committing documentation changes")
+        report.append(
+            "   5. Consider adding this validation to CI/CD pipeline")
 
         return "\n".join(report)
 
+
 def main():
     """Main validation script entry point."""
-    parser = argparse.ArgumentParser(description="Validate LeanVibe Agent Hive documentation")
-    parser.add_argument("--all", action="store_true", help="Run all validation checks")
-    parser.add_argument("--api-reference", action="store_true", help="Validate API reference")
-    parser.add_argument("--deployment", action="store_true", help="Validate deployment guide")
-    parser.add_argument("--troubleshooting", action="store_true", help="Validate troubleshooting guide")
-    parser.add_argument("--output", type=str, help="Output file for validation report")
+    parser = argparse.ArgumentParser(
+        description="Validate LeanVibe Agent Hive documentation")
+    parser.add_argument("--all", action="store_true",
+                        help="Run all validation checks")
+    parser.add_argument("--api-reference", action="store_true",
+                        help="Validate API reference")
+    parser.add_argument("--deployment", action="store_true",
+                        help="Validate deployment guide")
+    parser.add_argument("--troubleshooting", action="store_true",
+                        help="Validate troubleshooting guide")
+    parser.add_argument("--output", type=str,
+                        help="Output file for validation report")
 
     args = parser.parse_args()
 
@@ -554,7 +582,8 @@ def main():
     validator = DocumentationValidator(project_root)
 
     # Run validation
-    if args.all or not any([args.api_reference, args.deployment, args.troubleshooting]):
+    if args.all or not any(
+            [args.api_reference, args.deployment, args.troubleshooting]):
         results = validator.validate_all()
     else:
         results = []
@@ -582,8 +611,9 @@ def main():
         print(f"\n❌ Validation failed with {failed_checks} critical issues")
         sys.exit(1)
     else:
-        print(f"\n✅ Validation completed successfully!")
+        print("\n✅ Validation completed successfully!")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

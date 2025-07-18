@@ -5,15 +5,20 @@ This module tests the comprehensive performance monitoring, analytics,
 and optimization capabilities for the enhanced multi-agent coordination system.
 """
 
-import pytest
 import asyncio
 import time
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import patch
+
+import pytest
 
 from advanced_orchestration.performance_monitor import (
-    PerformanceMonitor, PerformanceMetric, PerformanceMetricType,
-    PerformanceAlert, PerformanceThreshold, PerformanceReport
+    PerformanceAlert,
+    PerformanceMetric,
+    PerformanceMetricType,
+    PerformanceMonitor,
+    PerformanceReport,
+    PerformanceThreshold,
 )
 
 
@@ -93,14 +98,17 @@ class TestPerformanceMonitor:
         # Check agent metrics were updated
         assert sample_metric.agent_id in monitor.agent_metrics
         assert sample_metric.metric_type in monitor.agent_metrics[sample_metric.agent_id]
-        assert sample_metric.value in monitor.agent_metrics[sample_metric.agent_id][sample_metric.metric_type]
+        assert sample_metric.value in monitor.agent_metrics[
+            sample_metric.agent_id][sample_metric.metric_type]
 
         # Check workflow metrics were updated
         assert sample_metric.workflow_id in monitor.workflow_metrics
         assert sample_metric.metric_type in monitor.workflow_metrics[sample_metric.workflow_id]
 
         # Check performance history was updated
-        history_key = f"{sample_metric.metric_type.value}_{sample_metric.agent_id}"
+        history_key = f"{
+            sample_metric.metric_type.value}_{
+            sample_metric.agent_id}"
         assert history_key in monitor.performance_history
         assert sample_metric.value in monitor.performance_history[history_key]
 
@@ -174,9 +182,11 @@ class TestPerformanceMonitor:
         # Test different metric types
         test_cases = [
             (PerformanceMetricType.LATENCY, "Consider optimizing task routing"),
-            (PerformanceMetricType.THROUGHPUT, "Consider increasing agent parallelism"),
+            (PerformanceMetricType.THROUGHPUT,
+             "Consider increasing agent parallelism"),
             (PerformanceMetricType.ERROR_RATE, "Review error handling"),
-            (PerformanceMetricType.COORDINATION_EFFICIENCY, "Optimize agent communication"),
+            (PerformanceMetricType.COORDINATION_EFFICIENCY,
+             "Optimize agent communication"),
         ]
 
         threshold = PerformanceThreshold(
@@ -195,7 +205,8 @@ class TestPerformanceMonitor:
                 agent_id="test-agent"
             )
 
-            recommendation = monitor._generate_recommendation(metric, threshold)
+            recommendation = monitor._generate_recommendation(
+                metric, threshold)
             assert expected_phrase in recommendation
             assert "test-agent" in recommendation
 
@@ -205,7 +216,8 @@ class TestPerformanceMonitor:
 
         # Mock some workflow metrics to enable calculation
         monitor.workflow_metrics["test-workflow"] = {
-            PerformanceMetricType.WORKFLOW_COMPLETION_TIME: [10.0, 12.0, 8.0, 15.0]
+            PerformanceMetricType.WORKFLOW_COMPLETION_TIME: [
+                10.0, 12.0, 8.0, 15.0]
         }
 
         # Test coordination efficiency calculation
@@ -235,7 +247,8 @@ class TestPerformanceMonitor:
 
         # Add performance history that shows degradation
         history_key = f"{PerformanceMetricType.LATENCY.value}_global"
-        monitor.performance_history[history_key] = [1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+        monitor.performance_history[history_key] = [
+            1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
 
         # Capture log output to verify trend detection
         with patch.object(monitor.logger, 'warning') as mock_warning:
@@ -253,9 +266,12 @@ class TestPerformanceMonitor:
 
         # Add some sample metrics
         metrics = [
-            PerformanceMetric(PerformanceMetricType.LATENCY, 2.0, datetime.now()),
-            PerformanceMetric(PerformanceMetricType.THROUGHPUT, 15.0, datetime.now()),
-            PerformanceMetric(PerformanceMetricType.ERROR_RATE, 0.05, datetime.now()),
+            PerformanceMetric(PerformanceMetricType.LATENCY,
+                              2.0, datetime.now()),
+            PerformanceMetric(PerformanceMetricType.THROUGHPUT,
+                              15.0, datetime.now()),
+            PerformanceMetric(PerformanceMetricType.ERROR_RATE,
+                              0.05, datetime.now()),
         ]
 
         for metric in metrics:
@@ -288,7 +304,8 @@ class TestPerformanceMonitor:
         recent_time = datetime.now()
         metrics = [
             PerformanceMetric(PerformanceMetricType.LATENCY, 1.5, recent_time),
-            PerformanceMetric(PerformanceMetricType.THROUGHPUT, 20.0, recent_time),
+            PerformanceMetric(
+                PerformanceMetricType.THROUGHPUT, 20.0, recent_time),
         ]
 
         for metric in metrics:
@@ -318,10 +335,14 @@ class TestPerformanceMonitor:
 
         # Add agent-specific metrics
         agent_metrics = [
-            PerformanceMetric(PerformanceMetricType.LATENCY, 1.0, datetime.now(), agent_id="agent-1"),
-            PerformanceMetric(PerformanceMetricType.LATENCY, 1.2, datetime.now(), agent_id="agent-1"),
-            PerformanceMetric(PerformanceMetricType.THROUGHPUT, 15.0, datetime.now(), agent_id="agent-1"),
-            PerformanceMetric(PerformanceMetricType.LATENCY, 2.0, datetime.now(), agent_id="agent-2"),
+            PerformanceMetric(PerformanceMetricType.LATENCY, 1.0,
+                              datetime.now(), agent_id="agent-1"),
+            PerformanceMetric(PerformanceMetricType.LATENCY, 1.2,
+                              datetime.now(), agent_id="agent-1"),
+            PerformanceMetric(PerformanceMetricType.THROUGHPUT, 15.0,
+                              datetime.now(), agent_id="agent-1"),
+            PerformanceMetric(PerformanceMetricType.LATENCY, 2.0,
+                              datetime.now(), agent_id="agent-2"),
         ]
 
         for metric in agent_metrics:
@@ -355,12 +376,14 @@ class TestPerformanceMonitor:
         # Test improving trend
         improving_values = [5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0, 1.5, 1.0]
         improving_trend = monitor._calculate_trend(improving_values)
-        assert improving_trend < 0  # Negative trend for latency is good (improving)
+        # Negative trend for latency is good (improving)
+        assert improving_trend < 0
 
         # Test degrading trend
         degrading_values = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
         degrading_trend = monitor._calculate_trend(degrading_values)
-        assert degrading_trend > 0  # Positive trend for latency is bad (degrading)
+        # Positive trend for latency is bad (degrading)
+        assert degrading_trend > 0
 
         # Test stable trend
         stable_values = [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
@@ -437,15 +460,18 @@ class TestPerformanceMonitor:
         metrics_summary = {
             PerformanceMetricType.LATENCY: {"avg": 6.0},  # Critical
             PerformanceMetricType.THROUGHPUT: {"avg": 8.0},  # Warning
-            PerformanceMetricType.ERROR_RATE: {"avg": 0.008},  # Optimization opportunity
+            # Optimization opportunity
+            PerformanceMetricType.ERROR_RATE: {"avg": 0.008},
         }
 
-        recommendations = monitor._generate_performance_recommendations(metrics_summary)
+        recommendations = monitor._generate_performance_recommendations(
+            metrics_summary)
 
         assert len(recommendations) == 3
 
         # Check critical recommendation
-        critical_rec = next(rec for rec in recommendations if "CRITICAL" in rec)
+        critical_rec = next(
+            rec for rec in recommendations if "CRITICAL" in rec)
         assert "latency" in critical_rec.lower()
         assert "immediate action required" in critical_rec.lower()
 
@@ -455,7 +481,8 @@ class TestPerformanceMonitor:
         assert "consider optimization" in warning_rec.lower()
 
         # Check optimization opportunity
-        opportunity_rec = next(rec for rec in recommendations if "OPPORTUNITY" in rec)
+        opportunity_rec = next(
+            rec for rec in recommendations if "OPPORTUNITY" in rec)
         assert "error_rate" in opportunity_rec.lower()
         assert "excellent" in opportunity_rec.lower()
 
@@ -518,8 +545,10 @@ class TestPerformanceIntegration:
 
         # Record some metrics
         metrics = [
-            PerformanceMetric(PerformanceMetricType.LATENCY, 2.0, datetime.now()),
-            PerformanceMetric(PerformanceMetricType.THROUGHPUT, 15.0, datetime.now()),
+            PerformanceMetric(PerformanceMetricType.LATENCY,
+                              2.0, datetime.now()),
+            PerformanceMetric(PerformanceMetricType.THROUGHPUT,
+                              15.0, datetime.now()),
         ]
 
         for metric in metrics:
@@ -564,7 +593,8 @@ class TestPerformanceIntegration:
         assert len(report.recommendations) > 0
 
         # Step 4: Check that critical issue is flagged in recommendations
-        critical_recommendations = [rec for rec in report.recommendations if "CRITICAL" in rec]
+        critical_recommendations = [
+            rec for rec in report.recommendations if "CRITICAL" in rec]
         assert len(critical_recommendations) > 0
 
         # Step 5: Verify real-time metrics reflect the issue

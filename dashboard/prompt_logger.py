@@ -6,15 +6,16 @@ Simple SQLite-based logging system to track agent prompts and provide
 PM review functionality for prompt optimization.
 """
 
-import sqlite3
 import json
+import logging
+import sqlite3
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-import logging
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class PromptLog:
@@ -42,8 +43,8 @@ class PromptLog:
             'error_message': self.error_message,
             'gemini_feedback': self.gemini_feedback,
             'pm_review': self.pm_review,
-            'suggested_improvement': self.suggested_improvement
-        }
+            'suggested_improvement': self.suggested_improvement}
+
 
 class PromptLogger:
     """Simple SQLite-based prompt logger"""
@@ -104,7 +105,11 @@ class PromptLogger:
                 WHERE id = ?
             """, (feedback, log_id))
 
-    def add_pm_review(self, log_id: int, review: str, suggested_improvement: str):
+    def add_pm_review(
+            self,
+            log_id: int,
+            review: str,
+            suggested_improvement: str):
         """Add PM review and improvement suggestion"""
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
@@ -125,9 +130,13 @@ class PromptLogger:
             rows = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
 
-            return [self._row_to_prompt_log(dict(zip(columns, row))) for row in rows]
+            return [self._row_to_prompt_log(
+                dict(zip(columns, row))) for row in rows]
 
-    def get_prompts_for_agent(self, agent_name: str, limit: int = 20) -> List[PromptLog]:
+    def get_prompts_for_agent(
+            self,
+            agent_name: str,
+            limit: int = 20) -> List[PromptLog]:
         """Get prompts for specific agent"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute("""
@@ -140,7 +149,8 @@ class PromptLogger:
             rows = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
 
-            return [self._row_to_prompt_log(dict(zip(columns, row))) for row in rows]
+            return [self._row_to_prompt_log(
+                dict(zip(columns, row))) for row in rows]
 
     def get_prompts_needing_review(self) -> List[PromptLog]:
         """Get prompts that need PM review"""
@@ -154,13 +164,15 @@ class PromptLogger:
             rows = cursor.fetchall()
             columns = [desc[0] for desc in cursor.description]
 
-            return [self._row_to_prompt_log(dict(zip(columns, row))) for row in rows]
+            return [self._row_to_prompt_log(
+                dict(zip(columns, row))) for row in rows]
 
     def get_prompt_stats(self) -> Dict[str, Any]:
         """Get prompt statistics for dashboard"""
         with sqlite3.connect(self.db_path) as conn:
             # Total prompts
-            total_prompts = conn.execute("SELECT COUNT(*) FROM prompt_logs").fetchone()[0]
+            total_prompts = conn.execute(
+                "SELECT COUNT(*) FROM prompt_logs").fetchone()[0]
 
             # Success rate
             success_rate = conn.execute("""
@@ -203,6 +215,7 @@ class PromptLogger:
             pm_review=row['pm_review'],
             suggested_improvement=row['suggested_improvement']
         )
+
 
 # Global logger instance
 prompt_logger = PromptLogger()

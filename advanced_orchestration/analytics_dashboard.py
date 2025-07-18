@@ -5,18 +5,15 @@ This module provides a comprehensive analytics dashboard for monitoring,
 analyzing, and optimizing multi-agent coordination performance.
 """
 
-import asyncio
 import json
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import statistics
-import math
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
-from .performance_monitor import PerformanceMonitor, PerformanceMetricType, PerformanceAlert
-from .models import AgentSpecialization, WorkflowType, CoordinationMetrics
+from .performance_monitor import PerformanceMonitor
 
 
 class DashboardView(Enum):
@@ -110,35 +107,36 @@ class AnalyticsDashboard:
                 "description": "Some agents are significantly more loaded than others",
                 "impact": "medium",
                 "effort": "low",
-                "category": "efficiency"
-            },
+                "category": "efficiency"},
             "coordination_overhead": {
                 "title": "High Coordination Overhead",
                 "description": "Coordination between agents is taking longer than expected",
                 "impact": "high",
                 "effort": "medium",
-                "category": "performance"
-            },
+                "category": "performance"},
             "workflow_bottleneck": {
                 "title": "Workflow Bottleneck Identified",
                 "description": "Specific workflow steps are causing delays",
                 "impact": "high",
                 "effort": "medium",
-                "category": "performance"
-            }
-        }
+                "category": "performance"}}
 
         self.logger.info("AnalyticsDashboard initialized")
 
-    async def generate_dashboard_data(self, view_type: DashboardView,
-                                    time_range: Optional[Tuple[datetime, datetime]] = None) -> DashboardData:
+    async def generate_dashboard_data(self,
+                                      view_type: DashboardView,
+                                      time_range: Optional[Tuple[datetime,
+                                                                 datetime]] = None) -> DashboardData:
         """Generate comprehensive dashboard data."""
         if not time_range:
             end_time = datetime.now()
             start_time = end_time - timedelta(hours=24)
             time_range = (start_time, end_time)
 
-        cache_key = f"{view_type.value}_{time_range[0].timestamp()}_{time_range[1].timestamp()}"
+        cache_key = f"{
+            view_type.value}_{
+            time_range[0].timestamp()}_{
+            time_range[1].timestamp()}"
 
         # Check cache
         if cache_key in self.cache:
@@ -154,8 +152,8 @@ class AnalyticsDashboard:
 
         return dashboard_data
 
-    async def _generate_fresh_dashboard_data(self, view_type: DashboardView,
-                                           time_range: Tuple[datetime, datetime]) -> DashboardData:
+    async def _generate_fresh_dashboard_data(
+            self, view_type: DashboardView, time_range: Tuple[datetime, datetime]) -> DashboardData:
         """Generate fresh dashboard data."""
 
         # Get base metrics
@@ -180,8 +178,10 @@ class AnalyticsDashboard:
             performance_summary=performance_summary
         )
 
-    async def _generate_metrics(self, view_type: DashboardView,
-                              time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
+    async def _generate_metrics(self,
+                                view_type: DashboardView,
+                                time_range: Tuple[datetime,
+                                                  datetime]) -> List[DashboardMetric]:
         """Generate dashboard metrics based on view type."""
         metrics = []
 
@@ -200,39 +200,46 @@ class AnalyticsDashboard:
 
         return metrics
 
-    async def _generate_overview_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
+    async def _generate_overview_metrics(
+            self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate overview dashboard metrics."""
         metrics = []
 
         # System-wide coordination efficiency
         real_time_data = self.performance_monitor.get_real_time_metrics()
 
-        coordination_efficiency = real_time_data.get("metrics", {}).get("coordination_efficiency", {})
+        coordination_efficiency = real_time_data.get(
+            "metrics", {}).get("coordination_efficiency", {})
         if coordination_efficiency:
             metrics.append(DashboardMetric(
                 name="Coordination Efficiency",
                 value=coordination_efficiency.get("current", 0.0),
                 unit="%",
                 trend=coordination_efficiency.get("trend", 0.0),
-                status=self._get_status_from_value(coordination_efficiency.get("current", 0.0), 0.9, 0.7, 0.5),
+                status=self._get_status_from_value(
+                    coordination_efficiency.get("current", 0.0), 0.9, 0.7, 0.5),
                 description="Overall efficiency of agent coordination and task distribution",
                 chart_type="gauge",
-                color=self._get_color_from_status(self._get_status_from_value(coordination_efficiency.get("current", 0.0), 0.9, 0.7, 0.5)),
+                color=self._get_color_from_status(self._get_status_from_value(
+                    coordination_efficiency.get("current", 0.0), 0.9, 0.7, 0.5)),
                 target_value=0.95
             ))
 
         # Parallel efficiency
-        parallel_efficiency = real_time_data.get("metrics", {}).get("parallel_efficiency", {})
+        parallel_efficiency = real_time_data.get(
+            "metrics", {}).get("parallel_efficiency", {})
         if parallel_efficiency:
             metrics.append(DashboardMetric(
                 name="Parallel Efficiency",
                 value=parallel_efficiency.get("current", 0.0),
                 unit="%",
                 trend=parallel_efficiency.get("trend", 0.0),
-                status=self._get_status_from_value(parallel_efficiency.get("current", 0.0), 0.85, 0.65, 0.45),
+                status=self._get_status_from_value(
+                    parallel_efficiency.get("current", 0.0), 0.85, 0.65, 0.45),
                 description="Efficiency of parallel task execution across agents",
                 chart_type="gauge",
-                color=self._get_color_from_status(self._get_status_from_value(parallel_efficiency.get("current", 0.0), 0.85, 0.65, 0.45)),
+                color=self._get_color_from_status(self._get_status_from_value(
+                    parallel_efficiency.get("current", 0.0), 0.85, 0.65, 0.45)),
                 target_value=0.90
             ))
 
@@ -244,10 +251,12 @@ class AnalyticsDashboard:
                 value=throughput.get("current", 0.0),
                 unit="tasks/min",
                 trend=throughput.get("trend", 0.0),
-                status=self._get_status_from_value(throughput.get("current", 0.0), 15.0, 10.0, 5.0),
+                status=self._get_status_from_value(
+                    throughput.get("current", 0.0), 15.0, 10.0, 5.0),
                 description="Number of tasks completed per minute across all agents",
                 chart_type="line",
-                color=self._get_color_from_status(self._get_status_from_value(throughput.get("current", 0.0), 15.0, 10.0, 5.0)),
+                color=self._get_color_from_status(self._get_status_from_value(
+                    throughput.get("current", 0.0), 15.0, 10.0, 5.0)),
                 target_value=20.0
             ))
 
@@ -258,11 +267,14 @@ class AnalyticsDashboard:
                 name="Error Rate",
                 value=error_rate.get("current", 0.0),
                 unit="%",
-                trend=-error_rate.get("trend", 0.0),  # Negative trend is good for errors
-                status=self._get_status_from_value(error_rate.get("current", 0.0), 0.01, 0.05, 0.10, reverse=True),
+                # Negative trend is good for errors
+                trend=-error_rate.get("trend", 0.0),
+                status=self._get_status_from_value(error_rate.get(
+                    "current", 0.0), 0.01, 0.05, 0.10, reverse=True),
                 description="Percentage of tasks that fail or require retry",
                 chart_type="line",
-                color=self._get_color_from_status(self._get_status_from_value(error_rate.get("current", 0.0), 0.01, 0.05, 0.10, reverse=True)),
+                color=self._get_color_from_status(self._get_status_from_value(
+                    error_rate.get("current", 0.0), 0.01, 0.05, 0.10, reverse=True)),
                 target_value=0.005
             ))
 
@@ -274,22 +286,28 @@ class AnalyticsDashboard:
 
         real_time_data = self.performance_monitor.get_real_time_metrics()
 
-        for metric_name, metric_data in real_time_data.get("metrics", {}).items():
+        for metric_name, metric_data in real_time_data.get(
+                "metrics", {}).items():
             metrics.append(DashboardMetric(
                 name=metric_name.replace("_", " ").title(),
                 value=metric_data.get("current", 0.0),
                 unit=self._get_unit_for_metric(metric_name),
                 trend=metric_data.get("trend", 0.0),
-                status=self._get_status_for_metric(metric_name, metric_data.get("current", 0.0)),
-                description=f"Current {metric_name.replace('_', ' ')} measurement",
+                status=self._get_status_for_metric(
+                    metric_name, metric_data.get("current", 0.0)),
+                description=f"Current {
+    metric_name.replace(
+        '_', ' ')} measurement",
                 chart_type="line",
-                color=self._get_color_for_metric(metric_name, metric_data.get("current", 0.0)),
+                color=self._get_color_for_metric(
+                    metric_name, metric_data.get("current", 0.0)),
                 historical_data=self._get_historical_data(metric_name)
             ))
 
         return metrics
 
-    async def _generate_agent_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
+    async def _generate_agent_metrics(
+            self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate agent-specific metrics."""
         metrics = []
 
@@ -304,10 +322,12 @@ class AnalyticsDashboard:
                     value=productivity.get("current", 0.0),
                     unit="tasks/hour",
                     trend=0.0,  # Could calculate from historical data
-                    status=self._get_status_from_value(productivity.get("current", 0.0), 10.0, 7.0, 3.0),
+                    status=self._get_status_from_value(
+                        productivity.get("current", 0.0), 10.0, 7.0, 3.0),
                     description=f"Task completion rate for {agent_id}",
                     chart_type="bar",
-                    color=self._get_color_from_status(self._get_status_from_value(productivity.get("current", 0.0), 10.0, 7.0, 3.0))
+                    color=self._get_color_from_status(self._get_status_from_value(
+                        productivity.get("current", 0.0), 10.0, 7.0, 3.0))
                 ))
 
             # Agent stability
@@ -318,15 +338,18 @@ class AnalyticsDashboard:
                     value=stability,
                     unit="%",
                     trend=0.0,
-                    status=self._get_status_from_value(stability, 0.9, 0.7, 0.5),
+                    status=self._get_status_from_value(
+                        stability, 0.9, 0.7, 0.5),
                     description=f"Performance stability for {agent_id}",
                     chart_type="gauge",
-                    color=self._get_color_from_status(self._get_status_from_value(stability, 0.9, 0.7, 0.5))
+                    color=self._get_color_from_status(
+                        self._get_status_from_value(stability, 0.9, 0.7, 0.5))
                 ))
 
         return metrics
 
-    async def _generate_workflow_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
+    async def _generate_workflow_metrics(
+            self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate workflow-specific metrics."""
         metrics = []
 
@@ -335,7 +358,8 @@ class AnalyticsDashboard:
 
         return metrics
 
-    async def _generate_system_health_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
+    async def _generate_system_health_metrics(
+            self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate system health metrics."""
         metrics = []
 
@@ -353,7 +377,8 @@ class AnalyticsDashboard:
         ))
 
         # Active alerts
-        active_alerts = len([a for a in self.performance_monitor.alerts if a.severity in ["warning", "critical"]])
+        active_alerts = len([a for a in self.performance_monitor.alerts if a.severity in [
+            "warning", "critical"]])
         metrics.append(DashboardMetric(
             name="Active Alerts",
             value=active_alerts,
@@ -362,13 +387,15 @@ class AnalyticsDashboard:
             status="good" if active_alerts == 0 else "warning" if active_alerts < 5 else "critical",
             description="Number of active performance alerts",
             chart_type="bar",
-            color=self.metric_colors["good" if active_alerts == 0 else "warning" if active_alerts < 5 else "critical"],
+            color=self.metric_colors["good" if active_alerts ==
+                                     0 else "warning" if active_alerts < 5 else "critical"],
             target_value=0
         ))
 
         return metrics
 
-    async def _generate_optimization_metrics(self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
+    async def _generate_optimization_metrics(
+            self, time_range: Tuple[datetime, datetime]) -> List[DashboardMetric]:
         """Generate optimization-focused metrics."""
         metrics = []
 
@@ -386,29 +413,39 @@ class AnalyticsDashboard:
 
         return metrics
 
-    async def _generate_alerts(self, view_type: DashboardView,
-                             time_range: Tuple[datetime, datetime]) -> List[DashboardAlert]:
+    async def _generate_alerts(self,
+                               view_type: DashboardView,
+                               time_range: Tuple[datetime,
+                                                 datetime]) -> List[DashboardAlert]:
         """Generate dashboard alerts."""
         alerts = []
 
         # Convert performance alerts to dashboard alerts
         for perf_alert in self.performance_monitor.alerts:
             if time_range[0] <= perf_alert.timestamp <= time_range[1]:
-                alerts.append(DashboardAlert(
-                    id=perf_alert.alert_id,
-                    title=f"{perf_alert.metric_type.value.replace('_', ' ').title()} Alert",
-                    severity=perf_alert.severity,
-                    message=f"Current value: {perf_alert.current_value:.2f}, Threshold: {perf_alert.threshold_value:.2f}",
-                    timestamp=perf_alert.timestamp,
-                    action_items=[perf_alert.recommendation] if perf_alert.recommendation else [],
-                    auto_fix_available=perf_alert.auto_fix_available,
-                    estimated_fix_time="5-10 minutes" if perf_alert.auto_fix_available else None
-                ))
+                alerts.append(
+                    DashboardAlert(
+                        id=perf_alert.alert_id,
+                        title=f"{
+                            perf_alert.metric_type.value.replace(
+                                '_',
+                                ' ').title()} Alert",
+                        severity=perf_alert.severity,
+                        message=f"Current value: {
+                            perf_alert.current_value:.2f}, Threshold: {
+                            perf_alert.threshold_value:.2f}",
+                        timestamp=perf_alert.timestamp,
+                        action_items=[
+                            perf_alert.recommendation] if perf_alert.recommendation else [],
+                        auto_fix_available=perf_alert.auto_fix_available,
+                        estimated_fix_time="5-10 minutes" if perf_alert.auto_fix_available else None))
 
         return alerts
 
-    async def _generate_insights(self, view_type: DashboardView,
-                               time_range: Tuple[datetime, datetime]) -> List[DashboardInsight]:
+    async def _generate_insights(self,
+                                 view_type: DashboardView,
+                                 time_range: Tuple[datetime,
+                                                   datetime]) -> List[DashboardInsight]:
         """Generate dashboard insights."""
         insights = []
 
@@ -429,41 +466,44 @@ class AnalyticsDashboard:
                 if avg_productivity > 0 and std_productivity / avg_productivity > 0.3:
                     insight = DashboardInsight(
                         title="Agent Workload Imbalance",
-                        description=f"Agent productivity varies significantly (CV: {std_productivity/avg_productivity:.2f})",
+                        description=f"Agent productivity varies significantly (CV: {
+                            std_productivity / avg_productivity:.2f})",
                         impact="medium",
                         effort="low",
                         category="efficiency",
                         action_items=[
                             "Review task distribution algorithm",
                             "Consider agent specialization optimization",
-                            "Implement dynamic load balancing"
-                        ],
-                        estimated_improvement="15-25% efficiency gain"
-                    )
+                            "Implement dynamic load balancing"],
+                        estimated_improvement="15-25% efficiency gain")
                     insights.append(insight)
 
         # Check for coordination overhead
         real_time_data = self.performance_monitor.get_real_time_metrics()
-        coordination_efficiency = real_time_data.get("metrics", {}).get("coordination_efficiency", {})
-        if coordination_efficiency and coordination_efficiency.get("current", 1.0) < 0.7:
+        coordination_efficiency = real_time_data.get(
+            "metrics", {}).get("coordination_efficiency", {})
+        if coordination_efficiency and coordination_efficiency.get(
+                "current", 1.0) < 0.7:
             insight = DashboardInsight(
                 title="High Coordination Overhead",
-                description=f"Coordination efficiency is {coordination_efficiency.get('current', 0.0):.1%}",
+                description=f"Coordination efficiency is {
+                    coordination_efficiency.get(
+                        'current',
+                        0.0):.1%}",
                 impact="high",
                 effort="medium",
                 category="performance",
                 action_items=[
                     "Optimize agent communication protocols",
                     "Reduce dependency resolution complexity",
-                    "Implement coordination caching"
-                ],
-                estimated_improvement="20-30% performance improvement"
-            )
+                    "Implement coordination caching"],
+                estimated_improvement="20-30% performance improvement")
             insights.append(insight)
 
         return insights
 
-    async def _generate_agent_status(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Dict[str, Any]]:
+    async def _generate_agent_status(
+            self, time_range: Tuple[datetime, datetime]) -> Dict[str, Dict[str, Any]]:
         """Generate agent status information."""
         agent_status = {}
 
@@ -481,7 +521,8 @@ class AnalyticsDashboard:
 
         return agent_status
 
-    async def _generate_workflow_status(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Dict[str, Any]]:
+    async def _generate_workflow_status(
+            self, time_range: Tuple[datetime, datetime]) -> Dict[str, Dict[str, Any]]:
         """Generate workflow status information."""
         workflow_status = {}
 
@@ -490,7 +531,8 @@ class AnalyticsDashboard:
 
         return workflow_status
 
-    async def _generate_system_health(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Any]:
+    async def _generate_system_health(
+            self, time_range: Tuple[datetime, datetime]) -> Dict[str, Any]:
         """Generate system health information."""
         return {
             "overall_status": "healthy",
@@ -502,7 +544,8 @@ class AnalyticsDashboard:
             "last_health_check": datetime.now().isoformat()
         }
 
-    async def _generate_performance_summary(self, time_range: Tuple[datetime, datetime]) -> Dict[str, Any]:
+    async def _generate_performance_summary(
+            self, time_range: Tuple[datetime, datetime]) -> Dict[str, Any]:
         """Generate performance summary."""
         return {
             "total_tasks_completed": 1250,
@@ -513,8 +556,13 @@ class AnalyticsDashboard:
             "parallel_efficiency": 0.78
         }
 
-    def _get_status_from_value(self, value: float, excellent: float, good: float,
-                             warning: float, reverse: bool = False) -> str:
+    def _get_status_from_value(
+            self,
+            value: float,
+            excellent: float,
+            good: float,
+            warning: float,
+            reverse: bool = False) -> str:
         """Get status string from metric value."""
         if reverse:
             if value <= excellent:
@@ -554,9 +602,11 @@ class AnalyticsDashboard:
     def _get_status_for_metric(self, metric_name: str, value: float) -> str:
         """Get status for specific metric."""
         if metric_name == "latency":
-            return self._get_status_from_value(value, 1.0, 2.0, 5.0, reverse=True)
+            return self._get_status_from_value(
+                value, 1.0, 2.0, 5.0, reverse=True)
         elif metric_name == "error_rate":
-            return self._get_status_from_value(value, 0.01, 0.05, 0.10, reverse=True)
+            return self._get_status_from_value(
+                value, 0.01, 0.05, 0.10, reverse=True)
         elif metric_name in ["coordination_efficiency", "parallel_efficiency"]:
             return self._get_status_from_value(value, 0.9, 0.7, 0.5)
         else:
@@ -570,9 +620,13 @@ class AnalyticsDashboard:
     def _get_historical_data(self, metric_name: str) -> List[float]:
         """Get historical data for metric."""
         history_key = f"{metric_name}_global"
-        return self.performance_monitor.performance_history.get(history_key, [])[-50:]  # Last 50 points
+        # Last 50 points
+        return self.performance_monitor.performance_history.get(
+            history_key, [])[-50:]
 
-    def export_dashboard_data(self, dashboard_data: DashboardData, format: str = "json") -> str:
+    def export_dashboard_data(self,
+                              dashboard_data: DashboardData,
+                              format: str = "json") -> str:
         """Export dashboard data in specified format."""
         if format == "json":
             return json.dumps({

@@ -9,8 +9,8 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,8 @@ class IntegrationAgentCommunicator:
         self.coordination_session_id = None
         self.agent_status = "unknown"
 
-    async def initiate_pr_breakdown_coordination(self, pr_number: int = 28) -> Dict[str, Any]:
+    async def initiate_pr_breakdown_coordination(
+            self, pr_number: int = 28) -> Dict[str, Any]:
         """Initiate PR breakdown coordination with integration agent."""
 
         coordination_message = {
@@ -138,12 +139,15 @@ class IntegrationAgentCommunicator:
         self.communication_log.append(coordination_message)
 
         # Save coordination message to file for integration agent
-        coordination_file = Path("coordination_protocols/integration_agent_coordination_request.json")
+        coordination_file = Path(
+            "coordination_protocols/integration_agent_coordination_request.json")
         with open(coordination_file, "w") as f:
             json.dump(coordination_message, f, indent=2, default=str)
 
-        self.logger.info(f"✅ PR #{pr_number} coordination message sent to integration agent")
-        self.logger.info(f"📋 Coordination request saved to: {coordination_file}")
+        self.logger.info(
+            f"✅ PR #{pr_number} coordination message sent to integration agent")
+        self.logger.info(
+            f"📋 Coordination request saved to: {coordination_file}")
 
         return coordination_message
 
@@ -189,7 +193,8 @@ class IntegrationAgentCommunicator:
         }
 
         # Save acknowledgment template
-        template_file = Path("coordination_protocols/integration_agent_acknowledgment_template.json")
+        template_file = Path(
+            "coordination_protocols/integration_agent_acknowledgment_template.json")
         with open(template_file, "w") as f:
             json.dump(acknowledgment_template, f, indent=2, default=str)
 
@@ -206,45 +211,45 @@ class IntegrationAgentCommunicator:
             "orchestration_agent_status": "active_and_ready",
             "integration_agent_status": self.agent_status,
             "coordination_session_id": self.coordination_session_id,
-            "messages_sent": len(self.communication_log),
+            "messages_sent": len(
+                self.communication_log),
             "pr_breakdown_info": {
                 "target_pr": 28,
                 "coordination_method": "structured_component_breakdown",
                 "component_count": 5,
                 "estimated_timeline": "6 weeks across 3 phases",
-                "quality_assurance": "80% test coverage with automated validation"
-            },
+                "quality_assurance": "80% test coverage with automated validation"},
             "coordination_system_readiness": {
                 "orchestration_protocols": "✅ deployed",
                 "quality_gates": "✅ configured",
                 "monitoring_systems": "✅ operational",
                 "checkpoint_validation": "✅ ready",
-                "cross_agent_communication": "✅ active"
-            },
+                "cross_agent_communication": "✅ active"},
             "awaiting_response": {
                 "from_agent": "integration_agent",
                 "expected_response_time": "30 minutes",
                 "response_type": "coordination_acknowledgment",
-                "timeout_action": "escalate_to_pm_agent"
-            },
+                "timeout_action": "escalate_to_pm_agent"},
             "next_milestone": {
                 "milestone_name": "API Gateway Foundation Start",
-                "target_date": (datetime.now() + timedelta(days=1)).isoformat(),
+                "target_date": (
+                    datetime.now() +
+                    timedelta(
+                        days=1)).isoformat(),
                 "success_criteria": [
                     "Integration agent acknowledges coordination",
                     "API Gateway component analysis begins",
                     "Development environment configured",
-                    "Quality gates established"
-                ]
-            }
-        }
+                    "Quality gates established"]}}
 
         # Save status report
-        report_file = Path("coordination_protocols/coordination_status_report.json")
+        report_file = Path(
+            "coordination_protocols/coordination_status_report.json")
         with open(report_file, "w") as f:
             json.dump(status_report, f, indent=2, default=str)
 
-        self.logger.info(f"📊 Coordination status report generated: {report_file}")
+        self.logger.info(
+            f"📊 Coordination status report generated: {report_file}")
 
         return status_report
 
@@ -275,9 +280,9 @@ def initiate_integration_agent_coordination():
 
         print("✅ COORDINATION INITIATED SUCCESSFULLY")
         print("=" * 60)
-        print(f"📋 Coordination Request: coordination_protocols/integration_agent_coordination_request.json")
-        print(f"📋 Acknowledgment Template: coordination_protocols/integration_agent_acknowledgment_template.json")
-        print(f"📊 Status Report: coordination_protocols/coordination_status_report.json")
+        print("📋 Coordination Request: coordination_protocols/integration_agent_coordination_request.json")
+        print("📋 Acknowledgment Template: coordination_protocols/integration_agent_acknowledgment_template.json")
+        print("📊 Status Report: coordination_protocols/coordination_status_report.json")
         print("")
         print("🎯 AWAITING INTEGRATION AGENT RESPONSE")
         print("⏰ Response Timeout: 30 minutes")

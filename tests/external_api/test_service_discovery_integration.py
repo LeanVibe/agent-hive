@@ -3,17 +3,28 @@ Integration tests for Service Discovery system.
 Tests the complete integration between Service Discovery, API Gateway, and client libraries.
 """
 
-import pytest
 import asyncio
-import json
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
+
+import pytest
 from fastapi.testclient import TestClient
 
-from external_api.service_discovery import ServiceDiscovery, ServiceInstance, ServiceStatus
-from external_api.service_discovery_api import ServiceDiscoveryAPI, create_service_discovery_api
 from external_api.api_gateway import ApiGateway
-from external_api.models import ApiGatewayConfig, ApiRequest, ApiResponse
-from external_api.client_generators import ClientLibraryFactory, PythonClientGenerator, JavaScriptClientGenerator
+from external_api.client_generators import (
+    ClientLibraryFactory,
+    JavaScriptClientGenerator,
+    PythonClientGenerator,
+)
+from external_api.models import ApiGatewayConfig, ApiRequest
+from external_api.service_discovery import (
+    ServiceDiscovery,
+    ServiceInstance,
+    ServiceStatus,
+)
+from external_api.service_discovery_api import (
+    ServiceDiscoveryAPI,
+    create_service_discovery_api,
+)
 
 
 class TestServiceDiscoveryIntegration:
@@ -31,7 +42,8 @@ class TestServiceDiscoveryIntegration:
     @pytest.fixture
     def service_discovery_api(self, service_discovery):
         """Create ServiceDiscoveryAPI instance."""
-        return ServiceDiscoveryAPI(service_discovery, host="127.0.0.1", port=8001)
+        return ServiceDiscoveryAPI(
+            service_discovery, host="127.0.0.1", port=8001)
 
     @pytest.fixture
     def api_gateway_config(self):
@@ -93,7 +105,8 @@ class TestServiceDiscoveryIntegration:
             )
         ]
 
-    async def test_end_to_end_service_lifecycle(self, service_discovery, sample_services):
+    async def test_end_to_end_service_lifecycle(
+            self, service_discovery, sample_services):
         """Test complete service lifecycle from registration to cleanup."""
         await service_discovery.start()
 
@@ -135,7 +148,8 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
-    async def test_api_gateway_service_routing(self, api_gateway, service_discovery, sample_services):
+    async def test_api_gateway_service_routing(
+            self, api_gateway, service_discovery, sample_services):
         """Test API Gateway routing to services via service discovery."""
         await service_discovery.start()
 
@@ -146,13 +160,16 @@ class TestServiceDiscoveryIntegration:
 
             # Register service routes in API Gateway
             api_gateway.register_service_route("/api/v1/users", "user-service")
-            api_gateway.register_service_route("/api/v1/orders", "order-service")
+            api_gateway.register_service_route(
+                "/api/v1/orders", "order-service")
 
             # Test service route discovery
-            user_service_name = api_gateway._find_service_route("/api/v1/users/123")
+            user_service_name = api_gateway._find_service_route(
+                "/api/v1/users/123")
             assert user_service_name == "user-service"
 
-            order_service_name = api_gateway._find_service_route("/api/v1/orders/456")
+            order_service_name = api_gateway._find_service_route(
+                "/api/v1/orders/456")
             assert order_service_name == "order-service"
 
             # Test service instance retrieval
@@ -171,7 +188,8 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
-    async def test_rest_api_complete_workflow(self, test_client_api, sample_services):
+    async def test_rest_api_complete_workflow(
+            self, test_client_api, sample_services):
         """Test complete REST API workflow."""
         # Test system info before registration
         response = test_client_api.get("/system/info")
@@ -195,7 +213,8 @@ class TestServiceDiscoveryIntegration:
                     "version": service.version
                 }
 
-                response = test_client_api.post("/services/register", json=service_data)
+                response = test_client_api.post(
+                    "/services/register", json=service_data)
                 assert response.status_code == 200
                 registered_services.append(service.service_id)
 
@@ -230,7 +249,8 @@ class TestServiceDiscoveryIntegration:
             assert service_data["service_name"] == "user-service"
 
             # Test heartbeat via API
-            response = test_client_api.post("/services/user-service-001/heartbeat")
+            response = test_client_api.post(
+                "/services/user-service-001/heartbeat")
             assert response.status_code == 200
             heartbeat_data = response.json()
             assert heartbeat_data["message"] == "Heartbeat received"
@@ -244,8 +264,10 @@ class TestServiceDiscoveryIntegration:
             assert "notification-service" in all_services
 
             # Test getting healthy instance via API
-            response = test_client_api.get("/services/healthy/notification-service")
-            assert response.status_code == 200  # Should work since no health check URL means healthy
+            response = test_client_api.get(
+                "/services/healthy/notification-service")
+            # Should work since no health check URL means healthy
+            assert response.status_code == 200
 
         finally:
             # Clean up: deregister all services
@@ -298,7 +320,8 @@ class TestServiceDiscoveryIntegration:
 
         # Test Python client generation
         python_generator = PythonClientGenerator()
-        python_client = python_generator.generate_client(api_endpoint, service_name)
+        python_client = python_generator.generate_client(
+            api_endpoint, service_name)
 
         assert "class TestServiceClient:" in python_client
         assert "async def discover_instances" in python_client
@@ -363,7 +386,8 @@ class TestServiceDiscoveryIntegration:
         assert api_custom.port == 9000
         assert api_custom.service_discovery.config["health_check_interval"] == 5
 
-    async def test_service_watcher_integration(self, service_discovery, sample_services):
+    async def test_service_watcher_integration(
+            self, service_discovery, sample_services):
         """Test service watcher functionality in integration."""
         await service_discovery.start()
 
@@ -397,7 +421,8 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
-    async def test_concurrent_operations_integration(self, service_discovery, test_client_api):
+    async def test_concurrent_operations_integration(
+            self, service_discovery, test_client_api):
         """Test concurrent operations across the entire system."""
         await service_discovery.start()
 
@@ -417,29 +442,34 @@ class TestServiceDiscoveryIntegration:
                 services_data.append(service_data)
 
             # Register all services concurrently via API
-            registration_tasks = []
+            []
             for service_data in services_data:
-                # Note: TestClient doesn't support async, so we simulate concurrent registration
-                response = test_client_api.post("/services/register", json=service_data)
+                # Note: TestClient doesn't support async, so we simulate
+                # concurrent registration
+                response = test_client_api.post(
+                    "/services/register", json=service_data)
                 assert response.status_code == 200
 
             # Verify all services are registered
-            response = test_client_api.get("/services/discover/concurrent-service")
+            response = test_client_api.get(
+                "/services/discover/concurrent-service")
             assert response.status_code == 200
             discovery_data = response.json()
             assert discovery_data["total_count"] == 10
 
             # Test concurrent heartbeats
-            heartbeat_tasks = []
+            []
             for i in range(10):
                 service_id = f"concurrent-service-{i:03d}"
-                response = test_client_api.post(f"/services/{service_id}/heartbeat")
+                response = test_client_api.post(
+                    f"/services/{service_id}/heartbeat")
                 assert response.status_code == 200
 
             # Test concurrent discovery
-            discovery_tasks = []
+            []
             for _ in range(5):
-                response = test_client_api.get("/services/discover/concurrent-service")
+                response = test_client_api.get(
+                    "/services/discover/concurrent-service")
                 assert response.status_code == 200
                 data = response.json()
                 assert data["total_count"] == 10
@@ -454,7 +484,12 @@ class TestServiceDiscoveryIntegration:
             await service_discovery.stop()
 
     @patch('aiohttp.ClientSession')
-    async def test_api_gateway_service_proxying(self, mock_session, api_gateway, service_discovery, sample_services):
+    async def test_api_gateway_service_proxying(
+            self,
+            mock_session,
+            api_gateway,
+            service_discovery,
+            sample_services):
         """Test API Gateway proxying requests to discovered services."""
         await service_discovery.start()
 
@@ -498,7 +533,8 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
-    async def test_error_scenarios_integration(self, service_discovery, test_client_api):
+    async def test_error_scenarios_integration(
+            self, service_discovery, test_client_api):
         """Test error scenarios across the integrated system."""
         await service_discovery.start()
 
@@ -511,31 +547,36 @@ class TestServiceDiscoveryIntegration:
                 "port": 99999  # Invalid port
             }
 
-            response = test_client_api.post("/services/register", json=invalid_service)
+            response = test_client_api.post(
+                "/services/register", json=invalid_service)
             assert response.status_code == 422  # Validation error
 
             # Test operations on non-existent services
             response = test_client_api.get("/services/nonexistent-service")
             assert response.status_code == 404
 
-            response = test_client_api.post("/services/nonexistent-service/heartbeat")
+            response = test_client_api.post(
+                "/services/nonexistent-service/heartbeat")
             assert response.status_code == 404
 
             response = test_client_api.delete("/services/nonexistent-service")
             assert response.status_code == 404
 
-            response = test_client_api.get("/services/discover/nonexistent-service")
+            response = test_client_api.get(
+                "/services/discover/nonexistent-service")
             assert response.status_code == 200  # Returns empty list
             data = response.json()
             assert data["total_count"] == 0
 
-            response = test_client_api.get("/services/healthy/nonexistent-service")
+            response = test_client_api.get(
+                "/services/healthy/nonexistent-service")
             assert response.status_code == 404
 
         finally:
             await service_discovery.stop()
 
-    async def test_system_metrics_and_monitoring(self, service_discovery, test_client_api, sample_services):
+    async def test_system_metrics_and_monitoring(
+            self, service_discovery, test_client_api, sample_services):
         """Test system metrics and monitoring capabilities."""
         await service_discovery.start()
 
@@ -567,10 +608,12 @@ class TestServiceDiscoveryIntegration:
             }
 
             # Register services
-            response = test_client_api.post("/services/register", json=healthy_service)
+            response = test_client_api.post(
+                "/services/register", json=healthy_service)
             assert response.status_code == 200
 
-            response = test_client_api.post("/services/register", json=unhealthy_service)
+            response = test_client_api.post(
+                "/services/register", json=unhealthy_service)
             assert response.status_code == 200
 
             # Check updated system info
@@ -584,14 +627,16 @@ class TestServiceDiscoveryIntegration:
             assert "unhealthy-service" in updated_info["service_names"]
 
             # Test service status monitoring
-            response = test_client_api.get("/services/healthy-service-001/status")
+            response = test_client_api.get(
+                "/services/healthy-service-001/status")
             assert response.status_code == 200
             status_data = response.json()
             assert status_data["service_id"] == "healthy-service-001"
             assert "status" in status_data
 
             # Test discovery with health filtering
-            response = test_client_api.get("/services/discover/healthy-service?healthy_only=true")
+            response = test_client_api.get(
+                "/services/discover/healthy-service?healthy_only=true")
             assert response.status_code == 200
             healthy_discovery = response.json()
             assert healthy_discovery["total_count"] >= 1

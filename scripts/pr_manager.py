@@ -9,15 +9,14 @@ and integration criteria for XP methodology compliance.
 
 import json
 import os
+import re
 import sqlite3
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -171,7 +170,8 @@ class PRManager:
                 "--name-only"
             ], capture_output=True, text=True, check=True)
 
-            changed_files = files_result.stdout.strip().split('\n') if files_result.stdout.strip() else []
+            changed_files = files_result.stdout.strip().split(
+                '\n') if files_result.stdout.strip() else []
 
             return {
                 'number': pr_data['number'],
@@ -229,21 +229,25 @@ class PRManager:
 
             analysis['has_test_files'] = len(test_files) > 0
             analysis['has_code_files'] = len(code_files) > 0
-            analysis['test_to_code_ratio'] = len(test_files) / len(code_files) if code_files else 0
+            analysis['test_to_code_ratio'] = len(
+                test_files) / len(code_files) if code_files else 0
 
             # Risk indicators
             if len(code_files) > 0 and len(test_files) == 0:
-                analysis['risk_indicators'].append("Code changes without tests")
+                analysis['risk_indicators'].append(
+                    "Code changes without tests")
 
             if len(code_files) > 10:
-                analysis['risk_indicators'].append("Large number of files changed")
+                analysis['risk_indicators'].append(
+                    "Large number of files changed")
 
             # Calculate complexity score (simplified)
             added_lines = diff_content.count('\n+')
             deleted_lines = diff_content.count('\n-')
 
             if added_lines + deleted_lines > 0:
-                analysis['complexity_score'] = min(10.0, (added_lines + deleted_lines) / 100.0)
+                analysis['complexity_score'] = min(
+                    10.0, (added_lines + deleted_lines) / 100.0)
 
             return analysis
 
@@ -289,10 +293,12 @@ class PRManager:
                 "python", "-m", "pytest", "--cov=.", "--cov-report=json"
             ], capture_output=True, text=True, timeout=300)
 
-            if coverage_result.returncode == 0 and os.path.exists("coverage.json"):
+            if coverage_result.returncode == 0 and os.path.exists(
+                    "coverage.json"):
                 with open("coverage.json", 'r') as f:
                     coverage_data = json.load(f)
-                    total_coverage = coverage_data.get('totals', {}).get('percent_covered', 0)
+                    total_coverage = coverage_data.get(
+                        'totals', {}).get('percent_covered', 0)
                     checks['coverage_adequate'] = total_coverage >= self.quality_gates.min_test_coverage
 
             # Basic linting check
@@ -319,7 +325,7 @@ class PRManager:
         return checks
 
     def calculate_code_quality_score(self, pr_info: Dict, pr_analysis: Dict,
-                                   automated_checks: Dict) -> float:
+                                     automated_checks: Dict) -> float:
         """Calculate overall code quality score for PR."""
         score = 0.0
 
@@ -340,7 +346,11 @@ class PRManager:
             score += 1.0
 
         # Test inclusion component (15%)
-        if pr_analysis.get('has_test_files', False) and pr_analysis.get('has_code_files', False):
+        if pr_analysis.get(
+                'has_test_files',
+                False) and pr_analysis.get(
+                'has_code_files',
+                False):
             score += 1.5
         elif pr_analysis.get('has_test_files', False):
             score += 0.5
@@ -348,31 +358,43 @@ class PRManager:
         return min(score, 10.0)
 
     def check_quality_gates(self, pr_info: Dict, pr_analysis: Dict,
-                           automated_checks: Dict) -> Tuple[bool, List[str]]:
+                            automated_checks: Dict) -> Tuple[bool, List[str]]:
         """Check if PR meets quality gate requirements."""
         issues = []
 
         # File count check
         if pr_info['changed_files_count'] > self.quality_gates.max_files_changed:
-            issues.append(f"Too many files changed: {pr_info['changed_files_count']} > {self.quality_gates.max_files_changed}")
+            issues.append(
+                f"Too many files changed: {
+                    pr_info['changed_files_count']} > {
+                    self.quality_gates.max_files_changed}")
 
         # Lines changed check
         total_lines = pr_info['additions'] + pr_info['deletions']
         if total_lines > self.quality_gates.max_lines_per_pr:
-            issues.append(f"Too many lines changed: {total_lines} > {self.quality_gates.max_lines_per_pr}")
+            issues.append(
+                f"Too many lines changed: {total_lines} > {
+                    self.quality_gates.max_lines_per_pr}")
 
         # Commits check
         if len(pr_info['commits']) > self.quality_gates.max_commits_per_pr:
-            issues.append(f"Too many commits: {len(pr_info['commits'])} > {self.quality_gates.max_commits_per_pr}")
+            issues.append(
+                f"Too many commits: {
+                    len(
+                        pr_info['commits'])} > {
+                    self.quality_gates.max_commits_per_pr}")
 
         # Test requirements
-        if self.quality_gates.require_tests_for_code and pr_analysis.get('has_code_files', False):
+        if self.quality_gates.require_tests_for_code and pr_analysis.get(
+                'has_code_files', False):
             if not pr_analysis.get('has_test_files', False):
                 issues.append("Code changes require corresponding tests")
 
         # Coverage check
         if not automated_checks.get('coverage_adequate', False):
-            issues.append(f"Test coverage below minimum: {self.quality_gates.min_test_coverage}%")
+            issues.append(
+                f"Test coverage below minimum: {
+                    self.quality_gates.min_test_coverage}%")
 
         # Tests passing check
         if not automated_checks.get('tests_pass', False):
@@ -400,20 +422,22 @@ class PRManager:
         automated_checks = self.run_automated_checks(pr_number)
 
         # Calculate quality score
-        quality_score = self.calculate_code_quality_score(pr_info, pr_analysis, automated_checks)
+        quality_score = self.calculate_code_quality_score(
+            pr_info, pr_analysis, automated_checks)
 
         # Check quality gates
-        gates_passed, blocking_issues = self.check_quality_gates(pr_info, pr_analysis, automated_checks)
+        gates_passed, blocking_issues = self.check_quality_gates(
+            pr_info, pr_analysis, automated_checks)
 
         # Determine review requirements
         human_review_required = (
-            quality_score < self.quality_gates.require_human_review_threshold * 10 or
-            pr_info['changed_files_count'] > self.quality_gates.max_files_changed * 0.8 or
-            len(blocking_issues) > 0
-        )
+            quality_score < self.quality_gates.require_human_review_threshold *
+            10 or pr_info['changed_files_count'] > self.quality_gates.max_files_changed *
+            0.8 or len(blocking_issues) > 0)
 
         # Generate recommendations
-        recommendations = self.generate_recommendations(pr_info, pr_analysis, automated_checks, quality_score)
+        recommendations = self.generate_recommendations(
+            pr_info, pr_analysis, automated_checks, quality_score)
 
         # Calculate review duration
         review_duration = (time.time() - start_time) / 60.0  # minutes
@@ -424,14 +448,16 @@ class PRManager:
             pr_title=pr_info['title'],
             pr_author=pr_info['author'],
             pr_state=pr_info['state'],
-            review_id=f"review-{pr_number}-{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            review_id=f"review-{pr_number}-{
+                datetime.now().strftime('%Y%m%d_%H%M%S')}",
             timestamp=datetime.now().isoformat(),
             files_changed=pr_info['changed_files_count'],
             lines_added=pr_info['additions'],
             lines_deleted=pr_info['deletions'],
             commits_count=len(pr_info['commits']),
             has_tests=pr_analysis.get('has_test_files', False),
-            test_coverage=automated_checks.get('coverage_adequate', False) * 100,  # Simplified
+            test_coverage=automated_checks.get(
+                'coverage_adequate', False) * 100,  # Simplified
             tdd_compliance=automated_checks.get('tests_pass', False),
             code_quality_score=quality_score,
             automated_checks_passed=gates_passed,
@@ -448,34 +474,47 @@ class PRManager:
 
         return review
 
-    def generate_recommendations(self, pr_info: Dict, pr_analysis: Dict,
-                               automated_checks: Dict, quality_score: float) -> List[str]:
+    def generate_recommendations(
+            self,
+            pr_info: Dict,
+            pr_analysis: Dict,
+            automated_checks: Dict,
+            quality_score: float) -> List[str]:
         """Generate improvement recommendations for PR."""
         recommendations = []
 
         # Size recommendations
         if pr_info['changed_files_count'] > self.quality_gates.max_files_changed:
-            recommendations.append("Consider breaking this PR into smaller, focused changes")
+            recommendations.append(
+                "Consider breaking this PR into smaller, focused changes")
 
         # Test recommendations
-        if pr_analysis.get('has_code_files', False) and not pr_analysis.get('has_test_files', False):
+        if pr_analysis.get(
+                'has_code_files',
+                False) and not pr_analysis.get(
+                'has_test_files',
+                False):
             recommendations.append("Add tests for the new/modified code")
 
         # Coverage recommendations
         if not automated_checks.get('coverage_adequate', False):
-            recommendations.append("Increase test coverage to meet minimum requirements")
+            recommendations.append(
+                "Increase test coverage to meet minimum requirements")
 
         # Quality recommendations
         if not automated_checks.get('linting_clean', False):
-            recommendations.append("Fix code quality issues identified by linting")
+            recommendations.append(
+                "Fix code quality issues identified by linting")
 
         # Performance recommendations
         if quality_score < 7.0:
-            recommendations.append("Improve overall code quality before merging")
+            recommendations.append(
+                "Improve overall code quality before merging")
 
         # General recommendations
         if quality_score >= 8.0:
-            recommendations.append("Great work! This PR meets high quality standards")
+            recommendations.append(
+                "Great work! This PR meets high quality standards")
 
         return recommendations
 
@@ -507,10 +546,13 @@ class PRManager:
                     INSERT INTO pr_quality_issues
                     (issue_id, review_id, issue_type, severity, description, recommendation)
                     VALUES (?, ?, ?, ?, ?, ?)
-                """, (
-                    f"{review.review_id}-{len(review.blocking_issues)}-{hash(issue)}",
-                    review.review_id, "quality_gate", "high", issue, "Fix before merging"
-                ))
+                """,
+                             (f"{review.review_id}-{len(review.blocking_issues)}-{hash(issue)}",
+                              review.review_id,
+                              "quality_gate",
+                              "high",
+                              issue,
+                              "Fix before merging"))
 
             conn.commit()
 
@@ -562,7 +604,7 @@ class PRManager:
 
         # Add recommendations
         if review.recommendations:
-            report += f"""
+            report += """
 ### 💡 Recommendations
 """
             for i, rec in enumerate(review.recommendations, 1):
@@ -653,8 +695,12 @@ def main():
             review = manager.review_pr(pr_number)
             print(f"✅ PR #{pr_number} reviewed")
             print(f"Quality Score: {review.code_quality_score:.1f}/10.0")
-            print(f"Status: {'APPROVED' if review.integration_approved else 'NEEDS WORK'}")
-            print(f"Merge Eligible: {'Yes' if review.merge_eligibility else 'No'}")
+            print(
+                f"Status: {
+                    'APPROVED' if review.integration_approved else 'NEEDS WORK'}")
+            print(
+                f"Merge Eligible: {
+                    'Yes' if review.merge_eligibility else 'No'}")
 
             if review.blocking_issues:
                 print(f"Blocking Issues: {len(review.blocking_issues)}")
@@ -676,7 +722,8 @@ def main():
             report = manager.generate_pr_report(pr_number)
 
             # Save report
-            filename = f"pr_report_{pr_number}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+            filename = f"pr_report_{pr_number}_{
+                datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
             with open(filename, 'w') as f:
                 f.write(report)
 
@@ -694,7 +741,10 @@ def main():
         print(f"\n✅ Reviewed {len(reviews)} PRs")
         for review in reviews:
             status = "✅ APPROVED" if review.integration_approved else "❌ NEEDS WORK"
-            print(f"PR #{review.pr_number}: {status} (Quality: {review.code_quality_score:.1f}/10.0)")
+            print(
+                f"PR #{
+                    review.pr_number}: {status} (Quality: {
+                    review.code_quality_score:.1f}/10.0)")
 
     elif command == "list-open":
         try:
@@ -707,7 +757,8 @@ def main():
 
             print(f"Open PRs ({len(pr_list)} found):")
             for pr in pr_list:
-                print(f"#{pr['number']}: {pr['title']} by {pr['author']['login']}")
+                print(
+                    f"#{pr['number']}: {pr['title']} by {pr['author']['login']}")
 
         except subprocess.CalledProcessError as e:
             print(f"Error listing PRs: {e}")

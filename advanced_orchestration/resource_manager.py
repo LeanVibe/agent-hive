@@ -8,12 +8,17 @@ for the multi-agent system.
 import asyncio
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any, Dict, List, Optional
+
 import psutil
 
 from .models import (
-    ResourceRequirements, ResourceAllocation, ResourceUsage, ResourceLimits,
-    ResourceOptimization, ResourceAllocationException
+    ResourceAllocation,
+    ResourceAllocationException,
+    ResourceLimits,
+    ResourceOptimization,
+    ResourceRequirements,
+    ResourceUsage,
 )
 
 
@@ -53,7 +58,10 @@ class ResourceManager:
 
         self.logger.info(f"ResourceManager initialized with limits: {limits}")
 
-    async def allocate_resources(self, agent_id: str, requirements: ResourceRequirements) -> ResourceAllocation:
+    async def allocate_resources(
+            self,
+            agent_id: str,
+            requirements: ResourceRequirements) -> ResourceAllocation:
         """
         Allocate resources to an agent.
 
@@ -70,11 +78,13 @@ class ResourceManager:
         try:
             # Check if agent already has resources allocated
             if agent_id in self.allocated_resources:
-                raise ResourceAllocationException(f"Agent {agent_id} already has resources allocated")
+                raise ResourceAllocationException(
+                    f"Agent {agent_id} already has resources allocated")
 
             # Validate resource constraints
             if not await self.check_resource_constraints(requirements):
-                raise ResourceAllocationException("Insufficient resources available")
+                raise ResourceAllocationException(
+                    "Insufficient resources available")
 
             # Create allocation
             allocation = ResourceAllocation(
@@ -93,12 +103,15 @@ class ResourceManager:
             self.total_allocated.disk_mb += requirements.disk_mb
             self.total_allocated.network_mbps += requirements.network_mbps
 
-            self.logger.info(f"Resources allocated to agent {agent_id}: {requirements}")
+            self.logger.info(
+                f"Resources allocated to agent {agent_id}: {requirements}")
             return allocation
 
         except Exception as e:
-            self.logger.error(f"Failed to allocate resources to agent {agent_id}: {e}")
-            raise ResourceAllocationException(f"Resource allocation failed: {e}")
+            self.logger.error(
+                f"Failed to allocate resources to agent {agent_id}: {e}")
+            raise ResourceAllocationException(
+                f"Resource allocation failed: {e}")
 
     async def deallocate_resources(self, agent_id: str) -> bool:
         """
@@ -112,7 +125,8 @@ class ResourceManager:
         """
         try:
             if agent_id not in self.allocated_resources:
-                self.logger.warning(f"No resources allocated to agent {agent_id}")
+                self.logger.warning(
+                    f"No resources allocated to agent {agent_id}")
                 return False
 
             allocation = self.allocated_resources[agent_id]
@@ -130,7 +144,8 @@ class ResourceManager:
             return True
 
         except Exception as e:
-            self.logger.error(f"Failed to deallocate resources from agent {agent_id}: {e}")
+            self.logger.error(
+                f"Failed to deallocate resources from agent {agent_id}: {e}")
             return False
 
     async def get_resource_usage(self) -> ResourceUsage:
@@ -151,7 +166,8 @@ class ResourceManager:
             net_io = psutil.net_io_counters()
             if net_io:
                 # Simplified network usage calculation
-                network_percent = min(100.0, (net_io.bytes_sent + net_io.bytes_recv) / (1024 * 1024) * 0.1)
+                network_percent = min(
+                    100.0, (net_io.bytes_sent + net_io.bytes_recv) / (1024 * 1024) * 0.1)
 
             usage = ResourceUsage(
                 cpu_percent=cpu_percent,
@@ -177,7 +193,8 @@ class ResourceManager:
                 network_percent=0.0
             )
 
-    async def check_resource_constraints(self, requirements: ResourceRequirements) -> bool:
+    async def check_resource_constraints(
+            self, requirements: ResourceRequirements) -> bool:
         """
         Check if resource requirements can be satisfied.
 
@@ -188,16 +205,20 @@ class ResourceManager:
             bool: True if requirements can be satisfied
         """
         # Check against limits
-        if (self.total_allocated.cpu_cores + requirements.cpu_cores > self.limits.max_cpu_cores):
+        if (self.total_allocated.cpu_cores +
+                requirements.cpu_cores > self.limits.max_cpu_cores):
             return False
 
-        if (self.total_allocated.memory_mb + requirements.memory_mb > self.limits.max_memory_mb):
+        if (self.total_allocated.memory_mb +
+                requirements.memory_mb > self.limits.max_memory_mb):
             return False
 
-        if (self.total_allocated.disk_mb + requirements.disk_mb > self.limits.max_disk_mb):
+        if (self.total_allocated.disk_mb +
+                requirements.disk_mb > self.limits.max_disk_mb):
             return False
 
-        if (self.total_allocated.network_mbps + requirements.network_mbps > self.limits.max_network_mbps):
+        if (self.total_allocated.network_mbps +
+                requirements.network_mbps > self.limits.max_network_mbps):
             return False
 
         # Check against current system usage
@@ -231,10 +252,14 @@ class ResourceManager:
 
             # Calculate average usage over last 10 measurements
             recent_usage = self.usage_history[-10:]
-            avg_cpu = sum(u.cpu_percent for u in recent_usage) / len(recent_usage)
-            avg_memory = sum(u.memory_percent for u in recent_usage) / len(recent_usage)
-            avg_disk = sum(u.disk_percent for u in recent_usage) / len(recent_usage)
-            avg_network = sum(u.network_percent for u in recent_usage) / len(recent_usage)
+            avg_cpu = sum(u.cpu_percent for u in recent_usage) / \
+                len(recent_usage)
+            avg_memory = sum(
+                u.memory_percent for u in recent_usage) / len(recent_usage)
+            avg_disk = sum(u.disk_percent for u in recent_usage) / \
+                len(recent_usage)
+            avg_network = sum(u.network_percent for u in recent_usage) / \
+                len(recent_usage)
 
             # Generate optimization recommendations
             for agent_id, allocation in self.allocated_resources.items():
@@ -245,16 +270,22 @@ class ResourceManager:
                 if optimization:
                     optimizations.append(optimization)
 
-            self.logger.info(f"Generated {len(optimizations)} resource optimizations")
+            self.logger.info(
+                f"Generated {len(optimizations)} resource optimizations")
             return optimizations
 
         except Exception as e:
             self.logger.error(f"Failed to optimize resource allocation: {e}")
             return optimizations
 
-    async def _analyze_agent_allocation(self, agent_id: str, allocation: ResourceAllocation,
-                                       avg_cpu: float, avg_memory: float, avg_disk: float,
-                                       avg_network: float) -> Optional[ResourceOptimization]:
+    async def _analyze_agent_allocation(
+            self,
+            agent_id: str,
+            allocation: ResourceAllocation,
+            avg_cpu: float,
+            avg_memory: float,
+            avg_disk: float,
+            avg_network: float) -> Optional[ResourceOptimization]:
         """
         Analyze a single agent's resource allocation.
 
@@ -270,14 +301,17 @@ class ResourceManager:
             ResourceOptimization: Optimization recommendation or None
         """
         # Calculate utilization efficiency
-        cpu_efficiency = min(100.0, avg_cpu / max(1.0, allocation.allocated_cpu * 10))
-        memory_efficiency = min(100.0, avg_memory / max(1.0, (allocation.allocated_memory / 1024) * 10))
+        cpu_efficiency = min(
+            100.0, avg_cpu / max(1.0, allocation.allocated_cpu * 10))
+        memory_efficiency = min(
+            100.0, avg_memory / max(1.0, (allocation.allocated_memory / 1024) * 10))
 
         # Check for over-allocation
         if cpu_efficiency < 50.0 or memory_efficiency < 50.0:
             # Recommend reducing allocation
             recommended_cpu = max(1, int(allocation.allocated_cpu * 0.8))
-            recommended_memory = max(512, int(allocation.allocated_memory * 0.8))
+            recommended_memory = max(
+                512, int(allocation.allocated_memory * 0.8))
 
             recommended_allocation = ResourceAllocation(
                 agent_id=agent_id,
@@ -288,15 +322,17 @@ class ResourceManager:
                 allocation_time=datetime.now()
             )
 
-            expected_improvement = (100.0 - max(cpu_efficiency, memory_efficiency)) / 100.0
+            expected_improvement = (
+                100.0 - max(cpu_efficiency, memory_efficiency)) / 100.0
 
             return ResourceOptimization(
                 agent_id=agent_id,
                 current_allocation=allocation,
                 recommended_allocation=recommended_allocation,
                 expected_improvement=expected_improvement,
-                reason=f"Over-allocated resources detected (CPU: {cpu_efficiency:.1f}%, Memory: {memory_efficiency:.1f}%)"
-            )
+                reason=f"Over-allocated resources detected (CPU: {
+                    cpu_efficiency:.1f}%, Memory: {
+                    memory_efficiency:.1f}%)")
 
         # Check for under-allocation
         elif cpu_efficiency > 90.0 or memory_efficiency > 90.0:
@@ -320,15 +356,17 @@ class ResourceManager:
                     allocation_time=datetime.now()
                 )
 
-                expected_improvement = (min(cpu_efficiency, memory_efficiency) - 90.0) / 100.0
+                expected_improvement = (
+                    min(cpu_efficiency, memory_efficiency) - 90.0) / 100.0
 
                 return ResourceOptimization(
                     agent_id=agent_id,
                     current_allocation=allocation,
                     recommended_allocation=recommended_allocation,
                     expected_improvement=expected_improvement,
-                    reason=f"Under-allocated resources detected (CPU: {cpu_efficiency:.1f}%, Memory: {memory_efficiency:.1f}%)"
-                )
+                    reason=f"Under-allocated resources detected (CPU: {
+                        cpu_efficiency:.1f}%, Memory: {
+                        memory_efficiency:.1f}%)")
 
         return None
 
@@ -346,29 +384,38 @@ class ResourceManager:
                 'cpu_cores': self.total_allocated.cpu_cores,
                 'memory_mb': self.total_allocated.memory_mb,
                 'disk_mb': self.total_allocated.disk_mb,
-                'network_mbps': self.total_allocated.network_mbps
-            },
+                'network_mbps': self.total_allocated.network_mbps},
             'limits': {
                 'max_cpu_cores': self.limits.max_cpu_cores,
                 'max_memory_mb': self.limits.max_memory_mb,
                 'max_disk_mb': self.limits.max_disk_mb,
-                'max_network_mbps': self.limits.max_network_mbps
-            },
+                'max_network_mbps': self.limits.max_network_mbps},
             'current_usage': {
                 'cpu_percent': current_usage.cpu_percent,
                 'memory_percent': current_usage.memory_percent,
                 'disk_percent': current_usage.disk_percent,
-                'network_percent': current_usage.network_percent
-            },
+                'network_percent': current_usage.network_percent},
             'allocation_efficiency': {
-                'cpu': (self.total_allocated.cpu_cores / self.limits.max_cpu_cores) * 100,
-                'memory': (self.total_allocated.memory_mb / self.limits.max_memory_mb) * 100,
-                'disk': (self.total_allocated.disk_mb / self.limits.max_disk_mb) * 100,
-                'network': (self.total_allocated.network_mbps / self.limits.max_network_mbps) * 100
-            },
-            'active_allocations': len(self.allocated_resources),
-            'agents': list(self.allocated_resources.keys())
-        }
+                'cpu': (
+                    self.total_allocated.cpu_cores /
+                    self.limits.max_cpu_cores) *
+                100,
+                'memory': (
+                    self.total_allocated.memory_mb /
+                    self.limits.max_memory_mb) *
+                100,
+                'disk': (
+                    self.total_allocated.disk_mb /
+                    self.limits.max_disk_mb) *
+                100,
+                'network': (
+                    self.total_allocated.network_mbps /
+                    self.limits.max_network_mbps) *
+                100},
+            'active_allocations': len(
+                self.allocated_resources),
+            'agents': list(
+                self.allocated_resources.keys())}
 
     async def start_monitoring(self) -> None:
         """Start resource usage monitoring."""
@@ -394,7 +441,9 @@ class ResourceManager:
                 self.logger.error(f"Resource monitoring error: {e}")
                 await asyncio.sleep(30)  # Wait longer on error
 
-    def get_agent_allocation(self, agent_id: str) -> Optional[ResourceAllocation]:
+    def get_agent_allocation(
+            self,
+            agent_id: str) -> Optional[ResourceAllocation]:
         """
         Get resource allocation for a specific agent.
 
@@ -414,10 +463,14 @@ class ResourceManager:
             ResourceRequirements: Available resources
         """
         return ResourceRequirements(
-            cpu_cores=max(0, self.limits.max_cpu_cores - self.total_allocated.cpu_cores),
-            memory_mb=max(0, self.limits.max_memory_mb - self.total_allocated.memory_mb),
-            disk_mb=max(0, self.limits.max_disk_mb - self.total_allocated.disk_mb),
-            network_mbps=max(0, self.limits.max_network_mbps - self.total_allocated.network_mbps)
+            cpu_cores=max(0, self.limits.max_cpu_cores -
+                          self.total_allocated.cpu_cores),
+            memory_mb=max(0, self.limits.max_memory_mb -
+                          self.total_allocated.memory_mb),
+            disk_mb=max(0, self.limits.max_disk_mb -
+                        self.total_allocated.disk_mb),
+            network_mbps=max(0, self.limits.max_network_mbps -
+                             self.total_allocated.network_mbps)
         )
 
     def get_resource_efficiency(self) -> Dict[str, float]:
@@ -431,12 +484,16 @@ class ResourceManager:
             return {'cpu': 0.0, 'memory': 0.0, 'disk': 0.0, 'network': 0.0}
 
         # Calculate average efficiency over recent history
-        recent_usage = self.usage_history[-10:] if len(self.usage_history) >= 10 else self.usage_history
+        recent_usage = self.usage_history[-10:] if len(
+            self.usage_history) >= 10 else self.usage_history
 
         avg_cpu = sum(u.cpu_percent for u in recent_usage) / len(recent_usage)
-        avg_memory = sum(u.memory_percent for u in recent_usage) / len(recent_usage)
-        avg_disk = sum(u.disk_percent for u in recent_usage) / len(recent_usage)
-        avg_network = sum(u.network_percent for u in recent_usage) / len(recent_usage)
+        avg_memory = sum(
+            u.memory_percent for u in recent_usage) / len(recent_usage)
+        avg_disk = sum(u.disk_percent for u in recent_usage) / \
+            len(recent_usage)
+        avg_network = sum(
+            u.network_percent for u in recent_usage) / len(recent_usage)
 
         return {
             'cpu': avg_cpu,

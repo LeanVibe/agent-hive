@@ -10,7 +10,8 @@ class SmartContextManager:
         """Run continuously to prevent context issues"""
         while True:
             for agent in self.get_all_agents():
-                predicted_overflow_time = self.predictor.predict_overflow(agent)
+                predicted_overflow_time = self.predictor.predict_overflow(
+                    agent)
 
                 if predicted_overflow_time < 30:  # 30 minutes
                     # Proactively summarize before overflow

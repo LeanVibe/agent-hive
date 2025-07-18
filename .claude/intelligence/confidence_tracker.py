@@ -39,7 +39,9 @@ class ConfidenceTracker:
             self.db_path = Path(db_path)
 
         self._init_db()
-        logger.info(f"ConfidenceTracker initialized with database: {self.db_path}")
+        logger.info(
+    f"ConfidenceTracker initialized with database: {
+        self.db_path}")
 
     def _init_db(self):
         """Initialize confidence tracking database with proper schema."""
@@ -104,12 +106,16 @@ class ConfidenceTracker:
         # If we have enough samples and high success rate, proceed autonomously
         config = get_config()
         min_samples = config.get('intelligence.confidence.min_samples', 5)
-        high_success_threshold = config.get('intelligence.confidence.high_success_threshold', 0.9)
+        high_success_threshold = config.get(
+    'intelligence.confidence.high_success_threshold', 0.9)
 
         if result and result[1] >= min_samples:
             success_rate = result[0]
             if success_rate > high_success_threshold:
-                logger.debug(f"High success pattern found: {success_rate:.3f} from {result[1]} samples")
+                logger.debug(
+    f"High success pattern found: {
+        success_rate:.3f} from {
+            result[1]} samples")
                 return False, success_rate
 
         # Calculate combined confidence score
@@ -119,8 +125,10 @@ class ConfidenceTracker:
 
         # Apply dynamic threshold based on risk assessment
         risk_score = self._calculate_risk(context)
-        base_threshold = config.get('intelligence.confidence.base_threshold', 0.75)
-        high_risk_threshold = config.get('intelligence.confidence.high_risk_threshold', 0.85)
+        base_threshold = config.get(
+    'intelligence.confidence.base_threshold', 0.75)
+        high_risk_threshold = config.get(
+    'intelligence.confidence.high_risk_threshold', 0.85)
 
         threshold = high_risk_threshold if risk_score > 0.7 else base_threshold
 
@@ -190,7 +198,8 @@ class ConfidenceTracker:
                     ?
                 ))
                 """,
-                (context_hash, success_rate, total, datetime.now(), context_hash, datetime.now()),
+                (context_hash, success_rate, total,
+                 datetime.now(), context_hash, datetime.now()),
             )
 
         logger.info(
@@ -351,5 +360,6 @@ class ConfidenceTracker:
             """)
             deleted_patterns = cursor.rowcount
 
-        logger.info(f"Cleanup completed: deleted {deleted_decisions} decisions and {deleted_patterns} patterns")
+        logger.info(
+    f"Cleanup completed: deleted {deleted_decisions} decisions and {deleted_patterns} patterns")
         return deleted_decisions + deleted_patterns

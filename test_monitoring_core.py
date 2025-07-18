@@ -7,11 +7,12 @@ Comprehensive test coverage for minimal monitoring core.
 Following frontend blueprint pattern: focused, compliant testing.
 """
 
-import unittest
 import os
 import tempfile
-from unittest.mock import patch, MagicMock
-from monitoring_core import MonitoringCore, get_system_health, collect_metrics
+import unittest
+from unittest.mock import MagicMock, patch
+
+from monitoring_core import MonitoringCore, collect_metrics, get_system_health
 
 
 class TestMonitoringCore(unittest.TestCase):
@@ -33,7 +34,8 @@ class TestMonitoringCore(unittest.TestCase):
         # Database should exist and have correct structure
         import sqlite3
         with sqlite3.connect(self.temp_db.name) as conn:
-            cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='metrics'")
+            cursor = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='metrics'")
             self.assertIsNotNone(cursor.fetchone())
 
     def test_record_metric(self):
@@ -42,7 +44,8 @@ class TestMonitoringCore(unittest.TestCase):
 
         import sqlite3
         with sqlite3.connect(self.temp_db.name) as conn:
-            cursor = conn.execute("SELECT metric_name, value FROM metrics WHERE metric_name='test_metric'")
+            cursor = conn.execute(
+                "SELECT metric_name, value FROM metrics WHERE metric_name='test_metric'")
             row = cursor.fetchone()
 
         self.assertIsNotNone(row)
@@ -56,7 +59,8 @@ class TestMonitoringCore(unittest.TestCase):
         """Test latest metrics collection."""
         # Mock system metrics
         mock_cpu.return_value = 25.5
-        mock_memory.return_value = MagicMock(percent=60.0, used=8589934592)  # 8GB
+        mock_memory.return_value = MagicMock(
+            percent=60.0, used=8589934592)  # 8GB
         mock_disk.return_value = MagicMock(percent=45.0)
 
         metrics = self.monitor.get_latest_metrics()
@@ -73,7 +77,8 @@ class TestMonitoringCore(unittest.TestCase):
         """Test metric collection and storage."""
         # Mock system metrics
         mock_cpu.return_value = 30.0
-        mock_memory.return_value = MagicMock(percent=50.0, used=4294967296)  # 4GB
+        mock_memory.return_value = MagicMock(
+            percent=50.0, used=4294967296)  # 4GB
         mock_disk.return_value = MagicMock(percent=40.0)
 
         metrics = self.monitor.collect_and_store()
@@ -97,7 +102,8 @@ class TestMonitoringCore(unittest.TestCase):
         """Test health status with healthy metrics."""
         # Mock healthy system metrics
         mock_cpu.return_value = 20.0
-        mock_memory.return_value = MagicMock(percent=40.0, used=2147483648)  # 2GB
+        mock_memory.return_value = MagicMock(
+            percent=40.0, used=2147483648)  # 2GB
         mock_disk.return_value = MagicMock(percent=30.0)
 
         health = self.monitor.get_health_status()
@@ -114,7 +120,8 @@ class TestMonitoringCore(unittest.TestCase):
         """Test health status with warning metrics."""
         # Mock warning level metrics
         mock_cpu.return_value = 85.0  # High CPU
-        mock_memory.return_value = MagicMock(percent=60.0, used=6442450944)  # 6GB
+        mock_memory.return_value = MagicMock(
+            percent=60.0, used=6442450944)  # 6GB
         mock_disk.return_value = MagicMock(percent=50.0)
 
         health = self.monitor.get_health_status()
@@ -125,11 +132,13 @@ class TestMonitoringCore(unittest.TestCase):
     @patch('psutil.cpu_percent')
     @patch('psutil.virtual_memory')
     @patch('psutil.disk_usage')
-    def test_get_health_status_critical(self, mock_disk, mock_memory, mock_cpu):
+    def test_get_health_status_critical(
+            self, mock_disk, mock_memory, mock_cpu):
         """Test health status with critical metrics."""
         # Mock critical metrics
         mock_cpu.return_value = 90.0  # High CPU
-        mock_memory.return_value = MagicMock(percent=90.0, used=19327352832)  # 18GB
+        mock_memory.return_value = MagicMock(
+            percent=90.0, used=19327352832)  # 18GB
         mock_disk.return_value = MagicMock(percent=95.0)  # High disk
 
         health = self.monitor.get_health_status()

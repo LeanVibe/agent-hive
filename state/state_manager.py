@@ -6,14 +6,14 @@ task states, checkpoints, and ML integration.
 """
 
 import asyncio
-import sqlite3
 import json
 import logging
+import sqlite3
+from contextlib import asynccontextmanager
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass, field, asdict
-from contextlib import asynccontextmanager
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,8 @@ class StateManager:
 
             conn.commit()
 
-    async def register_agent(self, agent_id: str, capabilities: Optional[List[str]] = None) -> bool:
+    async def register_agent(self, agent_id: str,
+                             capabilities: Optional[List[str]] = None) -> bool:
         """Register a new agent or update existing agent."""
         try:
             agent_state = AgentState(
@@ -160,9 +161,12 @@ class StateManager:
             logger.error(f"Error registering agent {agent_id}: {e}")
             return False
 
-    async def update_agent_state(self, agent_id: str, status: Optional[str] = None,
-                                context_usage: Optional[float] = None,
-                                current_task_id: Optional[str] = None) -> bool:
+    async def update_agent_state(
+            self,
+            agent_id: str,
+            status: Optional[str] = None,
+            context_usage: Optional[float] = None,
+            current_task_id: Optional[str] = None) -> bool:
         """Update agent state with various parameters."""
         try:
             if agent_id in self._agent_cache:
@@ -177,12 +181,17 @@ class StateManager:
 
                 with sqlite3.connect(self.db_path) as conn:
                     cursor = conn.cursor()
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         UPDATE agents
                         SET status = ?, current_task_id = ?, context_usage = ?, last_activity = ?
                         WHERE agent_id = ?
-                    """, (agent_state.status, agent_state.current_task_id,
-                         agent_state.context_usage, agent_state.last_activity.isoformat(), agent_id))
+                    """,
+                        (agent_state.status,
+                         agent_state.current_task_id,
+                         agent_state.context_usage,
+                         agent_state.last_activity.isoformat(),
+                         agent_id))
                     conn.commit()
 
                 return True
@@ -192,7 +201,8 @@ class StateManager:
             logger.error(f"Error updating agent status for {agent_id}: {e}")
             return False
 
-    async def add_task(self, task_id: str, priority: int = 5, metadata: Optional[Dict[str, Any]] = None) -> bool:
+    async def add_task(self, task_id: str, priority: int = 5,
+                       metadata: Optional[Dict[str, Any]] = None) -> bool:
         """Create a new task."""
         try:
             task_state = TaskState(
@@ -204,20 +214,21 @@ class StateManager:
 
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT OR REPLACE INTO tasks
                     (task_id, status, agent_id, priority, created_at, started_at, completed_at, metadata)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    task_state.task_id,
-                    task_state.status,
-                    task_state.agent_id,
-                    task_state.priority,
-                    task_state.created_at.isoformat(),
-                    task_state.started_at.isoformat() if task_state.started_at else None,
-                    task_state.completed_at.isoformat() if task_state.completed_at else None,
-                    json.dumps(task_state.metadata)
-                ))
+                """,
+                    (task_state.task_id,
+                     task_state.status,
+                     task_state.agent_id,
+                     task_state.priority,
+                     task_state.created_at.isoformat(),
+                     task_state.started_at.isoformat() if task_state.started_at else None,
+                     task_state.completed_at.isoformat() if task_state.completed_at else None,
+                     json.dumps(
+                         task_state.metadata)))
                 conn.commit()
 
             # Update cache
@@ -228,8 +239,12 @@ class StateManager:
             logger.error(f"Error creating task {task_id}: {e}")
             return False
 
-    async def update_task_state(self, task_id: str, status: Optional[str] = None,
-                               agent_id: Optional[str] = None, priority: Optional[int] = None) -> bool:
+    async def update_task_state(
+            self,
+            task_id: str,
+            status: Optional[str] = None,
+            agent_id: Optional[str] = None,
+            priority: Optional[int] = None) -> bool:
         """Update task state."""
         try:
             if task_id in self._task_cache:
@@ -248,18 +263,18 @@ class StateManager:
 
                 with sqlite3.connect(self.db_path) as conn:
                     cursor = conn.cursor()
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         UPDATE tasks
                         SET status = ?, agent_id = ?, priority = ?, started_at = ?, completed_at = ?
                         WHERE task_id = ?
-                    """, (
-                        task_state.status,
-                        task_state.agent_id,
-                        task_state.priority,
-                        task_state.started_at.isoformat() if task_state.started_at else None,
-                        task_state.completed_at.isoformat() if task_state.completed_at else None,
-                        task_id
-                    ))
+                    """,
+                        (task_state.status,
+                         task_state.agent_id,
+                         task_state.priority,
+                         task_state.started_at.isoformat() if task_state.started_at else None,
+                         task_state.completed_at.isoformat() if task_state.completed_at else None,
+                         task_id))
                     conn.commit()
 
                 return True
@@ -290,8 +305,10 @@ class StateManager:
                         agent_id=row[2],
                         priority=row[3],
                         created_at=datetime.fromisoformat(row[4]),
-                        started_at=datetime.fromisoformat(row[5]) if row[5] else None,
-                        completed_at=datetime.fromisoformat(row[6]) if row[6] else None,
+                        started_at=datetime.fromisoformat(
+                            row[5]) if row[5] else None,
+                        completed_at=datetime.fromisoformat(
+                            row[6]) if row[6] else None,
                         metadata=json.loads(row[7])
                     )
                 return None
@@ -324,7 +341,8 @@ class StateManager:
             return False
 
         except Exception as e:
-            logger.error(f"Error assigning task {task_id} to agent {agent_id}: {e}")
+            logger.error(
+                f"Error assigning task {task_id} to agent {agent_id}: {e}")
             return False
 
     async def complete_task(self, task_id: str, success: bool = True) -> bool:
@@ -405,17 +423,20 @@ class StateManager:
             cursor.execute("SELECT COUNT(*) FROM agents")
             self._system_state.total_agents = cursor.fetchone()[0]
 
-            cursor.execute("SELECT COUNT(*) FROM agents WHERE status != 'idle'")
+            cursor.execute(
+                "SELECT COUNT(*) FROM agents WHERE status != 'idle'")
             self._system_state.active_agents = cursor.fetchone()[0]
 
             # Count tasks
             cursor.execute("SELECT COUNT(*) FROM tasks")
             self._system_state.total_tasks = cursor.fetchone()[0]
 
-            cursor.execute("SELECT COUNT(*) FROM tasks WHERE status = 'completed'")
+            cursor.execute(
+                "SELECT COUNT(*) FROM tasks WHERE status = 'completed'")
             self._system_state.completed_tasks = cursor.fetchone()[0]
 
-            cursor.execute("SELECT COUNT(*) FROM tasks WHERE status = 'failed'")
+            cursor.execute(
+                "SELECT COUNT(*) FROM tasks WHERE status = 'failed'")
             self._system_state.failed_tasks = cursor.fetchone()[0]
 
             # Calculate average context usage
@@ -425,7 +446,11 @@ class StateManager:
 
         return self._system_state
 
-    async def create_checkpoint(self, checkpoint_name: str, data: Optional[Dict[str, Any]] = None, agent_id: Optional[str] = None) -> Optional[str]:
+    async def create_checkpoint(self,
+                                checkpoint_name: str,
+                                data: Optional[Dict[str,
+                                                    Any]] = None,
+                                agent_id: Optional[str] = None) -> Optional[str]:
         """Create a system checkpoint."""
         try:
             checkpoint_data = data or {}
@@ -449,15 +474,18 @@ class StateManager:
             logger.error(f"Error creating checkpoint {checkpoint_name}: {e}")
             return None
 
-    async def should_create_checkpoint(self, agent_id: str) -> Tuple[bool, str]:
+    async def should_create_checkpoint(
+            self, agent_id: str) -> Tuple[bool, str]:
         """Determine if a checkpoint should be created based on context usage."""
         try:
             if agent_id in self._agent_cache:
                 agent_state = self._agent_cache[agent_id]
                 if agent_state.context_usage >= 0.8:
-                    return True, f"High context usage: {agent_state.context_usage:.1%}"
+                    return True, f"High context usage: {
+                        agent_state.context_usage:.1%}"
                 else:
-                    return False, f"No checkpoint needed - context usage: {agent_state.context_usage:.1%}"
+                    return False, f"No checkpoint needed - context usage: {
+                        agent_state.context_usage:.1%}"
             return False, "Agent not found"
 
         except Exception as e:
@@ -474,16 +502,19 @@ class StateManager:
                 cursor.execute("SELECT COUNT(*) FROM agents")
                 total_agents = cursor.fetchone()[0]
 
-                cursor.execute("SELECT COUNT(*) FROM agents WHERE status != 'idle'")
+                cursor.execute(
+                    "SELECT COUNT(*) FROM agents WHERE status != 'idle'")
                 active_agents = cursor.fetchone()[0]
 
                 cursor.execute("SELECT COUNT(*) FROM tasks")
                 total_tasks = cursor.fetchone()[0]
 
-                cursor.execute("SELECT COUNT(*) FROM tasks WHERE status = 'completed'")
+                cursor.execute(
+                    "SELECT COUNT(*) FROM tasks WHERE status = 'completed'")
                 completed_tasks = cursor.fetchone()[0]
 
-                cursor.execute("SELECT COUNT(*) FROM tasks WHERE status = 'failed'")
+                cursor.execute(
+                    "SELECT COUNT(*) FROM tasks WHERE status = 'failed'")
                 failed_tasks = cursor.fetchone()[0]
 
                 cursor.execute("SELECT AVG(context_usage) FROM agents")
@@ -519,7 +550,8 @@ class StateManager:
             logger.error(f"Error during shutdown: {e}")
             return False
 
-    async def get_checkpoint(self, checkpoint_name: str) -> Optional[Dict[str, Any]]:
+    async def get_checkpoint(
+            self, checkpoint_name: str) -> Optional[Dict[str, Any]]:
         """Retrieve a checkpoint."""
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -543,7 +575,8 @@ class StateManager:
     async def cleanup_old_data(self, days_to_keep: int = 30) -> bool:
         """Clean up old data from the database."""
         try:
-            cutoff_date = (datetime.now() - timedelta(days=days_to_keep)).isoformat()
+            cutoff_date = (datetime.now() -
+                           timedelta(days=days_to_keep)).isoformat()
 
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()

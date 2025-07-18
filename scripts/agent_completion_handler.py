@@ -8,16 +8,15 @@ import argparse
 import asyncio
 import json
 import logging
-import os
 import subprocess
-import sys
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class AgentCompletionHandler:
     """Automated detection and handling of agent task completion"""
@@ -48,21 +47,30 @@ class AgentCompletionHandler:
 
         # Method 1: Check tmux output for completion signals
         completion_keywords = [
-            "task completed", "work completed", "mission accomplished",
-            "✅", "completed successfully", "ready to merge", "PR is ready",
-            "conflicts resolved", "successfully merged", "blocking work unblocked"
-        ]
+            "task completed",
+            "work completed",
+            "mission accomplished",
+            "✅",
+            "completed successfully",
+            "ready to merge",
+            "PR is ready",
+            "conflicts resolved",
+            "successfully merged",
+            "blocking work unblocked"]
 
         try:
             # Capture recent tmux output
-            cmd = ["tmux", "capture-pane", "-t", f"agent-hive:{agent_id}", "-p"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "capture-pane", "-t",
+                   f"agent-hive:{agent_id}", "-p"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 output = result.stdout.lower()
                 for keyword in completion_keywords:
                     if keyword.lower() in output:
-                        logger.info(f"🎯 Completion keyword detected: '{keyword}'")
+                        logger.info(
+                            f"🎯 Completion keyword detected: '{keyword}'")
                         return True
 
         except Exception as e:
@@ -87,11 +95,14 @@ class AgentCompletionHandler:
             # Check if there are recent commits from agent's worktree
             for worktree in agent_worktrees:
                 if worktree.exists():
-                    cmd = ["git", "-C", str(worktree), "log", "--oneline", "-5", "--since=2 hours ago"]
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+                    cmd = ["git", "-C", str(worktree), "log",
+                           "--oneline", "-5", "--since=2 hours ago"]
+                    result = subprocess.run(
+                        cmd, capture_output=True, text=True, timeout=10)
 
                     if result.returncode == 0 and result.stdout.strip():
-                        logger.info(f"🔄 Recent git activity detected in {worktree}")
+                        logger.info(
+                            f"🔄 Recent git activity detected in {worktree}")
                         return True
 
         except Exception as e:
@@ -141,8 +152,10 @@ class AgentCompletionHandler:
 
         try:
             # Get recent tmux output
-            cmd = ["tmux", "capture-pane", "-t", f"agent-hive:{agent_id}", "-p"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            cmd = ["tmux", "capture-pane", "-t",
+                   f"agent-hive:{agent_id}", "-p"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 output = result.stdout
@@ -152,7 +165,8 @@ class AgentCompletionHandler:
                     summary["deliverables"].append("PR created/updated")
 
                 if "conflicts resolved" in output.lower():
-                    summary["blockers_resolved"].append("Merge conflicts resolved")
+                    summary["blockers_resolved"].append(
+                        "Merge conflicts resolved")
 
                 if "tests pass" in output.lower() or "✅" in output:
                     summary["accomplishments"].append("Quality gates passed")
@@ -188,19 +202,24 @@ class AgentCompletionHandler:
             if worktree.exists():
                 try:
                     # Check if tests pass
-                    cmd = ["python", "-m", "pytest", "tests/", "-x", "--tb=no", "-q"]
-                    result = subprocess.run(cmd, cwd=worktree, capture_output=True, text=True, timeout=60)
+                    cmd = ["python", "-m", "pytest",
+                           "tests/", "-x", "--tb=no", "-q"]
+                    result = subprocess.run(
+                        cmd, cwd=worktree, capture_output=True, text=True, timeout=60)
                     validation["tests_passing"] = result.returncode == 0
 
                     # Check build status
                     if Path(worktree / "requirements.txt").exists():
-                        cmd = ["python", "-c", "import sys; print('Build check passed')"]
-                        result = subprocess.run(cmd, cwd=worktree, capture_output=True, text=True, timeout=30)
+                        cmd = ["python", "-c",
+                               "import sys; print('Build check passed')"]
+                        result = subprocess.run(
+                            cmd, cwd=worktree, capture_output=True, text=True, timeout=30)
                         validation["build_successful"] = result.returncode == 0
 
                     # Check git status for conflicts
                     cmd = ["git", "status", "--porcelain"]
-                    result = subprocess.run(cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
+                    result = subprocess.run(
+                        cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
 
                     if result.returncode == 0:
                         # No unmerged paths means conflicts resolved
@@ -209,30 +228,38 @@ class AgentCompletionHandler:
                     # Check if work is committed (no staged changes)
                     cmd = ["git", "diff", "--cached", "--quiet"]
                     result = subprocess.run(cmd, cwd=worktree, timeout=10)
-                    validation["work_committed"] = result.returncode != 0  # Exit code 1 means there ARE staged changes
+                    # Exit code 1 means there ARE staged changes
+                    validation["work_committed"] = result.returncode != 0
 
                     # Check if work is pushed to remote
                     cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
-                    result = subprocess.run(cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
+                    result = subprocess.run(
+                        cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
 
                     if result.returncode == 0:
                         branch_name = result.stdout.strip()
 
                         # Check if branch exists on remote
-                        cmd = ["git", "ls-remote", "--heads", "origin", branch_name]
-                        result = subprocess.run(cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
-                        validation["branch_exists"] = result.returncode == 0 and result.stdout.strip()
+                        cmd = ["git", "ls-remote",
+                               "--heads", "origin", branch_name]
+                        result = subprocess.run(
+                            cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
+                        validation["branch_exists"] = result.returncode == 0 and result.stdout.strip(
+                        )
 
                         if validation["branch_exists"]:
                             # Check if local is up to date with remote
                             cmd = ["git", "rev-parse", "HEAD"]
-                            local_result = subprocess.run(cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
+                            local_result = subprocess.run(
+                                cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
 
                             cmd = ["git", "rev-parse", f"origin/{branch_name}"]
-                            remote_result = subprocess.run(cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
+                            remote_result = subprocess.run(
+                                cmd, cwd=worktree, capture_output=True, text=True, timeout=10)
 
                             if local_result.returncode == 0 and remote_result.returncode == 0:
-                                validation["work_pushed"] = local_result.stdout.strip() == remote_result.stdout.strip()
+                                validation["work_pushed"] = local_result.stdout.strip(
+                                ) == remote_result.stdout.strip()
 
                 except Exception as e:
                     logger.debug(f"Error validating completion: {e}")
@@ -241,39 +268,50 @@ class AgentCompletionHandler:
 
         return validation
 
-    async def _generate_completion_report(self, agent_id: str, summary: Dict, validation: Dict) -> Dict:
+    async def _generate_completion_report(
+            self,
+            agent_id: str,
+            summary: Dict,
+            validation: Dict) -> Dict:
         """Generate comprehensive completion report"""
         report = {
             "agent_id": agent_id,
             "completion_time": summary["completion_time"],
             "summary": summary,
             "validation": validation,
-            "overall_status": "completed" if all(validation.values()) else "completed_with_issues",
-            "recommendations": []
-        }
+            "overall_status": "completed" if all(
+                validation.values()) else "completed_with_issues",
+            "recommendations": []}
 
         # Add recommendations based on validation
         if not validation["tests_passing"]:
-            report["recommendations"].append("Review and fix failing tests before final merge")
+            report["recommendations"].append(
+                "Review and fix failing tests before final merge")
 
         if not validation["conflicts_resolved"]:
-            report["recommendations"].append("Resolve remaining merge conflicts")
+            report["recommendations"].append(
+                "Resolve remaining merge conflicts")
 
         if not validation["work_committed"]:
-            report["recommendations"].append("Commit staged changes to complete work")
+            report["recommendations"].append(
+                "Commit staged changes to complete work")
 
         if not validation["work_pushed"]:
-            report["recommendations"].append("Push committed work to remote repository")
+            report["recommendations"].append(
+                "Push committed work to remote repository")
 
         if not validation["branch_exists"]:
-            report["recommendations"].append("Create remote branch for code review")
+            report["recommendations"].append(
+                "Create remote branch for code review")
 
         if report["overall_status"] == "completed_with_issues":
-            report["recommendations"].append("Manual review required before proceeding")
+            report["recommendations"].append(
+                "Manual review required before proceeding")
 
         return report
 
-    async def _send_completion_notifications(self, agent_id: str, report: Dict):
+    async def _send_completion_notifications(
+            self, agent_id: str, report: Dict):
         """Send completion notifications to relevant parties"""
 
         # 1. Notify PM agent
@@ -282,10 +320,13 @@ class AgentCompletionHandler:
         pm_message += f"Time: {report['completion_time']}\n"
 
         if report['recommendations']:
-            pm_message += f"⚠️ Recommendations: {', '.join(report['recommendations'])}"
+            pm_message += f"⚠️ Recommendations: {
+                ', '.join(
+                    report['recommendations'])}"
 
         try:
-            cmd = ["python", "scripts/send_agent_message.py", "--agent", "pm-agent", "--message", pm_message]
+            cmd = ["python", "scripts/send_agent_message.py",
+                   "--agent", "pm-agent", "--message", pm_message]
             subprocess.run(cmd, timeout=10)
         except Exception as e:
             logger.debug(f"Error sending PM notification: {e}")
@@ -298,7 +339,8 @@ class AgentCompletionHandler:
         # 3. Update orchestrator if running
         try:
             # Send to orchestrator
-            orchestrator_message = f"Agent {agent_id} completed: {report['overall_status']}"
+            orchestrator_message = f"Agent {agent_id} completed: {
+                report['overall_status']}"
             logger.info(f"📊 {orchestrator_message}")
         except Exception as e:
             logger.debug(f"Error notifying orchestrator: {e}")
@@ -307,8 +349,16 @@ class AgentCompletionHandler:
         """Clean up completed agent resources"""
         try:
             # Keep the tmux window but mark as completed
-            completion_marker = f"[COMPLETED-{datetime.now().strftime('%H:%M')}]"
-            cmd = ["tmux", "send-keys", "-t", f"agent-hive:{agent_id}", f"echo '{completion_marker} Agent task completed at {datetime.now()}'", "Enter"]
+            completion_marker = f"[COMPLETED-{
+                datetime.now().strftime('%H:%M')}]"
+            cmd = [
+                "tmux",
+                "send-keys",
+                "-t",
+                f"agent-hive:{agent_id}",
+                f"echo '{completion_marker} Agent task completed at {
+                    datetime.now()}'",
+                "Enter"]
             subprocess.run(cmd, timeout=10)
 
             # Update agent registry
@@ -342,8 +392,13 @@ class AgentCompletionHandler:
 
         # Get list of active agents
         try:
-            cmd = ["python", "scripts/check_agent_status.py", "--format", "json"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            cmd = [
+                "python",
+                "scripts/check_agent_status.py",
+                "--format",
+                "json"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=15)
 
             if result.returncode == 0:
                 status_data = json.loads(result.stdout)
@@ -354,7 +409,8 @@ class AgentCompletionHandler:
                     if agent_name:
                         completion_detected = await self.monitor_agent_completion(agent_name)
                         if completion_detected:
-                            logger.info(f"✅ Handled completion for {agent_name}")
+                            logger.info(
+                                f"✅ Handled completion for {agent_name}")
 
         except Exception as e:
             logger.error(f"Error monitoring active agents: {e}")
@@ -363,8 +419,10 @@ class AgentCompletionHandler:
 async def main():
     parser = argparse.ArgumentParser(description="Agent Completion Handler")
     parser.add_argument("--agent", help="Specific agent to monitor")
-    parser.add_argument("--monitor-all", action="store_true", help="Monitor all active agents")
-    parser.add_argument("--continuous", action="store_true", help="Continuous monitoring mode")
+    parser.add_argument("--monitor-all", action="store_true",
+                        help="Monitor all active agents")
+    parser.add_argument("--continuous", action="store_true",
+                        help="Continuous monitoring mode")
 
     args = parser.parse_args()
 

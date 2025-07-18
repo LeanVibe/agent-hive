@@ -6,16 +6,16 @@ during refactoring process.
 """
 
 import asyncio
-import pytest
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+from dev_tools.smart_test_enforcer import SmartTestEnforcer
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
-
-from dev_tools.smart_test_enforcer import SmartTestEnforcer
 
 
 class TestSmartTestEnforcer:
@@ -36,7 +36,8 @@ class TestSmartTestEnforcer:
         """Test enforcer initialization."""
         assert enforcer.test_patterns is not None
         assert enforcer.code_extensions is not None
-        assert len(enforcer.test_patterns) >= 6  # Python, JS, TS, Swift, Java, C#
+        # Python, JS, TS, Swift, Java, C#
+        assert len(enforcer.test_patterns) >= 6
         assert '.py' in enforcer.code_extensions
         assert '.js' in enforcer.code_extensions
 
@@ -235,7 +236,8 @@ class TestSmartTestEnforcer:
 
         assert result is False
 
-    def test_find_existing_tests_unsupported_language(self, enforcer, temp_dir):
+    def test_find_existing_tests_unsupported_language(
+            self, enforcer, temp_dir):
         """Test finding existing tests for unsupported language."""
         # Create a file with unsupported extension
         code_file = temp_dir / "example.xyz"
@@ -274,7 +276,8 @@ class TestSmartTestEnforcer:
         assert "example.js" in prompt
 
     @patch('dev_tools.smart_test_enforcer.get_config')
-    def test_create_test_prompt_custom_template(self, mock_get_config, enforcer):
+    def test_create_test_prompt_custom_template(
+            self, mock_get_config, enforcer):
         """Test test prompt creation with custom template."""
         mock_config = Mock()
         mock_config.get.return_value = "Custom template: {content} for {filename}"
@@ -342,7 +345,8 @@ class TestSmartTestEnforcer:
         # Mock asyncio subprocess
         mock_process = Mock()
         mock_process.returncode = 0
-        mock_process.communicate = AsyncMock(return_value=(b"test content", b""))
+        mock_process.communicate = AsyncMock(
+            return_value=(b"test content", b""))
 
         with patch('asyncio.create_subprocess_exec', return_value=mock_process):
             with patch('asyncio.wait_for') as mock_wait_for:
@@ -351,7 +355,7 @@ class TestSmartTestEnforcer:
                 await enforcer._generate_tests_async(code_file)
 
                 # Check that test file was created
-                test_file = enforcer._get_test_path(code_file)
+                enforcer._get_test_path(code_file)
                 expected_test_file = temp_dir / "tests" / "test_example.py"
                 expected_test_file.parent.mkdir(parents=True, exist_ok=True)
 
@@ -365,7 +369,8 @@ class TestSmartTestEnforcer:
         # Mock failed subprocess
         mock_process = Mock()
         mock_process.returncode = 1
-        mock_process.communicate = AsyncMock(return_value=(b"", b"Error occurred"))
+        mock_process.communicate = AsyncMock(
+            return_value=(b"", b"Error occurred"))
 
         with patch('asyncio.create_subprocess_exec', return_value=mock_process):
             with patch('asyncio.wait_for') as mock_wait_for:
@@ -383,7 +388,8 @@ class TestSmartTestEnforcer:
 
         # Mock subprocess that times out
         mock_process = Mock()
-        mock_process.communicate = AsyncMock(side_effect=asyncio.TimeoutError())
+        mock_process.communicate = AsyncMock(
+            side_effect=asyncio.TimeoutError())
 
         with patch('asyncio.create_subprocess_exec', return_value=mock_process):
             with patch('asyncio.wait_for', side_effect=asyncio.TimeoutError()):
@@ -447,7 +453,8 @@ class TestSmartTestEnforcer:
     def test_get_test_coverage_report_error(self, enforcer):
         """Test getting test coverage report with error."""
         # Use non-existent directory
-        stats = enforcer.get_test_coverage_report(Path("/non/existent/directory"))
+        stats = enforcer.get_test_coverage_report(
+            Path("/non/existent/directory"))
 
         assert stats['total_files'] == 0
 

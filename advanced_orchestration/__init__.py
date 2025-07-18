@@ -11,25 +11,16 @@ This package provides components for:
 - Adaptive learning and continuous improvement
 """
 
+from .cli_integration import EnhancedOrchestrationCLI
+from .enhanced_coordination import EnhancedCoordinationProtocol
 from .multi_agent_coordinator import MultiAgentCoordinator
 from .resource_manager import ResourceManager
 from .scaling_manager import ScalingManager
 from .workflow_coordinator import WorkflowCoordinator
-from .enhanced_coordination import EnhancedCoordinationProtocol
-from .cli_integration import EnhancedOrchestrationCLI
-from .models import *
 
 # ML Enhancement imports
 try:
-    from ml_enhancements import (
-        PatternOptimizer,
-        PredictiveAnalytics,
-        AdaptiveLearning,
-        MLConfig,
-        PatternData,
-        AnalyticsResult,
-        LearningMetrics
-    )
+    pass
 
     ML_AVAILABLE = True
 

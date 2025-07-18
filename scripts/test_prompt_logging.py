@@ -5,9 +5,11 @@ Test script to demonstrate prompt logging functionality
 
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))
 
 from dashboard.prompt_logger import prompt_logger
+
+sys.path.append(str(Path(__file__).parent.parent))
+
 
 def test_prompt_logging():
     """Test prompt logging functionality"""
@@ -20,8 +22,7 @@ def test_prompt_logging():
         "documentation-agent",
         "Hello! I'm ready to work on documentation tasks. Please provide me with specific requirements.",
         "Great! I'll start working on the documentation structure.",
-        True
-    )
+        True)
 
     # Test failed prompt
     log_id2 = prompt_logger.log_prompt(
@@ -52,7 +53,7 @@ def test_prompt_logging():
 
     # Test statistics
     stats = prompt_logger.get_prompt_stats()
-    print(f"📊 Statistics:")
+    print("📊 Statistics:")
     print(f"  Total prompts: {stats['total_prompts']}")
     print(f"  Success rate: {stats['success_rate']:.1%}")
     print(f"  Needs review: {stats['needs_review']}")
@@ -78,6 +79,7 @@ def test_prompt_logging():
     # Test prompts needing review
     needs_review = prompt_logger.get_prompts_needing_review()
     print(f"📝 Prompts needing review: {len(needs_review)}")
+
 
 if __name__ == "__main__":
     test_prompt_logging()

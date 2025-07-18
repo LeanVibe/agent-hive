@@ -7,19 +7,14 @@ This module tracks refactoring activities, measures code quality improvements,
 and ensures continuous improvement practices for XP methodology compliance.
 """
 
+import ast
 import json
 import os
 import sqlite3
-import subprocess
 import sys
-import time
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
-import ast
-import hashlib
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -234,7 +229,8 @@ class RefactoringTracker:
             # Analyze functions and classes
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
-                    func_complexity = self.calculate_cyclomatic_complexity(node)
+                    func_complexity = self.calculate_cyclomatic_complexity(
+                        node)
                     complexity_data['functions'].append({
                         'name': node.name,
                         'complexity': func_complexity,
@@ -248,7 +244,8 @@ class RefactoringTracker:
 
                     for item in node.body:
                         if isinstance(item, ast.FunctionDef):
-                            method_complexity = self.calculate_cyclomatic_complexity(item)
+                            method_complexity = self.calculate_cyclomatic_complexity(
+                                item)
                             methods.append({
                                 'name': item.name,
                                 'complexity': method_complexity
@@ -264,9 +261,7 @@ class RefactoringTracker:
 
             # Calculate maintainability index (simplified)
             complexity_data['maintainability_index'] = self.calculate_maintainability_index(
-                complexity_data['total_complexity'],
-                complexity_data['lines_of_code']
-            )
+                complexity_data['total_complexity'], complexity_data['lines_of_code'])
 
             return complexity_data
 
@@ -300,7 +295,8 @@ class RefactoringTracker:
 
         return complexity
 
-    def calculate_maintainability_index(self, complexity: float, lines: int) -> float:
+    def calculate_maintainability_index(
+            self, complexity: float, lines: int) -> float:
         """Calculate maintainability index (simplified version)."""
         if lines == 0:
             return 100.0
@@ -323,14 +319,17 @@ class RefactoringTracker:
             # Check for high complexity functions
             for func in complexity_data['functions']:
                 if func['complexity'] > self.complexity_threshold:
-                    opportunities.append({
-                        'type': 'high_complexity',
-                        'target': func['name'],
-                        'file': file_path,
-                        'severity': 'high',
-                        'description': f"Function {func['name']} has complexity {func['complexity']} > {self.complexity_threshold}",
-                        'suggested_refactoring': 'extract_method'
-                    })
+                    opportunities.append(
+                        {
+                            'type': 'high_complexity',
+                            'target': func['name'],
+                            'file': file_path,
+                            'severity': 'high',
+                            'description': f"Function {
+                                func['name']} has complexity {
+                                func['complexity']} > {
+                                self.complexity_threshold}",
+                            'suggested_refactoring': 'extract_method'})
 
             # Check for long functions
             for func in complexity_data['functions']:
@@ -358,14 +357,15 @@ class RefactoringTracker:
 
             # Check overall maintainability
             if complexity_data['maintainability_index'] < 40:
-                opportunities.append({
-                    'type': 'low_maintainability',
-                    'target': file_path,
-                    'file': file_path,
-                    'severity': 'high',
-                    'description': f"File maintainability index is {complexity_data['maintainability_index']:.1f}",
-                    'suggested_refactoring': 'general_cleanup'
-                })
+                opportunities.append(
+                    {
+                        'type': 'low_maintainability',
+                        'target': file_path,
+                        'file': file_path,
+                        'severity': 'high',
+                        'description': f"File maintainability index is {
+                            complexity_data['maintainability_index']:.1f}",
+                        'suggested_refactoring': 'general_cleanup'})
 
         except Exception as e:
             print(f"Error detecting refactoring opportunities: {e}")
@@ -373,7 +373,7 @@ class RefactoringTracker:
         return opportunities
 
     def start_refactoring_session(self, author: str, description: str,
-                                 files: List[str] = None) -> str:
+                                  files: List[str] = None) -> str:
         """Start a new refactoring session."""
         session_id = f"refactor-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
@@ -384,7 +384,8 @@ class RefactoringTracker:
         baseline_data = {}
         for file_path in files:
             if file_path.endswith('.py') and os.path.exists(file_path):
-                baseline_data[file_path] = self.analyze_code_complexity(file_path)
+                baseline_data[file_path] = self.analyze_code_complexity(
+                    file_path)
 
         # Store session start
         session_data = {
@@ -408,7 +409,8 @@ class RefactoringTracker:
 
         return session_id
 
-    def end_refactoring_session(self, session_id: str) -> Optional[RefactoringSession]:
+    def end_refactoring_session(
+            self, session_id: str) -> Optional[RefactoringSession]:
         """End a refactoring session and calculate metrics."""
         try:
             # Load session data
@@ -432,7 +434,8 @@ class RefactoringTracker:
             changes = self.analyze_refactoring_changes(session_data)
 
             # Determine refactoring type
-            refactoring_type = self.classify_refactoring_type(session_data['description'])
+            refactoring_type = self.classify_refactoring_type(
+                session_data['description'])
 
             # Calculate safety score
             safety_score = self.calculate_safety_score(changes)
@@ -453,13 +456,16 @@ class RefactoringTracker:
                 lines_before=changes.get('lines_before', 0),
                 lines_after=changes.get('lines_after', 0),
                 lines_removed=changes.get('lines_removed', 0),
-                duplicated_code_removed=changes.get('duplicated_code_removed', 0),
+                duplicated_code_removed=changes.get(
+                    'duplicated_code_removed', 0),
                 code_smells_fixed=changes.get('code_smells_fixed', 0),
                 test_coverage_change=changes.get('test_coverage_change', 0.0),
-                performance_improvement=changes.get('performance_improvement', 0.0),
+                performance_improvement=changes.get(
+                    'performance_improvement', 0.0),
                 refactoring_type=refactoring_type,
                 safety_score=safety_score,
-                continuous_improvement_score=self.calculate_improvement_score(changes),
+                continuous_improvement_score=self.calculate_improvement_score(
+                    changes),
                 description=session_data['description'],
                 tools_used=["manual"],  # Default
                 tests_maintained=changes.get('tests_maintained', True),
@@ -528,21 +534,29 @@ class RefactoringTracker:
                     changes['lines_removed'] += baseline_lines - current_lines
 
                 # Track refactored functions and classes
-                baseline_functions = {f['name'] for f in baseline.get('functions', [])}
-                current_functions = {f['name'] for f in current.get('functions', [])}
+                baseline_functions = {f['name']
+                                      for f in baseline.get('functions', [])}
+                current_functions = {f['name']
+                                     for f in current.get('functions', [])}
 
-                baseline_classes = {c['name'] for c in baseline.get('classes', [])}
-                current_classes = {c['name'] for c in current.get('classes', [])}
+                baseline_classes = {c['name']
+                                    for c in baseline.get('classes', [])}
+                current_classes = {c['name']
+                                   for c in current.get('classes', [])}
 
-                changes['functions_refactored'].extend(list(baseline_functions | current_functions))
-                changes['classes_refactored'].extend(list(baseline_classes | current_classes))
+                changes['functions_refactored'].extend(
+                    list(baseline_functions | current_functions))
+                changes['classes_refactored'].extend(
+                    list(baseline_classes | current_classes))
 
         # Calculate overall complexity reduction
-        changes['complexity_reduction'] = changes['before_complexity'] - changes['after_complexity']
+        changes['complexity_reduction'] = changes['before_complexity'] - \
+            changes['after_complexity']
 
         # Estimate other improvements (simplified)
         if changes['complexity_reduction'] > 0:
-            changes['code_smells_fixed'] = max(1, int(changes['complexity_reduction'] / 3))
+            changes['code_smells_fixed'] = max(
+                1, int(changes['complexity_reduction'] / 3))
             changes['performance_improvement'] = changes['complexity_reduction'] * 0.5
 
         return changes
@@ -632,7 +646,8 @@ class RefactoringTracker:
             ))
             conn.commit()
 
-    def calculate_refactoring_metrics(self, days: int = 7) -> RefactoringMetrics:
+    def calculate_refactoring_metrics(
+            self, days: int = 7) -> RefactoringMetrics:
         """Calculate comprehensive refactoring metrics."""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
@@ -679,25 +694,30 @@ class RefactoringTracker:
 
         # Calculate derived metrics
         total_hours = total_minutes / 60.0
-        frequency = (total_sessions / days) * 7 if days > 0 else 0  # sessions per week
+        frequency = (total_sessions / days) * \
+            7 if days > 0 else 0  # sessions per week
 
         functions_refactored = 0
         files_set = set()
 
         for functions_json, classes_json in refactoring_data:
             try:
-                functions = json.loads(functions_json) if functions_json else []
+                functions = json.loads(
+                    functions_json) if functions_json else []
                 functions_refactored += len(functions)
             except json.JSONDecodeError:
                 pass
 
         # Calculate other metrics
-        refactoring_coverage = min(100.0, (total_sessions / max(1, days)) * 30)  # Estimated
+        refactoring_coverage = min(
+            100.0, (total_sessions / max(1, days)) * 30)  # Estimated
         quality_trend = "improving" if avg_complexity_reduction > 0 else "stable"
         maintainability_score = min(100.0, (avg_complexity_reduction * 2) + 60)
 
         return RefactoringMetrics(
-            period_id=f"refactor-metrics-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}",
+            period_id=f"refactor-metrics-{
+                start_date.strftime('%Y%m%d')}-{
+                end_date.strftime('%Y%m%d')}",
             start_date=start_date.strftime('%Y-%m-%d'),
             end_date=end_date.strftime('%Y-%m-%d'),
             total_sessions=total_sessions,
@@ -729,7 +749,8 @@ class RefactoringTracker:
             for file in files:
                 if file.endswith('.py'):
                     file_path = os.path.join(root, file)
-                    opportunities.extend(self.detect_refactoring_opportunity(file_path))
+                    opportunities.extend(
+                        self.detect_refactoring_opportunity(file_path))
 
         # Get recent sessions
         with sqlite3.connect(self.db_path) as conn:
@@ -780,7 +801,10 @@ class RefactoringTracker:
         for session_data in recent_sessions:
             session_id, author, description, refactoring_type, complexity_reduction, safety_score, duration = session_data
             report += f"- **{session_id}**: {description} by {author}\n"
-            report += f"  Type: {refactoring_type} | Complexity: -{complexity_reduction:.1f} | Safety: {safety_score:.2f} | Duration: {duration:.0f}min\n"
+            report += f"  Type: {refactoring_type} | Complexity: -{
+                complexity_reduction:.1f} | Safety: {
+                safety_score:.2f} | Duration: {
+                duration:.0f}min\n"
 
         if not recent_sessions:
             report += "No recent refactoring sessions found.\n"
@@ -792,7 +816,8 @@ class RefactoringTracker:
 
         # Group by severity
         high_severity = [o for o in opportunities if o['severity'] == 'high']
-        medium_severity = [o for o in opportunities if o['severity'] == 'medium']
+        medium_severity = [
+            o for o in opportunities if o['severity'] == 'medium']
 
         if high_severity:
             report += f"""
@@ -834,19 +859,27 @@ class RefactoringTracker:
         recommendations = []
 
         if metrics.continuous_improvement_frequency < self.target_frequency:
-            recommendations.append(f"Increase refactoring frequency from {metrics.continuous_improvement_frequency:.1f} to {self.target_frequency} sessions/week")
+            recommendations.append(
+                f"Increase refactoring frequency from {
+                    metrics.continuous_improvement_frequency:.1f} to {
+                    self.target_frequency} sessions/week")
 
         if metrics.avg_safety_score < self.safety_threshold:
-            recommendations.append("Improve refactoring safety practices - ensure tests are maintained")
+            recommendations.append(
+                "Improve refactoring safety practices - ensure tests are maintained")
 
         if len(high_severity) > 0:
-            recommendations.append(f"Address {len(high_severity)} high-priority refactoring opportunities")
+            recommendations.append(
+                f"Address {
+                    len(high_severity)} high-priority refactoring opportunities")
 
         if metrics.quality_trend == "stable":
-            recommendations.append("Focus on more impactful refactoring to improve quality trend")
+            recommendations.append(
+                "Focus on more impactful refactoring to improve quality trend")
 
         if not recommendations:
-            recommendations.append("Excellent continuous improvement practices - maintain current approach")
+            recommendations.append(
+                "Excellent continuous improvement practices - maintain current approach")
 
         for i, rec in enumerate(recommendations, 1):
             report += f"{i}. {rec}\n"
@@ -881,13 +914,18 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python refactoring_tracker.py <command> [options]")
         print("Commands:")
-        print("  start <author> <description> [files...]  - Start refactoring session")
+        print(
+            "  start <author> <description> [files...]  - Start refactoring session")
         print("  end <session_id>                         - End refactoring session")
         print("  analyze <file_path>                      - Analyze code complexity")
-        print("  opportunities [directory]                - Find refactoring opportunities")
-        print("  report [days]                            - Generate refactoring report")
-        print("  metrics [days]                           - Show refactoring metrics")
-        print("  sessions [limit]                         - Show recent sessions")
+        print(
+            "  opportunities [directory]                - Find refactoring opportunities")
+        print(
+            "  report [days]                            - Generate refactoring report")
+        print(
+            "  metrics [days]                           - Show refactoring metrics")
+        print(
+            "  sessions [limit]                         - Show recent sessions")
         sys.exit(1)
 
     tracker = RefactoringTracker()
@@ -895,14 +933,16 @@ def main():
 
     if command == "start":
         if len(sys.argv) < 4:
-            print("Usage: python refactoring_tracker.py start <author> <description> [files...]")
+            print(
+                "Usage: python refactoring_tracker.py start <author> <description> [files...]")
             sys.exit(1)
 
         author = sys.argv[2]
         description = sys.argv[3]
         files = sys.argv[4:] if len(sys.argv) > 4 else []
 
-        session_id = tracker.start_refactoring_session(author, description, files)
+        session_id = tracker.start_refactoring_session(
+            author, description, files)
         print(f"Session ID: {session_id}")
 
     elif command == "end":
@@ -914,7 +954,7 @@ def main():
         session = tracker.end_refactoring_session(session_id)
 
         if session:
-            print(f"✅ Refactoring session completed successfully")
+            print("✅ Refactoring session completed successfully")
 
     elif command == "analyze":
         if len(sys.argv) < 3:
@@ -932,7 +972,9 @@ def main():
         print(f"Code Complexity Analysis: {file_path}")
         print(f"Total Complexity: {complexity_data['total_complexity']}")
         print(f"Lines of Code: {complexity_data['lines_of_code']}")
-        print(f"Maintainability Index: {complexity_data['maintainability_index']:.1f}")
+        print(
+            f"Maintainability Index: {
+                complexity_data['maintainability_index']:.1f}")
         print(f"Functions: {len(complexity_data['functions'])}")
         print(f"Classes: {len(complexity_data['classes'])}")
 
@@ -946,24 +988,29 @@ def main():
             for file in files:
                 if file.endswith('.py'):
                     file_path = os.path.join(root, file)
-                    opportunities.extend(tracker.detect_refactoring_opportunity(file_path))
+                    opportunities.extend(
+                        tracker.detect_refactoring_opportunity(file_path))
 
         if opportunities:
             print(f"Found {len(opportunities)} refactoring opportunities:")
 
             # Group by severity
-            high_severity = [o for o in opportunities if o['severity'] == 'high']
-            medium_severity = [o for o in opportunities if o['severity'] == 'medium']
+            high_severity = [
+                o for o in opportunities if o['severity'] == 'high']
+            medium_severity = [
+                o for o in opportunities if o['severity'] == 'medium']
 
             if high_severity:
                 print(f"\n🚨 High Priority ({len(high_severity)}):")
                 for opp in high_severity:
-                    print(f"  - {opp['target']} in {opp['file']}: {opp['description']}")
+                    print(
+                        f"  - {opp['target']} in {opp['file']}: {opp['description']}")
 
             if medium_severity:
                 print(f"\n⚠️ Medium Priority ({len(medium_severity)}):")
                 for opp in medium_severity:
-                    print(f"  - {opp['target']} in {opp['file']}: {opp['description']}")
+                    print(
+                        f"  - {opp['target']} in {opp['file']}: {opp['description']}")
         else:
             print("✅ No significant refactoring opportunities found")
 
@@ -972,7 +1019,8 @@ def main():
         report = tracker.generate_refactoring_report(days)
 
         # Save report
-        filename = f"refactoring_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"refactoring_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(report)
 
@@ -986,9 +1034,12 @@ def main():
         print(f"Refactoring Metrics ({days} days):")
         print(f"  Total Sessions: {metrics.total_sessions}")
         print(f"  Total Hours: {metrics.total_hours:.1f}")
-        print(f"  Complexity Reduction: {metrics.avg_complexity_reduction:.1f}")
+        print(
+            f"  Complexity Reduction: {metrics.avg_complexity_reduction:.1f}")
         print(f"  Safety Score: {metrics.avg_safety_score:.2f}")
-        print(f"  Frequency: {metrics.continuous_improvement_frequency:.1f} sessions/week")
+        print(
+            f"  Frequency: {
+                metrics.continuous_improvement_frequency:.1f} sessions/week")
         print(f"  Quality Trend: {metrics.quality_trend}")
 
     elif command == "sessions":
@@ -1012,8 +1063,14 @@ def main():
                 session_id, author, description, refactoring_type, complexity_reduction, safety_score, start_time, duration = session_data
                 start_dt = datetime.fromisoformat(start_time)
                 print(f"  {session_id}: {description} by {author}")
-                print(f"    Date: {start_dt.strftime('%Y-%m-%d %H:%M')} | Type: {refactoring_type}")
-                print(f"    Complexity: -{complexity_reduction:.1f} | Safety: {safety_score:.2f} | Duration: {duration:.0f}min")
+                print(
+                    f"    Date: {
+                        start_dt.strftime('%Y-%m-%d %H:%M')} | Type: {refactoring_type}")
+                print(
+                    f"    Complexity: -{
+                        complexity_reduction:.1f} | Safety: {
+                        safety_score:.2f} | Duration: {
+                        duration:.0f}min")
         else:
             print("No refactoring sessions found")
 

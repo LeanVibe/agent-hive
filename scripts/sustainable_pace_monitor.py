@@ -8,17 +8,14 @@ to prevent burnout and maintain XP methodology compliance.
 """
 
 import json
-import os
+import re
 import sqlite3
+import statistics
 import subprocess
 import sys
-import time
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
-import statistics
+from typing import Dict, List, Tuple
 
 
 @dataclass
@@ -221,11 +218,17 @@ class SustainablePaceMonitor:
 
             conn.commit()
 
-    def track_work_activity(self, team_member: str, activity_type: str,
-                           duration_minutes: float, productivity_score: float = 7.0,
-                           stress_indicator: float = 5.0, notes: str = "") -> str:
+    def track_work_activity(
+            self,
+            team_member: str,
+            activity_type: str,
+            duration_minutes: float,
+            productivity_score: float = 7.0,
+            stress_indicator: float = 5.0,
+            notes: str = "") -> str:
         """Track individual work activity."""
-        activity_id = f"activity-{team_member}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        activity_id = f"activity-{team_member}-{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}"
         start_time = datetime.now()
         end_time = start_time + timedelta(minutes=duration_minutes)
 
@@ -242,10 +245,15 @@ class SustainablePaceMonitor:
             ))
             conn.commit()
 
-        print(f"✅ Tracked {activity_type} activity for {team_member}: {duration_minutes:.1f} minutes")
+        print(
+            f"✅ Tracked {activity_type} activity for {team_member}: {
+                duration_minutes:.1f} minutes")
         return activity_id
 
-    def analyze_team_member_workload(self, team_member: str, days: int = 7) -> WorkloadPeriod:
+    def analyze_team_member_workload(
+            self,
+            team_member: str,
+            days: int = 7) -> WorkloadPeriod:
         """Analyze workload for a specific team member."""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
@@ -266,13 +274,18 @@ class SustainablePaceMonitor:
 
         if not activities:
             # Return default workload if no data
-            return self.create_default_workload(team_member, start_date, end_date)
+            return self.create_default_workload(
+                team_member, start_date, end_date)
 
         # Calculate work metrics
-        total_hours = sum(duration / 60.0 for _, duration, _, _, _ in activities)
-        coding_hours = sum(duration / 60.0 for type_, duration, _, _, _ in activities if type_ == 'coding')
-        meeting_hours = sum(duration / 60.0 for type_, duration, _, _, _ in activities if type_ == 'meeting')
-        break_hours = sum(duration / 60.0 for type_, duration, _, _, _ in activities if type_ == 'break')
+        total_hours = sum(duration / 60.0 for _,
+                          duration, _, _, _ in activities)
+        coding_hours = sum(duration / 60.0 for type_, duration, _,
+                           _, _ in activities if type_ == 'coding')
+        meeting_hours = sum(duration / 60.0 for type_, duration, _,
+                            _, _ in activities if type_ == 'meeting')
+        break_hours = sum(duration / 60.0 for type_, duration, _,
+                          _, _ in activities if type_ == 'break')
 
         # Calculate daily hours
         daily_hours = self.calculate_daily_hours(activities, start_date, days)
@@ -289,15 +302,21 @@ class SustainablePaceMonitor:
 
         # Calculate wellbeing scores
         stress_level = self.calculate_stress_level(activities)
-        satisfaction_score = self.calculate_satisfaction_score(activities, total_hours)
+        satisfaction_score = self.calculate_satisfaction_score(
+            activities, total_hours)
 
         # Calculate XP compliance scores
-        sustainable_pace_score = self.calculate_sustainable_pace_score(total_hours, overtime_hours)
-        work_life_balance_score = self.calculate_work_life_balance_score(daily_hours, break_hours)
-        team_collaboration_score = self.calculate_collaboration_score(activities)
+        sustainable_pace_score = self.calculate_sustainable_pace_score(
+            total_hours, overtime_hours)
+        work_life_balance_score = self.calculate_work_life_balance_score(
+            daily_hours, break_hours)
+        team_collaboration_score = self.calculate_collaboration_score(
+            activities)
 
         # Create workload period
-        period_id = f"workload-{team_member}-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"
+        period_id = f"workload-{team_member}-{
+            start_date.strftime('%Y%m%d')}-{
+            end_date.strftime('%Y%m%d')}"
 
         workload = WorkloadPeriod(
             period_id=period_id,
@@ -315,10 +334,12 @@ class SustainablePaceMonitor:
             commits_made=git_metrics['commits'],
             lines_changed=git_metrics['lines_changed'],
             issues_resolved=git_metrics['issues_resolved'],
-            pair_programming_hours=sum(duration / 60.0 for type_, duration, _, _, _ in activities if type_ == 'pair_programming'),
+            pair_programming_hours=sum(
+                duration / 60.0 for type_, duration, _, _, _ in activities if type_ == 'pair_programming'),
             stress_level=stress_level,
             satisfaction_score=satisfaction_score,
-            fatigue_indicators=self.detect_fatigue_indicators(activities, daily_hours),
+            fatigue_indicators=self.detect_fatigue_indicators(
+                activities, daily_hours),
             sustainable_pace_score=sustainable_pace_score,
             work_life_balance_score=work_life_balance_score,
             team_collaboration_score=team_collaboration_score
@@ -327,9 +348,15 @@ class SustainablePaceMonitor:
         self.save_workload_period(workload)
         return workload
 
-    def create_default_workload(self, team_member: str, start_date: datetime, end_date: datetime) -> WorkloadPeriod:
+    def create_default_workload(
+            self,
+            team_member: str,
+            start_date: datetime,
+            end_date: datetime) -> WorkloadPeriod:
         """Create default workload when no activity data exists."""
-        period_id = f"workload-{team_member}-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"
+        period_id = f"workload-{team_member}-{
+            start_date.strftime('%Y%m%d')}-{
+            end_date.strftime('%Y%m%d')}"
 
         return WorkloadPeriod(
             period_id=period_id,
@@ -356,7 +383,11 @@ class SustainablePaceMonitor:
             team_collaboration_score=75.0
         )
 
-    def calculate_daily_hours(self, activities: List[Tuple], start_date: datetime, days: int) -> List[float]:
+    def calculate_daily_hours(
+            self,
+            activities: List[Tuple],
+            start_date: datetime,
+            days: int) -> List[float]:
         """Calculate daily work hours from activities."""
         daily_hours = [0.0] * days
 
@@ -385,12 +416,17 @@ class SustainablePaceMonitor:
                 continue
 
         # Get top 4 peak hours
-        sorted_hours = sorted(hour_counts.items(), key=lambda x: x[1], reverse=True)
+        sorted_hours = sorted(hour_counts.items(),
+                              key=lambda x: x[1], reverse=True)
         peak_hours = [f"{hour:02d}:00" for hour, _ in sorted_hours[:4]]
 
         return peak_hours
 
-    def get_git_metrics(self, team_member: str, start_date: datetime, end_date: datetime) -> Dict:
+    def get_git_metrics(
+            self,
+            team_member: str,
+            start_date: datetime,
+            end_date: datetime) -> Dict:
         """Get git activity metrics for team member."""
         try:
             # Get commits by author
@@ -402,7 +438,8 @@ class SustainablePaceMonitor:
                 "--oneline"
             ], capture_output=True, text=True)
 
-            commits = len(result.stdout.strip().split('\n')) if result.stdout.strip() else 0
+            commits = len(result.stdout.strip().split(
+                '\n')) if result.stdout.strip() else 0
 
             # Get line changes
             diff_result = subprocess.run([
@@ -418,7 +455,8 @@ class SustainablePaceMonitor:
                 # Parse insertions and deletions
                 for line in diff_result.stdout.split('\n'):
                     if '+' in line and '-' in line:
-                        # Extract numbers from lines like "5 files changed, 150 insertions(+), 30 deletions(-)"
+                        # Extract numbers from lines like "5 files changed, 150
+                        # insertions(+), 30 deletions(-)"
                         parts = line.split(',')
                         for part in parts:
                             if 'insertion' in part or 'deletion' in part:
@@ -429,7 +467,8 @@ class SustainablePaceMonitor:
             return {
                 'commits': commits,
                 'lines_changed': lines_changed,
-                'issues_resolved': max(1, commits // 5)  # Estimate issues from commits
+                # Estimate issues from commits
+                'issues_resolved': max(1, commits // 5)
             }
 
         except Exception:
@@ -454,12 +493,16 @@ class SustainablePaceMonitor:
 
         return min(10.0, max(1.0, avg_stress))
 
-    def calculate_satisfaction_score(self, activities: List[Tuple], total_hours: float) -> float:
+    def calculate_satisfaction_score(
+            self,
+            activities: List[Tuple],
+            total_hours: float) -> float:
         """Calculate satisfaction score from productivity and workload."""
         if not activities:
             return 7.5
 
-        productivity_scores = [productivity for _, _, productivity, _, _ in activities]
+        productivity_scores = [productivity for _,
+                               _, productivity, _, _ in activities]
         avg_productivity = statistics.mean(productivity_scores)
 
         # Base satisfaction on productivity
@@ -472,7 +515,10 @@ class SustainablePaceMonitor:
 
         return min(10.0, max(1.0, satisfaction))
 
-    def calculate_sustainable_pace_score(self, total_hours: float, overtime_hours: float) -> float:
+    def calculate_sustainable_pace_score(
+            self,
+            total_hours: float,
+            overtime_hours: float) -> float:
         """Calculate sustainable pace compliance score."""
         target_hours = self.pace_targets['max_weekly_hours']
 
@@ -486,7 +532,10 @@ class SustainablePaceMonitor:
 
         return base_score
 
-    def calculate_work_life_balance_score(self, daily_hours: List[float], break_hours: float) -> float:
+    def calculate_work_life_balance_score(
+            self,
+            daily_hours: List[float],
+            break_hours: float) -> float:
         """Calculate work-life balance score."""
         score = 100.0
 
@@ -512,7 +561,8 @@ class SustainablePaceMonitor:
                 consecutive_days = 0
 
         if max_consecutive > self.pace_targets['max_consecutive_work_days']:
-            score -= (max_consecutive - self.pace_targets['max_consecutive_work_days']) * 10
+            score -= (max_consecutive -
+                      self.pace_targets['max_consecutive_work_days']) * 10
 
         return max(0, min(100, score))
 
@@ -530,7 +580,8 @@ class SustainablePaceMonitor:
             return 50.0
 
         total_collab_hours = sum(collaboration_activities) / 60.0
-        total_hours = sum(duration for _, duration, _, _, _ in activities) / 60.0
+        total_hours = sum(duration for _, duration, _,
+                          _, _ in activities) / 60.0
 
         # Ideal collaboration is 20-30% of total time
         collab_percentage = (total_collab_hours / total_hours) * 100
@@ -542,7 +593,10 @@ class SustainablePaceMonitor:
         else:
             return max(70.0, 100.0 - (collab_percentage - 30) * 2)
 
-    def detect_fatigue_indicators(self, activities: List[Tuple], daily_hours: List[float]) -> List[str]:
+    def detect_fatigue_indicators(
+            self,
+            activities: List[Tuple],
+            daily_hours: List[float]) -> List[str]:
         """Detect fatigue indicators from work patterns."""
         indicators = []
 
@@ -579,7 +633,8 @@ class SustainablePaceMonitor:
     def save_workload_period(self, workload: WorkloadPeriod):
         """Save workload period to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO workload_periods
                 (period_id, team_member, start_date, end_date, total_hours,
                  coding_hours, meeting_hours, break_hours, daily_hours,
@@ -588,21 +643,38 @@ class SustainablePaceMonitor:
                  stress_level, satisfaction_score, fatigue_indicators,
                  sustainable_pace_score, work_life_balance_score, team_collaboration_score)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                workload.period_id, workload.team_member, workload.start_date,
-                workload.end_date, workload.total_hours, workload.coding_hours,
-                workload.meeting_hours, workload.break_hours, json.dumps(workload.daily_hours),
-                json.dumps(workload.peak_hours), workload.work_days, workload.overtime_hours,
-                workload.commits_made, workload.lines_changed, workload.issues_resolved,
-                workload.pair_programming_hours, workload.stress_level, workload.satisfaction_score,
-                json.dumps(workload.fatigue_indicators), workload.sustainable_pace_score,
-                workload.work_life_balance_score, workload.team_collaboration_score
-            ))
+            """,
+                (workload.period_id,
+                 workload.team_member,
+                 workload.start_date,
+                 workload.end_date,
+                 workload.total_hours,
+                 workload.coding_hours,
+                 workload.meeting_hours,
+                 workload.break_hours,
+                 json.dumps(
+                     workload.daily_hours),
+                    json.dumps(
+                     workload.peak_hours),
+                    workload.work_days,
+                    workload.overtime_hours,
+                    workload.commits_made,
+                    workload.lines_changed,
+                    workload.issues_resolved,
+                    workload.pair_programming_hours,
+                    workload.stress_level,
+                    workload.satisfaction_score,
+                    json.dumps(
+                     workload.fatigue_indicators),
+                    workload.sustainable_pace_score,
+                    workload.work_life_balance_score,
+                    workload.team_collaboration_score))
             conn.commit()
 
     def assess_burnout_risk(self, team_member: str) -> Dict:
         """Assess burnout risk for a team member."""
-        workload = self.analyze_team_member_workload(team_member, 14)  # 2 weeks
+        workload = self.analyze_team_member_workload(
+            team_member, 14)  # 2 weeks
 
         # Calculate risk factors
         risk_factors = []
@@ -647,7 +719,8 @@ class SustainablePaceMonitor:
             risk_level = "low"
 
         # Generate recommendations
-        recommendations = self.generate_burnout_recommendations(risk_factors, workload)
+        recommendations = self.generate_burnout_recommendations(
+            risk_factors, workload)
 
         assessment = {
             'team_member': team_member,
@@ -668,13 +741,17 @@ class SustainablePaceMonitor:
 
         return assessment
 
-    def generate_burnout_recommendations(self, risk_factors: List[str], workload: WorkloadPeriod) -> List[str]:
+    def generate_burnout_recommendations(
+            self,
+            risk_factors: List[str],
+            workload: WorkloadPeriod) -> List[str]:
         """Generate recommendations to reduce burnout risk."""
         recommendations = []
 
         if "Excessive working hours" in risk_factors:
             recommendations.append("Reduce weekly hours to 40 or less")
-            recommendations.append("Consider redistributing workload among team members")
+            recommendations.append(
+                "Consider redistributing workload among team members")
 
         if "High overtime hours" in risk_factors:
             recommendations.append("Implement strict overtime limits")
@@ -682,7 +759,8 @@ class SustainablePaceMonitor:
 
         if "High stress levels" in risk_factors:
             recommendations.append("Schedule stress management sessions")
-            recommendations.append("Increase pair programming to share workload")
+            recommendations.append(
+                "Increase pair programming to share workload")
 
         if "Poor work-life balance" in risk_factors:
             recommendations.append("Encourage taking regular breaks")
@@ -694,16 +772,20 @@ class SustainablePaceMonitor:
 
         if "Low job satisfaction" in risk_factors:
             recommendations.append("Schedule one-on-one feedback sessions")
-            recommendations.append("Provide professional development opportunities")
+            recommendations.append(
+                "Provide professional development opportunities")
 
         if not recommendations:
-            recommendations.append("Continue current sustainable pace practices")
+            recommendations.append(
+                "Continue current sustainable pace practices")
 
         return recommendations
 
     def save_burnout_assessment(self, assessment: Dict):
         """Save burnout assessment to database."""
-        assessment_id = f"burnout-{assessment['team_member']}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        assessment_id = f"burnout-{
+            assessment['team_member']}-{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("""
@@ -712,9 +794,11 @@ class SustainablePaceMonitor:
                  risk_score, contributing_factors, recommendations, follow_up_date)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                assessment_id, assessment['team_member'], datetime.now().isoformat(),
+                assessment_id, assessment['team_member'], datetime.now(
+                ).isoformat(),
                 assessment['risk_level'], assessment['risk_score'],
-                json.dumps(assessment['risk_factors']), json.dumps(assessment['recommendations']),
+                json.dumps(assessment['risk_factors']), json.dumps(
+                    assessment['recommendations']),
                 (datetime.now() + timedelta(days=7)).isoformat()
             ))
             conn.commit()
@@ -747,27 +831,38 @@ class SustainablePaceMonitor:
         overtime_percentage = (overtime_hours / total_target_hours) * 100
 
         # Count burnout risk members
-        burnout_risk_members = len([w for w in workloads if w.total_hours > self.pace_targets['burnout_risk_threshold']])
+        burnout_risk_members = len(
+            [w for w in workloads if w.total_hours > self.pace_targets['burnout_risk_threshold']])
 
         # Calculate sustainable pace compliance
-        compliant_members = len([w for w in workloads if w.sustainable_pace_score >= 70])
+        compliant_members = len(
+            [w for w in workloads if w.sustainable_pace_score >= 70])
         sustainable_pace_compliance = (compliant_members / team_size) * 100
 
         # Calculate productivity metrics
-        total_productivity = sum(w.commits_made + w.issues_resolved for w in workloads)
-        productivity_per_hour = total_productivity / total_team_hours if total_team_hours > 0 else 0
+        total_productivity = sum(
+            w.commits_made + w.issues_resolved for w in workloads)
+        productivity_per_hour = total_productivity / \
+            total_team_hours if total_team_hours > 0 else 0
 
         # Calculate wellbeing metrics
-        average_stress_level = statistics.mean([w.stress_level for w in workloads])
-        average_satisfaction = statistics.mean([w.satisfaction_score for w in workloads])
-        team_collaboration_score = statistics.mean([w.team_collaboration_score for w in workloads])
+        average_stress_level = statistics.mean(
+            [w.stress_level for w in workloads])
+        average_satisfaction = statistics.mean(
+            [w.satisfaction_score for w in workloads])
+        team_collaboration_score = statistics.mean(
+            [w.team_collaboration_score for w in workloads])
 
         # Calculate XP compliance
-        forty_hour_week_compliance = (len([w for w in workloads if w.total_hours <= 40]) / team_size) * 100
+        forty_hour_week_compliance = (
+            len([w for w in workloads if w.total_hours <= 40]) / team_size) * 100
         collective_ownership_score = team_collaboration_score
-        continuous_improvement_score = statistics.mean([w.satisfaction_score for w in workloads]) * 10
+        continuous_improvement_score = statistics.mean(
+            [w.satisfaction_score for w in workloads]) * 10
 
-        period_id = f"team-pace-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"
+        period_id = f"team-pace-{
+            start_date.strftime('%Y%m%d')}-{
+            end_date.strftime('%Y%m%d')}"
 
         return TeamPaceMetrics(
             period_id=period_id,
@@ -807,9 +902,14 @@ class SustainablePaceMonitor:
         # Default team members
         return ["developer1", "developer2", "developer3"]
 
-    def create_default_team_metrics(self, start_date: datetime, end_date: datetime) -> TeamPaceMetrics:
+    def create_default_team_metrics(
+            self,
+            start_date: datetime,
+            end_date: datetime) -> TeamPaceMetrics:
         """Create default team metrics when no data exists."""
-        period_id = f"team-pace-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"
+        period_id = f"team-pace-{
+            start_date.strftime('%Y%m%d')}-{
+            end_date.strftime('%Y%m%d')}"
 
         return TeamPaceMetrics(
             period_id=period_id,
@@ -887,7 +987,9 @@ class SustainablePaceMonitor:
 """
 
             if workload.fatigue_indicators:
-                report += f"- **⚠️ Fatigue Indicators**: {', '.join(workload.fatigue_indicators)}\n"
+                report += f"- **⚠️ Fatigue Indicators**: {
+                    ', '.join(
+                        workload.fatigue_indicators)}\n"
 
         # XP compliance assessment
         report += f"""
@@ -918,25 +1020,34 @@ class SustainablePaceMonitor:
         recommendations = []
 
         if team_metrics.burnout_risk_members > 0:
-            recommendations.append(f"🚨 Immediate attention needed for {team_metrics.burnout_risk_members} team member(s) at burnout risk")
+            recommendations.append(
+                f"🚨 Immediate attention needed for {
+                    team_metrics.burnout_risk_members} team member(s) at burnout risk")
 
         if team_metrics.overtime_percentage > 15:
-            recommendations.append(f"⚠️ Reduce overtime from {team_metrics.overtime_percentage:.1f}% to <10%")
+            recommendations.append(
+                f"⚠️ Reduce overtime from {
+                    team_metrics.overtime_percentage:.1f}% to <10%")
 
         if team_metrics.forty_hour_week_compliance < 80:
-            recommendations.append("⚠️ Improve 40-hour week compliance - review workload distribution")
+            recommendations.append(
+                "⚠️ Improve 40-hour week compliance - review workload distribution")
 
         if team_metrics.average_stress_level > 6:
-            recommendations.append("🧘 Implement stress management practices - stress level too high")
+            recommendations.append(
+                "🧘 Implement stress management practices - stress level too high")
 
         if team_metrics.team_collaboration_score < 70:
-            recommendations.append("🤝 Increase pair programming and collaboration activities")
+            recommendations.append(
+                "🤝 Increase pair programming and collaboration activities")
 
         if team_metrics.average_satisfaction < 7:
-            recommendations.append("😊 Address team satisfaction - conduct feedback sessions")
+            recommendations.append(
+                "😊 Address team satisfaction - conduct feedback sessions")
 
         if not recommendations:
-            recommendations.append("✅ Excellent sustainable pace practices - continue current approach")
+            recommendations.append(
+                "✅ Excellent sustainable pace practices - continue current approach")
 
         for i, rec in enumerate(recommendations, 1):
             report += f"{i}. {rec}\n"
@@ -970,10 +1081,13 @@ def main():
         print("Usage: python sustainable_pace_monitor.py <command> [options]")
         print("Commands:")
         print("  track <member> <activity> <minutes>  - Track work activity")
-        print("  analyze <member> [days]              - Analyze member workload")
+        print(
+            "  analyze <member> [days]              - Analyze member workload")
         print("  burnout <member>                     - Assess burnout risk")
-        print("  team-metrics [days]                  - Show team pace metrics")
-        print("  report [days]                        - Generate sustainable pace report")
+        print(
+            "  team-metrics [days]                  - Show team pace metrics")
+        print(
+            "  report [days]                        - Generate sustainable pace report")
         print("  targets                              - Show pace targets")
         print("  wellbeing <member>                   - Wellbeing check-in")
         sys.exit(1)
@@ -983,7 +1097,8 @@ def main():
 
     if command == "track":
         if len(sys.argv) < 5:
-            print("Usage: python sustainable_pace_monitor.py track <member> <activity> <minutes>")
+            print(
+                "Usage: python sustainable_pace_monitor.py track <member> <activity> <minutes>")
             sys.exit(1)
 
         member = sys.argv[2]
@@ -995,7 +1110,8 @@ def main():
 
     elif command == "analyze":
         if len(sys.argv) < 3:
-            print("Usage: python sustainable_pace_monitor.py analyze <member> [days]")
+            print(
+                "Usage: python sustainable_pace_monitor.py analyze <member> [days]")
             sys.exit(1)
 
         member = sys.argv[2]
@@ -1008,11 +1124,16 @@ def main():
         print(f"  Overtime: {workload.overtime_hours:.1f}")
         print(f"  Stress Level: {workload.stress_level:.1f}/10")
         print(f"  Satisfaction: {workload.satisfaction_score:.1f}/10")
-        print(f"  Sustainable Pace Score: {workload.sustainable_pace_score:.1f}%")
+        print(
+            f"  Sustainable Pace Score: {
+                workload.sustainable_pace_score:.1f}%")
         print(f"  Work-Life Balance: {workload.work_life_balance_score:.1f}%")
 
         if workload.fatigue_indicators:
-            print(f"  ⚠️ Fatigue Indicators: {', '.join(workload.fatigue_indicators)}")
+            print(
+                f"  ⚠️ Fatigue Indicators: {
+                    ', '.join(
+                        workload.fatigue_indicators)}")
 
     elif command == "burnout":
         if len(sys.argv) < 3:
@@ -1026,7 +1147,7 @@ def main():
         print(f"  Risk Level: {assessment['risk_level'].upper()}")
         print(f"  Risk Score: {assessment['risk_score']}/100")
         print(f"  Risk Factors: {', '.join(assessment['risk_factors'])}")
-        print(f"  Recommendations:")
+        print("  Recommendations:")
         for rec in assessment['recommendations']:
             print(f"    - {rec}")
 
@@ -1036,11 +1157,16 @@ def main():
 
         print(f"Team Pace Metrics ({days} days):")
         print(f"  Team Size: {metrics.team_size}")
-        print(f"  Average Hours per Person: {metrics.average_hours_per_person:.1f}")
+        print(
+            f"  Average Hours per Person: {
+                metrics.average_hours_per_person:.1f}")
         print(f"  Overtime Percentage: {metrics.overtime_percentage:.1f}%")
         print(f"  Burnout Risk Members: {metrics.burnout_risk_members}")
-        print(f"  Sustainable Pace Compliance: {metrics.sustainable_pace_compliance:.1f}%")
-        print(f"  40-Hour Week Compliance: {metrics.forty_hour_week_compliance:.1f}%")
+        print(
+            f"  Sustainable Pace Compliance: {
+                metrics.sustainable_pace_compliance:.1f}%")
+        print(
+            f"  40-Hour Week Compliance: {metrics.forty_hour_week_compliance:.1f}%")
         print(f"  Average Stress Level: {metrics.average_stress_level:.1f}/10")
         print(f"  Average Satisfaction: {metrics.average_satisfaction:.1f}/10")
 
@@ -1049,7 +1175,8 @@ def main():
         report = monitor.generate_sustainable_pace_report(days)
 
         # Save report
-        filename = f"sustainable_pace_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"sustainable_pace_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(report)
 
@@ -1064,7 +1191,9 @@ def main():
         print(f"  Max Overtime: {targets['max_overtime_percentage']}%")
         print(f"  Target Stress Level: ≤{targets['target_stress_level']}/10")
         print(f"  Target Satisfaction: ≥{targets['target_satisfaction']}/10")
-        print(f"  Burnout Risk Threshold: {targets['burnout_risk_threshold']} hours/week")
+        print(
+            f"  Burnout Risk Threshold: {
+                targets['burnout_risk_threshold']} hours/week")
 
     elif command == "wellbeing":
         if len(sys.argv) < 3:

@@ -8,8 +8,18 @@ This package provides a comprehensive tutorial system with:
 - Step-by-step guidance
 """
 
-from .tutorial_manager import TutorialManager, Tutorial, TutorialStep, TutorialMetadata
-from .validation import StepValidator, ValidationResult, TutorialValidator, TutorialTestRunner
+from .tutorial_manager import (
+    Tutorial,
+    TutorialManager,
+    TutorialMetadata,
+    TutorialStep,
+)
+from .validation import (
+    StepValidator,
+    TutorialTestRunner,
+    TutorialValidator,
+    ValidationResult,
+)
 
 __version__ = "1.0.0"
 __all__ = [

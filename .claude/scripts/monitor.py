@@ -8,7 +8,8 @@ def monitor():
     try:
         db = sqlite3.connect(".claude/state.db")
         cursor = db.cursor()
-        cursor.execute("SELECT agent, AVG(confidence) FROM tasks GROUP BY agent")
+        cursor.execute(
+            "SELECT agent, AVG(confidence) FROM tasks GROUP BY agent")
         confidences = cursor.fetchall()
         repo = git.Repo(".")
         recent = repo.git.log("--oneline", "-n", "5")

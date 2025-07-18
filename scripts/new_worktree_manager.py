@@ -6,13 +6,14 @@ Creates and manages new worktrees with strict quality gates for future work.
 Enforces clean separation between legacy and new development.
 """
 
-import subprocess
-import sys
 import json
 import os
-from pathlib import Path
-from typing import Dict, List, Optional
+import subprocess
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, List
+
 
 class NewWorktreeManager:
     """Manages new worktree creation with strict quality gates"""
@@ -33,7 +34,8 @@ class NewWorktreeManager:
             "min_coverage": 85,    # Test coverage percentage
         }
 
-    def create_new_worktree(self, agent_name: str, task_description: str) -> Dict[str, any]:
+    def create_new_worktree(self, agent_name: str,
+                            task_description: str) -> Dict[str, any]:
         """Create a new worktree for an agent with strict quality gates"""
         try:
             # Create unique branch name
@@ -47,19 +49,22 @@ class NewWorktreeManager:
 
             # Create worktree with new branch
             subprocess.run([
-                "git", "worktree", "add", "-b", branch_name, str(worktree_path), "main"
+                "git", "worktree", "add", "-b", branch_name, str(
+                    worktree_path), "main"
             ], check=True)
 
             # Setup quality gates in worktree
-            self._setup_quality_gates(worktree_path, agent_name, task_description)
+            self._setup_quality_gates(
+                worktree_path, agent_name, task_description)
 
             # Create agent-specific CLAUDE.md
-            self._create_agent_claude_file(worktree_path, agent_name, task_description)
+            self._create_agent_claude_file(
+                worktree_path, agent_name, task_description)
 
             # Setup pre-commit hooks
             self._setup_pre_commit_hooks(worktree_path)
 
-            print(f"✅ New worktree created successfully!")
+            print("✅ New worktree created successfully!")
 
             return {
                 "success": True,
@@ -77,7 +82,11 @@ class NewWorktreeManager:
             print(f"❌ Error creating worktree: {e}")
             return {"success": False, "error": str(e)}
 
-    def _setup_quality_gates(self, worktree_path: Path, agent_name: str, task_description: str):
+    def _setup_quality_gates(
+            self,
+            worktree_path: Path,
+            agent_name: str,
+            task_description: str):
         """Setup quality gates configuration in worktree"""
         quality_config = {
             "agent_name": agent_name,
@@ -103,7 +112,11 @@ class NewWorktreeManager:
 
         print(f"✅ Quality gates configured: {quality_file}")
 
-    def _create_agent_claude_file(self, worktree_path: Path, agent_name: str, task_description: str):
+    def _create_agent_claude_file(
+            self,
+            worktree_path: Path,
+            agent_name: str,
+            task_description: str):
         """Create agent-specific CLAUDE.md file"""
         claude_content = f"""# {agent_name.title()} Agent - New Work Environment
 
@@ -172,7 +185,8 @@ Remember: Quality over speed. Better to deliver fewer, high-quality features tha
                 with open(git_dir, 'r') as f:
                     git_content = f.read().strip()
                     if git_content.startswith("gitdir: "):
-                        actual_git_dir = Path(git_content[8:])  # Remove "gitdir: " prefix
+                        # Remove "gitdir: " prefix
+                        actual_git_dir = Path(git_content[8:])
                         hooks_dir = actual_git_dir / "hooks"
                     else:
                         # Fallback to main repo hooks
@@ -258,7 +272,9 @@ echo "✅ Quality gates passed. Proceeding with commit."
         try:
             quality_file = worktree_path / ".quality-gates.json"
             if not quality_file.exists():
-                return {"success": False, "error": "No quality gates configuration found"}
+                return {
+                    "success": False,
+                    "error": "No quality gates configuration found"}
 
             with open(quality_file, 'r') as f:
                 config = json.load(f)
@@ -291,7 +307,8 @@ echo "✅ Quality gates passed. Proceeding with commit."
 
                             max_size = config["quality_gates"]["max_pr_size"]
                             if changes > max_size:
-                                results["errors"].append(f"PR size {changes} exceeds limit {max_size}")
+                                results["errors"].append(
+                                    f"PR size {changes} exceeds limit {max_size}")
                                 results["success"] = False
                             else:
                                 results["checks"]["pr_size"] = f"✅ {changes}/{max_size} lines"
@@ -316,6 +333,7 @@ echo "✅ Quality gates passed. Proceeding with commit."
         except Exception as e:
             return {"success": False, "error": str(e)}
 
+
 def main():
     """Main CLI interface"""
     if len(sys.argv) < 2:
@@ -330,7 +348,8 @@ def main():
 
     if command == "create":
         if len(sys.argv) < 4:
-            print("Usage: python new_worktree_manager.py create <agent-name> <task-description>")
+            print(
+                "Usage: python new_worktree_manager.py create <agent-name> <task-description>")
             return
 
         agent_name = sys.argv[2]
@@ -339,10 +358,12 @@ def main():
         result = manager.create_new_worktree(agent_name, task_description)
 
         if result["success"]:
-            print(f"🎉 New worktree created successfully!")
+            print("🎉 New worktree created successfully!")
             print(f"📁 Path: {result['worktree_path']}")
             print(f"🌿 Branch: {result['branch_name']}")
-            print(f"🔒 Quality gates: {result['quality_gates']['max_pr_size']} line limit")
+            print(
+                f"🔒 Quality gates: {
+                    result['quality_gates']['max_pr_size']} line limit")
         else:
             print(f"❌ Failed to create worktree: {result['error']}")
 
@@ -355,7 +376,8 @@ def main():
             print(f"📋 Found {len(worktrees)} new worktree(s):")
             for wt in worktrees:
                 status = "🔄 Modified" if wt["has_changes"] else "✅ Clean"
-                print(f"  - {wt['agent_name']}: {wt['task_description']} ({status})")
+                print(
+                    f"  - {wt['agent_name']}: {wt['task_description']} ({status})")
                 print(f"    Path: {wt['path']}")
                 print(f"    Created: {wt['created_at']}")
 
@@ -383,6 +405,7 @@ def main():
             print("❌ Errors:")
             for error in result["errors"]:
                 print(f"  - {error}")
+
 
 if __name__ == "__main__":
     main()

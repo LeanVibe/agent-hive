@@ -6,21 +6,21 @@ context compression, and performance optimization for specialized agent capabili
 """
 
 from .persona_manager import (
-    PersonaManager,
-    PersonaType,
+    CompressionLevel,
+    ContextCompressor,
+    PersonaCapability,
     PersonaConfig,
     PersonaContext,
+    PersonaManager,
     PersonaPerformanceMetrics,
-    PersonaCapability,
-    ContextCompressor,
+    PersonaType,
     QualityValidator,
-    CompressionLevel,
-    persona_manager,
     activate_persona,
-    switch_persona,
     find_optimal_persona,
     get_persona_capabilities,
-    get_system_metrics
+    get_system_metrics,
+    persona_manager,
+    switch_persona,
 )
 
 __version__ = "1.0.0"

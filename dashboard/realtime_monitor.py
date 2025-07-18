@@ -13,16 +13,18 @@ Provides real-time monitoring of agent activities including:
 import asyncio
 import json
 import logging
-import psutil
 import subprocess
 import time
+from collections import defaultdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, asdict
-from collections import defaultdict
+from typing import Any, Dict, List, Optional
+
+import psutil
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class AgentActivity:
@@ -36,6 +38,7 @@ class AgentActivity:
         data = asdict(self)
         data['timestamp'] = self.timestamp.isoformat()
         return data
+
 
 @dataclass
 class AgentMetrics:
@@ -55,6 +58,7 @@ class AgentMetrics:
         data = asdict(self)
         data['last_activity'] = self.last_activity.isoformat()
         return data
+
 
 class RealtimeAgentMonitor:
     """Real-time agent activity monitoring system"""
@@ -175,7 +179,8 @@ class RealtimeAgentMonitor:
             try:
                 if self.prompt_logger:
                     # Get recent prompts
-                    recent_prompts = self.prompt_logger.get_recent_prompts(limit=10)
+                    recent_prompts = self.prompt_logger.get_recent_prompts(
+                        limit=10)
 
                     for prompt in recent_prompts:
                         # Track communication activity
@@ -196,7 +201,8 @@ class RealtimeAgentMonitor:
                         if prompt.agent_name in self.agent_metrics:
                             self.agent_metrics[prompt.agent_name].communication_count += 1
 
-                await asyncio.sleep(self.monitoring_interval * 2)  # Less frequent
+                # Less frequent
+                await asyncio.sleep(self.monitoring_interval * 2)
 
             except Exception as e:
                 logger.error(f"Communication monitoring error: {e}")
@@ -220,7 +226,8 @@ class RealtimeAgentMonitor:
                         )
                         self._add_activity(activity)
 
-                await asyncio.sleep(self.monitoring_interval * 3)  # Less frequent
+                # Less frequent
+                await asyncio.sleep(self.monitoring_interval * 3)
 
             except Exception as e:
                 logger.error(f"Task monitoring error: {e}")
@@ -266,7 +273,8 @@ class RealtimeAgentMonitor:
 
         return agents
 
-    async def _get_git_activity(self, agent_name: str, agent_path: Path) -> Optional[Dict[str, Any]]:
+    async def _get_git_activity(
+            self, agent_name: str, agent_path: Path) -> Optional[Dict[str, Any]]:
         """Get git activity for an agent"""
         try:
             # Get recent commits
@@ -306,7 +314,8 @@ class RealtimeAgentMonitor:
 
         return None
 
-    async def _get_task_progress(self, agent_name: str, agent_path: Path) -> Optional[Dict[str, Any]]:
+    async def _get_task_progress(
+            self, agent_name: str, agent_path: Path) -> Optional[Dict[str, Any]]:
         """Get task progress for an agent"""
         try:
             # Check for TODO/FIXME comments
@@ -316,7 +325,8 @@ class RealtimeAgentMonitor:
 
             todos = []
             if result.returncode == 0:
-                todos = result.stdout.strip().split('\n')[:10]  # First 10 todos
+                todos = result.stdout.strip().split(
+                    '\n')[:10]  # First 10 todos
 
             # Check for recent file modifications
             mod_result = await self._run_command([
@@ -335,7 +345,8 @@ class RealtimeAgentMonitor:
             }
 
         except Exception as e:
-            logger.warning(f"Error getting task progress for {agent_name}: {e}")
+            logger.warning(
+                f"Error getting task progress for {agent_name}: {e}")
 
         return None
 
@@ -345,11 +356,14 @@ class RealtimeAgentMonitor:
             result = await self._run_command(["git", "branch", "--show-current"], cwd=repo_path)
             if result.returncode == 0:
                 return result.stdout.strip()
-        except:
+        except BaseException:
             pass
         return "unknown"
 
-    async def _run_command(self, cmd: List[str], cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
+    async def _run_command(
+            self,
+            cmd: List[str],
+            cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
         """Run a command asynchronously"""
         process = await asyncio.create_subprocess_exec(
             *cmd,
@@ -372,8 +386,10 @@ class RealtimeAgentMonitor:
             metrics = self.agent_metrics[activity.agent_name]
 
             if activity.activity_type == "git":
-                metrics.git_commits_today += activity.details.get("recent_commits", 0)
-                metrics.lines_changed_today += activity.details.get("lines_changed", 0)
+                metrics.git_commits_today += activity.details.get(
+                    "recent_commits", 0)
+                metrics.lines_changed_today += activity.details.get(
+                    "lines_changed", 0)
 
             metrics.last_activity = activity.timestamp
 
@@ -396,7 +412,8 @@ class RealtimeAgentMonitor:
             score -= 10
 
         # Reward recent activity
-        time_since_activity = (datetime.now() - metrics.last_activity).total_seconds()
+        time_since_activity = (
+            datetime.now() - metrics.last_activity).total_seconds()
         if time_since_activity > 3600:  # 1 hour
             score -= 30
         elif time_since_activity > 1800:  # 30 minutes
@@ -410,7 +427,8 @@ class RealtimeAgentMonitor:
 
         return max(0, min(100, score))
 
-    def get_recent_activities(self, limit: int = 50, agent_name: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_recent_activities(
+            self, limit: int = 50, agent_name: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get recent activities"""
         activities = self.activities
 
@@ -422,23 +440,29 @@ class RealtimeAgentMonitor:
 
         return [activity.to_dict() for activity in activities[:limit]]
 
-    def get_agent_metrics(self, agent_name: Optional[str] = None) -> Dict[str, Any]:
+    def get_agent_metrics(
+            self, agent_name: Optional[str] = None) -> Dict[str, Any]:
         """Get agent metrics"""
         if agent_name:
-            return self.agent_metrics.get(agent_name, {}).to_dict() if agent_name in self.agent_metrics else {}
+            return self.agent_metrics.get(agent_name, {}).to_dict(
+            ) if agent_name in self.agent_metrics else {}
 
-        return {name: metrics.to_dict() for name, metrics in self.agent_metrics.items()}
+        return {name: metrics.to_dict()
+                for name, metrics in self.agent_metrics.items()}
 
     def get_system_overview(self) -> Dict[str, Any]:
         """Get system overview"""
         total_agents = len(self.agent_metrics)
-        active_agents = sum(1 for m in self.agent_metrics.values()
-                          if (datetime.now() - m.last_activity).total_seconds() < 3600)
+        active_agents = sum(1 for m in self.agent_metrics.values() if (
+            datetime.now() - m.last_activity).total_seconds() < 3600)
 
-        avg_health = sum(m.health_score for m in self.agent_metrics.values()) / max(total_agents, 1)
+        avg_health = sum(
+            m.health_score for m in self.agent_metrics.values()) / max(total_agents, 1)
 
-        total_commits = sum(m.git_commits_today for m in self.agent_metrics.values())
-        total_lines = sum(m.lines_changed_today for m in self.agent_metrics.values())
+        total_commits = sum(
+            m.git_commits_today for m in self.agent_metrics.values())
+        total_lines = sum(
+            m.lines_changed_today for m in self.agent_metrics.values())
 
         return {
             "total_agents": total_agents,
@@ -450,8 +474,10 @@ class RealtimeAgentMonitor:
             "activity_count": len(self.activities)
         }
 
+
 # Global monitor instance
 monitor = RealtimeAgentMonitor()
+
 
 async def main():
     """Main function for standalone monitoring"""

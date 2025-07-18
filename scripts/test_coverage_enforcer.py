@@ -12,11 +12,10 @@ import os
 import sqlite3
 import subprocess
 import sys
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Dict, List, Tuple
 
 
 @dataclass
@@ -137,15 +136,16 @@ class TestCoverageEnforcer:
             conn.commit()
 
     def run_coverage_analysis(self, test_path: str = "tests/",
-                             source_path: str = ".",
-                             output_formats: List[str] = None) -> Dict:
+                              source_path: str = ".",
+                              output_formats: List[str] = None) -> Dict:
         """Run comprehensive coverage analysis."""
         if output_formats is None:
             output_formats = ["json", "xml", "html", "term"]
 
         try:
             # Build coverage command
-            cmd = ["python", "-m", "pytest", f"--cov={source_path}", "--cov-branch"]
+            cmd = ["python", "-m", "pytest",
+                   f"--cov={source_path}", "--cov-branch"]
 
             # Add output formats
             for fmt in output_formats:
@@ -162,7 +162,8 @@ class TestCoverageEnforcer:
             cmd.append(test_path)
 
             # Run coverage
-            result = subprocess.run(cmd, capture_output=True, text=True, cwd=".")
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, cwd=".")
 
             # Parse coverage results
             coverage_data = self.parse_coverage_results(output_formats)
@@ -306,7 +307,8 @@ class TestCoverageEnforcer:
         x_mean = (n - 1) / 2
         y_mean = sum(coverages) / n
 
-        numerator = sum((i - x_mean) * (coverages[i] - y_mean) for i in range(n))
+        numerator = sum(
+            (i - x_mean) * (coverages[i] - y_mean) for i in range(n))
         denominator = sum((i - x_mean) ** 2 for i in range(n))
 
         if denominator == 0:
@@ -335,30 +337,42 @@ class TestCoverageEnforcer:
             'starting_coverage': coverages[0]
         }
 
-    def check_coverage_quality_gates(self, coverage_data: Dict) -> Tuple[bool, List[str]]:
+    def check_coverage_quality_gates(
+            self, coverage_data: Dict) -> Tuple[bool, List[str]]:
         """Check if coverage meets quality gate requirements."""
         violations = []
 
         # Check total coverage
         if coverage_data['total_coverage'] < self.targets.minimum_total:
-            violations.append(f"Total coverage {coverage_data['total_coverage']:.1f}% < {self.targets.minimum_total}%")
+            violations.append(
+                f"Total coverage {
+                    coverage_data['total_coverage']:.1f}% < {
+                    self.targets.minimum_total}%")
 
         # Check line coverage
         if coverage_data['line_coverage'] < self.targets.minimum_line:
-            violations.append(f"Line coverage {coverage_data['line_coverage']:.1f}% < {self.targets.minimum_line}%")
+            violations.append(
+                f"Line coverage {
+                    coverage_data['line_coverage']:.1f}% < {
+                    self.targets.minimum_line}%")
 
         # Check branch coverage
         if coverage_data['branch_coverage'] < self.targets.minimum_branch:
-            violations.append(f"Branch coverage {coverage_data['branch_coverage']:.1f}% < {self.targets.minimum_branch}%")
+            violations.append(
+                f"Branch coverage {
+                    coverage_data['branch_coverage']:.1f}% < {
+                    self.targets.minimum_branch}%")
 
         # Check file-level coverage
         low_coverage_files = []
         for file_path, file_data in coverage_data.get('files', {}).items():
             if file_data['line_coverage'] < self.targets.file_minimum:
-                low_coverage_files.append(f"{file_path}: {file_data['line_coverage']:.1f}%")
+                low_coverage_files.append(
+                    f"{file_path}: {file_data['line_coverage']:.1f}%")
 
         if low_coverage_files:
-            violations.append(f"Low coverage files: {', '.join(low_coverage_files[:5])}")
+            violations.append(
+                f"Low coverage files: {', '.join(low_coverage_files[:5])}")
 
         return len(violations) == 0, violations
 
@@ -373,7 +387,8 @@ class TestCoverageEnforcer:
         coverage_data = analysis_result['coverage_data']
 
         # Check quality gates
-        gates_passed, violations = self.check_coverage_quality_gates(coverage_data)
+        gates_passed, violations = self.check_coverage_quality_gates(
+            coverage_data)
 
         # Analyze trends
         trends = self.analyze_coverage_trends()
@@ -401,12 +416,14 @@ class TestCoverageEnforcer:
 """
 
         if trends['data_points'] >= 2:
-            report += f"- **Starting Coverage**: {trends['starting_coverage']:.1f}%\n"
-            report += f"- **Current Coverage**: {trends['current_coverage']:.1f}%\n"
+            report += f"- **Starting Coverage**: {
+                trends['starting_coverage']:.1f}%\n"
+            report += f"- **Current Coverage**: {
+                trends['current_coverage']:.1f}%\n"
 
         # Add violations if any
         if violations:
-            report += f"""
+            report += """
 ## ⚠️ Quality Gate Violations
 """
             for i, violation in enumerate(violations, 1):
@@ -414,7 +431,7 @@ class TestCoverageEnforcer:
 
         # Add file-level details if requested
         if detailed and coverage_data.get('files'):
-            report += f"""
+            report += """
 ## 📁 File-Level Coverage
 """
 
@@ -424,12 +441,17 @@ class TestCoverageEnforcer:
                 key=lambda x: x[1]['line_coverage']
             )
 
-            for file_path, file_data in sorted_files[:10]:  # Top 10 lowest coverage
+            # Top 10 lowest coverage
+            for file_path, file_data in sorted_files[:10]:
                 status = "❌" if file_data['line_coverage'] < self.targets.file_minimum else "✅"
-                report += f"{status} **{file_path}**: {file_data['line_coverage']:.1f}% ({file_data['lines_covered']}/{file_data['lines_total']} lines)\n"
+                report += f"{status} **{file_path}**: {
+                    file_data['line_coverage']:.1f}% ({
+                    file_data['lines_covered']}/{
+                    file_data['lines_total']} lines)\n"
 
         # Add recommendations
-        report += self.generate_coverage_recommendations(coverage_data, violations, trends)
+        report += self.generate_coverage_recommendations(
+            coverage_data, violations, trends)
 
         # Save report
         report_record = CoverageReport(
@@ -457,25 +479,30 @@ class TestCoverageEnforcer:
         return report
 
     def generate_coverage_recommendations(self, coverage_data: Dict,
-                                        violations: List[str],
-                                        trends: Dict) -> str:
+                                          violations: List[str],
+                                          trends: Dict) -> str:
         """Generate coverage improvement recommendations."""
         recommendations = []
 
         # Coverage-based recommendations
         if coverage_data['total_coverage'] < self.targets.minimum_total:
             gap = self.targets.minimum_total - coverage_data['total_coverage']
-            recommendations.append(f"Increase total coverage by {gap:.1f}% to meet minimum requirements")
+            recommendations.append(
+                f"Increase total coverage by {
+                    gap:.1f}% to meet minimum requirements")
 
         if coverage_data['branch_coverage'] < self.targets.minimum_branch:
-            recommendations.append("Add tests for conditional branches and edge cases")
+            recommendations.append(
+                "Add tests for conditional branches and edge cases")
 
         # Trend-based recommendations
         if trends['direction'] == 'decreasing':
-            recommendations.append("Coverage is declining - prioritize adding tests for new code")
+            recommendations.append(
+                "Coverage is declining - prioritize adding tests for new code")
 
         if trends['direction'] == 'stable' and coverage_data['total_coverage'] < self.targets.warning_threshold:
-            recommendations.append("Coverage is stable but below warning threshold - plan improvement")
+            recommendations.append(
+                "Coverage is stable but below warning threshold - plan improvement")
 
         # File-based recommendations
         low_coverage_files = []
@@ -484,13 +511,15 @@ class TestCoverageEnforcer:
                 low_coverage_files.append(file_path)
 
         if low_coverage_files:
-            recommendations.append(f"Focus on {len(low_coverage_files)} files with low coverage")
+            recommendations.append(
+                f"Focus on {len(low_coverage_files)} files with low coverage")
 
         # General recommendations
         if not recommendations:
-            recommendations.append("Coverage is meeting targets - continue current testing practices")
+            recommendations.append(
+                "Coverage is meeting targets - continue current testing practices")
 
-        report_section = f"""
+        report_section = """
 ## 💡 Recommendations
 """
 
@@ -521,20 +550,30 @@ Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
     def save_coverage_report(self, report: CoverageReport):
         """Save coverage report to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO coverage_reports
                 (report_id, timestamp, total_coverage, line_coverage, branch_coverage,
                  function_coverage, lines_covered, lines_total, branches_covered,
                  branches_total, functions_covered, functions_total, files_analyzed,
                  coverage_trend, quality_gate_passed)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                report.report_id, report.timestamp, report.total_coverage,
-                report.line_coverage, report.branch_coverage, report.function_coverage,
-                report.lines_covered, report.lines_total, report.branches_covered,
-                report.branches_total, report.functions_covered, report.functions_total,
-                report.files_analyzed, report.coverage_trend, report.quality_gate_passed
-            ))
+            """,
+                (report.report_id,
+                 report.timestamp,
+                 report.total_coverage,
+                 report.line_coverage,
+                 report.branch_coverage,
+                 report.function_coverage,
+                 report.lines_covered,
+                 report.lines_total,
+                 report.branches_covered,
+                 report.branches_total,
+                 report.functions_covered,
+                 report.functions_total,
+                 report.files_analyzed,
+                 report.coverage_trend,
+                 report.quality_gate_passed))
             conn.commit()
 
     def check_pre_commit_coverage(self) -> bool:
@@ -546,10 +585,13 @@ Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
             return False
 
         coverage_data = analysis_result['coverage_data']
-        gates_passed, violations = self.check_coverage_quality_gates(coverage_data)
+        gates_passed, violations = self.check_coverage_quality_gates(
+            coverage_data)
 
         if gates_passed:
-            print(f"✅ Coverage quality gates passed: {coverage_data['total_coverage']:.1f}%")
+            print(
+                f"✅ Coverage quality gates passed: {
+                    coverage_data['total_coverage']:.1f}%")
             return True
         else:
             print("❌ Coverage quality gates failed:")
@@ -587,7 +629,8 @@ def main():
         report = enforcer.generate_coverage_report(detailed)
 
         # Save report
-        filename = f"coverage_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"coverage_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(report)
 
@@ -602,7 +645,7 @@ def main():
 
         if result['success']:
             data = result['coverage_data']
-            print(f"✅ Coverage analysis completed")
+            print("✅ Coverage analysis completed")
             print(f"Total Coverage: {data['total_coverage']:.1f}%")
             print(f"Line Coverage: {data['line_coverage']:.1f}%")
             print(f"Branch Coverage: {data['branch_coverage']:.1f}%")
@@ -623,7 +666,8 @@ def main():
     elif command == "gates":
         result = enforcer.run_coverage_analysis()
         if result['success']:
-            gates_passed, violations = enforcer.check_coverage_quality_gates(result['coverage_data'])
+            gates_passed, violations = enforcer.check_coverage_quality_gates(
+                result['coverage_data'])
 
             if gates_passed:
                 print("✅ All quality gates passed")

@@ -7,13 +7,12 @@ coordination, and collaborative decision-making in the Agent Hive.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple, Set
-from dataclasses import dataclass, field
-from enum import Enum
-import json
 import uuid
 from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -83,8 +82,7 @@ class AgentMessage:
             'expires_at': self.expires_at.isoformat() if self.expires_at else None,
             'correlation_id': self.correlation_id,
             'requires_response': self.requires_response,
-            'metadata': self.metadata
-        }
+            'metadata': self.metadata}
 
 
 @dataclass
@@ -225,7 +223,8 @@ class AgentCoordinationProtocols:
         # Communication channels
         self.communication_channels: Dict[str, asyncio.Queue] = {}
 
-        self.logger.info(f"Agent coordination protocols initialized for {agent_id}")
+        self.logger.info(
+            f"Agent coordination protocols initialized for {agent_id}")
 
     def _initialize_message_handlers(self) -> None:
         """Initialize message handlers for different message types."""
@@ -242,8 +241,7 @@ class AgentCoordinationProtocols:
             MessageType.COLLABORATION_ACCEPT: self._handle_collaboration_accept,
             MessageType.COLLABORATION_DECLINE: self._handle_collaboration_decline,
             MessageType.HEARTBEAT: self._handle_heartbeat,
-            MessageType.EMERGENCY: self._handle_emergency
-        }
+            MessageType.EMERGENCY: self._handle_emergency}
 
     async def send_message(
         self,
@@ -279,8 +277,9 @@ class AgentCoordinationProtocols:
             priority=priority,
             content=content,
             requires_response=requires_response,
-            expires_at=datetime.now() + timedelta(seconds=timeout) if requires_response else None
-        )
+            expires_at=datetime.now() +
+            timedelta(
+                seconds=timeout) if requires_response else None)
 
         # Send message
         await self._deliver_message(message)
@@ -297,11 +296,13 @@ class AgentCoordinationProtocols:
                 response = await asyncio.wait_for(future, timeout=timeout)
                 return response
             except asyncio.TimeoutError:
-                self.logger.warning(f"Message {message_id} to {recipient_id} timed out")
+                self.logger.warning(
+                    f"Message {message_id} to {recipient_id} timed out")
                 self.pending_responses.pop(message_id, None)
                 return None
             except Exception as e:
-                self.logger.error(f"Error waiting for response to {message_id}: {e}")
+                self.logger.error(
+                    f"Error waiting for response to {message_id}: {e}")
                 self.pending_responses.pop(message_id, None)
                 return None
 
@@ -385,7 +386,9 @@ class AgentCoordinationProtocols:
         # Update metrics
         self.coordination_metrics['sessions_coordinated'] += 1
 
-        self.logger.info(f"Initiated coordination session {session_id} with {len(participants)} participants")
+        self.logger.info(
+            f"Initiated coordination session {session_id} with {
+                len(participants)} participants")
         return session
 
     async def propose_collaboration(
@@ -445,7 +448,9 @@ class AgentCoordinationProtocols:
                 requires_response=True
             )
 
-        self.logger.info(f"Proposed collaboration {proposal_id} to {len(participants)} agents")
+        self.logger.info(
+            f"Proposed collaboration {proposal_id} to {
+                len(participants)} agents")
         return proposal
 
     async def register_capability(
@@ -524,11 +529,12 @@ class AgentCoordinationProtocols:
             for capability in capabilities.values():
                 if (capability.name == capability_name and
                     capability.performance_score >= min_performance and
-                    capability.availability >= min_availability):
+                        capability.availability >= min_availability):
                     matching_agents.append((agent_id, capability))
 
         # Sort by performance score (descending)
-        matching_agents.sort(key=lambda x: x[1].performance_score, reverse=True)
+        matching_agents.sort(
+            key=lambda x: x[1].performance_score, reverse=True)
 
         return matching_agents
 
@@ -731,9 +737,11 @@ class AgentCoordinationProtocols:
                 try:
                     await handler(message)
                 except Exception as e:
-                    self.logger.error(f"Error handling message {message.message_id}: {e}")
+                    self.logger.error(
+                        f"Error handling message {message.message_id}: {e}")
             else:
-                self.logger.warning(f"No handler for message type {message.message_type}")
+                self.logger.warning(
+                    f"No handler for message type {message.message_type}")
 
     async def _deliver_message(self, message: AgentMessage) -> None:
         """Deliver a message to the recipient agent."""
@@ -756,10 +764,13 @@ class AgentCoordinationProtocols:
         response_content = {
             'task_id': task_info.get('task_id'),
             'can_handle': can_handle,
-            'estimated_time': task_info.get('estimated_time', 0),
-            'resource_requirements': task_info.get('resource_requirements', {}),
-            'confidence': 0.8 if can_handle else 0.2
-        }
+            'estimated_time': task_info.get(
+                'estimated_time',
+                0),
+            'resource_requirements': task_info.get(
+                'resource_requirements',
+                {}),
+            'confidence': 0.8 if can_handle else 0.2}
 
         # Send response
         await self.send_message(
@@ -777,13 +788,14 @@ class AgentCoordinationProtocols:
             if not future.done():
                 future.set_result(message)
 
-    async def _handle_coordination_request(self, message: AgentMessage) -> None:
+    async def _handle_coordination_request(
+            self, message: AgentMessage) -> None:
         """Handle coordination request."""
         request_info = message.content
 
         if 'session_id' in request_info:
             # Join coordination session
-            session_id = request_info['session_id']
+            request_info['session_id']
             response = await self._evaluate_coordination_request(request_info)
 
             await self.send_message(
@@ -793,7 +805,8 @@ class AgentCoordinationProtocols:
                 priority=Priority.HIGH
             )
 
-    async def _handle_coordination_response(self, message: AgentMessage) -> None:
+    async def _handle_coordination_response(
+            self, message: AgentMessage) -> None:
         """Handle coordination response."""
         # Complete pending response if exists
         if message.correlation_id and message.correlation_id in self.pending_responses:
@@ -812,7 +825,8 @@ class AgentCoordinationProtocols:
             'status': status_info
         }
 
-    async def _handle_capability_announcement(self, message: AgentMessage) -> None:
+    async def _handle_capability_announcement(
+            self, message: AgentMessage) -> None:
         """Handle capability announcement."""
         agent_id = message.sender_id
         capability_info = message.content.get('capability', {})
@@ -834,7 +848,8 @@ class AgentCoordinationProtocols:
 
         self.agent_capabilities[agent_id][capability.capability_id] = capability
 
-        self.logger.info(f"Learned capability {capability.name} from agent {agent_id}")
+        self.logger.info(
+            f"Learned capability {capability.name} from agent {agent_id}")
 
     async def _handle_resource_request(self, message: AgentMessage) -> None:
         """Handle resource request."""
@@ -865,7 +880,8 @@ class AgentCoordinationProtocols:
             if not future.done():
                 future.set_result(message)
 
-    async def _handle_collaboration_invite(self, message: AgentMessage) -> None:
+    async def _handle_collaboration_invite(
+            self, message: AgentMessage) -> None:
         """Handle collaboration invitation."""
         proposal_info = message.content
 
@@ -873,7 +889,7 @@ class AgentCoordinationProtocols:
         decision = await self._evaluate_collaboration_proposal(proposal_info)
 
         response_type = (MessageType.COLLABORATION_ACCEPT if decision['accept']
-                        else MessageType.COLLABORATION_DECLINE)
+                         else MessageType.COLLABORATION_DECLINE)
 
         await self.send_message(
             message.sender_id,
@@ -882,7 +898,8 @@ class AgentCoordinationProtocols:
             priority=Priority.HIGH
         )
 
-    async def _handle_collaboration_accept(self, message: AgentMessage) -> None:
+    async def _handle_collaboration_accept(
+            self, message: AgentMessage) -> None:
         """Handle collaboration acceptance."""
         proposal_id = message.content.get('proposal_id')
         if proposal_id in self.collaboration_proposals:
@@ -893,7 +910,8 @@ class AgentCoordinationProtocols:
             if len(proposal.responses) == len(proposal.participants):
                 await self._finalize_collaboration(proposal)
 
-    async def _handle_collaboration_decline(self, message: AgentMessage) -> None:
+    async def _handle_collaboration_decline(
+            self, message: AgentMessage) -> None:
         """Handle collaboration decline."""
         proposal_id = message.content.get('proposal_id')
         if proposal_id in self.collaboration_proposals:
@@ -918,7 +936,8 @@ class AgentCoordinationProtocols:
         """Handle emergency message."""
         emergency_info = message.content
 
-        self.logger.critical(f"Emergency from {message.sender_id}: {emergency_info}")
+        self.logger.critical(
+            f"Emergency from {message.sender_id}: {emergency_info}")
 
         # Broadcast emergency to other agents
         await self.broadcast_message(
@@ -928,20 +947,22 @@ class AgentCoordinationProtocols:
             exclude_agents={message.sender_id}
         )
 
-    async def _evaluate_task_capability(self, task_info: Dict[str, Any]) -> bool:
+    async def _evaluate_task_capability(
+            self, task_info: Dict[str, Any]) -> bool:
         """Evaluate if this agent can handle a task."""
         # Check if we have capabilities matching the task requirements
         task_type = task_info.get('type')
         required_capabilities = task_info.get('required_capabilities', [])
 
         for capability in self.capabilities.values():
-            if (capability.name == task_type or
-                any(spec in required_capabilities for spec in capability.specializations)):
+            if (capability.name == task_type or any(
+                    spec in required_capabilities for spec in capability.specializations)):
                 return capability.availability > 0.5
 
         return False
 
-    async def _evaluate_coordination_request(self, request_info: Dict[str, Any]) -> Dict[str, Any]:
+    async def _evaluate_coordination_request(
+            self, request_info: Dict[str, Any]) -> Dict[str, Any]:
         """Evaluate a coordination request."""
         # Simple evaluation - accept if we're not overloaded
         return {
@@ -950,12 +971,14 @@ class AgentCoordinationProtocols:
             'estimated_participation': 'full'
         }
 
-    async def _evaluate_resource_request(self, resource_info: Dict[str, Any]) -> bool:
+    async def _evaluate_resource_request(
+            self, resource_info: Dict[str, Any]) -> bool:
         """Evaluate if we can provide requested resources."""
         # Simple evaluation - check if we have available resources
         return True  # Placeholder
 
-    async def _evaluate_collaboration_proposal(self, proposal_info: Dict[str, Any]) -> Dict[str, Any]:
+    async def _evaluate_collaboration_proposal(
+            self, proposal_info: Dict[str, Any]) -> Dict[str, Any]:
         """Evaluate a collaboration proposal."""
         # Simple evaluation - accept if objective aligns with our capabilities
         return {
@@ -964,7 +987,8 @@ class AgentCoordinationProtocols:
             'estimated_contribution': 'medium'
         }
 
-    async def _finalize_collaboration(self, proposal: CollaborationProposal) -> None:
+    async def _finalize_collaboration(
+            self, proposal: CollaborationProposal) -> None:
         """Finalize a collaboration proposal."""
         # All participants accepted - start collaboration
         session_id = await self.initiate_coordination_session(
@@ -978,7 +1002,9 @@ class AgentCoordinationProtocols:
 
         self.coordination_metrics['successful_collaborations'] += 1
 
-        self.logger.info(f"Collaboration {proposal.proposal_id} started with session {session_id}")
+        self.logger.info(
+            f"Collaboration {
+                proposal.proposal_id} started with session {session_id}")
 
     async def _process_resource_negotiation(
         self,
@@ -999,7 +1025,8 @@ class AgentCoordinationProtocols:
         for response in responses:
             if response.content.get('can_provide'):
                 allocation['providers'].append(response.sender_id)
-                allocation['conditions'].extend(response.content.get('conditions', []))
+                allocation['conditions'].extend(
+                    response.content.get('conditions', []))
 
         return allocation
 
@@ -1108,7 +1135,8 @@ class AgentCoordinationProtocols:
         for session_id, session in self.active_sessions.items():
             if session.status == 'active':
                 # Check if session has been idle for too long
-                if not session.messages or (current_time - session.messages[-1].timestamp).total_seconds() > 3600:
+                if not session.messages or (
+                        current_time - session.messages[-1].timestamp).total_seconds() > 3600:
                     expired_sessions.append(session_id)
 
         for session_id in expired_sessions:

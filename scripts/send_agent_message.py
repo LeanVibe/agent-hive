@@ -5,16 +5,20 @@ Inter-Agent Communication Tool
 Reliable message sending between agents that automatically submits without manual Enter.
 """
 
-import subprocess
-import time
-import sys
 import argparse
+import subprocess
+import sys
+import time
 from pathlib import Path
 
 # Add dashboard logging
 sys.path.append(str(Path(__file__).parent.parent))
 
-def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = True) -> bool:
+
+def send_message_to_agent(
+        agent_name: str,
+        message: str,
+        auto_submit: bool = True) -> bool:
     """
     Send a message to an agent with automatic submission.
 
@@ -33,7 +37,8 @@ def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = Tru
     # Log the message
     try:
         from dashboard.prompt_logger import prompt_logger
-        prompt_logger.log_prompt(f"to-{agent_name}", message, "Inter-agent message sent", True)
+        prompt_logger.log_prompt(
+            f"to-{agent_name}", message, "Inter-agent message sent", True)
     except ImportError:
         pass  # Continue without logging if dashboard not available
 
@@ -69,9 +74,12 @@ def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = Tru
         # Auto-submit if requested
         if auto_submit:
             time.sleep(0.2)  # Brief pause before Enter
-            subprocess.run([
-                "tmux", "send-keys", "-t", f"{session_name}:{window_name}", "Enter"
-            ], capture_output=True)
+            subprocess.run(["tmux",
+                            "send-keys",
+                            "-t",
+                            f"{session_name}:{window_name}",
+                            "Enter"],
+                           capture_output=True)
 
         print(f"✅ Message sent to {agent_name}")
         return True
@@ -80,7 +88,11 @@ def send_message_to_agent(agent_name: str, message: str, auto_submit: bool = Tru
         print(f"❌ Error sending message to {agent_name}: {e}")
         return False
 
-def send_message_chunked(agent_name: str, message: str, chunk_size: int = 200) -> bool:
+
+def send_message_chunked(
+        agent_name: str,
+        message: str,
+        chunk_size: int = 200) -> bool:
     """
     Send a long message in smaller chunks to avoid input buffer issues.
     """
@@ -125,6 +137,7 @@ def send_message_chunked(agent_name: str, message: str, chunk_size: int = 200) -
         print(f"❌ Error sending chunked message: {e}")
         return False
 
+
 def ping_all_agents_improved():
     """Ping all agents with improved message delivery"""
 
@@ -158,8 +171,10 @@ Your message sending should now work automatically. Continue with your current t
             success_count += 1
         time.sleep(1)  # Pause between agents
 
-    print(f"\n📊 Results: {success_count}/{len(agents)} agents contacted successfully")
+    print(
+        f"\n📊 Results: {success_count}/{len(agents)} agents contacted successfully")
     print("✅ All agents should now receive messages automatically")
+
 
 def test_message_methods(agent_name: str, test_message: str):
     """Test different message sending methods"""
@@ -169,13 +184,15 @@ def test_message_methods(agent_name: str, test_message: str):
 
     # Test Method 1: Buffer paste
     print("1. Testing buffer paste method...")
-    success1 = send_message_to_agent(agent_name, f"TEST 1 - Buffer: {test_message}")
+    success1 = send_message_to_agent(
+        agent_name, f"TEST 1 - Buffer: {test_message}")
 
     time.sleep(2)
 
     # Test Method 2: Chunked sending
     print("2. Testing chunked method...")
-    success2 = send_message_chunked(agent_name, f"TEST 2 - Chunked: {test_message}")
+    success2 = send_message_chunked(
+        agent_name, f"TEST 2 - Chunked: {test_message}")
 
     time.sleep(2)
 
@@ -198,15 +215,20 @@ def test_message_methods(agent_name: str, test_message: str):
     print(f"  Chunked: {'✅' if success2 else '❌'}")
     print(f"  Direct: {'✅' if success3 else '❌'}")
 
+
 def main():
     """Main CLI interface"""
 
-    parser = argparse.ArgumentParser(description="Send messages to agents reliably")
+    parser = argparse.ArgumentParser(
+        description="Send messages to agents reliably")
     parser.add_argument("--agent", help="Agent name to send message to")
     parser.add_argument("--message", help="Message to send")
-    parser.add_argument("--ping-all", action="store_true", help="Ping all agents with improved communication")
-    parser.add_argument("--test", help="Test different message methods with specified agent")
-    parser.add_argument("--no-auto-submit", action="store_true", help="Don't automatically submit with Enter")
+    parser.add_argument("--ping-all", action="store_true",
+                        help="Ping all agents with improved communication")
+    parser.add_argument(
+        "--test", help="Test different message methods with specified agent")
+    parser.add_argument("--no-auto-submit", action="store_true",
+                        help="Don't automatically submit with Enter")
 
     args = parser.parse_args()
 
@@ -221,10 +243,13 @@ def main():
         sys.exit(0 if success else 1)
     else:
         parser.print_help()
-        print(f"\nExamples:")
+        print("\nExamples:")
         print(f"  python {sys.argv[0]} --ping-all")
-        print(f"  python {sys.argv[0]} --agent documentation-agent --message 'Hello!'")
+        print(
+            f"  python {
+                sys.argv[0]} --agent documentation-agent --message 'Hello!'")
         print(f"  python {sys.argv[0]} --test documentation-agent")
+
 
 if __name__ == "__main__":
     main()

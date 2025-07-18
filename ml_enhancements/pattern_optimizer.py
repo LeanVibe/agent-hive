@@ -10,18 +10,15 @@ import json
 import logging
 import sqlite3
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Union
+from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
 from .models import MLConfig, PatternData, WorkflowOptimization
-
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +34,10 @@ class PatternOptimizer:
     - Recommend workflow improvements
     """
 
-    def __init__(self, config: Optional[MLConfig] = None, db_path: Optional[str] = None):
+    def __init__(
+            self,
+            config: Optional[MLConfig] = None,
+            db_path: Optional[str] = None):
         """Initialize PatternOptimizer with configuration and database."""
         self.config = config or MLConfig()
         self.db_path = db_path or "pattern_optimizer.db"
@@ -146,7 +146,8 @@ class PatternOptimizer:
         """Update pattern data based on new execution."""
 
         feature_hash = self._hash_features(features)
-        performance_score = self._calculate_performance_score(performance_metrics)
+        performance_score = self._calculate_performance_score(
+            performance_metrics)
 
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -170,21 +171,27 @@ class PatternOptimizer:
                 new_score = (1 - alpha) * old_score + alpha * performance_score
 
                 # Update confidence based on sample count
-                new_confidence = min(0.95, 0.5 + 0.45 * (new_sample_count / 100))
+                new_confidence = min(0.95, 0.5 + 0.45 *
+                                     (new_sample_count / 100))
 
                 optimization_score = self._calculate_optimization_score(
                     new_score, new_confidence, new_sample_count
                 )
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE workflow_patterns
                     SET performance_score = ?, optimization_score = ?,
                         confidence = ?, sample_count = ?, last_updated = ?
                     WHERE workflow_type = ? AND feature_hash = ?
-                """, (
-                    new_score, optimization_score, new_confidence,
-                    new_sample_count, datetime.now(), workflow_type, feature_hash
-                ))
+                """,
+                    (new_score,
+                     optimization_score,
+                     new_confidence,
+                     new_sample_count,
+                     datetime.now(),
+                        workflow_type,
+                        feature_hash))
             else:
                 # Create new pattern
                 pattern_id = f"{workflow_type}_{feature_hash[:8]}"
@@ -266,7 +273,9 @@ class PatternOptimizer:
 
         return base_score * sample_factor
 
-    def analyze_patterns(self, workflow_type: Optional[str] = None) -> List[PatternData]:
+    def analyze_patterns(
+            self,
+            workflow_type: Optional[str] = None) -> List[PatternData]:
         """Analyze workflow patterns and return optimization opportunities."""
 
         with sqlite3.connect(self.db_path) as conn:
@@ -276,7 +285,8 @@ class PatternOptimizer:
                     WHERE workflow_type = ? AND sample_count >= ?
                     ORDER BY optimization_score DESC
                 """
-                cursor = conn.execute(query, (workflow_type, self.config.min_data_points))
+                cursor = conn.execute(
+                    query, (workflow_type, self.config.min_data_points))
             else:
                 query = """
                     SELECT * FROM workflow_patterns
@@ -287,8 +297,16 @@ class PatternOptimizer:
 
             patterns = []
             for row in cursor.fetchall():
-                (pattern_id, wf_type, feature_hash, perf_score, opt_score,
-                 confidence, sample_count, created_at, last_updated, metadata) = row
+                (pattern_id,
+                 wf_type,
+                 feature_hash,
+                 perf_score,
+                 opt_score,
+                 confidence,
+                 sample_count,
+                 created_at,
+                 last_updated,
+                 metadata) = row
 
                 pattern = PatternData(
                     pattern_id=pattern_id,
@@ -302,7 +320,8 @@ class PatternOptimizer:
                 )
                 patterns.append(pattern)
 
-        logger.info(f"Analyzed {len(patterns)} patterns for workflow: {workflow_type}")
+        logger.info(
+            f"Analyzed {len(patterns)} patterns for workflow: {workflow_type}")
         return patterns
 
     def get_optimization_recommendations(
@@ -317,7 +336,8 @@ class PatternOptimizer:
             return []
 
         recommendations = []
-        current_score = self._get_current_performance(workflow_type, current_features)
+        current_score = self._get_current_performance(
+            workflow_type, current_features)
 
         for pattern in patterns[:5]:  # Top 5 patterns
             if pattern.confidence < self.config.confidence_threshold:
@@ -328,7 +348,8 @@ class PatternOptimizer:
                 continue
 
             # Generate recommendations based on pattern analysis
-            changes = self._generate_optimization_changes(pattern, current_features)
+            changes = self._generate_optimization_changes(
+                pattern, current_features)
 
             recommendation = WorkflowOptimization(
                 workflow_id=f"{workflow_type}_{pattern.pattern_id}",
@@ -346,7 +367,8 @@ class PatternOptimizer:
         # Sort by impact score
         recommendations.sort(key=lambda x: x.impact_score, reverse=True)
 
-        logger.info(f"Generated {len(recommendations)} optimization recommendations")
+        logger.info(
+            f"Generated {len(recommendations)} optimization recommendations")
         return recommendations
 
     def _get_current_performance(
@@ -377,7 +399,8 @@ class PatternOptimizer:
             """, (workflow_type,))
 
             result = cursor.fetchone()
-            return float(result[0]) if result and result[0] is not None else 0.5
+            return float(
+                result[0]) if result and result[0] is not None else 0.5
 
     def _generate_optimization_changes(
         self,
@@ -392,20 +415,25 @@ class PatternOptimizer:
 
         if pattern.performance_metrics.get('performance_score', 0) > 0.8:
             if current_features.get('agent_count', 1) < 3:
-                changes.append("Consider increasing agent count to 3-5 for better parallel processing")
+                changes.append(
+                    "Consider increasing agent count to 3-5 for better parallel processing")
 
             if current_features.get('resource_usage', 0) < 0.6:
-                changes.append("Increase resource allocation to improve execution speed")
+                changes.append(
+                    "Increase resource allocation to improve execution speed")
 
             if current_features.get('queue_size', 0) > 10:
-                changes.append("Implement queue optimization to reduce task backlog")
+                changes.append(
+                    "Implement queue optimization to reduce task backlog")
 
         if not changes:
-            changes.append("Optimize based on high-performing pattern analysis")
+            changes.append(
+                "Optimize based on high-performing pattern analysis")
 
         return changes
 
-    async def get_task_patterns(self, task_type: Optional[str] = None) -> List[Dict[str, Any]]:
+    async def get_task_patterns(
+            self, task_type: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get task execution patterns for intelligent decision making."""
 
         try:
@@ -417,7 +445,8 @@ class PatternOptimizer:
                         WHERE workflow_type LIKE ? AND sample_count >= ?
                         ORDER BY performance_score DESC
                     """
-                    cursor = conn.execute(query, (f"%{task_type}%", self.config.min_data_points))
+                    cursor = conn.execute(
+                        query, (f"%{task_type}%", self.config.min_data_points))
                 else:
                     query = """
                         SELECT workflow_type, performance_score, optimization_score, confidence, sample_count, metadata
@@ -425,7 +454,8 @@ class PatternOptimizer:
                         WHERE sample_count >= ?
                         ORDER BY performance_score DESC
                     """
-                    cursor = conn.execute(query, (self.config.min_data_points,))
+                    cursor = conn.execute(
+                        query, (self.config.min_data_points,))
 
                 patterns = []
                 for row in cursor.fetchall():
@@ -437,19 +467,26 @@ class PatternOptimizer:
                         'optimization_score': opt_score,
                         'confidence': confidence,
                         'sample_count': sample_count,
-                        'metadata': json.loads(metadata or '{}'),
-                        'recommended_strategy': self._get_recommended_strategy(perf_score, opt_score)
-                    }
+                        'metadata': json.loads(
+                            metadata or '{}'),
+                        'recommended_strategy': self._get_recommended_strategy(
+                            perf_score,
+                            opt_score)}
                     patterns.append(pattern)
 
-                logger.info(f"Retrieved {len(patterns)} task patterns for type: {task_type}")
+                logger.info(
+                    f"Retrieved {
+                        len(patterns)} task patterns for type: {task_type}")
                 return patterns
 
         except Exception as e:
             logger.error(f"Error retrieving task patterns: {e}")
             return []
 
-    def _get_recommended_strategy(self, performance_score: float, optimization_score: float) -> str:
+    def _get_recommended_strategy(
+            self,
+            performance_score: float,
+            optimization_score: float) -> str:
         """Get recommended allocation strategy based on pattern analysis."""
 
         if performance_score > 0.8 and optimization_score < 0.3:
@@ -487,7 +524,9 @@ class PatternOptimizer:
             # Get training data
             training_data = self._prepare_training_data()
             if len(training_data) < self.config.min_data_points:
-                logger.warning(f"Insufficient training data: {len(training_data)} samples")
+                logger.warning(
+                    f"Insufficient training data: {
+                        len(training_data)} samples")
                 return {'error': 'insufficient_data'}
 
             X = training_data[self.feature_columns].values
@@ -495,7 +534,8 @@ class PatternOptimizer:
 
             # Train clustering model for pattern grouping
             try:
-                self.cluster_model = KMeans(n_clusters=min(5, len(training_data) // 10), random_state=42)
+                self.cluster_model = KMeans(n_clusters=min(
+                    5, len(training_data) // 10), random_state=42)
                 X_scaled = self.scaler.fit_transform(X)
                 self.cluster_model.fit(X_scaled)
             except (ValueError, MemoryError) as e:
@@ -525,11 +565,12 @@ class PatternOptimizer:
 
             metrics = {
                 'model_version': self.model_version,
-                'training_samples': float(len(training_data)),
+                'training_samples': float(
+                    len(training_data)),
                 'mse': float(mse),
                 'r2_score': float(r2),
-                'clusters': float(self.cluster_model.n_clusters if self.cluster_model else 0)
-            }
+                'clusters': float(
+                    self.cluster_model.n_clusters if self.cluster_model else 0)}
 
             logger.info(f"Model training completed: {metrics}")
             return metrics
@@ -554,7 +595,8 @@ class PatternOptimizer:
                 LIMIT ?
             """
 
-            cursor = conn.execute(query, (cutoff_date, self.config.pattern_analysis_window))
+            cursor = conn.execute(
+                query, (cutoff_date, self.config.pattern_analysis_window))
 
             data = []
             for row in cursor.fetchall():
@@ -582,7 +624,8 @@ class PatternOptimizer:
 
         return pd.DataFrame(data)
 
-    def predict_performance(self, features: Dict[str, float]) -> Tuple[float, float]:
+    def predict_performance(
+            self, features: Dict[str, float]) -> Tuple[float, float]:
         """Predict performance for given feature set."""
 
         if not self.performance_model:
@@ -602,14 +645,16 @@ class PatternOptimizer:
 
         return prediction, confidence
 
-    def _estimate_prediction_confidence(self, features: Dict[str, float]) -> float:
+    def _estimate_prediction_confidence(
+            self, features: Dict[str, float]) -> float:
         """Estimate confidence in prediction based on training data similarity."""
 
         if not self.cluster_model:
             return 0.5
 
         # Transform features and find nearest cluster
-        feature_vector = [features.get(col, 0.0) for col in self.feature_columns]
+        feature_vector = [features.get(col, 0.0)
+                          for col in self.feature_columns]
         feature_scaled = self.scaler.transform([feature_vector])
 
         # Distance to nearest cluster center
@@ -677,9 +722,7 @@ class PatternOptimizer:
                 'model_status': {
                     'cluster_model_trained': self.cluster_model is not None,
                     'performance_model_trained': self.performance_model is not None,
-                    'model_version': self.model_version
-                }
-            }
+                    'model_version': self.model_version}}
 
     def cleanup_old_patterns(self, days_to_keep: int = 90) -> int:
         """Clean up old pattern data."""
@@ -702,5 +745,6 @@ class PatternOptimizer:
             executions_deleted = cursor.rowcount
             conn.commit()
 
-        logger.info(f"Cleaned up {patterns_deleted} patterns and {executions_deleted} executions")
+        logger.info(
+            f"Cleaned up {patterns_deleted} patterns and {executions_deleted} executions")
         return patterns_deleted + executions_deleted

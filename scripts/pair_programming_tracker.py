@@ -8,16 +8,12 @@ and ensures XP methodology compliance for collective code ownership.
 """
 
 import json
-import os
 import sqlite3
 import subprocess
 import sys
-import time
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
-import re
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -178,11 +174,16 @@ class PairProgrammingTracker:
 
             conn.commit()
 
-    def start_pair_session(self, participants: List[str], session_type: str = "development",
-                          focus_area: str = "", tools: List[str] = None) -> str:
+    def start_pair_session(
+            self,
+            participants: List[str],
+            session_type: str = "development",
+            focus_area: str = "",
+            tools: List[str] = None) -> str:
         """Start a new pair programming session."""
         if len(participants) < 2:
-            raise ValueError("Pair programming requires at least 2 participants")
+            raise ValueError(
+                "Pair programming requires at least 2 participants")
 
         session_id = f"pair-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         start_time = datetime.now().isoformat()
@@ -197,7 +198,8 @@ class PairProgrammingTracker:
                 (session_id, participants, start_time, last_activity, current_driver)
                 VALUES (?, ?, ?, ?, ?)
             """, (
-                session_id, json.dumps(participants), start_time, start_time, participants[0]
+                session_id, json.dumps(
+                    participants), start_time, start_time, participants[0]
             ))
             conn.commit()
 
@@ -228,7 +230,8 @@ class PairProgrammingTracker:
                 activity_count = result[1]
 
                 if new_driver not in participants:
-                    print(f"❌ {new_driver} is not a participant in this session")
+                    print(
+                        f"❌ {new_driver} is not a participant in this session")
                     return False
 
                 # Update driver and activity count
@@ -240,14 +243,18 @@ class PairProgrammingTracker:
 
                 conn.commit()
 
-                print(f"🔄 Driver switched to {new_driver} in session {session_id}")
+                print(
+                    f"🔄 Driver switched to {new_driver} in session {session_id}")
                 return True
 
         except Exception as e:
             print(f"Error switching driver: {e}")
             return False
 
-    def end_pair_session(self, session_id: str, notes: str = "") -> Optional[PairSession]:
+    def end_pair_session(
+            self,
+            session_id: str,
+            notes: str = "") -> Optional[PairSession]:
         """End an active pair programming session."""
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -274,7 +281,8 @@ class PairProgrammingTracker:
                 duration_minutes = (end_dt - start_dt).total_seconds() / 60.0
 
                 # Analyze session metrics
-                session_metrics = self.analyze_session_activity(session_id, start_time, end_time)
+                session_metrics = self.analyze_session_activity(
+                    session_id, start_time, end_time)
 
                 # Create session record
                 session = PairSession(
@@ -287,13 +295,18 @@ class PairProgrammingTracker:
                     files_modified=session_metrics.get('files_modified', 0),
                     lines_added=session_metrics.get('lines_added', 0),
                     lines_deleted=session_metrics.get('lines_deleted', 0),
-                    test_coverage_change=session_metrics.get('coverage_change', 0.0),
-                    code_quality_score=session_metrics.get('quality_score', 7.5),
-                    refactoring_count=session_metrics.get('refactoring_count', 0),
+                    test_coverage_change=session_metrics.get(
+                        'coverage_change', 0.0),
+                    code_quality_score=session_metrics.get(
+                        'quality_score', 7.5),
+                    refactoring_count=session_metrics.get(
+                        'refactoring_count', 0),
                     bug_fixes=session_metrics.get('bug_fixes', 0),
                     driver_switches=activity_count,
-                    knowledge_sharing_score=self.calculate_knowledge_sharing_score(participants),
-                    collective_ownership_score=self.calculate_collective_ownership_score(participants),
+                    knowledge_sharing_score=self.calculate_knowledge_sharing_score(
+                        participants),
+                    collective_ownership_score=self.calculate_collective_ownership_score(
+                        participants),
                     session_type="development",  # Default
                     focus_area="general",  # Default
                     tools_used=["ide", "terminal"],  # Default
@@ -304,13 +317,16 @@ class PairProgrammingTracker:
                 self.save_pair_session(session)
 
                 # Remove from active sessions
-                conn.execute("DELETE FROM active_sessions WHERE session_id = ?", (session_id,))
+                conn.execute(
+                    "DELETE FROM active_sessions WHERE session_id = ?", (session_id,))
                 conn.commit()
 
                 print(f"✅ Ended pair programming session: {session_id}")
                 print(f"Duration: {duration_minutes:.1f} minutes")
                 print(f"Driver switches: {activity_count}")
-                print(f"Knowledge sharing score: {session.knowledge_sharing_score:.2f}")
+                print(
+                    f"Knowledge sharing score: {
+                        session.knowledge_sharing_score:.2f}")
 
                 return session
 
@@ -318,7 +334,11 @@ class PairProgrammingTracker:
             print(f"Error ending session: {e}")
             return None
 
-    def analyze_session_activity(self, session_id: str, start_time: str, end_time: str) -> Dict:
+    def analyze_session_activity(
+            self,
+            session_id: str,
+            start_time: str,
+            end_time: str) -> Dict:
         """Analyze git activity during a pair programming session."""
         try:
             # Get git commits during session timeframe
@@ -342,7 +362,8 @@ class PairProgrammingTracker:
             # Parse git output
             lines = result.stdout.strip().split('\n')
             commits = [line for line in lines if len(line) == 40]  # SHA hashes
-            file_changes = [line for line in lines if line.startswith(('M', 'A', 'D'))]
+            file_changes = [
+                line for line in lines if line.startswith(('M', 'A', 'D'))]
 
             # Get detailed diff stats
             diff_result = subprocess.run([
@@ -387,7 +408,8 @@ class PairProgrammingTracker:
     def count_refactoring_commits(self, commit_hashes: List[str]) -> int:
         """Count commits that appear to be refactoring."""
         refactoring_count = 0
-        refactoring_keywords = ['refactor', 'clean', 'improve', 'optimize', 'restructure']
+        refactoring_keywords = ['refactor', 'clean',
+                                'improve', 'optimize', 'restructure']
 
         for commit_hash in commit_hashes:
             try:
@@ -396,7 +418,8 @@ class PairProgrammingTracker:
                 ], capture_output=True, text=True, check=True)
 
                 commit_message = result.stdout.strip().lower()
-                if any(keyword in commit_message for keyword in refactoring_keywords):
+                if any(
+                        keyword in commit_message for keyword in refactoring_keywords):
                     refactoring_count += 1
 
             except subprocess.CalledProcessError:
@@ -424,7 +447,8 @@ class PairProgrammingTracker:
 
         return bug_fix_count
 
-    def calculate_knowledge_sharing_score(self, participants: List[str]) -> float:
+    def calculate_knowledge_sharing_score(
+            self, participants: List[str]) -> float:
         """Calculate knowledge sharing score for participants."""
         # Simplified scoring based on participant diversity and experience
         base_score = 0.7
@@ -438,7 +462,8 @@ class PairProgrammingTracker:
 
         return min(base_score, 1.0)
 
-    def calculate_collective_ownership_score(self, participants: List[str]) -> float:
+    def calculate_collective_ownership_score(
+            self, participants: List[str]) -> float:
         """Calculate collective code ownership score."""
         # Simplified scoring based on participants working across codebase
         base_score = 0.6
@@ -455,7 +480,8 @@ class PairProgrammingTracker:
     def save_pair_session(self, session: PairSession):
         """Save pair programming session to database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO pair_sessions
                 (session_id, participants, start_time, end_time, duration_minutes,
                  commits_made, files_modified, lines_added, lines_deleted,
@@ -464,20 +490,33 @@ class PairProgrammingTracker:
                  collective_ownership_score, session_type, focus_area,
                  tools_used, notes)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                session.session_id, json.dumps(session.participants),
-                session.start_time, session.end_time, session.duration_minutes,
-                session.commits_made, session.files_modified, session.lines_added,
-                session.lines_deleted, session.test_coverage_change,
-                session.code_quality_score, session.refactoring_count,
-                session.bug_fixes, session.driver_switches,
-                session.knowledge_sharing_score, session.collective_ownership_score,
-                session.session_type, session.focus_area,
-                json.dumps(session.tools_used), session.notes
-            ))
+            """,
+                (session.session_id,
+                 json.dumps(
+                     session.participants),
+                    session.start_time,
+                    session.end_time,
+                    session.duration_minutes,
+                    session.commits_made,
+                    session.files_modified,
+                    session.lines_added,
+                    session.lines_deleted,
+                    session.test_coverage_change,
+                    session.code_quality_score,
+                    session.refactoring_count,
+                    session.bug_fixes,
+                    session.driver_switches,
+                    session.knowledge_sharing_score,
+                    session.collective_ownership_score,
+                    session.session_type,
+                    session.focus_area,
+                    json.dumps(
+                     session.tools_used),
+                    session.notes))
             conn.commit()
 
-    def calculate_pair_programming_metrics(self, days: int = 7) -> PairProgrammingMetrics:
+    def calculate_pair_programming_metrics(
+            self, days: int = 7) -> PairProgrammingMetrics:
         """Calculate comprehensive pair programming metrics."""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
@@ -535,12 +574,16 @@ class PairProgrammingTracker:
         active_pairs = len(participant_data)
 
         # XP compliance metrics (simplified calculations)
-        pair_programming_coverage = min(90.0, (total_sessions / days) * 20)  # Estimated
+        pair_programming_coverage = min(
+            90.0, (total_sessions / days) * 20)  # Estimated
         knowledge_distribution = avg_knowledge_sharing * 100
-        rotation_frequency = avg_switches / max(avg_duration / 60, 1)  # switches per hour
+        rotation_frequency = avg_switches / \
+            max(avg_duration / 60, 1)  # switches per hour
 
         return PairProgrammingMetrics(
-            period_id=f"pair-metrics-{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}",
+            period_id=f"pair-metrics-{
+                start_date.strftime('%Y%m%d')}-{
+                end_date.strftime('%Y%m%d')}",
             start_date=start_date.strftime('%Y-%m-%d'),
             end_date=end_date.strftime('%Y-%m-%d'),
             total_sessions=total_sessions,
@@ -612,7 +655,9 @@ class PairProgrammingTracker:
             except json.JSONDecodeError:
                 participants_str = "Unknown"
 
-            report += f"- **{session_id}**: {participants_str} ({duration:.0f}min, {switches} switches, KS: {knowledge_score:.2f})\n"
+            report += f"- **{session_id}**: {participants_str} ({
+                duration:.0f}min, {switches} switches, KS: {
+                knowledge_score:.2f})\n"
 
         # XP compliance assessment
         compliance_score = (
@@ -635,21 +680,29 @@ class PairProgrammingTracker:
         recommendations = []
 
         if metrics.pair_programming_coverage < self.target_coverage:
-            recommendations.append(f"Increase pair programming coverage from {metrics.pair_programming_coverage:.1f}% to {self.target_coverage}%")
+            recommendations.append(
+                f"Increase pair programming coverage from {
+                    metrics.pair_programming_coverage:.1f}% to {
+                    self.target_coverage}%")
 
         if metrics.avg_knowledge_sharing_score < self.knowledge_sharing_threshold:
-            recommendations.append("Improve knowledge sharing by pairing experienced with junior developers")
+            recommendations.append(
+                "Improve knowledge sharing by pairing experienced with junior developers")
 
         if metrics.avg_session_duration < 30:
-            recommendations.append("Increase average session duration - sessions too short for effective pairing")
+            recommendations.append(
+                "Increase average session duration - sessions too short for effective pairing")
         elif metrics.avg_session_duration > 240:
-            recommendations.append("Consider shorter sessions to maintain focus and energy")
+            recommendations.append(
+                "Consider shorter sessions to maintain focus and energy")
 
         if metrics.rotation_frequency < 0.5:
-            recommendations.append("Increase driver rotation frequency for better knowledge sharing")
+            recommendations.append(
+                "Increase driver rotation frequency for better knowledge sharing")
 
         if not recommendations:
-            recommendations.append("Excellent pair programming practices - continue current approach")
+            recommendations.append(
+                "Excellent pair programming practices - continue current approach")
 
         for i, rec in enumerate(recommendations, 1):
             report += f"{i}. {rec}\n"
@@ -664,7 +717,7 @@ class PairProgrammingTracker:
 
 ### 📊 Target Benchmarks
 - **Coverage Target**: ≥{self.target_coverage}% of development time
-- **Session Duration**: {self.min_session_duration}-{self.max_session_duration//60*60} minutes
+- **Session Duration**: {self.min_session_duration}-{self.max_session_duration // 60 * 60} minutes
 - **Knowledge Sharing**: ≥{self.knowledge_sharing_threshold} score
 - **Driver Rotation**: ≥0.5 switches per hour
 - **Quality Improvement**: ≥7.5/10.0 score
@@ -683,12 +736,16 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python pair_programming_tracker.py <command> [options]")
         print("Commands:")
-        print("  start <user1> <user2> [type] [focus]  - Start pair programming session")
+        print(
+            "  start <user1> <user2> [type] [focus]  - Start pair programming session")
         print("  switch <session_id> <new_driver>      - Switch driver in active session")
-        print("  end <session_id> [notes]              - End pair programming session")
+        print(
+            "  end <session_id> [notes]              - End pair programming session")
         print("  active                                - List active sessions")
-        print("  report [days]                         - Generate pair programming report")
-        print("  metrics [days]                        - Show pair programming metrics")
+        print(
+            "  report [days]                         - Generate pair programming report")
+        print(
+            "  metrics [days]                        - Show pair programming metrics")
         print("  history [limit]                       - Show recent sessions")
         sys.exit(1)
 
@@ -697,19 +754,22 @@ def main():
 
     if command == "start":
         if len(sys.argv) < 4:
-            print("Usage: python pair_programming_tracker.py start <user1> <user2> [type] [focus]")
+            print(
+                "Usage: python pair_programming_tracker.py start <user1> <user2> [type] [focus]")
             sys.exit(1)
 
         participants = [sys.argv[2], sys.argv[3]]
         session_type = sys.argv[4] if len(sys.argv) > 4 else "development"
         focus_area = sys.argv[5] if len(sys.argv) > 5 else "general"
 
-        session_id = tracker.start_pair_session(participants, session_type, focus_area)
+        session_id = tracker.start_pair_session(
+            participants, session_type, focus_area)
         print(f"Session ID: {session_id}")
 
     elif command == "switch":
         if len(sys.argv) < 4:
-            print("Usage: python pair_programming_tracker.py switch <session_id> <new_driver>")
+            print(
+                "Usage: python pair_programming_tracker.py switch <session_id> <new_driver>")
             sys.exit(1)
 
         session_id = sys.argv[2]
@@ -719,7 +779,8 @@ def main():
 
     elif command == "end":
         if len(sys.argv) < 3:
-            print("Usage: python pair_programming_tracker.py end <session_id> [notes]")
+            print(
+                "Usage: python pair_programming_tracker.py end <session_id> [notes]")
             sys.exit(1)
 
         session_id = sys.argv[2]
@@ -727,7 +788,7 @@ def main():
 
         session = tracker.end_pair_session(session_id, notes)
         if session:
-            print(f"Session ended successfully")
+            print("Session ended successfully")
 
     elif command == "active":
         with sqlite3.connect(tracker.db_path) as conn:
@@ -741,7 +802,8 @@ def main():
             active_sessions = cursor.fetchall()
 
         if active_sessions:
-            print(f"Active Pair Programming Sessions ({len(active_sessions)}):")
+            print(
+                f"Active Pair Programming Sessions ({len(active_sessions)}):")
             for session_id, participants_json, start_time, driver, switches in active_sessions:
                 try:
                     participants = json.loads(participants_json)
@@ -749,8 +811,11 @@ def main():
                 except json.JSONDecodeError:
                     participants_str = "Unknown"
 
-                duration = (datetime.now() - datetime.fromisoformat(start_time)).total_seconds() / 60
-                print(f"  {session_id}: {participants_str} (Driver: {driver}, {duration:.0f}min, {switches} switches)")
+                duration = (
+                    datetime.now() - datetime.fromisoformat(start_time)).total_seconds() / 60
+                print(
+                    f"  {session_id}: {participants_str} (Driver: {driver}, {
+                        duration:.0f}min, {switches} switches)")
         else:
             print("No active pair programming sessions")
 
@@ -759,7 +824,8 @@ def main():
         report = tracker.generate_pair_programming_report(days)
 
         # Save report
-        filename = f"pair_programming_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"pair_programming_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w') as f:
             f.write(report)
 
@@ -774,9 +840,14 @@ def main():
         print(f"  Total Sessions: {metrics.total_sessions}")
         print(f"  Total Hours: {metrics.total_hours:.1f}")
         print(f"  Coverage: {metrics.pair_programming_coverage:.1f}%")
-        print(f"  Knowledge Sharing: {metrics.avg_knowledge_sharing_score:.2f}")
-        print(f"  Collective Ownership: {metrics.avg_collective_ownership_score:.2f}")
-        print(f"  Quality Improvement: {metrics.avg_code_quality_improvement:.1f}")
+        print(
+            f"  Knowledge Sharing: {metrics.avg_knowledge_sharing_score:.2f}")
+        print(
+            f"  Collective Ownership: {
+                metrics.avg_collective_ownership_score:.2f}")
+        print(
+            f"  Quality Improvement: {
+                metrics.avg_code_quality_improvement:.1f}")
 
     elif command == "history":
         limit = int(sys.argv[2]) if len(sys.argv) > 2 else 10
@@ -805,8 +876,12 @@ def main():
 
                 start_dt = datetime.fromisoformat(start_time)
                 print(f"  {session_id}: {participants_str}")
-                print(f"    Date: {start_dt.strftime('%Y-%m-%d %H:%M')} | Duration: {duration:.0f}min")
-                print(f"    Knowledge Sharing: {ks_score:.2f} | Collective Ownership: {co_score:.2f}")
+                print(
+                    f"    Date: {start_dt.strftime('%Y-%m-%d %H:%M')} | Duration: {duration:.0f}min")
+                print(
+                    f"    Knowledge Sharing: {
+                        ks_score:.2f} | Collective Ownership: {
+                        co_score:.2f}")
         else:
             print("No pair programming sessions found")
 

@@ -4,8 +4,8 @@ Check agent progress and push status
 """
 
 import subprocess
-import sys
 from pathlib import Path
+
 
 def check_agent_progress():
     """Check progress of all agents"""
@@ -35,7 +35,8 @@ def check_agent_progress():
             current_branch = line.split(" ", 1)[1]
 
             if current_worktree and "agent" in current_worktree.name:
-                agent_name = current_worktree.name.replace("-worktree", "").replace("worktrees/", "")
+                agent_name = current_worktree.name.replace(
+                    "-worktree", "").replace("worktrees/", "")
 
                 print(f"\n📊 {agent_name}")
                 print(f"   📁 Path: {current_worktree}")
@@ -56,7 +57,9 @@ def check_agent_progress():
                         for commit in commits[:2]:  # Show first 2 commits
                             print(f"      • {commit}")
                     else:
-                        print(f"   ❌ Could not get commits: {commit_result.stderr}")
+                        print(
+                            f"   ❌ Could not get commits: {
+                                commit_result.stderr}")
 
                 except Exception as e:
                     print(f"   ❌ Error checking commits: {e}")
@@ -77,19 +80,22 @@ def check_agent_progress():
                         if "ahead" in branch_line:
                             print(f"   📤 Status: {branch_line.strip()}")
                         elif "up to date" in branch_line or "origin" in branch_line:
-                            print(f"   ✅ Status: Up to date with remote")
+                            print("   ✅ Status: Up to date with remote")
                         else:
                             print(f"   📊 Status: {branch_line.strip()}")
                     else:
-                        print(f"   ❌ Could not get status: {status_result.stderr}")
+                        print(
+                            f"   ❌ Could not get status: {
+                                status_result.stderr}")
 
                 except Exception as e:
                     print(f"   ❌ Error checking status: {e}")
 
-    print(f"\n📊 Summary")
+    print("\n📊 Summary")
     print("✅ All agents have been pinged to resume work")
     print("📤 Agents instructed to push after each commit")
     print("🔄 Agents told to work continuously unless blocked")
+
 
 if __name__ == "__main__":
     check_agent_progress()

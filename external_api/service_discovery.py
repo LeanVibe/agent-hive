@@ -6,14 +6,11 @@ for distributed agent and service components.
 """
 
 import asyncio
-import json
 import logging
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set, Callable, Any
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
+from datetime import datetime
 from enum import Enum
-
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +70,8 @@ class ServiceDiscovery:
         self.config = config or {}
         self.services: Dict[str, ServiceRegistration] = {}
         self.service_watchers: Dict[str, List[Callable]] = {}
-        self.health_check_interval = self.config.get("health_check_interval", 30)
+        self.health_check_interval = self.config.get(
+            "health_check_interval", 30)
         self.cleanup_interval = self.config.get("cleanup_interval", 60)
 
         # Health checking
@@ -90,7 +88,8 @@ class ServiceDiscovery:
             return
 
         self._running = True
-        self._cleanup_task = asyncio.create_task(self._cleanup_expired_services())
+        self._cleanup_task = asyncio.create_task(
+            self._cleanup_expired_services())
         logger.info("Service discovery started")
 
     async def stop(self) -> None:
@@ -138,8 +137,7 @@ class ServiceDiscovery:
             # Start health checking if URL provided
             if instance.health_check_url:
                 self._health_check_tasks[instance.service_id] = asyncio.create_task(
-                    self._health_check_loop(instance.service_id)
-                )
+                    self._health_check_loop(instance.service_id))
             else:
                 # If no health check URL, mark as healthy
                 registration.status = ServiceStatus.HEALTHY
@@ -147,11 +145,15 @@ class ServiceDiscovery:
             # Notify watchers
             await self._notify_watchers(instance.service_name, "registered", instance)
 
-            logger.info(f"Registered service {instance.service_id} ({instance.service_name})")
+            logger.info(
+                f"Registered service {
+                    instance.service_id} ({
+                    instance.service_name})")
             return True
 
         except Exception as e:
-            logger.error(f"Failed to register service {instance.service_id}: {e}")
+            logger.error(
+                f"Failed to register service {instance.service_id}: {e}")
             return False
 
     async def deregister_service(self, service_id: str) -> bool:
@@ -166,7 +168,8 @@ class ServiceDiscovery:
         """
         try:
             if service_id not in self.services:
-                logger.warning(f"Service {service_id} not found for deregistration")
+                logger.warning(
+                    f"Service {service_id} not found for deregistration")
                 return False
 
             registration = self.services[service_id]
@@ -194,8 +197,10 @@ class ServiceDiscovery:
             logger.error(f"Failed to deregister service {service_id}: {e}")
             return False
 
-    async def discover_services(self, service_name: str,
-                               healthy_only: bool = True) -> List[ServiceInstance]:
+    async def discover_services(
+            self,
+            service_name: str,
+            healthy_only: bool = True) -> List[ServiceInstance]:
         """
         Discover services by name.
 
@@ -214,10 +219,12 @@ class ServiceDiscovery:
                     continue
                 instances.append(registration.instance)
 
-        logger.debug(f"Discovered {len(instances)} instances of {service_name}")
+        logger.debug(
+            f"Discovered {len(instances)} instances of {service_name}")
         return instances
 
-    async def get_service_by_id(self, service_id: str) -> Optional[ServiceInstance]:
+    async def get_service_by_id(
+            self, service_id: str) -> Optional[ServiceInstance]:
         """
         Get service instance by ID.
 
@@ -230,7 +237,8 @@ class ServiceDiscovery:
         registration = self.services.get(service_id)
         return registration.instance if registration else None
 
-    async def get_healthy_instance(self, service_name: str) -> Optional[ServiceInstance]:
+    async def get_healthy_instance(
+            self, service_name: str) -> Optional[ServiceInstance]:
         """
         Get a healthy instance of a service (simple round-robin).
 
@@ -246,11 +254,12 @@ class ServiceDiscovery:
             return None
 
         # Simple round-robin selection
-        # In production, this could be more sophisticated (weighted, least connections, etc.)
+        # In production, this could be more sophisticated (weighted, least
+        # connections, etc.)
         return healthy_instances[0]
 
-    async def watch_service(self, service_name: str,
-                          callback: Callable[[str, ServiceInstance], None]) -> None:
+    async def watch_service(self, service_name: str, callback: Callable[[
+                            str, ServiceInstance], None]) -> None:
         """
         Watch for changes to a service.
 
@@ -293,7 +302,8 @@ class ServiceDiscovery:
         logger.debug(f"Heartbeat received from {service_id}")
         return True
 
-    async def get_service_status(self, service_id: str) -> Optional[ServiceStatus]:
+    async def get_service_status(
+            self, service_id: str) -> Optional[ServiceStatus]:
         """
         Get current status of a service.
 
@@ -398,8 +408,9 @@ class ServiceDiscovery:
             return True
 
         try:
-            import aiohttp
             import asyncio
+
+            import aiohttp
 
             # Real HTTP health check with timeout and retry logic
             timeout = aiohttp.ClientTimeout(total=5.0, connect=2.0)
@@ -411,33 +422,41 @@ class ServiceDiscovery:
 
                     if not is_healthy:
                         logger.warning(
-                            f"Health check failed for {instance.service_id}: "
-                            f"HTTP {response.status} from {instance.health_check_url}"
-                        )
+                            f"Health check failed for {
+                                instance.service_id}: " f"HTTP {
+                                response.status} from {
+                                instance.health_check_url}")
                     else:
                         logger.debug(
-                            f"Health check passed for {instance.service_id}: "
-                            f"HTTP {response.status} from {instance.health_check_url}"
-                        )
+                            f"Health check passed for {
+                                instance.service_id}: " f"HTTP {
+                                response.status} from {
+                                instance.health_check_url}")
 
                     return is_healthy
 
         except ImportError:
-            logger.warning("aiohttp not available, falling back to basic health check")
+            logger.warning(
+                "aiohttp not available, falling back to basic health check")
             # Fallback to basic check if aiohttp not available
             await asyncio.sleep(0.1)
             return True
 
         except asyncio.TimeoutError:
-            logger.warning(f"Health check timeout for {instance.service_id}: {instance.health_check_url}")
+            logger.warning(
+                f"Health check timeout for {
+                    instance.service_id}: {
+                    instance.health_check_url}")
             return False
 
         except aiohttp.ClientError as e:
-            logger.warning(f"Health check client error for {instance.service_id}: {e}")
+            logger.warning(
+                f"Health check client error for {instance.service_id}: {e}")
             return False
 
         except Exception as e:
-            logger.warning(f"Health check failed for {instance.service_id}: {e}")
+            logger.warning(
+                f"Health check failed for {instance.service_id}: {e}")
             return False
 
     async def _cleanup_expired_services(self) -> None:
@@ -448,14 +467,16 @@ class ServiceDiscovery:
                 expired_services = []
 
                 for service_id, registration in self.services.items():
-                    time_since_heartbeat = (current_time - registration.last_heartbeat).total_seconds()
+                    time_since_heartbeat = (
+                        current_time - registration.last_heartbeat).total_seconds()
 
                     if time_since_heartbeat > registration.ttl:
                         expired_services.append(service_id)
 
                 # Remove expired services
                 for service_id in expired_services:
-                    logger.warning(f"Service {service_id} expired, removing from registry")
+                    logger.warning(
+                        f"Service {service_id} expired, removing from registry")
                     await self.deregister_service(service_id)
 
                 await asyncio.sleep(self.cleanup_interval)
@@ -467,7 +488,7 @@ class ServiceDiscovery:
                 await asyncio.sleep(self.cleanup_interval)
 
     async def _notify_watchers(self, service_name: str, event: str,
-                             instance: ServiceInstance) -> None:
+                               instance: ServiceInstance) -> None:
         """Notify watchers of service changes."""
         if service_name not in self.service_watchers:
             return

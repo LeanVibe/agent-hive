@@ -2,19 +2,19 @@
 Tests for Service Discovery component.
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, patch
 
-pytestmark = pytest.mark.asyncio
+import pytest
 
 from external_api.service_discovery import (
     ServiceDiscovery,
     ServiceInstance,
     ServiceRegistration,
-    ServiceStatus
+    ServiceStatus,
 )
+
+pytestmark = pytest.mark.asyncio
 
 
 class TestServiceDiscovery:
@@ -82,7 +82,8 @@ class TestServiceDiscovery:
         await service_discovery.stop()  # Should not raise error
         assert service_discovery._running is False
 
-    async def test_register_service_success(self, service_discovery, sample_service_instance):
+    async def test_register_service_success(
+            self, service_discovery, sample_service_instance):
         """Test successful service registration."""
         result = await service_discovery.register_service(sample_service_instance)
 
@@ -95,15 +96,18 @@ class TestServiceDiscovery:
         assert registration.registered_at is not None
         assert registration.last_heartbeat is not None
 
-    async def test_register_service_no_health_check(self, service_discovery, sample_service_instance_no_health):
+    async def test_register_service_no_health_check(
+            self, service_discovery, sample_service_instance_no_health):
         """Test service registration without health check."""
         result = await service_discovery.register_service(sample_service_instance_no_health)
 
         assert result is True
         registration = service_discovery.services[sample_service_instance_no_health.service_id]
-        assert registration.status == ServiceStatus.HEALTHY  # Should be healthy without health check
+        # Should be healthy without health check
+        assert registration.status == ServiceStatus.HEALTHY
 
-    async def test_deregister_service_success(self, service_discovery, sample_service_instance):
+    async def test_deregister_service_success(
+            self, service_discovery, sample_service_instance):
         """Test successful service deregistration."""
         # Register first
         await service_discovery.register_service(sample_service_instance)
@@ -120,7 +124,11 @@ class TestServiceDiscovery:
         result = await service_discovery.deregister_service("non-existent-service")
         assert result is False
 
-    async def test_discover_services(self, service_discovery, sample_service_instance, sample_service_instance_no_health):
+    async def test_discover_services(
+            self,
+            service_discovery,
+            sample_service_instance,
+            sample_service_instance_no_health):
         """Test service discovery by name."""
         # Register multiple instances of same service
         await service_discovery.register_service(sample_service_instance)
@@ -132,9 +140,13 @@ class TestServiceDiscovery:
 
         # Discover only healthy instances
         instances = await service_discovery.discover_services("test-service", healthy_only=True)
-        assert len(instances) == 1  # Only the one without health check is healthy
+        # Only the one without health check is healthy
+        assert len(instances) == 1
 
-    async def test_get_service_by_id(self, service_discovery, sample_service_instance):
+    async def test_get_service_by_id(
+            self,
+            service_discovery,
+            sample_service_instance):
         """Test getting service by ID."""
         # Service not registered
         instance = await service_discovery.get_service_by_id(sample_service_instance.service_id)
@@ -145,7 +157,10 @@ class TestServiceDiscovery:
         instance = await service_discovery.get_service_by_id(sample_service_instance.service_id)
         assert instance == sample_service_instance
 
-    async def test_get_healthy_instance(self, service_discovery, sample_service_instance_no_health):
+    async def test_get_healthy_instance(
+            self,
+            service_discovery,
+            sample_service_instance_no_health):
         """Test getting a healthy instance."""
         # No instances
         instance = await service_discovery.get_healthy_instance("test-service")
@@ -156,7 +171,10 @@ class TestServiceDiscovery:
         instance = await service_discovery.get_healthy_instance("test-service")
         assert instance == sample_service_instance_no_health
 
-    async def test_heartbeat_success(self, service_discovery, sample_service_instance):
+    async def test_heartbeat_success(
+            self,
+            service_discovery,
+            sample_service_instance):
         """Test successful heartbeat."""
         # Register service
         await service_discovery.register_service(sample_service_instance)
@@ -173,7 +191,10 @@ class TestServiceDiscovery:
         result = await service_discovery.heartbeat("unknown-service")
         assert result is False
 
-    async def test_heartbeat_recovery(self, service_discovery, sample_service_instance):
+    async def test_heartbeat_recovery(
+            self,
+            service_discovery,
+            sample_service_instance):
         """Test heartbeat recovery from unhealthy status."""
         # Register and simulate unhealthy status
         await service_discovery.register_service(sample_service_instance)
@@ -185,7 +206,10 @@ class TestServiceDiscovery:
         assert result is True
         assert registration.status == ServiceStatus.HEALTHY
 
-    async def test_get_service_status(self, service_discovery, sample_service_instance):
+    async def test_get_service_status(
+            self,
+            service_discovery,
+            sample_service_instance):
         """Test getting service status."""
         # Non-existent service
         status = await service_discovery.get_service_status("non-existent")
@@ -196,7 +220,11 @@ class TestServiceDiscovery:
         status = await service_discovery.get_service_status(sample_service_instance.service_id)
         assert status == ServiceStatus.STARTING
 
-    async def test_list_services(self, service_discovery, sample_service_instance, sample_service_instance_no_health):
+    async def test_list_services(
+            self,
+            service_discovery,
+            sample_service_instance,
+            sample_service_instance_no_health):
         """Test listing all services."""
         # Empty list
         services = await service_discovery.list_services()
@@ -217,7 +245,11 @@ class TestServiceDiscovery:
         assert "registered_at" in service_info
         assert "last_heartbeat" in service_info
 
-    async def test_get_system_info(self, service_discovery, sample_service_instance, sample_service_instance_no_health):
+    async def test_get_system_info(
+            self,
+            service_discovery,
+            sample_service_instance,
+            sample_service_instance_no_health):
         """Test getting system information."""
         # Empty system
         info = await service_discovery.get_system_info()
@@ -232,11 +264,15 @@ class TestServiceDiscovery:
 
         info = await service_discovery.get_system_info()
         assert info["total_instances"] == 2
-        assert info["healthy_instances"] == 1  # Only one without health check is healthy
+        # Only one without health check is healthy
+        assert info["healthy_instances"] == 1
         assert info["unique_services"] == 1
         assert "test-service" in info["service_names"]
 
-    async def test_watch_service(self, service_discovery, sample_service_instance):
+    async def test_watch_service(
+            self,
+            service_discovery,
+            sample_service_instance):
         """Test watching service changes."""
         events = []
 
@@ -256,7 +292,10 @@ class TestServiceDiscovery:
         assert events[0][0] == "registered"
         assert events[0][1] == sample_service_instance.service_id
 
-    async def test_health_check_loop(self, service_discovery, sample_service_instance):
+    async def test_health_check_loop(
+            self,
+            service_discovery,
+            sample_service_instance):
         """Test health check loop functionality."""
         await service_discovery.start()
 
@@ -271,7 +310,8 @@ class TestServiceDiscovery:
 
         await service_discovery.stop()
 
-    async def test_cleanup_expired_services(self, service_discovery, sample_service_instance):
+    async def test_cleanup_expired_services(
+            self, service_discovery, sample_service_instance):
         """Test cleanup of expired services."""
         await service_discovery.start()
 
@@ -280,14 +320,16 @@ class TestServiceDiscovery:
 
         # Manually set old heartbeat time
         registration = service_discovery.services[sample_service_instance.service_id]
-        registration.last_heartbeat = datetime.now() - timedelta(seconds=400)  # Older than TTL
+        registration.last_heartbeat = datetime.now(
+        ) - timedelta(seconds=400)  # Older than TTL
 
         # Wait for cleanup
         await asyncio.sleep(0.1)
 
         await service_discovery.stop()
 
-    async def test_perform_health_check(self, service_discovery, sample_service_instance):
+    async def test_perform_health_check(
+            self, service_discovery, sample_service_instance):
         """Test health check performance."""
         # Test with health check URL
         result = await service_discovery._perform_health_check(sample_service_instance)
@@ -323,7 +365,8 @@ class TestServiceDiscovery:
         assert instance.version == "1.0.0"
         assert instance.health_check_url is None
 
-    async def test_service_registration_dataclass(self, sample_service_instance):
+    async def test_service_registration_dataclass(
+            self, sample_service_instance):
         """Test ServiceRegistration dataclass functionality."""
         registration = ServiceRegistration(
             instance=sample_service_instance,
@@ -374,7 +417,8 @@ class TestServiceDiscovery:
         discovered = await service_discovery.discover_services("test-service", healthy_only=False)
         assert len(discovered) == 10
 
-    async def test_watcher_error_handling(self, service_discovery, sample_service_instance):
+    async def test_watcher_error_handling(
+            self, service_discovery, sample_service_instance):
         """Test error handling in watchers."""
         async def failing_callback(event, instance):
             raise Exception("Test error")
@@ -386,7 +430,10 @@ class TestServiceDiscovery:
         result = await service_discovery.register_service(sample_service_instance)
         assert result is True
 
-    async def test_multiple_watchers(self, service_discovery, sample_service_instance):
+    async def test_multiple_watchers(
+            self,
+            service_discovery,
+            sample_service_instance):
         """Test multiple watchers for the same service."""
         events1 = []
         events2 = []

@@ -7,20 +7,28 @@ correctly before deploying for PR #28 breakdown.
 """
 
 import asyncio
+import json
 import logging
 import sys
-import json
 from datetime import datetime
 from pathlib import Path
+
+from coordination_protocols.automated_coordination_orchestrator import (
+    AutomatedCoordinationOrchestrator,
+)
+from coordination_protocols.component_workflow import ComponentWorkflowManager
+from coordination_protocols.cross_agent_protocols import CrossAgentCoordinator
+from coordination_protocols.integration_checkpoint_system import (
+    IntegrationCheckpointSystem,
+)
+from coordination_protocols.pr_coordination_driver import (
+    PRCoordinationDriver,
+    coordinate_pr_breakdown,
+)
 
 # Add the current directory to the path to import coordination modules
 sys.path.insert(0, str(Path(__file__).parent))
 
-from coordination_protocols.pr_coordination_driver import PRCoordinationDriver, coordinate_pr_breakdown
-from coordination_protocols.automated_coordination_orchestrator import AutomatedCoordinationOrchestrator
-from coordination_protocols.integration_checkpoint_system import IntegrationCheckpointSystem
-from coordination_protocols.cross_agent_protocols import CrossAgentCoordinator
-from coordination_protocols.component_workflow import ComponentWorkflowManager
 
 # Set up logging
 logging.basicConfig(
@@ -66,8 +74,12 @@ async def test_cross_agent_coordinator():
         coordinator = CrossAgentCoordinator()
 
         # Test agent registration
-        from coordination_protocols.cross_agent_protocols import AgentCapability, AgentRole
         from datetime import timedelta
+
+        from coordination_protocols.cross_agent_protocols import (
+            AgentCapability,
+            AgentRole,
+        )
 
         test_capability = AgentCapability(
             agent_role=AgentRole.INTEGRATION,
@@ -265,10 +277,14 @@ async def run_all_tests():
     logger.info(f"🎯 Test Results: {passed}/{total} tests passed")
 
     if passed == total:
-        logger.info("🎉 All tests passed! Coordination system is ready for deployment.")
+        logger.info(
+            "🎉 All tests passed! Coordination system is ready for deployment.")
         return True
     else:
-        logger.error(f"❌ {total - passed} tests failed. System needs fixes before deployment.")
+        logger.error(
+            f"❌ {
+                total -
+                passed} tests failed. System needs fixes before deployment.")
         return False
 
 
@@ -282,8 +298,8 @@ async def generate_test_report():
         result = await driver.start_pr_breakdown_coordination()
 
         # Get comprehensive status
-        status = await driver.get_coordination_status()
-        report = await driver.get_coordination_report()
+        await driver.get_coordination_status()
+        await driver.get_coordination_report()
 
         # Create test report
         test_report = {
@@ -332,7 +348,8 @@ async def generate_test_report():
         with open("coordination_system_test_report.json", "w") as f:
             json.dump(test_report, f, indent=2, default=str)
 
-        logger.info("✅ Test report generated: coordination_system_test_report.json")
+        logger.info(
+            "✅ Test report generated: coordination_system_test_report.json")
         return test_report
 
     except Exception as e:
@@ -350,11 +367,14 @@ if __name__ == "__main__":
         report = await generate_test_report()
 
         if success and report:
-            logger.info("\n🎉 SUCCESS: Coordination system is ready for PR #28 breakdown!")
-            logger.info("📋 Test report saved to: coordination_system_test_report.json")
+            logger.info(
+                "\n🎉 SUCCESS: Coordination system is ready for PR #28 breakdown!")
+            logger.info(
+                "📋 Test report saved to: coordination_system_test_report.json")
             logger.info("🚀 Ready to deploy coordination system")
         else:
-            logger.error("\n❌ FAILURE: Coordination system needs fixes before deployment")
+            logger.error(
+                "\n❌ FAILURE: Coordination system needs fixes before deployment")
             sys.exit(1)
 
     # Run the main test

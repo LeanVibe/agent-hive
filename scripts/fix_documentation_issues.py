@@ -13,7 +13,8 @@ Usage:
 import argparse
 import re
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
+
 
 class DocumentationFixer:
     """Automatic documentation issue fixer."""
@@ -43,7 +44,8 @@ class DocumentationFixer:
             def fix_async_block(match):
                 code_block = match.group(1)
 
-                # Check if it contains await but isn't already in an async function
+                # Check if it contains await but isn't already in an async
+                # function
                 if 'await ' in code_block and 'async def' not in code_block and 'asyncio.run' not in code_block:
                     # Wrap in async function
                     lines = code_block.split('\n')
@@ -102,7 +104,8 @@ class DocumentationFixer:
             yaml_content = match.group(1)
 
             # If it has multiple documents without proper separation, fix it
-            if yaml_content.count('apiVersion:') > 1 and '---' not in yaml_content:
+            if yaml_content.count(
+                    'apiVersion:') > 1 and '---' not in yaml_content:
                 # Split by apiVersion and rejoin with proper separators
                 parts = yaml_content.split('apiVersion:')
                 if len(parts) > 2:
@@ -155,8 +158,10 @@ class DocumentationFixer:
                 fixed_lines = []
 
                 for line in lines:
-                    # If it looks like a function signature without a colon, add one
-                    if (line.strip().startswith('async def ') or line.strip().startswith('def ')) and '->' in line and not line.strip().endswith(':'):
+                    # If it looks like a function signature without a colon,
+                    # add one
+                    if (line.strip().startswith('async def ') or line.strip().startswith(
+                            'def ')) and '->' in line and not line.strip().endswith(':'):
                         line = line.rstrip() + ':'
                     fixed_lines.append(line)
 
@@ -192,12 +197,17 @@ class DocumentationFixer:
         self.fixes_applied = all_fixes
         return all_fixes
 
+
 def main():
     """Main documentation fixer entry point."""
-    parser = argparse.ArgumentParser(description="Fix LeanVibe Agent Hive documentation issues")
-    parser.add_argument("--all", action="store_true", help="Fix all documentation issues")
-    parser.add_argument("--async-examples", action="store_true", help="Fix async code examples")
-    parser.add_argument("--yaml-syntax", action="store_true", help="Fix YAML syntax issues")
+    parser = argparse.ArgumentParser(
+        description="Fix LeanVibe Agent Hive documentation issues")
+    parser.add_argument("--all", action="store_true",
+                        help="Fix all documentation issues")
+    parser.add_argument("--async-examples", action="store_true",
+                        help="Fix async code examples")
+    parser.add_argument("--yaml-syntax", action="store_true",
+                        help="Fix YAML syntax issues")
 
     args = parser.parse_args()
 
@@ -225,11 +235,12 @@ def main():
         print(f"\n✅ Applied {len(fixes)} fixes:")
         for fix in fixes:
             print(f"   {fix}")
-        print(f"\n💡 Run validation again to verify fixes: python scripts/validate_documentation.py --all")
+        print("\n💡 Run validation again to verify fixes: python scripts/validate_documentation.py --all")
     else:
-        print(f"\n ℹ️ No fixes needed or applied.")
+        print("\n ℹ️ No fixes needed or applied.")
 
     return 0
+
 
 if __name__ == "__main__":
     exit(main())

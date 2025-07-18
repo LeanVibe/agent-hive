@@ -12,15 +12,14 @@ This script provides comprehensive quality monitoring with:
 """
 
 import json
-import subprocess
-import sys
-import time
+import logging
 import sqlite3
+import statistics
+import subprocess
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-import logging
-import statistics
+from typing import Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -49,14 +48,18 @@ class QualityMetricsMonitor:
 
         # Quality thresholds
         self.coverage_threshold = self.config.get("coverage_threshold", 85.0)
-        self.performance_threshold = self.config.get("performance_threshold_ms", 2000)
-        self.regression_threshold = self.config.get("regression_threshold_percent", 20)
+        self.performance_threshold = self.config.get(
+            "performance_threshold_ms", 2000)
+        self.regression_threshold = self.config.get(
+            "regression_threshold_percent", 20)
 
         # Monitoring configuration
-        self.monitoring_interval = self.config.get("monitoring_interval_minutes", 30)
+        self.monitoring_interval = self.config.get(
+            "monitoring_interval_minutes", 30)
         self.trend_analysis_days = self.config.get("trend_analysis_days", 7)
 
-        logger.info("Quality Metrics Monitor initialized with advanced analytics")
+        logger.info(
+            "Quality Metrics Monitor initialized with advanced analytics")
 
     def _load_config(self, config_path: Optional[str]) -> Dict:
         """Load configuration from file or use defaults."""
@@ -78,7 +81,8 @@ class QualityMetricsMonitor:
                     user_config = json.load(f)
                 default_config.update(user_config)
             except Exception as e:
-                logger.warning(f"Failed to load config from {config_path}: {e}")
+                logger.warning(
+                    f"Failed to load config from {config_path}: {e}")
 
         return default_config
 
@@ -162,8 +166,10 @@ class QualityMetricsMonitor:
         }
 
         # Calculate overall quality score
-        analysis_results["overall_quality_score"] = self._calculate_quality_score(analysis_results)
-        analysis_results["quality_grade"] = self._determine_quality_grade(analysis_results["overall_quality_score"])
+        analysis_results["overall_quality_score"] = self._calculate_quality_score(
+            analysis_results)
+        analysis_results["quality_grade"] = self._determine_quality_grade(
+            analysis_results["overall_quality_score"])
 
         # Store results in database
         self._store_analysis_results(analysis_results)
@@ -173,14 +179,17 @@ class QualityMetricsMonitor:
         analysis_results["alerts"] = alerts
 
         # Generate recommendations
-        analysis_results["recommendations"] = self._generate_recommendations(analysis_results)
+        analysis_results["recommendations"] = self._generate_recommendations(
+            analysis_results)
 
         # Save detailed report
-        report_file = self.reports_dir / f"quality_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        report_file = self.reports_dir / \
+            f"quality_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_file, 'w') as f:
             json.dump(analysis_results, f, indent=2)
 
-        logger.info(f"✅ Quality analysis complete. Report saved: {report_file}")
+        logger.info(
+            f"✅ Quality analysis complete. Report saved: {report_file}")
         return analysis_results
 
     def _analyze_test_execution(self) -> Dict:
@@ -201,8 +210,10 @@ class QualityMetricsMonitor:
             ]
 
             start_time = time.time()
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-            execution_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+            subprocess.run(
+                cmd, capture_output=True, text=True, timeout=300)
+            execution_time = (time.time() - start_time) * \
+                1000  # Convert to milliseconds
 
             # Parse test results
             test_metrics = {"execution_time_ms": execution_time}
@@ -213,14 +224,33 @@ class QualityMetricsMonitor:
                         test_data = json.load(f)
 
                     summary = test_data.get("summary", {})
-                    test_metrics.update({
-                        "total_tests": summary.get("total", 0),
-                        "passed_tests": summary.get("passed", 0),
-                        "failed_tests": summary.get("failed", 0),
-                        "skipped_tests": summary.get("skipped", 0),
-                        "error_tests": summary.get("error", 0),
-                        "success_rate": (summary.get("passed", 0) / summary.get("total", 1)) * 100 if summary.get("total", 0) > 0 else 0
-                    })
+                    test_metrics.update(
+                        {
+                            "total_tests": summary.get(
+                                "total",
+                                0),
+                            "passed_tests": summary.get(
+                                "passed",
+                                0),
+                            "failed_tests": summary.get(
+                                "failed",
+                                0),
+                            "skipped_tests": summary.get(
+                                "skipped",
+                                0),
+                            "error_tests": summary.get(
+                                "error",
+                                0),
+                            "success_rate": (
+                                summary.get(
+                                    "passed",
+                                    0) /
+                                summary.get(
+                                    "total",
+                                    1)) *
+                            100 if summary.get(
+                                "total",
+                                0) > 0 else 0})
                 except Exception as e:
                     logger.error(f"Failed to parse test results: {e}")
 
@@ -230,7 +260,8 @@ class QualityMetricsMonitor:
                     with open("coverage.json", 'r') as f:
                         coverage_data = json.load(f)
 
-                    test_metrics["coverage_percentage"] = coverage_data.get("totals", {}).get("percent_covered", 0)
+                    test_metrics["coverage_percentage"] = coverage_data.get(
+                        "totals", {}).get("percent_covered", 0)
                 except Exception as e:
                     logger.error(f"Failed to parse coverage results: {e}")
 
@@ -261,7 +292,8 @@ class QualityMetricsMonitor:
                     test_data = json.load(f)
 
                 tests = test_data.get("tests", [])
-                durations = [test.get("duration", 0) for test in tests if test.get("duration")]
+                durations = [test.get("duration", 0)
+                             for test in tests if test.get("duration")]
 
                 if durations:
                     performance_data.update({
@@ -273,7 +305,8 @@ class QualityMetricsMonitor:
                     })
 
                     # Identify slow tests (top 10% by duration)
-                    slow_threshold = statistics.quantile(durations, 0.9) if len(durations) > 10 else max(durations)
+                    slow_threshold = statistics.quantile(
+                        durations, 0.9) if len(durations) > 10 else max(durations)
                     slow_tests = [
                         {
                             "test_name": test.get("nodeid", ""),
@@ -283,7 +316,8 @@ class QualityMetricsMonitor:
                         for test in tests
                         if test.get("duration", 0) >= slow_threshold
                     ]
-                    performance_data["slow_tests"] = sorted(slow_tests, key=lambda x: x["duration"], reverse=True)[:10]
+                    performance_data["slow_tests"] = sorted(
+                        slow_tests, key=lambda x: x["duration"], reverse=True)[:10]
 
             except Exception as e:
                 logger.error(f"Failed to analyze performance metrics: {e}")
@@ -327,7 +361,8 @@ class QualityMetricsMonitor:
 
                 # Sort by lowest coverage first
                 coverage_data["low_coverage_files"] = sorted(
-                    [f for f in file_coverage if f["coverage"] < self.coverage_threshold],
+                    [f for f in file_coverage if f["coverage"]
+                        < self.coverage_threshold],
                     key=lambda x: x["coverage"]
                 )[:10]
 
@@ -372,8 +407,10 @@ class QualityMetricsMonitor:
 
         # Calculate trend analysis
         coverages = [t["avg_coverage"] for t in trends if t["avg_coverage"]]
-        execution_times = [t["avg_execution_time"] for t in trends if t["avg_execution_time"]]
-        success_rates = [t["success_rate"] for t in trends if t["success_rate"]]
+        execution_times = [t["avg_execution_time"]
+                           for t in trends if t["avg_execution_time"]]
+        success_rates = [t["success_rate"]
+                         for t in trends if t["success_rate"]]
 
         trend_analysis = {
             "total_data_points": len(trends),
@@ -435,24 +472,29 @@ class QualityMetricsMonitor:
             recent_data = [dict(row) for row in cursor.fetchall()]
 
             if len(recent_data) >= 5:
-                recent_times = [d["avg_execution_time_ms"] for d in recent_data[:5]]
-                baseline_times = [d["avg_execution_time_ms"] for d in recent_data[5:]]
+                recent_times = [d["avg_execution_time_ms"]
+                                for d in recent_data[:5]]
+                baseline_times = [d["avg_execution_time_ms"]
+                                  for d in recent_data[5:]]
 
                 recent_avg = statistics.mean(recent_times)
-                baseline_avg = statistics.mean(baseline_times) if baseline_times else recent_avg
+                baseline_avg = statistics.mean(
+                    baseline_times) if baseline_times else recent_avg
 
                 if baseline_avg > 0:
-                    regression_percent = ((recent_avg - baseline_avg) / baseline_avg) * 100
+                    regression_percent = (
+                        (recent_avg - baseline_avg) / baseline_avg) * 100
 
                     if regression_percent > self.regression_threshold:
-                        regressions.append({
-                            "type": "performance_regression",
-                            "severity": "high" if regression_percent > 50 else "medium",
-                            "regression_percent": regression_percent,
-                            "recent_avg_ms": recent_avg,
-                            "baseline_avg_ms": baseline_avg,
-                            "description": f"Performance regression detected: {regression_percent:.1f}% slower than baseline"
-                        })
+                        regressions.append(
+                            {
+                                "type": "performance_regression",
+                                "severity": "high" if regression_percent > 50 else "medium",
+                                "regression_percent": regression_percent,
+                                "recent_avg_ms": recent_avg,
+                                "baseline_avg_ms": baseline_avg,
+                                "description": f"Performance regression detected: {
+                                    regression_percent:.1f}% slower than baseline"})
 
         except Exception as e:
             logger.error(f"Failed to detect regressions: {e}")
@@ -471,7 +513,7 @@ class QualityMetricsMonitor:
         # Get current metrics
         current_execution = self._analyze_test_execution()
         current_coverage = self._analyze_coverage_metrics()
-        current_performance = self._analyze_performance_metrics()
+        self._analyze_performance_metrics()
 
         gates = {
             "coverage_gate": {
@@ -513,22 +555,27 @@ class QualityMetricsMonitor:
 
     def _calculate_quality_score(self, analysis_results: Dict) -> float:
         """Calculate overall quality score (0-100)."""
-        score = 100.0
+        100.0
 
         # Coverage score (30% weight)
-        coverage = analysis_results.get("coverage_analysis", {}).get("overall_coverage", 0)
+        coverage = analysis_results.get(
+            "coverage_analysis", {}).get("overall_coverage", 0)
         coverage_score = min(coverage, 100) * 0.3
 
         # Performance score (25% weight)
-        execution_time = analysis_results.get("test_execution", {}).get("execution_time_ms", 0)
-        performance_score = max(0, 100 - (execution_time / self.performance_threshold * 100)) * 0.25
+        execution_time = analysis_results.get(
+            "test_execution", {}).get("execution_time_ms", 0)
+        performance_score = max(
+            0, 100 - (execution_time / self.performance_threshold * 100)) * 0.25
 
         # Success rate score (25% weight)
-        success_rate = analysis_results.get("test_execution", {}).get("success_rate", 0)
+        success_rate = analysis_results.get(
+            "test_execution", {}).get("success_rate", 0)
         success_score = success_rate * 0.25
 
         # Quality gates score (20% weight)
-        gates_passed = analysis_results.get("quality_gates", {}).get("pass_rate", 0)
+        gates_passed = analysis_results.get(
+            "quality_gates", {}).get("pass_rate", 0)
         gates_score = gates_passed * 0.2
 
         final_score = coverage_score + performance_score + success_score + gates_score
@@ -559,7 +606,7 @@ class QualityMetricsMonitor:
             import psutil
             process = psutil.Process()
             return process.memory_info().rss / 1024 / 1024  # Convert to MB
-        except:
+        except BaseException:
             return 0.0
 
     def _get_cpu_usage(self) -> float:
@@ -567,7 +614,7 @@ class QualityMetricsMonitor:
         try:
             import psutil
             return psutil.cpu_percent(interval=1)
-        except:
+        except BaseException:
             return 0.0
 
     def _store_analysis_results(self, results: Dict):
@@ -621,7 +668,8 @@ class QualityMetricsMonitor:
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (
                 today,
-                results.get("coverage_analysis", {}).get("overall_coverage", 0),
+                results.get("coverage_analysis", {}).get(
+                    "overall_coverage", 0),
                 test_data.get("execution_time_ms", 0),
                 test_data.get("total_tests", 0),
                 test_data.get("success_rate", 0),
@@ -640,7 +688,8 @@ class QualityMetricsMonitor:
         alerts = []
 
         # Coverage alerts
-        coverage = results.get("coverage_analysis", {}).get("overall_coverage", 0)
+        coverage = results.get("coverage_analysis", {}
+                               ).get("overall_coverage", 0)
         if coverage < self.coverage_threshold:
             alerts.append({
                 "type": "coverage_below_threshold",
@@ -651,15 +700,18 @@ class QualityMetricsMonitor:
             })
 
         # Performance alerts
-        execution_time = results.get("test_execution", {}).get("execution_time_ms", 0)
+        execution_time = results.get(
+            "test_execution", {}).get("execution_time_ms", 0)
         if execution_time > self.performance_threshold:
-            alerts.append({
-                "type": "performance_regression",
-                "severity": "high" if execution_time > self.performance_threshold * 1.5 else "medium",
-                "message": f"Test execution time ({execution_time}ms) exceeds threshold ({self.performance_threshold}ms)",
-                "current_value": execution_time,
-                "threshold": self.performance_threshold
-            })
+            alerts.append(
+                {
+                    "type": "performance_regression",
+                    "severity": "high" if execution_time > self.performance_threshold *
+                    1.5 else "medium",
+                    "message": f"Test execution time ({execution_time}ms) exceeds threshold ({
+                        self.performance_threshold}ms)",
+                    "current_value": execution_time,
+                    "threshold": self.performance_threshold})
 
         # Failed tests alerts
         failed_tests = results.get("test_execution", {}).get("failed_tests", 0)
@@ -720,9 +772,11 @@ class QualityMetricsMonitor:
         recommendations = []
 
         # Coverage recommendations
-        coverage = results.get("coverage_analysis", {}).get("overall_coverage", 0)
+        coverage = results.get("coverage_analysis", {}
+                               ).get("overall_coverage", 0)
         if coverage < self.coverage_threshold:
-            low_coverage_files = results.get("coverage_analysis", {}).get("low_coverage_files", [])
+            low_coverage_files = results.get(
+                "coverage_analysis", {}).get("low_coverage_files", [])
             recommendations.append({
                 "category": "coverage",
                 "priority": "high",
@@ -737,7 +791,8 @@ class QualityMetricsMonitor:
             })
 
         # Performance recommendations
-        slow_tests = results.get("performance_metrics", {}).get("slow_tests", [])
+        slow_tests = results.get(
+            "performance_metrics", {}).get("slow_tests", [])
         if slow_tests:
             recommendations.append({
                 "category": "performance",
@@ -755,7 +810,8 @@ class QualityMetricsMonitor:
         # Quality gate recommendations
         quality_gates = results.get("quality_gates", {})
         if not quality_gates.get("overall_passed", True):
-            failed_gates = [name for name, gate in quality_gates.get("gates", {}).items() if not gate["passed"]]
+            failed_gates = [name for name, gate in quality_gates.get(
+                "gates", {}).items() if not gate["passed"]]
             recommendations.append({
                 "category": "quality_gates",
                 "priority": "high",
@@ -792,18 +848,19 @@ class QualityMetricsMonitor:
         """Get current git branch."""
         try:
             result = subprocess.run(['git', 'branch', '--show-current'],
-                                  capture_output=True, text=True, timeout=5)
+                                    capture_output=True, text=True, timeout=5)
             return result.stdout.strip() if result.returncode == 0 else "unknown"
-        except:
+        except BaseException:
             return "unknown"
 
     def _get_current_commit(self) -> str:
         """Get current git commit hash."""
         try:
             result = subprocess.run(['git', 'rev-parse', 'HEAD'],
-                                  capture_output=True, text=True, timeout=5)
-            return result.stdout.strip()[:8] if result.returncode == 0 else "unknown"
-        except:
+                                    capture_output=True, text=True, timeout=5)
+            return result.stdout.strip()[
+                :8] if result.returncode == 0 else "unknown"
+        except BaseException:
             return "unknown"
 
     def generate_quality_dashboard(self, results: Dict) -> str:
@@ -942,7 +999,9 @@ class QualityMetricsMonitor:
 """
 
         # Save dashboard
-        dashboard_file = self.reports_dir / f"quality_dashboard_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+        dashboard_file = self.reports_dir / \
+            f"quality_dashboard_{
+    datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
         with open(dashboard_file, 'w') as f:
             f.write(dashboard_html)
 
@@ -1016,8 +1075,12 @@ class QualityMetricsMonitor:
         if alerts:
             report += "### 🚨 Quality Alerts\n\n"
             for alert in alerts:
-                severity_emoji = {"critical": "🔴", "high": "🟠", "medium": "🟡"}.get(alert["severity"], "🔵")
-                report += f"- {severity_emoji} **{alert['type'].replace('_', ' ').title()}**: {alert['message']}\n"
+                severity_emoji = {"critical": "🔴", "high": "🟠",
+                                  "medium": "🟡"}.get(alert["severity"], "🔵")
+                report += f"- {severity_emoji} **{
+                    alert['type'].replace(
+                        '_', ' ').title()}**: {
+                    alert['message']}\n"
         else:
             report += "### ✅ No Quality Alerts\n\nAll quality metrics are within acceptable thresholds.\n"
 
@@ -1028,8 +1091,11 @@ class QualityMetricsMonitor:
         if recommendations:
             report += "### 💡 Improvement Recommendations\n\n"
             for i, rec in enumerate(recommendations, 1):
-                priority_emoji = {"high": "🔴", "medium": "🟠", "low": "🟡"}.get(rec["priority"], "🔵")
-                report += f"{i}. {priority_emoji} **{rec['title']}** ({rec['priority'].upper()} priority)\n"
+                priority_emoji = {"high": "🔴", "medium": "🟠",
+                                  "low": "🟡"}.get(rec["priority"], "🔵")
+                report += f"{i}. {priority_emoji} **{
+                    rec['title']}** ({
+                    rec['priority'].upper()} priority)\n"
                 report += f"   - {rec['description']}\n"
                 for action in rec['actions']:
                     report += f"   - {action}\n"
@@ -1042,11 +1108,15 @@ def main():
     """Main function for quality metrics monitoring."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="LeanVibe Quality Metrics Monitoring")
+    parser = argparse.ArgumentParser(
+        description="LeanVibe Quality Metrics Monitoring")
     parser.add_argument("--config", help="Configuration file path")
-    parser.add_argument("--analyze", action="store_true", help="Run quality analysis")
-    parser.add_argument("--dashboard", action="store_true", help="Generate HTML dashboard")
-    parser.add_argument("--monitor", action="store_true", help="Start continuous monitoring")
+    parser.add_argument("--analyze", action="store_true",
+                        help="Run quality analysis")
+    parser.add_argument("--dashboard", action="store_true",
+                        help="Generate HTML dashboard")
+    parser.add_argument("--monitor", action="store_true",
+                        help="Start continuous monitoring")
 
     args = parser.parse_args()
 

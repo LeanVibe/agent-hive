@@ -10,20 +10,23 @@ This test suite covers:
 - Resource efficiency metrics
 """
 
-import pytest
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
 import sys
 from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
+
+from advanced_orchestration.models import (
+    ResourceAllocation,
+    ResourceAllocationException,
+    ResourceLimits,
+    ResourceRequirements,
+    ResourceUsage,
+)
+from advanced_orchestration.resource_manager import ResourceManager
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from advanced_orchestration.resource_manager import ResourceManager
-from advanced_orchestration.models import (
-    ResourceLimits, ResourceRequirements, ResourceAllocation, ResourceUsage,
-    ResourceOptimization, ResourceAllocationException
-)
 
 
 class TestResourceManager:
@@ -55,7 +58,8 @@ class TestResourceManager:
             network_mbps=100
         )
 
-    def test_resource_manager_initialization(self, resource_manager, resource_limits):
+    def test_resource_manager_initialization(
+            self, resource_manager, resource_limits):
         """Test resource manager initializes correctly"""
         assert resource_manager.limits == resource_limits
         assert resource_manager.allocated_resources == {}
@@ -67,7 +71,8 @@ class TestResourceManager:
         assert resource_manager.monitoring_active is False
 
     @pytest.mark.asyncio
-    async def test_resource_allocation_success(self, resource_manager, sample_requirements):
+    async def test_resource_allocation_success(
+            self, resource_manager, sample_requirements):
         """Test successful resource allocation"""
         agent_id = "test-agent-001"
 
@@ -89,7 +94,8 @@ class TestResourceManager:
         assert resource_manager.total_allocated.network_mbps == sample_requirements.network_mbps
 
     @pytest.mark.asyncio
-    async def test_resource_allocation_duplicate_agent(self, resource_manager, sample_requirements):
+    async def test_resource_allocation_duplicate_agent(
+            self, resource_manager, sample_requirements):
         """Test duplicate agent allocation fails"""
         agent_id = "test-agent-001"
 
@@ -101,7 +107,8 @@ class TestResourceManager:
             await resource_manager.allocate_resources(agent_id, sample_requirements)
 
     @pytest.mark.asyncio
-    async def test_resource_allocation_insufficient_resources(self, resource_manager):
+    async def test_resource_allocation_insufficient_resources(
+            self, resource_manager):
         """Test allocation fails when insufficient resources"""
         agent_id = "test-agent-001"
 
@@ -117,12 +124,13 @@ class TestResourceManager:
             await resource_manager.allocate_resources(agent_id, excessive_requirements)
 
     @pytest.mark.asyncio
-    async def test_resource_deallocation_success(self, resource_manager, sample_requirements):
+    async def test_resource_deallocation_success(
+            self, resource_manager, sample_requirements):
         """Test successful resource deallocation"""
         agent_id = "test-agent-001"
 
         # Allocate resources first
-        allocation = await resource_manager.allocate_resources(agent_id, sample_requirements)
+        await resource_manager.allocate_resources(agent_id, sample_requirements)
 
         # Deallocate resources
         result = await resource_manager.deallocate_resources(agent_id)
@@ -135,7 +143,8 @@ class TestResourceManager:
         assert resource_manager.total_allocated.network_mbps == 0
 
     @pytest.mark.asyncio
-    async def test_resource_deallocation_nonexistent_agent(self, resource_manager):
+    async def test_resource_deallocation_nonexistent_agent(
+            self, resource_manager):
         """Test deallocation of non-existent agent"""
         agent_id = "nonexistent-agent"
 
@@ -148,15 +157,16 @@ class TestResourceManager:
     async def test_get_resource_usage(self, resource_manager):
         """Test getting resource usage"""
         with patch('psutil.cpu_percent') as mock_cpu, \
-             patch('psutil.virtual_memory') as mock_memory, \
-             patch('psutil.disk_usage') as mock_disk, \
-             patch('psutil.net_io_counters') as mock_net:
+                patch('psutil.virtual_memory') as mock_memory, \
+                patch('psutil.disk_usage') as mock_disk, \
+                patch('psutil.net_io_counters') as mock_net:
 
             # Mock system metrics
             mock_cpu.return_value = 50.0
             mock_memory.return_value = Mock(percent=60.0)
             mock_disk.return_value = Mock(percent=70.0)
-            mock_net.return_value = Mock(bytes_sent=1000000, bytes_recv=2000000)
+            mock_net.return_value = Mock(
+                bytes_sent=1000000, bytes_recv=2000000)
 
             # Get resource usage
             usage = await resource_manager.get_resource_usage()
@@ -168,11 +178,12 @@ class TestResourceManager:
             assert len(resource_manager.usage_history) == 1
 
     @pytest.mark.asyncio
-    async def test_check_resource_constraints_success(self, resource_manager, sample_requirements):
+    async def test_check_resource_constraints_success(
+            self, resource_manager, sample_requirements):
         """Test resource constraint validation success"""
         with patch('psutil.cpu_percent') as mock_cpu, \
-             patch('psutil.virtual_memory') as mock_memory, \
-             patch('psutil.disk_usage') as mock_disk:
+                patch('psutil.virtual_memory') as mock_memory, \
+                patch('psutil.disk_usage') as mock_disk:
 
             # Mock low system usage
             mock_cpu.return_value = 20.0
@@ -188,8 +199,8 @@ class TestResourceManager:
     async def test_check_resource_constraints_failure(self, resource_manager):
         """Test resource constraint validation failure"""
         with patch('psutil.cpu_percent') as mock_cpu, \
-             patch('psutil.virtual_memory') as mock_memory, \
-             patch('psutil.disk_usage') as mock_disk:
+                patch('psutil.virtual_memory') as mock_memory, \
+                patch('psutil.disk_usage') as mock_disk:
 
             # Mock high system usage
             mock_cpu.return_value = 95.0
@@ -204,7 +215,8 @@ class TestResourceManager:
             assert result is False
 
     @pytest.mark.asyncio
-    async def test_optimize_resource_allocation(self, resource_manager, sample_requirements):
+    async def test_optimize_resource_allocation(
+            self, resource_manager, sample_requirements):
         """Test resource optimization recommendations"""
         agent_id = "test-agent-001"
 
@@ -214,8 +226,8 @@ class TestResourceManager:
         # Add usage history to trigger optimization
         for i in range(15):
             with patch('psutil.cpu_percent') as mock_cpu, \
-                 patch('psutil.virtual_memory') as mock_memory, \
-                 patch('psutil.disk_usage') as mock_disk:
+                    patch('psutil.virtual_memory') as mock_memory, \
+                    patch('psutil.disk_usage') as mock_disk:
 
                 # Mock low usage (over-allocated)
                 mock_cpu.return_value = 10.0
@@ -231,7 +243,8 @@ class TestResourceManager:
         assert len(optimizations) >= 0  # May or may not have recommendations
 
     @pytest.mark.asyncio
-    async def test_get_allocation_summary(self, resource_manager, sample_requirements):
+    async def test_get_allocation_summary(
+            self, resource_manager, sample_requirements):
         """Test getting allocation summary"""
         agent_id = "test-agent-001"
 
@@ -239,8 +252,8 @@ class TestResourceManager:
         await resource_manager.allocate_resources(agent_id, sample_requirements)
 
         with patch('psutil.cpu_percent') as mock_cpu, \
-             patch('psutil.virtual_memory') as mock_memory, \
-             patch('psutil.disk_usage') as mock_disk:
+                patch('psutil.virtual_memory') as mock_memory, \
+                patch('psutil.disk_usage') as mock_disk:
 
             mock_cpu.return_value = 50.0
             mock_memory.return_value = Mock(percent=60.0)
@@ -294,9 +307,10 @@ class TestResourceManager:
         retrieved_allocation = resource_manager.get_agent_allocation(agent_id)
         assert retrieved_allocation == allocation
 
-    def test_get_available_resources(self, resource_manager, sample_requirements):
+    def test_get_available_resources(
+            self, resource_manager, sample_requirements):
         """Test getting available resources"""
-        agent_id = "test-agent-001"
+        "test-agent-001"
 
         # Initially all resources are available
         available = resource_manager.get_available_resources()
@@ -310,10 +324,14 @@ class TestResourceManager:
 
         # Check available resources
         available = resource_manager.get_available_resources()
-        assert available.cpu_cores == resource_manager.limits.max_cpu_cores - sample_requirements.cpu_cores
-        assert available.memory_mb == resource_manager.limits.max_memory_mb - sample_requirements.memory_mb
-        assert available.disk_mb == resource_manager.limits.max_disk_mb - sample_requirements.disk_mb
-        assert available.network_mbps == resource_manager.limits.max_network_mbps - sample_requirements.network_mbps
+        assert available.cpu_cores == resource_manager.limits.max_cpu_cores - \
+            sample_requirements.cpu_cores
+        assert available.memory_mb == resource_manager.limits.max_memory_mb - \
+            sample_requirements.memory_mb
+        assert available.disk_mb == resource_manager.limits.max_disk_mb - \
+            sample_requirements.disk_mb
+        assert available.network_mbps == resource_manager.limits.max_network_mbps - \
+            sample_requirements.network_mbps
 
     def test_get_resource_efficiency(self, resource_manager):
         """Test getting resource efficiency metrics"""
@@ -345,7 +363,8 @@ class TestResourceManager:
     async def test_multiple_agent_allocation(self, resource_manager):
         """Test allocating resources to multiple agents"""
         agents = ["agent-1", "agent-2", "agent-3"]
-        requirements = ResourceRequirements(cpu_cores=1, memory_mb=512, disk_mb=1024)
+        requirements = ResourceRequirements(
+            cpu_cores=1, memory_mb=512, disk_mb=1024)
 
         # Allocate to multiple agents
         for agent_id in agents:
@@ -376,7 +395,7 @@ class TestResourceManager:
         # Second allocation should fail
         with pytest.raises(ResourceAllocationException):
             await resource_manager.allocate_resources("agent-2",
-                ResourceRequirements(cpu_cores=1, memory_mb=512))
+                                                      ResourceRequirements(cpu_cores=1, memory_mb=512))
 
 
 class TestResourceManagerIntegration:
@@ -416,8 +435,8 @@ class TestResourceManagerIntegration:
 
         # Get usage (mocked)
         with patch('psutil.cpu_percent') as mock_cpu, \
-             patch('psutil.virtual_memory') as mock_memory, \
-             patch('psutil.disk_usage') as mock_disk:
+                patch('psutil.virtual_memory') as mock_memory, \
+                patch('psutil.disk_usage') as mock_disk:
 
             mock_cpu.return_value = 50.0
             mock_memory.return_value = Mock(percent=60.0)

@@ -5,12 +5,11 @@ Escalation Monitor
 Monitors for human escalation files and provides notifications.
 """
 
-import os
 import time
-import glob
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
+
 
 class EscalationMonitor:
     """Monitor for human escalation requests"""
@@ -23,7 +22,8 @@ class EscalationMonitor:
     def scan_for_escalations(self) -> List[Path]:
         """Scan for new escalation files"""
         escalation_files = list(self.base_dir.glob(self.escalation_pattern))
-        new_files = [f for f in escalation_files if f not in self.processed_files]
+        new_files = [
+            f for f in escalation_files if f not in self.processed_files]
         return new_files
 
     def process_escalation(self, escalation_file: Path) -> Dict:
@@ -114,7 +114,10 @@ class EscalationMonitor:
         print("🚨" * 20)
         print()
         print(f"📁 File: {escalation['file']}")
-        print(f"⏰ Time: {datetime.fromtimestamp(escalation['timestamp']).strftime('%Y-%m-%d %H:%M:%S')}")
+        print(
+            f"⏰ Time: {
+                datetime.fromtimestamp(
+                    escalation['timestamp']).strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"🔥 Level: {escalation['level']}")
         print(f"📊 Urgency: {escalation['urgency']}/10")
         print(f"👥 Agents: {', '.join(escalation['agents'])}")
@@ -132,7 +135,8 @@ class EscalationMonitor:
         print("🔍 Starting escalation monitor...")
         print(f"📁 Monitoring directory: {self.base_dir}")
         print(f"🔄 Check interval: {interval} seconds")
-        print("⏰ Monitoring started at:", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        print("⏰ Monitoring started at:",
+              datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         print()
 
         while True:
@@ -145,7 +149,9 @@ class EscalationMonitor:
                     self.processed_files.add(escalation_file)
 
                 if not new_escalations:
-                    print(f"⏳ {datetime.now().strftime('%H:%M:%S')} - No escalations detected")
+                    print(
+                        f"⏳ {
+                            datetime.now().strftime('%H:%M:%S')} - No escalations detected")
 
                 time.sleep(interval)
 
@@ -170,6 +176,7 @@ class EscalationMonitor:
             print("✅ No escalations found")
             return False
 
+
 def main():
     """Main CLI interface"""
     import sys
@@ -193,17 +200,20 @@ def main():
                 print(f"📋 Found {len(files)} escalation file(s):")
                 for f in sorted(files):
                     mtime = datetime.fromtimestamp(f.stat().st_mtime)
-                    print(f"  - {f.name} ({mtime.strftime('%Y-%m-%d %H:%M:%S')})")
+                    print(
+                        f"  - {f.name} ({mtime.strftime('%Y-%m-%d %H:%M:%S')})")
             else:
                 print("✅ No escalation files found")
         else:
             print("Usage:")
             print("  python monitor_escalations.py --check")
-            print("  python monitor_escalations.py --continuous [interval_seconds]")
+            print(
+                "  python monitor_escalations.py --continuous [interval_seconds]")
             print("  python monitor_escalations.py --list")
     else:
         # Default: single check
         monitor.check_once()
+
 
 if __name__ == "__main__":
     main()

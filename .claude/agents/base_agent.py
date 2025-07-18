@@ -1,12 +1,11 @@
 # .claude/agents/base_agent.py
 """BaseAgent abstract class for LeanVibe orchestration system."""
 
-import asyncio
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
-from datetime import datetime
 
 
 class AgentStatus(Enum):
@@ -85,7 +84,6 @@ class BaseAgent(ABC):
         Returns:
             Result object with execution details
         """
-        pass
 
     @abstractmethod
     async def get_status(self) -> AgentInfo:
@@ -94,7 +92,6 @@ class BaseAgent(ABC):
         Returns:
             AgentInfo object with current status
         """
-        pass
 
     @abstractmethod
     def get_capabilities(self) -> List[str]:
@@ -103,7 +100,6 @@ class BaseAgent(ABC):
         Returns:
             List of capability strings
         """
-        pass
 
     @abstractmethod
     async def health_check(self) -> bool:
@@ -112,7 +108,6 @@ class BaseAgent(ABC):
         Returns:
             True if healthy, False otherwise
         """
-        pass
 
     @abstractmethod
     async def shutdown(self) -> None:
@@ -121,7 +116,6 @@ class BaseAgent(ABC):
         This method should clean up resources, terminate subprocesses,
         and prepare the agent for termination.
         """
-        pass
 
     # Common implementation methods
     def can_handle_task(self, task: Task) -> bool:
@@ -135,7 +129,8 @@ class BaseAgent(ABC):
         """
         return task.type in self.capabilities
 
-    def update_status(self, status: AgentStatus, error_message: Optional[str] = None):
+    def update_status(self, status: AgentStatus,
+                      error_message: Optional[str] = None):
         """Update agent status.
 
         Args:

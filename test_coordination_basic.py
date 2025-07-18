@@ -6,11 +6,10 @@ This script tests the basic functionality of coordination system components
 without requiring full integration with the advanced orchestration system.
 """
 
-import asyncio
+import json
 import logging
 import sys
-import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 # Set up logging
@@ -30,7 +29,9 @@ def test_component_workflow_manager():
 
     try:
         # Import and create manager
-        from coordination_protocols.component_workflow import ComponentWorkflowManager
+        from coordination_protocols.component_workflow import (
+            ComponentWorkflowManager,
+        )
         manager = ComponentWorkflowManager()
 
         # Test PR breakdown workflow creation
@@ -103,7 +104,8 @@ def test_coordination_protocols():
         ]
 
         for file_path in files_to_check:
-            assert Path(file_path).exists(), f"Missing coordination file: {file_path}"
+            assert Path(file_path).exists(
+            ), f"Missing coordination file: {file_path}"
 
         logger.info("✅ Coordination protocols test passed")
         return True
@@ -118,15 +120,22 @@ def test_component_specifications():
     logger.info("Testing component specifications...")
 
     try:
-        from coordination_protocols.component_workflow import ComponentWorkflowManager
+        from coordination_protocols.component_workflow import (
+            ComponentWorkflowManager,
+        )
         manager = ComponentWorkflowManager()
 
         # Create workflow
         pr_info = {"number": 28, "title": "Test PR", "size": 8763}
-        workflow_result = manager.create_pr_breakdown_workflow(pr_info)
+        manager.create_pr_breakdown_workflow(pr_info)
 
         # Check components exist
-        component_ids = ["api_gateway", "service_discovery", "github_integration", "slack_integration", "integration_manager"]
+        component_ids = [
+            "api_gateway",
+            "service_discovery",
+            "github_integration",
+            "slack_integration",
+            "integration_manager"]
 
         for component_id in component_ids:
             assert component_id in manager.components, f"Missing component: {component_id}"
@@ -149,22 +158,27 @@ def test_milestone_definitions():
     logger.info("Testing milestone definitions...")
 
     try:
-        from coordination_protocols.component_workflow import ComponentWorkflowManager
+        from coordination_protocols.component_workflow import (
+            ComponentWorkflowManager,
+        )
         manager = ComponentWorkflowManager()
 
         # Create workflow
         pr_info = {"number": 28, "title": "Test PR", "size": 8763}
-        workflow_result = manager.create_pr_breakdown_workflow(pr_info)
+        manager.create_pr_breakdown_workflow(pr_info)
 
         # Check milestones
-        expected_milestones = ["foundation_complete", "integrations_complete", "system_complete"]
+        expected_milestones = ["foundation_complete",
+                               "integrations_complete", "system_complete"]
 
         for milestone_id in expected_milestones:
             assert milestone_id in manager.milestones, f"Missing milestone: {milestone_id}"
 
             milestone = manager.milestones[milestone_id]
-            assert len(milestone.required_components) > 0, f"Milestone {milestone_id} has no required components"
-            assert len(milestone.completion_criteria) > 0, f"Milestone {milestone_id} has no completion criteria"
+            assert len(
+                milestone.required_components) > 0, f"Milestone {milestone_id} has no required components"
+            assert len(
+                milestone.completion_criteria) > 0, f"Milestone {milestone_id} has no completion criteria"
 
         logger.info("✅ Milestone definitions test passed")
         return True
@@ -179,18 +193,26 @@ def test_quality_gates():
     logger.info("Testing quality gate definitions...")
 
     try:
-        from coordination_protocols.component_workflow import ComponentWorkflowManager
+        from coordination_protocols.component_workflow import (
+            ComponentWorkflowManager,
+        )
         manager = ComponentWorkflowManager()
 
         # Create workflow
         pr_info = {"number": 28, "title": "Test PR", "size": 8763}
-        workflow_result = manager.create_pr_breakdown_workflow(pr_info)
+        manager.create_pr_breakdown_workflow(pr_info)
 
         # Check quality gates
-        component_ids = ["api_gateway", "service_discovery", "github_integration", "slack_integration", "integration_manager"]
+        component_ids = [
+            "api_gateway",
+            "service_discovery",
+            "github_integration",
+            "slack_integration",
+            "integration_manager"]
 
         for component_id in component_ids:
-            # Each component should have code quality, test coverage, and documentation gates
+            # Each component should have code quality, test coverage, and
+            # documentation gates
             expected_gates = [
                 f"{component_id}_code_quality",
                 f"{component_id}_test_coverage",
@@ -202,7 +224,8 @@ def test_quality_gates():
 
                 gate = manager.quality_gates[gate_id]
                 assert gate.component_id == component_id, f"Gate {gate_id} has incorrect component ID"
-                assert len(gate.validation_criteria) > 0, f"Gate {gate_id} has no validation criteria"
+                assert len(
+                    gate.validation_criteria) > 0, f"Gate {gate_id} has no validation criteria"
 
         logger.info("✅ Quality gates test passed")
         return True
@@ -217,12 +240,15 @@ def test_coordination_workflow():
     logger.info("Testing coordination workflow...")
 
     try:
-        from coordination_protocols.component_workflow import ComponentWorkflowManager, ComponentStatus
+        from coordination_protocols.component_workflow import (
+            ComponentStatus,
+            ComponentWorkflowManager,
+        )
         manager = ComponentWorkflowManager()
 
         # Create workflow
         pr_info = {"number": 28, "title": "Test PR", "size": 8763}
-        workflow_result = manager.create_pr_breakdown_workflow(pr_info)
+        manager.create_pr_breakdown_workflow(pr_info)
 
         # Test component status updates
         component_id = "api_gateway"
@@ -263,12 +289,14 @@ def test_coordination_report():
     logger.info("Testing coordination report generation...")
 
     try:
-        from coordination_protocols.component_workflow import ComponentWorkflowManager
+        from coordination_protocols.component_workflow import (
+            ComponentWorkflowManager,
+        )
         manager = ComponentWorkflowManager()
 
         # Create workflow
         pr_info = {"number": 28, "title": "Test PR", "size": 8763}
-        workflow_result = manager.create_pr_breakdown_workflow(pr_info)
+        manager.create_pr_breakdown_workflow(pr_info)
 
         # Generate report
         report = manager.generate_coordination_report()
@@ -316,7 +344,8 @@ def run_all_tests():
             result = test_func()
             test_results.append(result)
         except Exception as e:
-            logger.error(f"❌ Test {test_func.__name__} failed with exception: {e}")
+            logger.error(
+                f"❌ Test {test_func.__name__} failed with exception: {e}")
             test_results.append(False)
 
     # Summary
@@ -327,7 +356,8 @@ def run_all_tests():
     logger.info(f"🎯 Test Results: {passed}/{total} tests passed")
 
     if passed == total:
-        logger.info("🎉 All basic tests passed! Core coordination system is functional.")
+        logger.info(
+            "🎉 All basic tests passed! Core coordination system is functional.")
         return True
     else:
         logger.error(f"❌ {total - passed} tests failed. System needs fixes.")
@@ -339,7 +369,9 @@ def generate_test_report():
     logger.info("📊 Generating basic test report...")
 
     try:
-        from coordination_protocols.component_workflow import ComponentWorkflowManager
+        from coordination_protocols.component_workflow import (
+            ComponentWorkflowManager,
+        )
         manager = ComponentWorkflowManager()
 
         # Create test workflow
@@ -377,7 +409,8 @@ def generate_test_report():
         with open("basic_coordination_test_report.json", "w") as f:
             json.dump(test_report, f, indent=2, default=str)
 
-        logger.info("✅ Basic test report generated: basic_coordination_test_report.json")
+        logger.info(
+            "✅ Basic test report generated: basic_coordination_test_report.json")
         return test_report
 
     except Exception as e:
@@ -394,7 +427,8 @@ if __name__ == "__main__":
 
     if success and report:
         logger.info("\n🎉 SUCCESS: Basic coordination system is functional!")
-        logger.info("📋 Test report saved to: basic_coordination_test_report.json")
+        logger.info(
+            "📋 Test report saved to: basic_coordination_test_report.json")
         logger.info("🚀 Ready to proceed with advanced integration testing")
     else:
         logger.error("\n❌ FAILURE: Basic coordination system needs fixes")

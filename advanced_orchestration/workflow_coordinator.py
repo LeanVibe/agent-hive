@@ -11,18 +11,24 @@ This module provides advanced workflow coordination capabilities including:
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any, Set
 from collections import defaultdict
-import uuid
-import json
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Set
 
 from .models import (
-    WorkflowDefinition, EnhancedTaskAssignment, AgentCapabilities,
-    CoordinationMetrics, IntelligentRouting, QualityGate, WorkflowState,
-    TaskDependency, TaskStatus, TaskPriority, AgentSpecialization,
-    WorkflowType, DependencyType, AgentInfo, CoordinatorConfig,
-    TaskDistributionException, CoordinatorException
+    AgentCapabilities,
+    AgentSpecialization,
+    CoordinationMetrics,
+    CoordinatorConfig,
+    CoordinatorException,
+    EnhancedTaskAssignment,
+    IntelligentRouting,
+    QualityGate,
+    TaskDependency,
+    TaskPriority,
+    TaskStatus,
+    WorkflowDefinition,
+    WorkflowState,
 )
 from .multi_agent_coordinator import MultiAgentCoordinator
 
@@ -60,13 +66,16 @@ class WorkflowCoordinator:
         self.quality_gates: Dict[str, QualityGate] = {}
 
         # Coordination
-        self.task_dependencies: Dict[str, List[TaskDependency]] = defaultdict(list)
+        self.task_dependencies: Dict[str,
+                                     List[TaskDependency]] = defaultdict(list)
         self.dependency_graph: Dict[str, Set[str]] = defaultdict(set)
-        self.parallel_execution_groups: Dict[str, List[str]] = defaultdict(list)
+        self.parallel_execution_groups: Dict[str,
+                                             List[str]] = defaultdict(list)
 
         # Intelligence
         self.intelligent_routing = IntelligentRouting()
-        self.performance_history: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        self.performance_history: Dict[str,
+                                       List[Dict[str, Any]]] = defaultdict(list)
         self.coordination_metrics: Dict[str, CoordinationMetrics] = {}
 
         # Monitoring
@@ -80,7 +89,8 @@ class WorkflowCoordinator:
             'coordination_efficiency': 0.0
         }
 
-        self.logger.info("WorkflowCoordinator initialized with intelligent routing")
+        self.logger.info(
+            "WorkflowCoordinator initialized with intelligent routing")
 
     async def start(self) -> None:
         """Start the workflow coordinator."""
@@ -100,7 +110,8 @@ class WorkflowCoordinator:
         await self.multi_agent_coordinator.stop()
         self.logger.info("WorkflowCoordinator stopped")
 
-    async def register_workflow(self, workflow_def: WorkflowDefinition) -> bool:
+    async def register_workflow(
+            self, workflow_def: WorkflowDefinition) -> bool:
         """
         Register a new workflow definition.
 
@@ -121,14 +132,19 @@ class WorkflowCoordinator:
             # Register workflow
             self.workflow_definitions[workflow_def.workflow_id] = workflow_def
 
-            self.logger.info(f"Workflow {workflow_def.workflow_id} registered successfully")
+            self.logger.info(
+                f"Workflow {workflow_def.workflow_id} registered successfully")
             return True
 
         except Exception as e:
-            self.logger.error(f"Failed to register workflow {workflow_def.workflow_id}: {e}")
+            self.logger.error(
+                f"Failed to register workflow {workflow_def.workflow_id}: {e}")
             return False
 
-    async def execute_workflow(self, workflow_id: str, context: Dict[str, Any] = None) -> WorkflowState:
+    async def execute_workflow(self,
+                               workflow_id: str,
+                               context: Dict[str,
+                                             Any] = None) -> WorkflowState:
         """
         Execute a registered workflow.
 
@@ -165,10 +181,10 @@ class WorkflowCoordinator:
                     quality_consistency=0.0,
                     dependency_resolution_time=0.0,
                     agent_utilization={},
-                    coordination_overhead=0.0
-                ),
-                estimated_completion=datetime.now() + timedelta(minutes=workflow_def.estimated_duration)
-            )
+                    coordination_overhead=0.0),
+                estimated_completion=datetime.now() +
+                timedelta(
+                    minutes=workflow_def.estimated_duration))
 
             self.active_workflows[workflow_id] = workflow_state
 
@@ -188,7 +204,10 @@ class WorkflowCoordinator:
             self.logger.error(f"Failed to execute workflow {workflow_id}: {e}")
             raise CoordinatorException(f"Workflow execution failed: {e}")
 
-    async def register_agent_capabilities(self, agent_id: str, capabilities: AgentCapabilities) -> bool:
+    async def register_agent_capabilities(
+            self,
+            agent_id: str,
+            capabilities: AgentCapabilities) -> bool:
         """
         Register agent capabilities for intelligent routing.
 
@@ -201,14 +220,21 @@ class WorkflowCoordinator:
         """
         try:
             self.agent_capabilities[agent_id] = capabilities
-            self.logger.info(f"Agent {agent_id} capabilities registered: {capabilities.specialization}")
+            self.logger.info(
+                f"Agent {agent_id} capabilities registered: {
+                    capabilities.specialization}")
             return True
 
         except Exception as e:
-            self.logger.error(f"Failed to register agent capabilities for {agent_id}: {e}")
+            self.logger.error(
+                f"Failed to register agent capabilities for {agent_id}: {e}")
             return False
 
-    async def update_task_progress(self, task_id: str, progress: float, quality_score: float = 0.0) -> bool:
+    async def update_task_progress(
+            self,
+            task_id: str,
+            progress: float,
+            quality_score: float = 0.0) -> bool:
         """
         Update task progress and quality metrics.
 
@@ -233,11 +259,13 @@ class WorkflowCoordinator:
             if workflow_state:
                 await self._update_workflow_progress(workflow_state)
 
-            self.logger.debug(f"Task {task_id} progress updated: {progress:.1%}")
+            self.logger.debug(
+                f"Task {task_id} progress updated: {progress:.1%}")
             return True
 
         except Exception as e:
-            self.logger.error(f"Failed to update task progress for {task_id}: {e}")
+            self.logger.error(
+                f"Failed to update task progress for {task_id}: {e}")
             return False
 
     async def validate_quality_gate(self, gate_id: str) -> bool:
@@ -282,10 +310,12 @@ class WorkflowCoordinator:
             return True
 
         except Exception as e:
-            self.logger.error(f"Failed to validate quality gate {gate_id}: {e}")
+            self.logger.error(
+                f"Failed to validate quality gate {gate_id}: {e}")
             return False
 
-    async def get_coordination_metrics(self, workflow_id: str) -> Optional[CoordinationMetrics]:
+    async def get_coordination_metrics(
+            self, workflow_id: str) -> Optional[CoordinationMetrics]:
         """
         Get coordination metrics for a workflow.
 
@@ -297,7 +327,8 @@ class WorkflowCoordinator:
         """
         return self.coordination_metrics.get(workflow_id)
 
-    async def get_workflow_state(self, workflow_id: str) -> Optional[WorkflowState]:
+    async def get_workflow_state(
+            self, workflow_id: str) -> Optional[WorkflowState]:
         """
         Get current workflow state.
 
@@ -309,24 +340,30 @@ class WorkflowCoordinator:
         """
         return self.active_workflows.get(workflow_id)
 
-    async def _validate_workflow_definition(self, workflow_def: WorkflowDefinition) -> bool:
+    async def _validate_workflow_definition(
+            self, workflow_def: WorkflowDefinition) -> bool:
         """Validate workflow definition."""
         try:
             # Check tasks exist
             if not workflow_def.tasks:
-                self.logger.error(f"Workflow {workflow_def.workflow_id} has no tasks")
+                self.logger.error(
+                    f"Workflow {workflow_def.workflow_id} has no tasks")
                 return False
 
             # Check dependencies are valid
             task_set = set(workflow_def.tasks)
             for dep in workflow_def.dependencies:
                 if dep.task_id not in task_set or dep.depends_on not in task_set:
-                    self.logger.error(f"Invalid dependency in workflow {workflow_def.workflow_id}")
+                    self.logger.error(
+                        f"Invalid dependency in workflow {
+                            workflow_def.workflow_id}")
                     return False
 
             # Check for circular dependencies
             if await self._has_circular_dependencies(workflow_def):
-                self.logger.error(f"Circular dependencies detected in workflow {workflow_def.workflow_id}")
+                self.logger.error(
+                    f"Circular dependencies detected in workflow {
+                        workflow_def.workflow_id}")
                 return False
 
             return True
@@ -335,7 +372,8 @@ class WorkflowCoordinator:
             self.logger.error(f"Workflow validation failed: {e}")
             return False
 
-    async def _has_circular_dependencies(self, workflow_def: WorkflowDefinition) -> bool:
+    async def _has_circular_dependencies(
+            self, workflow_def: WorkflowDefinition) -> bool:
         """Check for circular dependencies in workflow."""
         graph = defaultdict(set)
 
@@ -366,7 +404,8 @@ class WorkflowCoordinator:
 
         return False
 
-    async def _build_dependency_graph(self, workflow_def: WorkflowDefinition) -> None:
+    async def _build_dependency_graph(
+            self, workflow_def: WorkflowDefinition) -> None:
         """Build dependency graph for workflow."""
         workflow_id = workflow_def.workflow_id
 
@@ -382,7 +421,8 @@ class WorkflowCoordinator:
         # Identify parallel execution groups
         await self._identify_parallel_groups(workflow_def)
 
-    async def _identify_parallel_groups(self, workflow_def: WorkflowDefinition) -> None:
+    async def _identify_parallel_groups(
+            self, workflow_def: WorkflowDefinition) -> None:
         """Identify tasks that can be executed in parallel."""
         workflow_id = workflow_def.workflow_id
         self.parallel_execution_groups[workflow_id] = []
@@ -405,7 +445,8 @@ class WorkflowCoordinator:
             if len(tasks) > 1:
                 self.parallel_execution_groups[workflow_id].append(tasks)
 
-    async def _calculate_task_level(self, task_id: str, workflow_id: str) -> int:
+    async def _calculate_task_level(
+            self, task_id: str, workflow_id: str) -> int:
         """Calculate dependency level for a task."""
         dependencies = self.dependency_graph[workflow_id].get(task_id, set())
 
@@ -419,16 +460,19 @@ class WorkflowCoordinator:
 
         return max_level
 
-    async def _create_enhanced_task_assignments(self, workflow_def: WorkflowDefinition, context: Dict[str, Any]) -> None:
+    async def _create_enhanced_task_assignments(
+            self, workflow_def: WorkflowDefinition, context: Dict[str, Any]) -> None:
         """Create enhanced task assignments for workflow."""
         workflow_id = workflow_def.workflow_id
 
         for task_id in workflow_def.tasks:
             # Get task dependencies
-            task_deps = [dep for dep in workflow_def.dependencies if dep.task_id == task_id]
+            task_deps = [
+                dep for dep in workflow_def.dependencies if dep.task_id == task_id]
 
             # Determine agent specialization
-            agent_spec = workflow_def.agent_assignments.get(task_id, AgentSpecialization.GENERAL)
+            agent_spec = workflow_def.agent_assignments.get(
+                task_id, AgentSpecialization.GENERAL)
 
             # Create enhanced task assignment
             enhanced_task = EnhancedTaskAssignment(
@@ -464,7 +508,10 @@ class WorkflowCoordinator:
         workflow_state.status = "completed"
         workflow_state.progress_percentage = 100.0
 
-    async def _execute_parallel_group(self, workflow_id: str, task_group: List[str]) -> None:
+    async def _execute_parallel_group(
+            self,
+            workflow_id: str,
+            task_group: List[str]) -> None:
         """Execute a group of tasks in parallel."""
         workflow_state = self.active_workflows[workflow_id]
 
@@ -487,7 +534,8 @@ class WorkflowCoordinator:
         await asyncio.gather(*tasks)
 
         # Update workflow state
-        workflow_state.active_tasks = [t for t in workflow_state.active_tasks if t not in ready_tasks]
+        workflow_state.active_tasks = [
+            t for t in workflow_state.active_tasks if t not in ready_tasks]
         workflow_state.completed_tasks.extend(ready_tasks)
 
         self.coordination_stats['parallel_tasks_executed'] += len(ready_tasks)
@@ -532,7 +580,8 @@ class WorkflowCoordinator:
             self.logger.error(f"Failed to execute task {task_id}: {e}")
             self.enhanced_tasks[task_id].status = TaskStatus.FAILED
 
-    async def _select_agent_for_task(self, task: EnhancedTaskAssignment) -> Optional[str]:
+    async def _select_agent_for_task(
+            self, task: EnhancedTaskAssignment) -> Optional[str]:
         """Select best agent for task using intelligent routing."""
         try:
             # Get available agents
@@ -566,12 +615,17 @@ class WorkflowCoordinator:
                 return await self._heuristic_agent_selection(task, candidates)
 
         except Exception as e:
-            self.logger.error(f"Failed to select agent for task {task.task_id}: {e}")
+            self.logger.error(
+                f"Failed to select agent for task {task.task_id}: {e}")
             return None
 
-    async def _ml_agent_selection(self, task: EnhancedTaskAssignment, candidates: List[str]) -> str:
+    async def _ml_agent_selection(
+            self,
+            task: EnhancedTaskAssignment,
+            candidates: List[str]) -> str:
         """Machine learning based agent selection."""
-        # Simplified ML selection - in production, this would use actual ML models
+        # Simplified ML selection - in production, this would use actual ML
+        # models
         best_agent = None
         best_score = 0.0
 
@@ -588,7 +642,8 @@ class WorkflowCoordinator:
             if agent_id in self.performance_history:
                 history = self.performance_history[agent_id]
                 if history:
-                    avg_performance = sum(h.get('performance', 0.5) for h in history) / len(history)
+                    avg_performance = sum(h.get('performance', 0.5)
+                                          for h in history) / len(history)
                     score += avg_performance * 0.3
 
             if score > best_score:
@@ -597,13 +652,16 @@ class WorkflowCoordinator:
 
         return best_agent or candidates[0]
 
-    async def _heuristic_agent_selection(self, task: EnhancedTaskAssignment, candidates: List[str]) -> str:
+    async def _heuristic_agent_selection(
+            self,
+            task: EnhancedTaskAssignment,
+            candidates: List[str]) -> str:
         """Heuristic-based agent selection."""
         # Select agent with least active tasks
         coordinator_state = await self.multi_agent_coordinator.get_coordinator_state()
 
         return min(candidates, key=lambda agent_id:
-                  coordinator_state.active_agents[agent_id].active_tasks)
+                   coordinator_state.active_agents[agent_id].active_tasks)
 
     async def _is_task_ready(self, task_id: str) -> bool:
         """Check if task is ready for execution."""
@@ -623,7 +681,10 @@ class WorkflowCoordinator:
 
         return True
 
-    async def _monitor_task_completion(self, enhanced_task_id: str, coordinator_task_id: str) -> None:
+    async def _monitor_task_completion(
+            self,
+            enhanced_task_id: str,
+            coordinator_task_id: str) -> None:
         """Monitor task completion and update state."""
         # This would be integrated with the multi-agent coordinator's task completion
         # For now, we'll simulate completion
@@ -634,7 +695,8 @@ class WorkflowCoordinator:
             self.enhanced_tasks[enhanced_task_id].status = TaskStatus.COMPLETED
             self.enhanced_tasks[enhanced_task_id].progress_percentage = 100.0
 
-    async def _update_workflow_progress(self, workflow_state: WorkflowState) -> None:
+    async def _update_workflow_progress(
+            self, workflow_state: WorkflowState) -> None:
         """Update workflow progress based on task completion."""
         workflow_id = workflow_state.workflow_id
         workflow_def = self.workflow_definitions[workflow_id]
@@ -642,13 +704,14 @@ class WorkflowCoordinator:
         total_tasks = len(workflow_def.tasks)
         completed_tasks = len(workflow_state.completed_tasks)
 
-        workflow_state.progress_percentage = (completed_tasks / total_tasks) * 100
+        workflow_state.progress_percentage = (
+            completed_tasks / total_tasks) * 100
         workflow_state.last_updated = datetime.now()
 
     async def _validate_workflow_quality_gates(self, workflow_id: str) -> None:
         """Validate all quality gates for workflow."""
         workflow_gates = [gate for gate in self.quality_gates.values()
-                         if gate.workflow_id == workflow_id]
+                          if gate.workflow_id == workflow_id]
 
         for gate in workflow_gates:
             await self.validate_quality_gate(gate.gate_id)
@@ -699,24 +762,33 @@ class WorkflowCoordinator:
             # Calculate metrics
             metrics = CoordinationMetrics(
                 workflow_completion_rate=workflow_state.progress_percentage / 100,
-                parallel_efficiency=self._calculate_parallel_efficiency(workflow_id),
-                task_distribution_balance=self._calculate_distribution_balance(workflow_id),
-                quality_consistency=self._calculate_quality_consistency(workflow_id),
-                dependency_resolution_time=self._calculate_dependency_resolution_time(workflow_id),
+                parallel_efficiency=self._calculate_parallel_efficiency(
+                    workflow_id),
+                task_distribution_balance=self._calculate_distribution_balance(
+                    workflow_id),
+                quality_consistency=self._calculate_quality_consistency(
+                    workflow_id),
+                dependency_resolution_time=self._calculate_dependency_resolution_time(
+                    workflow_id),
                 agent_utilization=await self._calculate_agent_utilization(workflow_id),
-                coordination_overhead=self._calculate_coordination_overhead(workflow_id)
+                coordination_overhead=self._calculate_coordination_overhead(
+                    workflow_id)
             )
 
             self.coordination_metrics[workflow_id] = metrics
             workflow_state.coordination_metrics = metrics
 
         except Exception as e:
-            self.logger.error(f"Failed to calculate coordination metrics for {workflow_id}: {e}")
+            self.logger.error(
+                f"Failed to calculate coordination metrics for {workflow_id}: {e}")
 
     def _calculate_parallel_efficiency(self, workflow_id: str) -> float:
         """Calculate parallel execution efficiency."""
-        # Simplified calculation - in production, this would be more sophisticated
-        return min(1.0, self.coordination_stats['parallel_tasks_executed'] / max(1, len(self.parallel_execution_groups[workflow_id])))
+        # Simplified calculation - in production, this would be more
+        # sophisticated
+        return min(1.0,
+                   self.coordination_stats['parallel_tasks_executed'] / max(1,
+                                                                            len(self.parallel_execution_groups[workflow_id])))
 
     def _calculate_distribution_balance(self, workflow_id: str) -> float:
         """Calculate task distribution balance."""
@@ -726,12 +798,13 @@ class WorkflowCoordinator:
     def _calculate_quality_consistency(self, workflow_id: str) -> float:
         """Calculate quality consistency across tasks."""
         workflow_tasks = [task for task in self.enhanced_tasks.values()
-                         if task.workflow_id == workflow_id]
+                          if task.workflow_id == workflow_id]
 
         if not workflow_tasks:
             return 0.0
 
-        quality_scores = [task.quality_score for task in workflow_tasks if task.quality_score > 0]
+        quality_scores = [
+            task.quality_score for task in workflow_tasks if task.quality_score > 0]
         if not quality_scores:
             return 0.0
 
@@ -742,7 +815,8 @@ class WorkflowCoordinator:
         # Simplified calculation
         return 30.0  # Placeholder
 
-    async def _calculate_agent_utilization(self, workflow_id: str) -> Dict[str, float]:
+    async def _calculate_agent_utilization(
+            self, workflow_id: str) -> Dict[str, float]:
         """Calculate agent utilization for workflow."""
         coordinator_state = await self.multi_agent_coordinator.get_coordinator_state()
 
@@ -769,12 +843,15 @@ class WorkflowCoordinator:
                 if agent_id in self.performance_history:
                     history = self.performance_history[agent_id]
                     if history:
-                        avg_performance = sum(h.get('performance', 0.5) for h in history) / len(history)
+                        avg_performance = sum(h.get('performance', 0.5)
+                                              for h in history) / len(history)
 
                         # Adapt skill level based on performance
                         if self.intelligent_routing.learning_enabled:
-                            adaptation = (avg_performance - 0.5) * capabilities.learning_rate
-                            capabilities.skill_level = max(0.0, min(1.0, capabilities.skill_level + adaptation))
+                            adaptation = (avg_performance - 0.5) * \
+                                capabilities.learning_rate
+                            capabilities.skill_level = max(
+                                0.0, min(1.0, capabilities.skill_level + adaptation))
                             capabilities.adaptation_score = avg_performance
 
             self.logger.debug("Agent routing optimization completed")

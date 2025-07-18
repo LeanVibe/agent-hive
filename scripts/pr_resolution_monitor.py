@@ -6,20 +6,21 @@ Monitors PR conflict resolution progress and automatically coordinates
 sequential agent rebases and merges.
 """
 
-import subprocess
 import json
+import subprocess
 import time
-import sys
-from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
+
 
 class PRResolutionMonitor:
     """Monitors and coordinates PR conflict resolution"""
 
     def __init__(self):
         self.target_prs = [
-            {"number": 29, "agent": "documentation-agent", "title": "Documentation ecosystem"},
-            {"number": 30, "agent": "intelligence-agent", "title": "Intelligence framework"},
+            {"number": 29, "agent": "documentation-agent",
+                "title": "Documentation ecosystem"},
+            {"number": 30, "agent": "intelligence-agent",
+                "title": "Intelligence framework"},
             {"number": 31, "agent": "integration-agent", "title": "Auth middleware"},
             {"number": 35, "agent": "unknown", "title": "API Gateway"},
             {"number": 36, "agent": "unknown", "title": "Service Discovery"},
@@ -82,7 +83,8 @@ class PRResolutionMonitor:
         pr_number = pr_info["number"]
 
         if agent_name == "unknown":
-            print(f"⚠️  Unknown agent for PR #{pr_number}, skipping auto-signal")
+            print(
+                f"⚠️  Unknown agent for PR #{pr_number}, skipping auto-signal")
             return
 
         message = f"""🚨 YOUR TURN: START REBASE FOR PR #{pr_number}
@@ -123,7 +125,8 @@ Please start immediately and report progress!"""
                 "--agent", agent_name, "--message", message
             ], check=True)
 
-            print(f"✅ Signaled {agent_name} to start rebase for PR #{pr_number}")
+            print(
+                f"✅ Signaled {agent_name} to start rebase for PR #{pr_number}")
 
         except Exception as e:
             print(f"❌ Failed to signal {agent_name}: {e}")
@@ -224,13 +227,15 @@ Please start immediately and report progress!"""
         for pr in self.failed_prs:
             print(f"   - PR #{pr['number']}: {pr['title']}")
 
-        remaining = len(self.target_prs) - len(self.merged_prs) - len(self.failed_prs)
+        remaining = len(self.target_prs) - \
+            len(self.merged_prs) - len(self.failed_prs)
         print(f"⏳ Remaining: {remaining} PRs")
 
         if len(self.merged_prs) == len(self.target_prs):
             print("🎉 ALL PRS SUCCESSFULLY MERGED!")
         else:
             print("⚠️  Some PRs still need attention")
+
 
 if __name__ == "__main__":
     monitor = PRResolutionMonitor()

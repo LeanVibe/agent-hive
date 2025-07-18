@@ -7,12 +7,10 @@ This micro-component handles ONLY core sprint planning functionality.
 Follows XP Small Releases principle: ≤500 lines, single responsibility.
 """
 
-import json
-import os
 import sqlite3
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
-from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -53,8 +51,13 @@ class SprintPlanningMicro:
             """)
             conn.commit()
 
-    def create_sprint(self, name: str, goal: str, days: int = 14,
-                     capacity: int = 40, velocity_target: int = 25) -> SprintMicro:
+    def create_sprint(
+            self,
+            name: str,
+            goal: str,
+            days: int = 14,
+            capacity: int = 40,
+            velocity_target: int = 25) -> SprintMicro:
         """Create a new sprint - micro-component core functionality."""
         start_date = datetime.now()
         end_date = start_date + timedelta(days=days)

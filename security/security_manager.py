@@ -6,19 +6,17 @@ Provides comprehensive security framework including command validation,
 input sanitization, audit logging, and access control for production deployment.
 """
 
-import re
-import logging
 import json
-import hashlib
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Set, Tuple
-from dataclasses import dataclass, asdict
-from enum import Enum
-from pathlib import Path
+import logging
+import re
 import sqlite3
 import threading
+import time
 from contextlib import contextmanager
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -171,7 +169,12 @@ class CommandValidator:
         self.blacklist = set(self.DANGEROUS_COMMANDS.keys())
         self.enabled = self.config.get('enabled', True)
 
-    def validate_command(self, command: str, context: Dict[str, Any] = None) -> Tuple[bool, str, RiskLevel]:
+    def validate_command(self,
+                         command: str,
+                         context: Dict[str,
+                                       Any] = None) -> Tuple[bool,
+                                                             str,
+                                                             RiskLevel]:
         """
         Validate a command against security policies.
 
@@ -199,7 +202,8 @@ class CommandValidator:
         # Check custom rules
         for rule in self.custom_rules:
             if not self._evaluate_rule(rule, command, context):
-                return False, f"Custom rule violation: {rule['name']}", RiskLevel.MEDIUM
+                return False, f"Custom rule violation: {
+                    rule['name']}", RiskLevel.MEDIUM
 
         # Extract base command
         base_cmd = command.split()[0] if command.split() else ""
@@ -213,7 +217,8 @@ class CommandValidator:
             return False, "Blacklisted command", RiskLevel.HIGH
 
         # Check for file system operations in sensitive directories
-        sensitive_dirs = ['/etc', '/usr/bin', '/usr/sbin', '/bin', '/sbin', '/root', '/home']
+        sensitive_dirs = ['/etc', '/usr/bin', '/usr/sbin',
+                          '/bin', '/sbin', '/root', '/home']
         for dir_path in sensitive_dirs:
             if dir_path in command:
                 return False, f"Operation in sensitive directory: {dir_path}", RiskLevel.HIGH
@@ -221,7 +226,8 @@ class CommandValidator:
         # Default to medium risk for unknown commands
         return True, "Unknown command - proceed with caution", RiskLevel.MEDIUM
 
-    def _evaluate_rule(self, rule: Dict[str, Any], command: str, context: Dict[str, Any]) -> bool:
+    def _evaluate_rule(
+            self, rule: Dict[str, Any], command: str, context: Dict[str, Any]) -> bool:
         """Evaluate a custom security rule."""
         rule_type = rule.get('type', 'regex')
 
@@ -265,8 +271,7 @@ class InputSanitizer:
     SQL_INJECTION_PATTERNS = [
         r"('|(\\')|(;)|(\\;)|(--|/\\*|\\*/)|(\bunion\b)|(\bselect\b)|(\binsert\b)|(\bdelete\b)|(\bupdate\b)|(\bcreate\b)|(\bdrop\b)|(\balter\b)|(\bexec\b)|(\bexecute\b)|(\bsp_\b))",
         r"(union)|(select)|(insert)|(delete)|(update)|(create)|(drop)|(alter)|(exec)|(execute)|(sp_)",
-        r"(script)|(javascript)|(vbscript)|(onload)|(onerror)|(onclick)"
-    ]
+        r"(script)|(javascript)|(vbscript)|(onload)|(onerror)|(onclick)"]
 
     XSS_PATTERNS = [
         r"<script[^>]*>.*?</script>",
@@ -346,7 +351,8 @@ class InputSanitizer:
             sanitized = re.sub(pattern, '', sanitized, flags=re.IGNORECASE)
 
         # Remove script tags and their content
-        sanitized = re.sub(r'<script[^>]*>.*?</script>', '', sanitized, flags=re.IGNORECASE | re.DOTALL)
+        sanitized = re.sub(r'<script[^>]*>.*?</script>', '',
+                           sanitized, flags=re.IGNORECASE | re.DOTALL)
 
         return sanitized
 
@@ -401,7 +407,8 @@ class InputSanitizer:
 
         return sanitized
 
-    def is_safe_input(self, input_data: str, input_type: str = 'text') -> Tuple[bool, str]:
+    def is_safe_input(self, input_data: str,
+                      input_type: str = 'text') -> Tuple[bool, str]:
         """
         Check if input is safe without sanitizing.
 
@@ -429,7 +436,11 @@ class InputSanitizer:
                     return False, f"Command injection pattern detected: {pattern}"
 
         elif input_type == 'path':
-            if re.search(r'\.\./', input_data) or re.search(r'\.\.\\', input_data):
+            if re.search(
+                    r'\.\./',
+                    input_data) or re.search(
+                    r'\.\.\\',
+                    input_data):
                 return False, "Directory traversal pattern detected"
 
         return True, "Input appears safe"
@@ -512,11 +523,11 @@ class AuditLogger:
             ))
 
     def get_security_events(self,
-                           start_time: datetime = None,
-                           end_time: datetime = None,
-                           agent_id: str = None,
-                           risk_level: RiskLevel = None,
-                           limit: int = 100) -> List[SecurityEvent]:
+                            start_time: datetime = None,
+                            end_time: datetime = None,
+                            agent_id: str = None,
+                            risk_level: RiskLevel = None,
+                            limit: int = 100) -> List[SecurityEvent]:
         """Retrieve security events from the audit log."""
 
         query = "SELECT * FROM security_events WHERE 1=1"
@@ -651,7 +662,11 @@ class AccessControlManager:
         """Assign a role to a user."""
         self.user_roles[user_id] = role
 
-    def check_permission(self, user_id: str, permission: str, session_id: str = None) -> bool:
+    def check_permission(
+            self,
+            user_id: str,
+            permission: str,
+            session_id: str = None) -> bool:
         """Check if a user has a specific permission."""
         # Check session-specific permissions first
         if session_id and session_id in self.session_permissions:
@@ -684,18 +699,25 @@ class SecurityManager:
 
     def __init__(self, config: Dict[str, Any] = None):
         self.config = config or {}
-        self.command_validator = CommandValidator(self.config.get('command_validator', {}))
-        self.input_sanitizer = InputSanitizer(self.config.get('input_sanitizer', {}))
-        self.audit_logger = AuditLogger(self.config.get('audit_db_path', 'security_audit.db'))
-        self.access_control = AccessControlManager(self.config.get('access_control', {}))
+        self.command_validator = CommandValidator(
+            self.config.get('command_validator', {}))
+        self.input_sanitizer = InputSanitizer(
+            self.config.get('input_sanitizer', {}))
+        self.audit_logger = AuditLogger(
+            self.config.get('audit_db_path', 'security_audit.db'))
+        self.access_control = AccessControlManager(
+            self.config.get('access_control', {}))
         self.enabled = self.config.get('enabled', True)
 
     def validate_operation(self,
-                          operation: str,
-                          agent_id: str,
-                          session_id: str,
-                          user_id: str = None,
-                          context: Dict[str, Any] = None) -> Tuple[bool, str, RiskLevel]:
+                           operation: str,
+                           agent_id: str,
+                           session_id: str,
+                           user_id: str = None,
+                           context: Dict[str,
+                                         Any] = None) -> Tuple[bool,
+                                                               str,
+                                                               RiskLevel]:
         """
         Validate an operation against all security policies.
 
@@ -710,7 +732,8 @@ class SecurityManager:
         # Check access permissions
         if user_id:
             required_permission = self._get_required_permission(operation)
-            if not self.access_control.check_permission(user_id, required_permission, session_id):
+            if not self.access_control.check_permission(
+                    user_id, required_permission, session_id):
                 self._log_security_event(
                     agent_id=agent_id,
                     session_id=session_id,
@@ -718,12 +741,14 @@ class SecurityManager:
                     action=operation,
                     result="denied",
                     risk_level=RiskLevel.MEDIUM,
-                    details={"user_id": user_id, "required_permission": required_permission}
+                    details={"user_id": user_id,
+                             "required_permission": required_permission}
                 )
                 return False, f"Permission denied: {required_permission}", RiskLevel.MEDIUM
 
         # Validate command
-        is_valid, reason, risk_level = self.command_validator.validate_command(operation, context)
+        is_valid, reason, risk_level = self.command_validator.validate_command(
+            operation, context)
 
         # Log the validation result
         self._log_security_event(
@@ -742,7 +767,8 @@ class SecurityManager:
         """Sanitize input data."""
         return self.input_sanitizer.sanitize_input(input_data, input_type)
 
-    def is_safe_input(self, input_data: str, input_type: str = 'text') -> Tuple[bool, str]:
+    def is_safe_input(self, input_data: str,
+                      input_type: str = 'text') -> Tuple[bool, str]:
         """Check if input is safe."""
         return self.input_sanitizer.is_safe_input(input_data, input_type)
 
@@ -763,15 +789,15 @@ class SecurityManager:
         return permission_map.get(operation, 'read_status')
 
     def _log_security_event(self,
-                           agent_id: str,
-                           session_id: str,
-                           event_type: str,
-                           action: str,
-                           result: str,
-                           risk_level: RiskLevel,
-                           details: Dict[str, Any],
-                           user_id: str = None,
-                           ip_address: str = None):
+                            agent_id: str,
+                            session_id: str,
+                            event_type: str,
+                            action: str,
+                            result: str,
+                            risk_level: RiskLevel,
+                            details: Dict[str, Any],
+                            user_id: str = None,
+                            ip_address: str = None):
         """Log a security event."""
         event = SecurityEvent(
             event_id=f"{agent_id}_{session_id}_{int(time.time() * 1000)}",
@@ -803,9 +829,15 @@ security_manager = SecurityManager()
 
 
 # Convenience functions
-def validate_command(command: str, agent_id: str, session_id: str, user_id: str = None) -> Tuple[bool, str, RiskLevel]:
+def validate_command(command: str,
+                     agent_id: str,
+                     session_id: str,
+                     user_id: str = None) -> Tuple[bool,
+                                                   str,
+                                                   RiskLevel]:
     """Validate a command against security policies."""
-    return security_manager.validate_operation(command, agent_id, session_id, user_id)
+    return security_manager.validate_operation(
+        command, agent_id, session_id, user_id)
 
 
 def sanitize_input(input_data: str, input_type: str = 'text') -> str:
@@ -813,9 +845,17 @@ def sanitize_input(input_data: str, input_type: str = 'text') -> str:
     return security_manager.sanitize_input(input_data, input_type)
 
 
-def log_security_event(agent_id: str, session_id: str, event_type: str, action: str, result: str, risk_level: RiskLevel, details: Dict[str, Any]):
+def log_security_event(agent_id: str,
+                       session_id: str,
+                       event_type: str,
+                       action: str,
+                       result: str,
+                       risk_level: RiskLevel,
+                       details: Dict[str,
+                                     Any]):
     """Log a security event."""
-    security_manager._log_security_event(agent_id, session_id, event_type, action, result, risk_level, details)
+    security_manager._log_security_event(
+        agent_id, session_id, event_type, action, result, risk_level, details)
 
 
 if __name__ == "__main__":
@@ -844,9 +884,12 @@ if __name__ == "__main__":
 
         print("Command Validation Tests:")
         for cmd in test_commands:
-            is_valid, reason, risk_level = sm.validate_operation(cmd, "test_agent", "test_session")
+            is_valid, reason, risk_level = sm.validate_operation(
+                cmd, "test_agent", "test_session")
             print(f"Command: {cmd}")
-            print(f"  Valid: {is_valid}, Reason: {reason}, Risk: {risk_level.value}")
+            print(
+                f"  Valid: {is_valid}, Reason: {reason}, Risk: {
+                    risk_level.value}")
             print()
 
         # Test input sanitization

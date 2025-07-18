@@ -8,8 +8,7 @@ once all feedback is implemented.
 
 import subprocess
 import sys
-import time
-from pathlib import Path
+
 
 def start_pr_monitoring():
     """Start PR monitoring in background"""
@@ -87,7 +86,7 @@ The system will automatically proceed with merge once feedback is implemented. N
                     "PR monitoring notification sent",
                     True
                 )
-            except:
+            except BaseException:
                 pass
 
         print("✅ All agents notified about PR monitoring")
@@ -124,6 +123,7 @@ The system will automatically proceed with merge once feedback is implemented. N
         print(f"❌ Failed to start monitoring: {e}")
         return False
 
+
 def check_monitoring_status():
     """Check if monitoring is already running"""
     try:
@@ -141,6 +141,7 @@ def check_monitoring_status():
 
     except Exception:
         return False
+
 
 def main():
     """Main function"""
@@ -162,6 +163,7 @@ def main():
     else:
         print("\n❌ Failed to start PR monitoring")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

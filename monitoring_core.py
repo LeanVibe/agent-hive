@@ -7,13 +7,12 @@ Essential system monitoring with SQLite storage.
 Compliant micro-component: <300 lines core functionality.
 """
 
-import time
-import sqlite3
-import psutil
 import logging
+import sqlite3
 from datetime import datetime
-from typing import Dict, Any
-from pathlib import Path
+from typing import Any, Dict
+
+import psutil
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +36,8 @@ class MonitoringCore:
                     timestamp TEXT NOT NULL
                 )
             ''')
-            conn.execute('CREATE INDEX IF NOT EXISTS idx_timestamp ON metrics(timestamp)')
+            conn.execute(
+                'CREATE INDEX IF NOT EXISTS idx_timestamp ON metrics(timestamp)')
 
     def record_metric(self, name: str, value: float):
         """Record a single metric."""
@@ -131,7 +131,10 @@ if __name__ == "__main__":
     # Collect metrics
     metrics = collect_metrics()
     print(f"CPU: {metrics['cpu_percent']:.1f}%")
-    print(f"Memory: {metrics['memory_mb']:.0f}MB ({metrics['memory_percent']:.1f}%)")
+    print(
+        f"Memory: {
+            metrics['memory_mb']:.0f}MB ({
+            metrics['memory_percent']:.1f}%)")
     print(f"Disk: {metrics['disk_percent']:.1f}%")
 
     print("\nMonitoring core test complete!")

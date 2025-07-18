@@ -5,8 +5,6 @@ Tests extracted from hook_system.py to ensure functionality is preserved
 during refactoring process.
 """
 
-import json
-import pytest
 import sqlite3
 import sys
 import tempfile
@@ -14,10 +12,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+import pytest
+from intelligence.confidence_tracker import ConfidenceTracker
+
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
-
-from intelligence.confidence_tracker import ConfidenceTracker
 
 
 class TestConfidenceTracker:
@@ -38,7 +37,7 @@ class TestConfidenceTracker:
 
     def test_init_creates_database_schema(self, temp_db):
         """Test that initialization creates proper database schema."""
-        tracker = ConfidenceTracker(db_path=temp_db)
+        ConfidenceTracker(db_path=temp_db)
 
         # Verify database file exists
         assert Path(temp_db).exists()
@@ -48,15 +47,18 @@ class TestConfidenceTracker:
             cursor = conn.cursor()
 
             # Check decisions table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='decisions'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='decisions'")
             assert cursor.fetchone() is not None
 
             # Check patterns table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='patterns'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='patterns'")
             assert cursor.fetchone() is not None
 
             # Check indexes
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_decisions_context_hash'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_decisions_context_hash'")
             assert cursor.fetchone() is not None
 
     def test_should_involve_human_no_pattern_data(self, tracker):
@@ -157,7 +159,8 @@ class TestConfidenceTracker:
         # Verify decision was recorded
         with sqlite3.connect(tracker.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM decisions WHERE id = ?", (decision_id,))
+            cursor.execute(
+                "SELECT * FROM decisions WHERE id = ?", (decision_id,))
             result = cursor.fetchone()
 
             assert result is not None
@@ -183,11 +186,14 @@ class TestConfidenceTracker:
         context_hash = tracker._hash_context(context)
         with sqlite3.connect(tracker.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT success_rate, sample_count FROM patterns WHERE pattern_hash = ?", (context_hash,))
+            cursor.execute(
+                "SELECT success_rate, sample_count FROM patterns WHERE pattern_hash = ?",
+                (context_hash,
+                 ))
             result = cursor.fetchone()
 
             assert result is not None
-            assert result[0] == 2/3  # 2 successes out of 3 = 0.667
+            assert result[0] == 2 / 3  # 2 successes out of 3 = 0.667
             assert result[1] == 3  # 3 total samples
 
     def test_get_pattern_stats_specific_context(self, tracker):
@@ -303,9 +309,14 @@ class TestConfidenceTracker:
             recent_time = datetime.now() - timedelta(days=10)
             cursor.execute(
                 "INSERT INTO decisions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                ("recent_decision", tracker._hash_context(recent_context), 0.8, 0.8,
-                 False, "success", recent_time, recent_time)
-            )
+                ("recent_decision",
+                 tracker._hash_context(recent_context),
+                 0.8,
+                 0.8,
+                 False,
+                 "success",
+                 recent_time,
+                 recent_time))
 
             conn.commit()
 
@@ -318,10 +329,12 @@ class TestConfidenceTracker:
         # Verify recent decision still exists
         with sqlite3.connect(tracker.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM decisions WHERE id = 'recent_decision'")
+            cursor.execute(
+                "SELECT COUNT(*) FROM decisions WHERE id = 'recent_decision'")
             assert cursor.fetchone()[0] == 1
 
-            cursor.execute("SELECT COUNT(*) FROM decisions WHERE id = 'old_decision'")
+            cursor.execute(
+                "SELECT COUNT(*) FROM decisions WHERE id = 'old_decision'")
             assert cursor.fetchone()[0] == 0
 
     @patch('intelligence.confidence_tracker.get_config')
@@ -338,11 +351,13 @@ class TestConfidenceTracker:
             }
         }
         mock_get_config.return_value = Mock()
-        mock_get_config.return_value.get.side_effect = lambda key, default: mock_config.get(key, default)
+        mock_get_config.return_value.get.side_effect = lambda key, default: mock_config.get(
+            key, default)
 
         tracker = ConfidenceTracker(db_path=temp_db)
 
-        # Test with high risk context - need risk > 0.7 to trigger high threshold
+        # Test with high risk context - need risk > 0.7 to trigger high
+        # threshold
         context = {
             "agent_confidence": 0.85,
             "gemini_confidence": 0.85,

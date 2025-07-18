@@ -6,11 +6,15 @@ Simple script that agents can use to send messages to each other automatically.
 """
 
 import subprocess
-import time
 import sys
+import time
 from pathlib import Path
 
-def send_to_agent(target_agent: str, message: str, from_agent: str = "unknown") -> bool:
+
+def send_to_agent(
+        target_agent: str,
+        message: str,
+        from_agent: str = "unknown") -> bool:
     """
     Send a message from one agent to another with automatic submission.
 
@@ -84,15 +88,18 @@ Please respond when convenient. This message was sent automatically."""
         print(f"❌ Communication failed: {e}")
         return False
 
+
 def main():
     """CLI interface for agent communication"""
 
     if len(sys.argv) < 3:
-        print("Usage: python agent_communicate.py <target_agent> <message> [from_agent]")
+        print(
+            "Usage: python agent_communicate.py <target_agent> <message> [from_agent]")
         print("")
         print("Examples:")
         print("  python agent_communicate.py documentation-agent 'Please update API docs'")
-        print("  python agent_communicate.py pm-agent 'Sprint planning needed' quality-agent")
+        print(
+            "  python agent_communicate.py pm-agent 'Sprint planning needed' quality-agent")
         print("")
         print("Available agents:")
         print("  - documentation-agent")
@@ -109,6 +116,7 @@ def main():
 
     success = send_to_agent(target_agent, message, from_agent)
     sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main()

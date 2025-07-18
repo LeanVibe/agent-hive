@@ -5,19 +5,15 @@ This module provides comprehensive performance monitoring, analytics, and optimi
 for the enhanced multi-agent coordination system.
 """
 
-import asyncio
-import json
 import logging
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import statistics
 import threading
+import time
 from collections import defaultdict, deque
-
-from .models import AgentSpecialization, WorkflowType, CoordinationMetrics
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class PerformanceMetricType(Enum):
@@ -92,15 +88,14 @@ class PerformanceMonitor:
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.metrics_store: deque = deque(maxlen=10000)  # Ring buffer for metrics
+        self.metrics_store: deque = deque(
+            maxlen=10000)  # Ring buffer for metrics
         self.alerts: List[PerformanceAlert] = []
         self.performance_history: Dict[str, List[float]] = defaultdict(list)
         self.agent_metrics: Dict[str, Dict[PerformanceMetricType, List[float]]] = defaultdict(
-            lambda: defaultdict(list)
-        )
+            lambda: defaultdict(list))
         self.workflow_metrics: Dict[str, Dict[PerformanceMetricType, List[float]]] = defaultdict(
-            lambda: defaultdict(list)
-        )
+            lambda: defaultdict(list))
         self.running = False
         self.monitor_thread: Optional[threading.Thread] = None
         self.lock = threading.Lock()
@@ -154,10 +149,10 @@ class PerformanceMonitor:
             PerformanceMetricType.LATENCY: self._optimize_latency,
             PerformanceMetricType.THROUGHPUT: self._optimize_throughput,
             PerformanceMetricType.COORDINATION_EFFICIENCY: self._optimize_coordination,
-            PerformanceMetricType.PARALLEL_EFFICIENCY: self._optimize_parallel_execution
-        }
+            PerformanceMetricType.PARALLEL_EFFICIENCY: self._optimize_parallel_execution}
 
-        self.logger.info("PerformanceMonitor initialized with advanced analytics")
+        self.logger.info(
+            "PerformanceMonitor initialized with advanced analytics")
 
     def start_monitoring(self) -> None:
         """Start continuous performance monitoring."""
@@ -165,7 +160,8 @@ class PerformanceMonitor:
             return
 
         self.running = True
-        self.monitor_thread = threading.Thread(target=self._monitoring_loop, daemon=True)
+        self.monitor_thread = threading.Thread(
+            target=self._monitoring_loop, daemon=True)
         self.monitor_thread.start()
         self.logger.info("Performance monitoring started")
 
@@ -183,14 +179,18 @@ class PerformanceMonitor:
 
             # Update agent metrics
             if metric.agent_id:
-                self.agent_metrics[metric.agent_id][metric.metric_type].append(metric.value)
+                self.agent_metrics[metric.agent_id][metric.metric_type].append(
+                    metric.value)
 
             # Update workflow metrics
             if metric.workflow_id:
-                self.workflow_metrics[metric.workflow_id][metric.metric_type].append(metric.value)
+                self.workflow_metrics[metric.workflow_id][metric.metric_type].append(
+                    metric.value)
 
             # Update performance history
-            history_key = f"{metric.metric_type.value}_{metric.agent_id or 'global'}"
+            history_key = f"{
+                metric.metric_type.value}_{
+                metric.agent_id or 'global'}"
             self.performance_history[history_key].append(metric.value)
 
             # Keep only last 1000 values for history
@@ -228,24 +228,29 @@ class PerformanceMonitor:
                 threshold_value=threshold_value,
                 agent_id=metric.agent_id,
                 workflow_id=metric.workflow_id,
-                recommendation=self._generate_recommendation(metric, threshold),
+                recommendation=self._generate_recommendation(
+                    metric, threshold),
                 auto_fix_available=metric.metric_type in self.optimization_strategies
             )
 
             self.alerts.append(alert)
-            self.logger.warning(f"Performance alert: {alert_severity} - {metric.metric_type.value} = {metric.value}")
+            self.logger.warning(
+                f"Performance alert: {alert_severity} - {metric.metric_type.value} = {metric.value}")
 
-    def _generate_recommendation(self, metric: PerformanceMetric, threshold: PerformanceThreshold) -> str:
+    def _generate_recommendation(
+            self,
+            metric: PerformanceMetric,
+            threshold: PerformanceThreshold) -> str:
         """Generate performance improvement recommendation."""
         recommendations = {
             PerformanceMetricType.LATENCY: "Consider optimizing task routing or reducing coordination overhead",
             PerformanceMetricType.THROUGHPUT: "Consider increasing agent parallelism or task batching",
             PerformanceMetricType.ERROR_RATE: "Review error handling and task validation processes",
             PerformanceMetricType.COORDINATION_EFFICIENCY: "Optimize agent communication and dependency resolution",
-            PerformanceMetricType.PARALLEL_EFFICIENCY: "Balance task distribution across agents"
-        }
+            PerformanceMetricType.PARALLEL_EFFICIENCY: "Balance task distribution across agents"}
 
-        base_recommendation = recommendations.get(metric.metric_type, "Review system configuration")
+        base_recommendation = recommendations.get(
+            metric.metric_type, "Review system configuration")
 
         if metric.agent_id:
             return f"Agent {metric.agent_id}: {base_recommendation}"
@@ -307,12 +312,15 @@ class PerformanceMonitor:
         if not self.workflow_metrics:
             return None
 
-        # Calculate based on workflow completion times and coordination overhead
+        # Calculate based on workflow completion times and coordination
+        # overhead
         recent_metrics = []
         for workflow_id, metrics in self.workflow_metrics.items():
-            completion_times = metrics.get(PerformanceMetricType.WORKFLOW_COMPLETION_TIME, [])
+            completion_times = metrics.get(
+                PerformanceMetricType.WORKFLOW_COMPLETION_TIME, [])
             if completion_times:
-                recent_metrics.extend(completion_times[-10:])  # Last 10 measurements
+                # Last 10 measurements
+                recent_metrics.extend(completion_times[-10:])
 
         if not recent_metrics:
             return None
@@ -321,7 +329,8 @@ class PerformanceMonitor:
         avg_completion_time = statistics.mean(recent_metrics)
         estimated_coordination_overhead = avg_completion_time * 0.2  # 20% overhead baseline
 
-        efficiency = max(0.0, 1.0 - (estimated_coordination_overhead / avg_completion_time))
+        efficiency = max(
+            0.0, 1.0 - (estimated_coordination_overhead / avg_completion_time))
         return min(1.0, efficiency)
 
     def _calculate_parallel_efficiency(self) -> Optional[float]:
@@ -332,14 +341,16 @@ class PerformanceMonitor:
         # Calculate based on agent utilization and task distribution
         agent_utilizations = []
         for agent_id, metrics in self.agent_metrics.items():
-            productivity = metrics.get(PerformanceMetricType.AGENT_PRODUCTIVITY, [])
+            productivity = metrics.get(
+                PerformanceMetricType.AGENT_PRODUCTIVITY, [])
             if productivity:
                 agent_utilizations.append(statistics.mean(productivity[-10:]))
 
         if not agent_utilizations:
             return None
 
-        # Parallel efficiency = 1 - coefficient_of_variation(agent_utilizations)
+        # Parallel efficiency = 1 -
+        # coefficient_of_variation(agent_utilizations)
         if len(agent_utilizations) < 2:
             return 1.0
 
@@ -364,50 +375,65 @@ class PerformanceMonitor:
                 recent_values = history[-10:]
                 if len(recent_values) >= 5:
                     # Check for degrading performance
-                    first_half = recent_values[:len(recent_values)//2]
-                    second_half = recent_values[len(recent_values)//2:]
+                    first_half = recent_values[:len(recent_values) // 2]
+                    second_half = recent_values[len(recent_values) // 2:]
 
-                    if statistics.mean(second_half) > statistics.mean(first_half) * 1.2:
-                        self.logger.warning(f"Performance degradation detected in {metric_type.value}")
+                    if statistics.mean(second_half) > statistics.mean(
+                            first_half) * 1.2:
+                        self.logger.warning(
+                            f"Performance degradation detected in {
+                                metric_type.value}")
 
     def _auto_optimize(self) -> None:
         """Automatically optimize performance based on metrics."""
         for alert in self.alerts:
-            if alert.auto_fix_available and alert.severity in ["warning", "critical"]:
-                optimization_func = self.optimization_strategies.get(alert.metric_type)
+            if alert.auto_fix_available and alert.severity in [
+                    "warning", "critical"]:
+                optimization_func = self.optimization_strategies.get(
+                    alert.metric_type)
                 if optimization_func:
                     try:
                         optimization_func(alert)
-                        self.logger.info(f"Auto-optimization applied for {alert.metric_type.value}")
+                        self.logger.info(
+                            f"Auto-optimization applied for {alert.metric_type.value}")
                     except Exception as e:
-                        self.logger.error(f"Auto-optimization failed for {alert.metric_type.value}: {e}")
+                        self.logger.error(
+                            f"Auto-optimization failed for {alert.metric_type.value}: {e}")
 
     def _optimize_latency(self, alert: PerformanceAlert) -> None:
         """Optimize system latency."""
         # Implementation would depend on specific coordination system
-        self.logger.info(f"Optimizing latency for {alert.agent_id or 'system'}")
+        self.logger.info(
+            f"Optimizing latency for {alert.agent_id or 'system'}")
 
     def _optimize_throughput(self, alert: PerformanceAlert) -> None:
         """Optimize system throughput."""
         # Implementation would depend on specific coordination system
-        self.logger.info(f"Optimizing throughput for {alert.agent_id or 'system'}")
+        self.logger.info(
+            f"Optimizing throughput for {alert.agent_id or 'system'}")
 
     def _optimize_coordination(self, alert: PerformanceAlert) -> None:
         """Optimize coordination efficiency."""
         # Implementation would depend on specific coordination system
-        self.logger.info(f"Optimizing coordination for {alert.workflow_id or 'system'}")
+        self.logger.info(
+            f"Optimizing coordination for {alert.workflow_id or 'system'}")
 
     def _optimize_parallel_execution(self, alert: PerformanceAlert) -> None:
         """Optimize parallel execution efficiency."""
         # Implementation would depend on specific coordination system
-        self.logger.info(f"Optimizing parallel execution for {alert.workflow_id or 'system'}")
+        self.logger.info(
+            f"Optimizing parallel execution for {
+                alert.workflow_id or 'system'}")
 
     def _cleanup_old_alerts(self) -> None:
         """Clean up old alerts."""
         cutoff_time = datetime.now() - timedelta(hours=24)
-        self.alerts = [alert for alert in self.alerts if alert.timestamp > cutoff_time]
+        self.alerts = [
+            alert for alert in self.alerts if alert.timestamp > cutoff_time]
 
-    def generate_performance_report(self, time_period: Optional[Tuple[datetime, datetime]] = None) -> PerformanceReport:
+    def generate_performance_report(self,
+                                    time_period: Optional[Tuple[datetime,
+                                                                datetime]] = None) -> PerformanceReport:
         """Generate comprehensive performance report."""
         if not time_period:
             end_time = datetime.now()
@@ -425,15 +451,15 @@ class PerformanceMonitor:
         # Calculate metrics summary
         metrics_summary = {}
         for metric_type in PerformanceMetricType:
-            type_metrics = [m.value for m in relevant_metrics if m.metric_type == metric_type]
+            type_metrics = [
+                m.value for m in relevant_metrics if m.metric_type == metric_type]
             if type_metrics:
                 metrics_summary[metric_type] = {
                     "avg": statistics.mean(type_metrics),
                     "min": min(type_metrics),
                     "max": max(type_metrics),
                     "std": statistics.stdev(type_metrics) if len(type_metrics) > 1 else 0.0,
-                    "count": len(type_metrics)
-                }
+                    "count": len(type_metrics)}
 
         # Calculate agent performance
         agent_performance = {}
@@ -442,12 +468,14 @@ class PerformanceMonitor:
             for metric_type, values in metrics.items():
                 if values:
                     agent_performance[agent_id][metric_type.value] = {
-                        "avg": statistics.mean(values[-100:]),  # Last 100 measurements
+                        # Last 100 measurements
+                        "avg": statistics.mean(values[-100:]),
                         "trend": self._calculate_trend(values[-20:]) if len(values) >= 20 else 0.0
                     }
 
         # Generate recommendations
-        recommendations = self._generate_performance_recommendations(metrics_summary)
+        recommendations = self._generate_performance_recommendations(
+            metrics_summary)
 
         # Get relevant alerts
         relevant_alerts = [
@@ -488,7 +516,8 @@ class PerformanceMonitor:
         # Normalize slope to -1 to 1 range
         return max(-1.0, min(1.0, slope))
 
-    def _generate_performance_recommendations(self, metrics_summary: Dict) -> List[str]:
+    def _generate_performance_recommendations(
+            self, metrics_summary: Dict) -> List[str]:
         """Generate performance improvement recommendations."""
         recommendations = []
 
@@ -501,20 +530,23 @@ class PerformanceMonitor:
 
             if avg_value >= threshold.critical_threshold:
                 recommendations.append(
-                    f"CRITICAL: {metric_type.value} averaging {avg_value:.2f}, "
-                    f"exceeds critical threshold of {threshold.critical_threshold}. "
-                    f"Immediate action required."
-                )
+                    f"CRITICAL: {
+                        metric_type.value} averaging {
+                        avg_value:.2f}, " f"exceeds critical threshold of {
+                        threshold.critical_threshold}. " f"Immediate action required.")
             elif avg_value >= threshold.warning_threshold:
                 recommendations.append(
-                    f"WARNING: {metric_type.value} averaging {avg_value:.2f}, "
-                    f"approaching warning threshold of {threshold.warning_threshold}. "
-                    f"Consider optimization."
-                )
+                    f"WARNING: {
+                        metric_type.value} averaging {
+                        avg_value:.2f}, " f"approaching warning threshold of {
+                        threshold.warning_threshold}. " f"Consider optimization.")
             elif avg_value <= threshold.optimization_threshold:
                 recommendations.append(
-                    f"OPPORTUNITY: {metric_type.value} averaging {avg_value:.2f}, "
-                    f"below optimization threshold of {threshold.optimization_threshold}. "
+                    f"OPPORTUNITY: {
+    metric_type.value} averaging {
+        avg_value:.2f}, "
+                    f"below optimization threshold of {
+    threshold.optimization_threshold}. "
                     f"Performance is excellent but could be leveraged for higher workloads."
                 )
 
@@ -532,7 +564,8 @@ class PerformanceMonitor:
 
         real_time_data = {}
         for metric_type in PerformanceMetricType:
-            type_metrics = [m.value for m in recent_metrics if m.metric_type == metric_type]
+            type_metrics = [
+                m.value for m in recent_metrics if m.metric_type == metric_type]
             if type_metrics:
                 real_time_data[metric_type.value] = {
                     "current": type_metrics[-1] if type_metrics else 0.0,

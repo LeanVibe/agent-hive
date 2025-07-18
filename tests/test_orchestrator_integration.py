@@ -6,18 +6,18 @@ verifying that ML components work correctly together.
 """
 
 import asyncio
-import pytest
-import tempfile
-from pathlib import Path
-from unittest.mock import Mock, patch, AsyncMock
 import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+from orchestrator import LeanVibeOrchestrator
+from task_queue_module.task_queue import Task
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
-
-from orchestrator import LeanVibeOrchestrator
-from task_queue_module.task_queue import Task
-from datetime import datetime
 
 
 class TestOrchestratorIntegration:
@@ -38,7 +38,8 @@ class TestOrchestratorIntegration:
         agent.agent_id = "claude-primary"
         agent.health_check = AsyncMock(return_value=True)
         agent.shutdown = AsyncMock()
-        agent.get_capabilities = Mock(return_value=["code_generation", "analysis"])
+        agent.get_capabilities = Mock(
+            return_value=["code_generation", "analysis"])
         agent.can_handle_task = Mock(return_value=True)
         agent.execute_task = AsyncMock(return_value=Mock(status="success"))
         return agent
@@ -150,7 +151,8 @@ class TestOrchestratorIntegration:
             import sqlite3
             with sqlite3.connect(orchestrator.state_manager.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT status FROM tasks WHERE task_id = ?", ("exec-task",))
+                cursor.execute(
+                    "SELECT status FROM tasks WHERE task_id = ?", ("exec-task",))
                 result = cursor.fetchone()
                 assert result is not None
                 assert result[0] == "completed"
@@ -161,7 +163,8 @@ class TestOrchestratorIntegration:
         await orchestrator._initialize_agents()
 
         # Start health monitoring
-        monitor_task = asyncio.create_task(orchestrator._monitor_agent_health())
+        monitor_task = asyncio.create_task(
+            orchestrator._monitor_agent_health())
 
         # Let it run briefly
         await asyncio.sleep(0.1)
@@ -171,7 +174,8 @@ class TestOrchestratorIntegration:
 
         # Check agent state remains healthy
         agent_state = await orchestrator.state_manager.get_agent_state("claude-primary")
-        assert agent_state.status in ["idle", "working"]  # Should not be offline
+        assert agent_state.status in [
+            "idle", "working"]  # Should not be offline
 
     @pytest.mark.asyncio
     async def test_checkpoint_monitoring(self, orchestrator):
@@ -218,7 +222,8 @@ class TestOrchestratorIntegration:
             "complexity": work_item.metadata.get("complexity", "medium")
         }
 
-        need_human, confidence = orchestrator.state_manager.confidence_tracker.should_involve_human(context)
+        need_human, confidence = orchestrator.state_manager.confidence_tracker.should_involve_human(
+            context)
 
         # Should be able to handle autonomously with high confidence
         assert need_human is False or confidence > 0.7
@@ -234,7 +239,7 @@ class TestOrchestratorIntegration:
                 id=f"state-task-{i}",
                 type="code_generation",
                 description=f"State test task {i}",
-                priority=i+1,
+                priority=i + 1,
                 data={},
                 created_at=datetime.now()
             )
@@ -267,7 +272,7 @@ class TestOrchestratorIntegration:
         await orchestrator.shutdown()
 
         # Check that agent status was updated
-        agent_state = await orchestrator.state_manager.get_agent_state("claude-primary")
+        await orchestrator.state_manager.get_agent_state("claude-primary")
         # Note: agent_state might be None after shutdown, which is expected
 
     @pytest.mark.asyncio
@@ -277,17 +282,20 @@ class TestOrchestratorIntegration:
 
         # Test confidence tracker
         context = {"task_type": "test", "agent_confidence": 0.9}
-        need_human, confidence = orchestrator.state_manager.confidence_tracker.should_involve_human(context)
+        need_human, confidence = orchestrator.state_manager.confidence_tracker.should_involve_human(
+            context)
         assert isinstance(need_human, bool)
         assert isinstance(confidence, float)
 
         # Test context monitor
-        context_result = orchestrator.state_manager.context_monitor.check_context("test-agent", 0.5)
+        context_result = orchestrator.state_manager.context_monitor.check_context(
+            "test-agent", 0.5)
         assert "current_usage" in context_result
         assert "action_required" in context_result
 
         # Test quality gate
-        quality_result = orchestrator.state_manager.quality_gate.evaluate({"test": "context"})
+        quality_result = orchestrator.state_manager.quality_gate.evaluate({
+                                                                          "test": "context"})
         assert "decision" in quality_result
         assert "confidence" in quality_result
 
@@ -314,7 +322,7 @@ class TestOrchestratorIntegration:
                 id=f"concurrent-task-{i}",
                 type="code_generation",
                 description=f"Concurrent test task {i}",
-                priority=i+1,
+                priority=i + 1,
                 data={},
                 created_at=datetime.now()
             )

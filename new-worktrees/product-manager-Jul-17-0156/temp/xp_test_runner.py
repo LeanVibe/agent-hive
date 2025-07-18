@@ -4,9 +4,9 @@ XP Methodology Test Runner for Foundation Epic Phase 1
 Sets TEST_RESULT environment variable for XP Quality Gate compliance
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 
@@ -53,9 +53,10 @@ def main():
                         for i, part in enumerate(parts):
                             if part == "passed":
                                 try:
-                                    count = int(parts[i-1])
+                                    count = int(parts[i - 1])
                                     total_tests += count
-                                    print(f"✅ {test_file}: {count} tests passed")
+                                    print(
+                                        f"✅ {test_file}: {count} tests passed")
                                 except (ValueError, IndexError):
                                     total_tests += 1
                                     print(f"✅ {test_file}: tests passed")
@@ -95,7 +96,7 @@ def main():
             f.write("XP_TEST_RESULT=1\n")
             f.write("ACCOUNTABILITY_SYSTEM_OPERATIONAL=false\n")
 
-        print(f"\n❌ FOUNDATION EPIC PHASE 1: TESTS FAILED")
+        print("\n❌ FOUNDATION EPIC PHASE 1: TESTS FAILED")
         print("🚨 XP Quality Gate: BLOCKED")
 
         os.environ['TEST_RESULT'] = '1'
@@ -109,9 +110,9 @@ if __name__ == "__main__":
 
     # Print final status for CI
     if exit_code == 0:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🏆 XP METHODOLOGY COMPLIANCE: ACHIEVED")
         print("🎯 Foundation Epic Phase 1: COMPLETE")
-        print("="*60)
+        print("=" * 60)
 
     sys.exit(exit_code)

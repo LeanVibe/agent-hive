@@ -11,9 +11,9 @@ Usage:
     python scripts/emergency_cli.py --emergency --force
 """
 
-import sys
 import subprocess
-from pathlib import Path
+import sys
+
 
 def main():
     """Quick emergency completion wrapper."""
@@ -64,6 +64,7 @@ def main():
         cmd = ["python", "scripts/emergency_complete.py"] + sys.argv[1:]
         result = subprocess.run(cmd)
         sys.exit(result.returncode)
+
 
 if __name__ == "__main__":
     main()

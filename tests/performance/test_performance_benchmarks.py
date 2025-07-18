@@ -5,22 +5,22 @@ This module provides comprehensive performance benchmarks to ensure
 the system meets performance requirements and detect regressions.
 """
 
-import pytest
-import time
 import asyncio
+import concurrent.futures
 import sys
 import tempfile
-import concurrent.futures
-from pathlib import Path
-from unittest.mock import Mock, patch
+import time
 from datetime import datetime
-from typing import Dict, List, Any
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pytest
+from task_queue_module.task_queue import Task, TaskQueue
+
+from state.state_manager import AgentState, StateManager, TaskState
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
-
-from state.state_manager import StateManager, AgentState, TaskState
-from task_queue_module.task_queue import TaskQueue, Task
 
 
 class PerformanceBenchmarks:
@@ -54,8 +54,8 @@ class PerformanceBenchmarks:
 
     @staticmethod
     def assert_performance_threshold(benchmark_result: Dict[str, Any],
-                                   threshold: float,
-                                   operation: str):
+                                     threshold: float,
+                                     operation: str):
         """Assert that a benchmark meets performance threshold."""
         duration = benchmark_result["duration"]
         assert duration <= threshold, (
@@ -211,10 +211,12 @@ class TestStateManagerPerformance:
             start_time = time.perf_counter()
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                 futures = [
-                    executor.submit(update_agent_state, f"concurrent-agent-{i}")
+                    executor.submit(update_agent_state,
+                                    f"concurrent-agent-{i}")
                     for i in range(50)
                 ]
-                results = [future.result() for future in concurrent.futures.as_completed(futures)]
+                results = [future.result()
+                           for future in concurrent.futures.as_completed(futures)]
 
             concurrent_time = time.perf_counter() - start_time
 
@@ -305,7 +307,8 @@ class TestTaskQueuePerformance:
                 if task:
                     consumed += 1
                 else:
-                    await asyncio.sleep(0.01)  # Small delay if no task available
+                    # Small delay if no task available
+                    await asyncio.sleep(0.01)
             return consumed
 
         # Test concurrent producer/consumer
@@ -332,8 +335,9 @@ class TestMemoryPerformance:
 
     def test_memory_usage_under_load(self):
         """Test memory usage under load."""
-        import psutil
         import os
+
+        import psutil
 
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss / 1024 / 1024  # MB
@@ -375,8 +379,9 @@ class TestMemoryPerformance:
     def test_memory_cleanup_performance(self):
         """Test memory cleanup performance."""
         import gc
-        import psutil
         import os
+
+        import psutil
 
         process = psutil.Process(os.getpid())
 

@@ -8,14 +8,12 @@ velocity tracking, and story point estimation for XP methodology enforcement.
 """
 
 import json
-import os
+import sqlite3
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
-import sqlite3
-from dataclasses import dataclass, asdict
-from pathlib import Path
 
 
 @dataclass
@@ -101,7 +99,8 @@ class SprintPlanningSystem:
 
             conn.commit()
 
-    def calculate_team_velocity(self, lookback_sprints: int = 3) -> Tuple[int, Dict]:
+    def calculate_team_velocity(
+            self, lookback_sprints: int = 3) -> Tuple[int, Dict]:
         """Calculate team velocity based on historical data."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -161,9 +160,16 @@ class SprintPlanningSystem:
 
         # Factor 2: Keywords indicating complexity
         high_complexity_keywords = [
-            "integration", "api", "database", "authentication", "security",
-            "performance", "optimization", "migration", "refactor", "architecture"
-        ]
+            "integration",
+            "api",
+            "database",
+            "authentication",
+            "security",
+            "performance",
+            "optimization",
+            "migration",
+            "refactor",
+            "architecture"]
 
         low_complexity_keywords = [
             "fix", "update", "text", "ui", "style", "copy", "documentation"
@@ -188,7 +194,7 @@ class SprintPlanningSystem:
             complexity_score -= 1
 
         # Convert to Fibonacci story points (1, 2, 3, 5, 8, 13, 21)
-        fibonacci_points = [1, 2, 3, 5, 8, 13, 21]
+        [1, 2, 3, 5, 8, 13, 21]
 
         if complexity_score <= 2:
             return 1
@@ -209,13 +215,15 @@ class SprintPlanningSystem:
         """Fetch GitHub issues for sprint planning."""
         try:
             # Build gh command
-            cmd = ["gh", "issue", "list", "--json", "number,title,body,labels,assignees", "--limit", "50"]
+            cmd = ["gh", "issue", "list", "--json",
+                   "number,title,body,labels,assignees", "--limit", "50"]
 
             if labels:
                 for label in labels:
                     cmd.extend(["--label", label])
 
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, check=True)
             return json.loads(result.stdout)
 
         except subprocess.CalledProcessError as e:
@@ -226,15 +234,16 @@ class SprintPlanningSystem:
             return []
 
     def create_sprint_plan(self,
-                          sprint_name: str,
-                          goal: str,
-                          duration_days: int = 14,
-                          include_labels: List[str] = None) -> SprintPlan:
+                           sprint_name: str,
+                           goal: str,
+                           duration_days: int = 14,
+                           include_labels: List[str] = None) -> SprintPlan:
         """Create a new sprint plan with automated story selection."""
 
         # Calculate sprint dates
         start_date = datetime.now().strftime("%Y-%m-%d")
-        end_date = (datetime.now() + timedelta(days=duration_days)).strftime("%Y-%m-%d")
+        end_date = (datetime.now() + timedelta(days=duration_days)
+                    ).strftime("%Y-%m-%d")
 
         # Calculate team velocity
         team_velocity, velocity_metrics = self.calculate_team_velocity()
@@ -267,7 +276,8 @@ class SprintPlanningSystem:
                 story_points=estimated_points,
                 status="planned",
                 assignee=assignee,
-                github_issue_url=f"https://github.com/LeanVibe/agent-hive/issues/{issue['number']}",
+                github_issue_url=f"https://github.com/LeanVibe/agent-hive/issues/{
+    issue['number']}",
                 created_at=datetime.now().isoformat(),
                 updated_at=datetime.now().isoformat()
             )
@@ -357,11 +367,17 @@ class SprintPlanningSystem:
             # Convert to objects
             stories = []
             for row in story_rows:
-                stories.append(SprintStory(
-                    id=row[0], title=row[2], description=row[3],
-                    story_points=row[4], status=row[5], assignee=row[6],
-                    github_issue_url=row[7], created_at=row[8], updated_at=row[9]
-                ))
+                stories.append(
+                    SprintStory(
+                        id=row[0],
+                        title=row[2],
+                        description=row[3],
+                        story_points=row[4],
+                        status=row[5],
+                        assignee=row[6],
+                        github_issue_url=row[7],
+                        created_at=row[8],
+                        updated_at=row[9]))
 
             return SprintPlan(
                 sprint_id=sprint_row[0], sprint_name=sprint_row[1],
@@ -444,7 +460,8 @@ def main():
 
     if command == "create":
         if len(sys.argv) < 4:
-            print("Usage: python sprint_planning.py create <sprint_name> <goal> [duration_days]")
+            print(
+                "Usage: python sprint_planning.py create <sprint_name> <goal> [duration_days]")
             sys.exit(1)
 
         sprint_name = sys.argv[2]
@@ -456,9 +473,10 @@ def main():
         print(f"Duration: {duration_days} days")
         print("\nFetching GitHub issues...")
 
-        sprint_plan = planner.create_sprint_plan(sprint_name, goal, duration_days)
+        sprint_plan = planner.create_sprint_plan(
+            sprint_name, goal, duration_days)
 
-        print(f"\n✅ Sprint created successfully!")
+        print("\n✅ Sprint created successfully!")
         print(f"Sprint ID: {sprint_plan.sprint_id}")
         print(f"Planned Points: {sprint_plan.planned_points}")
         print(f"Stories: {len(sprint_plan.stories)}")

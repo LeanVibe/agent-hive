@@ -9,23 +9,22 @@ This module provides security testing capabilities including:
 - Authentication and authorization testing
 """
 
-import pytest
-import subprocess
 import json
-import tempfile
 import os
-import sys
-import hashlib
 import re
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-from unittest.mock import Mock, patch
+from typing import Any, Dict, List
+
+import pytest
+from task_queue_module.task_queue import Task, TaskQueue
+
+from state.state_manager import AgentState, StateManager
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
-
-from state.state_manager import StateManager, AgentState, TaskState
-from task_queue_module.task_queue import TaskQueue, Task
 
 
 class SecurityTestFramework:
@@ -47,7 +46,8 @@ class SecurityTestFramework:
             cmd = [
                 'bandit', '-r', target_dir, '-f', 'json', '-q'
             ]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
 
             if result.returncode in [0, 1]:  # 0 = no issues, 1 = issues found
                 if result.stdout:
@@ -66,7 +66,8 @@ class SecurityTestFramework:
         """Check for known vulnerabilities in dependencies."""
         try:
             cmd = ['safety', 'check', '--json']
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0:
                 return {"vulnerabilities": [], "safe": True}
@@ -80,7 +81,8 @@ class SecurityTestFramework:
         except FileNotFoundError:
             return {"error": "Safety not installed"}
 
-    def validate_input_sanitization(self, test_inputs: List[str]) -> List[Dict[str, Any]]:
+    def validate_input_sanitization(
+            self, test_inputs: List[str]) -> List[Dict[str, Any]]:
         """Test input validation and sanitization."""
         results = []
 
@@ -127,7 +129,8 @@ class SecurityTestFramework:
 
     def _get_pattern_type(self, pattern: str) -> str:
         """Determine the type of attack pattern."""
-        if any(sql_word in pattern.lower() for sql_word in ['select', 'drop', 'union', 'insert']):
+        if any(sql_word in pattern.lower()
+               for sql_word in ['select', 'drop', 'union', 'insert']):
             return "SQL_INJECTION"
         elif any(xss_word in pattern.lower() for xss_word in ['script', 'alert', 'javascript']):
             return "XSS"
@@ -168,8 +171,7 @@ class SecurityTestFramework:
             result = {
                 "attempt": attempt,
                 "bypassed": self._test_auth_bypass(attempt),
-                "risk_level": "CRITICAL" if self._test_auth_bypass(attempt) else "LOW"
-            }
+                "risk_level": "CRITICAL" if self._test_auth_bypass(attempt) else "LOW"}
             results.append(result)
 
         return results
@@ -228,7 +230,8 @@ class SecurityTestFramework:
             "passwd", "shadow", "SAM", "config", ".env", "database.db"
         ]
 
-        if any(sensitive in file_path.lower() for sensitive in sensitive_files):
+        if any(sensitive in file_path.lower()
+               for sensitive in sensitive_files):
             return "HIGH"
         elif ".." in file_path or file_path.startswith("/"):
             return "MEDIUM"
@@ -288,7 +291,8 @@ class SecurityTestFramework:
             "risk_level": "MEDIUM"
         }
 
-    def generate_security_report(self, scan_results: Dict[str, Any]) -> Dict[str, Any]:
+    def generate_security_report(
+            self, scan_results: Dict[str, Any]) -> Dict[str, Any]:
         """Generate comprehensive security report."""
         total_issues = 0
         risk_distribution = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
@@ -305,17 +309,18 @@ class SecurityTestFramework:
         security_score = self._calculate_security_score(risk_distribution)
 
         report = {
-            "timestamp": str(Path(__file__).stat().st_mtime),
+            "timestamp": str(
+                Path(__file__).stat().st_mtime),
             "total_issues": total_issues,
             "risk_distribution": risk_distribution,
             "security_score": security_score,
             "recommendations": self._generate_recommendations(risk_distribution),
-            "detailed_results": scan_results
-        }
+            "detailed_results": scan_results}
 
         return report
 
-    def _calculate_security_score(self, risk_distribution: Dict[str, int]) -> float:
+    def _calculate_security_score(
+            self, risk_distribution: Dict[str, int]) -> float:
         """Calculate overall security score."""
         max_penalty = 100
         penalty = 0
@@ -327,24 +332,30 @@ class SecurityTestFramework:
 
         return max(0, 100 - min(penalty, max_penalty))
 
-    def _generate_recommendations(self, risk_distribution: Dict[str, int]) -> List[str]:
+    def _generate_recommendations(
+            self, risk_distribution: Dict[str, int]) -> List[str]:
         """Generate security recommendations."""
         recommendations = []
 
         if risk_distribution["CRITICAL"] > 0:
-            recommendations.append("URGENT: Fix critical security vulnerabilities immediately")
+            recommendations.append(
+                "URGENT: Fix critical security vulnerabilities immediately")
 
         if risk_distribution["HIGH"] > 0:
-            recommendations.append("HIGH PRIORITY: Address high-risk security issues")
+            recommendations.append(
+                "HIGH PRIORITY: Address high-risk security issues")
 
         if risk_distribution["MEDIUM"] > 0:
-            recommendations.append("MEDIUM PRIORITY: Review and fix medium-risk issues")
+            recommendations.append(
+                "MEDIUM PRIORITY: Review and fix medium-risk issues")
 
         if risk_distribution["LOW"] > 0:
-            recommendations.append("LOW PRIORITY: Consider addressing low-risk issues")
+            recommendations.append(
+                "LOW PRIORITY: Consider addressing low-risk issues")
 
         if not any(risk_distribution.values()):
-            recommendations.append("Good security posture - continue monitoring")
+            recommendations.append(
+                "Good security posture - continue monitoring")
 
         return recommendations
 
@@ -392,7 +403,8 @@ class TestSecurityFramework:
             assert "pattern_type" in result
             assert "sanitized" in result
             assert "risk_level" in result
-            assert result["risk_level"] in ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+            assert result["risk_level"] in [
+                "CRITICAL", "HIGH", "MEDIUM", "LOW"]
 
     def test_authentication_bypass_testing(self):
         """Test authentication bypass vulnerabilities."""
@@ -481,11 +493,11 @@ class TestSecurityFramework:
         scan_results = {
             "static_analysis": framework.run_static_analysis(".claude"),
             "dependency_check": framework.check_dependency_vulnerabilities(),
-            "input_validation": framework.validate_input_sanitization(["test_input"]),
+            "input_validation": framework.validate_input_sanitization(
+                ["test_input"]),
             "auth_bypass": framework.test_authentication_bypass(),
             "file_access": framework.test_file_access_vulnerabilities(),
-            "data_exposure": framework.test_data_exposure()
-        }
+            "data_exposure": framework.test_data_exposure()}
 
         # Generate report
         report = framework.generate_security_report(scan_results)
@@ -509,7 +521,7 @@ class TestSecurityIntegration:
 
     def test_state_manager_security(self):
         """Test StateManager security."""
-        framework = SecurityTestFramework()
+        SecurityTestFramework()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             # Test SQL injection protection
@@ -543,7 +555,7 @@ class TestSecurityIntegration:
         import asyncio
 
         async def run_test():
-            framework = SecurityTestFramework()
+            SecurityTestFramework()
             task_queue = TaskQueue()
 
             # Test malicious task data
@@ -573,7 +585,7 @@ class TestSecurityIntegration:
 
     def test_configuration_security(self):
         """Test configuration security."""
-        framework = SecurityTestFramework()
+        SecurityTestFramework()
 
         # Test for hardcoded credentials
         config_files = [
@@ -600,17 +612,19 @@ class TestSecurityIntegration:
 
                         # Should not find hardcoded credentials
                         for match in matches:
-                            assert len(match) == 0 or match in ['', 'YOUR_SECRET_HERE', 'CHANGE_ME']
+                            assert len(match) == 0 or match in [
+                                '', 'YOUR_SECRET_HERE', 'CHANGE_ME']
 
     @pytest.mark.asyncio
     async def test_concurrent_security_operations(self):
         """Test security under concurrent operations."""
-        framework = SecurityTestFramework()
+        SecurityTestFramework()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             state_manager = StateManager(Path(temp_dir))
 
-            # Create multiple agents concurrently with potential security issues
+            # Create multiple agents concurrently with potential security
+            # issues
             import asyncio
 
             async def create_agent(agent_id: str):

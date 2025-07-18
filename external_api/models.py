@@ -4,8 +4,8 @@ Data models for External API Integration components.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, Any, Optional, List
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class WebhookEventType(Enum):
@@ -42,9 +42,12 @@ class WebhookConfig:
         if not 1 <= self.port <= 65535:
             raise ValueError(f"Port must be between 1-65535, got {self.port}")
         if self.timeout_seconds <= 0:
-            raise ValueError(f"Timeout must be positive, got {self.timeout_seconds}")
+            raise ValueError(
+                f"Timeout must be positive, got {self.timeout_seconds}")
         if self.max_payload_size <= 0:
-            raise ValueError(f"Max payload size must be positive, got {self.max_payload_size}")
+            raise ValueError(
+                f"Max payload size must be positive, got {
+                    self.max_payload_size}")
 
 
 @dataclass
@@ -66,7 +69,9 @@ class ApiGatewayConfig:
         if not 1 <= self.port <= 65535:
             raise ValueError(f"Port must be between 1-65535, got {self.port}")
         if self.request_timeout <= 0:
-            raise ValueError(f"Request timeout must be positive, got {self.request_timeout}")
+            raise ValueError(
+                f"Request timeout must be positive, got {
+                    self.request_timeout}")
 
 
 @dataclass
@@ -84,11 +89,14 @@ class EventStreamConfig:
     def __post_init__(self):
         """Validate configuration parameters."""
         if self.buffer_size <= 0:
-            raise ValueError(f"Buffer size must be positive, got {self.buffer_size}")
+            raise ValueError(
+                f"Buffer size must be positive, got {self.buffer_size}")
         if self.flush_interval <= 0:
-            raise ValueError(f"Flush interval must be positive, got {self.flush_interval}")
+            raise ValueError(
+                f"Flush interval must be positive, got {self.flush_interval}")
         if self.max_retries < 0:
-            raise ValueError(f"Max retries must be non-negative, got {self.max_retries}")
+            raise ValueError(
+                f"Max retries must be non-negative, got {self.max_retries}")
 
 
 @dataclass
@@ -190,4 +198,5 @@ class ApiResponse:
         if not 100 <= self.status_code <= 599:
             raise ValueError(f"Invalid status code: {self.status_code}")
         if self.processing_time < 0:
-            raise ValueError(f"Processing time must be non-negative, got {self.processing_time}")
+            raise ValueError(
+                f"Processing time must be non-negative, got {self.processing_time}")

@@ -7,14 +7,14 @@ Monitors GitHub issues for completion signals and triggers implementation phases
 """
 
 import json
-import time
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass, asdict
-from enum import Enum
 import subprocess
 import sys
+import time
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Dict, List, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(
@@ -27,6 +27,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 class AgentStatus(Enum):
     """Status of review/implementation agents"""
     PENDING = "pending"
@@ -35,12 +36,14 @@ class AgentStatus(Enum):
     BLOCKED = "blocked"
     ERROR = "error"
 
+
 class FeedbackPhase(Enum):
     """Phase of feedback implementation workflow"""
     REVIEW = "review"
     IMPLEMENTATION = "implementation"
     VALIDATION = "validation"
     COMPLETE = "complete"
+
 
 @dataclass
 class Agent:
@@ -58,6 +61,7 @@ class Agent:
         if self.feedback_items is None:
             self.feedback_items = []
 
+
 @dataclass
 class AgentPair:
     """Represents a review-implementation agent pair"""
@@ -66,6 +70,7 @@ class AgentPair:
     focus_area: str
     handoff_complete: bool = False
     handoff_timestamp: Optional[datetime] = None
+
 
 class FeedbackMonitor:
     """Monitors feedback implementation workflow"""
@@ -169,12 +174,15 @@ class FeedbackMonitor:
 
         try:
             issue_data = json.loads(output)
-            return [comment['body'] for comment in issue_data.get('comments', [])]
+            return [comment['body']
+                    for comment in issue_data.get('comments', [])]
         except json.JSONDecodeError:
-            logger.error(f"Failed to parse JSON response for issue {issue_number}")
+            logger.error(
+                f"Failed to parse JSON response for issue {issue_number}")
             return []
 
-    def _check_completion_signals(self, comments: List[str]) -> Dict[str, bool]:
+    def _check_completion_signals(
+            self, comments: List[str]) -> Dict[str, bool]:
         """Check for completion signals in issue comments"""
         signals = {
             'review_complete': False,
@@ -218,7 +226,7 @@ class FeedbackMonitor:
                     line.startswith('* [x]') or
                     'TODO:' in line or
                     'FIXME:' in line or
-                    'Issue:' in line):
+                        'Issue:' in line):
                     feedback_items.append(line)
 
         return feedback_items
@@ -258,9 +266,11 @@ class FeedbackMonitor:
 
         # Update progress percentage based on feedback items
         if agent.feedback_items:
-            completed_items = sum(1 for item in agent.feedback_items if '[x]' in item)
+            completed_items = sum(
+                1 for item in agent.feedback_items if '[x]' in item)
             total_items = len(agent.feedback_items)
-            agent.progress_percentage = int((completed_items / total_items) * 100) if total_items > 0 else 0
+            agent.progress_percentage = int(
+                (completed_items / total_items) * 100) if total_items > 0 else 0
 
         agent.last_update = datetime.now()
 
@@ -293,7 +303,8 @@ The {pair.review_agent.focus_area} Review Agent (#{pair.review_agent.issue_numbe
 """
 
         success, _ = self._run_github_command([
-            'gh', 'issue', 'comment', str(pair.implementation_agent.issue_number),
+            'gh', 'issue', 'comment', str(
+                pair.implementation_agent.issue_number),
             '--body', handoff_message
         ])
 
@@ -302,7 +313,8 @@ The {pair.review_agent.focus_area} Review Agent (#{pair.review_agent.issue_numbe
             pair.handoff_timestamp = datetime.now()
             logger.info(f"Handoff triggered for {pair.focus_area} agents")
         else:
-            logger.error(f"Failed to trigger handoff for {pair.focus_area} agents")
+            logger.error(
+                f"Failed to trigger handoff for {pair.focus_area} agents")
 
     def _check_escalation_needed(self, agent: Agent) -> bool:
         """Check if agent needs escalation due to timeout or blocked status"""
@@ -319,7 +331,7 @@ The {pair.review_agent.focus_area} Review Agent (#{pair.review_agent.issue_numbe
 
         # Check for no progress
         if (time_since_update > self.escalation_threshold and
-            agent.progress_percentage < 25):
+                agent.progress_percentage < 25):
             return True
 
         return False
@@ -354,9 +366,15 @@ Progress: {agent.progress_percentage}%
         ])
 
         if success:
-            logger.warning(f"Escalation triggered for {agent.focus_area} {agent.agent_type} agent")
+            logger.warning(
+                f"Escalation triggered for {
+                    agent.focus_area} {
+                    agent.agent_type} agent")
         else:
-            logger.error(f"Failed to escalate {agent.focus_area} {agent.agent_type} agent")
+            logger.error(
+                f"Failed to escalate {
+                    agent.focus_area} {
+                    agent.agent_type} agent")
 
     def monitor_cycle(self):
         """Run one monitoring cycle"""
@@ -370,7 +388,7 @@ Progress: {agent.progress_percentage}%
             # Check for handoff trigger
             if (pair.review_agent.status == AgentStatus.COMPLETED and
                 pair.review_agent.phase == FeedbackPhase.IMPLEMENTATION and
-                not pair.handoff_complete):
+                    not pair.handoff_complete):
                 self._trigger_handoff(pair)
 
             # Check for escalation needs
@@ -387,16 +405,23 @@ Progress: {agent.progress_percentage}%
         """Log overall progress summary"""
         total_agents = len(self.agent_pairs) * 2
         completed_agents = sum(1 for pair in self.agent_pairs
-                             for agent in [pair.review_agent, pair.implementation_agent]
-                             if agent.status == AgentStatus.COMPLETED)
+                               for agent in [pair.review_agent, pair.implementation_agent]
+                               if agent.status == AgentStatus.COMPLETED)
 
         overall_progress = (completed_agents / total_agents) * 100
 
-        logger.info(f"Overall Progress: {overall_progress:.1f}% ({completed_agents}/{total_agents} agents completed)")
+        logger.info(
+            f"Overall Progress: {
+                overall_progress:.1f}% ({completed_agents}/{total_agents} agents completed)")
 
         for pair in self.agent_pairs:
-            logger.info(f"{pair.focus_area}: Review {pair.review_agent.status.value} ({pair.review_agent.progress_percentage}%), "
-                       f"Implementation {pair.implementation_agent.status.value} ({pair.implementation_agent.progress_percentage}%)")
+            logger.info(
+                f"{
+                    pair.focus_area}: Review {
+                    pair.review_agent.status.value} ({
+                    pair.review_agent.progress_percentage}%), " f"Implementation {
+                    pair.implementation_agent.status.value} ({
+                        pair.implementation_agent.progress_percentage}%)")
 
     def start_monitoring(self):
         """Start the monitoring loop"""
@@ -440,9 +465,10 @@ Progress: {agent.progress_percentage}%
                 'focus_area': pair.focus_area,
                 'handoff_complete': pair.handoff_complete,
                 'handoff_timestamp': pair.handoff_timestamp.isoformat() if pair.handoff_timestamp else None,
-                'review_agent': asdict(pair.review_agent),
-                'implementation_agent': asdict(pair.implementation_agent)
-            }
+                'review_agent': asdict(
+                    pair.review_agent),
+                'implementation_agent': asdict(
+                    pair.implementation_agent)}
 
             # Convert datetime objects to strings
             pair_data['review_agent']['last_update'] = pair.review_agent.last_update.isoformat()
@@ -465,6 +491,7 @@ Progress: {agent.progress_percentage}%
 
         return report
 
+
 def main():
     """Main monitoring function"""
     monitor = FeedbackMonitor()
@@ -483,6 +510,7 @@ def main():
             print("Usage: python feedback_monitoring.py [start|status|cycle]")
     else:
         print("Usage: python feedback_monitoring.py [start|status|cycle]")
+
 
 if __name__ == "__main__":
     main()

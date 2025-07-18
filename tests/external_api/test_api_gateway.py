@@ -2,17 +2,13 @@
 Tests for ApiGateway component.
 """
 
-import pytest
 import asyncio
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from external_api.api_gateway import ApiGateway
-from external_api.models import (
-    ApiGatewayConfig,
-    ApiRequest,
-    ApiResponse
-)
+from external_api.models import ApiGatewayConfig, ApiRequest, ApiResponse
 
 
 class TestApiGateway:
@@ -190,14 +186,16 @@ class TestApiGateway:
         assert response.request_id == sample_request.request_id
         assert response.processing_time > 0
 
-    async def test_handle_request_route_not_found(self, api_gateway, sample_request):
+    async def test_handle_request_route_not_found(
+            self, api_gateway, sample_request):
         """Test handling of non-existent routes."""
         response = await api_gateway.handle_request(sample_request)
 
         assert response.status_code == 404
         assert "Route not found" in response.body["error"]
 
-    async def test_handle_request_authentication_required(self, auth_gateway, sample_request):
+    async def test_handle_request_authentication_required(
+            self, auth_gateway, sample_request):
         """Test authentication when required."""
         # No API key provided
         response = await auth_gateway.handle_request(sample_request)
@@ -221,7 +219,8 @@ class TestApiGateway:
         response = await auth_gateway.handle_request(sample_request)
         assert response.status_code == 200
 
-    async def test_handle_request_rate_limiting(self, api_gateway, sample_request):
+    async def test_handle_request_rate_limiting(
+            self, api_gateway, sample_request):
         """Test rate limiting functionality."""
         async def test_handler(request):
             return {"status_code": 200, "body": {"result": "ok"}}
@@ -269,7 +268,8 @@ class TestApiGateway:
         assert response.status_code == 504
         assert "Request timeout" in response.body["error"]
 
-    async def test_handle_request_handler_error(self, api_gateway, sample_request):
+    async def test_handle_request_handler_error(
+            self, api_gateway, sample_request):
         """Test handler error handling."""
         async def error_handler(request):
             raise ValueError("Test error")

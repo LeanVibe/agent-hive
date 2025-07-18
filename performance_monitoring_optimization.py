@@ -6,25 +6,23 @@ optimization capabilities for the intelligent agent system.
 """
 
 import asyncio
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import json
+import logging
 import sqlite3
-import numpy as np
-import psutil
+import statistics
 import time
 from collections import defaultdict, deque
-import statistics
-import threading
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
+import psutil
+
+from agent_coordination_protocols import AgentCoordinationProtocols
 from intelligence_framework import IntelligenceFramework
 from intelligent_task_allocation import IntelligentTaskAllocator
-from agent_coordination_protocols import AgentCoordinationProtocols
-
 
 logger = logging.getLogger(__name__)
 
@@ -202,11 +200,14 @@ class SystemHealthStatus:
         return {
             'overall_health': self.overall_health,
             'component_health': self.component_health,
-            'active_alerts': [alert.to_dict() for alert in self.active_alerts],
-            'recent_metrics': {k.value: v for k, v in self.recent_metrics.items()},
-            'optimization_recommendations': [rec.to_dict() for rec in self.optimization_recommendations],
-            'timestamp': self.timestamp.isoformat()
-        }
+            'active_alerts': [
+                alert.to_dict() for alert in self.active_alerts],
+            'recent_metrics': {
+                k.value: v for k,
+                v in self.recent_metrics.items()},
+            'optimization_recommendations': [
+                rec.to_dict() for rec in self.optimization_recommendations],
+            'timestamp': self.timestamp.isoformat()}
 
 
 class PerformanceMonitoringOptimization:
@@ -237,7 +238,8 @@ class PerformanceMonitoringOptimization:
         self._initialize_default_thresholds()
 
         # Optimization
-        self.optimization_recommendations: List[OptimizationRecommendation] = []
+        self.optimization_recommendations: List[OptimizationRecommendation] = [
+        ]
         self.optimization_history: List[Dict[str, Any]] = []
 
         # Real-time monitoring
@@ -247,7 +249,8 @@ class PerformanceMonitoringOptimization:
 
         # Performance baselines
         self.performance_baselines: Dict[PerformanceMetricType, float] = {}
-        self.baseline_update_interval = self.config.get('baseline_update_interval', 3600)
+        self.baseline_update_interval = self.config.get(
+            'baseline_update_interval', 3600)
 
         # Resource monitoring
         self.system_resource_monitor = SystemResourceMonitor()
@@ -261,14 +264,15 @@ class PerformanceMonitoringOptimization:
         # Thread pool for background processing
         self.executor = ThreadPoolExecutor(max_workers=4)
 
-        self.logger.info("Performance Monitoring and Optimization system initialized")
+        self.logger.info(
+            "Performance Monitoring and Optimization system initialized")
 
     def _init_database(self) -> None:
         """Initialize SQLite database for performance data."""
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             # Performance metrics table
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS performance_metrics (
@@ -557,7 +561,10 @@ class PerformanceMonitoringOptimization:
             'system_health': (await self.get_system_health()).to_dict()
         }
 
-    async def _get_metrics_for_range(self, start_time: datetime, end_time: datetime) -> List[PerformanceMetric]:
+    async def _get_metrics_for_range(
+            self,
+            start_time: datetime,
+            end_time: datetime) -> List[PerformanceMetric]:
         """Get metrics for a specific time range."""
         metrics = []
         for metric in self.metrics_buffer:
@@ -565,7 +572,8 @@ class PerformanceMonitoringOptimization:
                 metrics.append(metric)
         return metrics
 
-    async def _calculate_performance_statistics(self, metrics_data: List[PerformanceMetric]) -> Dict[str, Any]:
+    async def _calculate_performance_statistics(
+            self, metrics_data: List[PerformanceMetric]) -> Dict[str, Any]:
         """Calculate performance statistics from metrics data."""
         stats = {}
 
@@ -588,14 +596,16 @@ class PerformanceMonitoringOptimization:
 
         return stats
 
-    async def _analyze_performance_trends(self, metrics_data: List[PerformanceMetric]) -> Dict[str, Any]:
+    async def _analyze_performance_trends(
+            self, metrics_data: List[PerformanceMetric]) -> Dict[str, Any]:
         """Analyze performance trends from metrics data."""
         trends = {}
 
         # Group metrics by type
         metrics_by_type = defaultdict(list)
         for metric in metrics_data:
-            metrics_by_type[metric.metric_type].append((metric.timestamp, metric.value))
+            metrics_by_type[metric.metric_type].append(
+                (metric.timestamp, metric.value))
 
         # Calculate trends for each type
         for metric_type, time_values in metrics_by_type.items():
@@ -614,7 +624,8 @@ class PerformanceMonitoringOptimization:
 
         return trends
 
-    async def _get_alerts_history(self, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+    async def _get_alerts_history(
+            self, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
         """Get alerts history for time range."""
         alerts = []
         for alert in self.active_alerts.values():
@@ -622,12 +633,14 @@ class PerformanceMonitoringOptimization:
                 alerts.append(alert.to_dict())
         return alerts
 
-    async def _get_optimization_history(self, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
+    async def _get_optimization_history(
+            self, start_time: datetime, end_time: datetime) -> List[Dict[str, Any]]:
         """Get optimization history for time range."""
         history = []
         for record in self.optimization_history:
             if 'implementation_time' in record:
-                impl_time = datetime.fromisoformat(record['implementation_time'])
+                impl_time = datetime.fromisoformat(
+                    record['implementation_time'])
                 if start_time <= impl_time <= end_time:
                     history.append(record)
         return history
@@ -664,7 +677,8 @@ class PerformanceMonitoringOptimization:
 
         return recommendations
 
-    async def _get_current_performance_metrics(self) -> Dict[PerformanceMetricType, float]:
+    async def _get_current_performance_metrics(
+            self) -> Dict[PerformanceMetricType, float]:
         """Get current performance metrics."""
         current_metrics = {}
 
@@ -709,7 +723,8 @@ class PerformanceMonitoringOptimization:
             return result
 
         except Exception as e:
-            self.logger.error(f"Failed to implement optimization {recommendation_id}: {e}")
+            self.logger.error(
+                f"Failed to implement optimization {recommendation_id}: {e}")
             return {'error': str(e), 'success': False}
 
     async def _metric_collection_loop(self) -> None:
@@ -792,12 +807,17 @@ class PerformanceMonitoringOptimization:
                 # Store in database
                 await self._store_baseline(metric_type, baseline_value, std_dev, len(values))
 
-    async def _store_baseline(self, metric_type: PerformanceMetricType, baseline_value: float, std_dev: float, sample_size: int) -> None:
+    async def _store_baseline(
+            self,
+            metric_type: PerformanceMetricType,
+            baseline_value: float,
+            std_dev: float,
+            sample_size: int) -> None:
         """Store performance baseline in database."""
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             baseline_id = f"baseline_{metric_type.value}_{int(time.time())}"
             confidence_lower = baseline_value - std_dev
             confidence_upper = baseline_value + std_dev
@@ -881,7 +901,8 @@ class PerformanceMonitoringOptimization:
             intelligence_metrics = self.intelligence_framework.get_intelligence_summary()
 
             # Decision accuracy
-            decision_accuracy = intelligence_metrics.get('performance_metrics', {}).get('decision_accuracy', 0)
+            decision_accuracy = intelligence_metrics.get(
+                'performance_metrics', {}).get('decision_accuracy', 0)
             await self.record_metric(
                 PerformanceMetricType.QUALITY_SCORE,
                 decision_accuracy,
@@ -896,7 +917,8 @@ class PerformanceMonitoringOptimization:
             # Task completion rate
             if allocator_summary['completed_tasks'] > 0:
                 completion_rate = allocator_summary['completed_tasks'] / (
-                    allocator_summary['completed_tasks'] + allocator_summary['failed_tasks']
+                    allocator_summary['completed_tasks'] +
+                    allocator_summary['failed_tasks']
                 )
                 await self.record_metric(
                     PerformanceMetricType.TASK_COMPLETION_RATE,
@@ -921,8 +943,7 @@ class PerformanceMonitoringOptimization:
             # Coordination effectiveness
             if coordination_status['metrics']['messages_sent'] > 0:
                 response_rate = coordination_status['metrics']['messages_received'] / (
-                    coordination_status['metrics']['messages_sent'] + 1
-                )
+                    coordination_status['metrics']['messages_sent'] + 1)
                 await self.record_metric(
                     PerformanceMetricType.COORDINATION_EFFECTIVENESS,
                     response_rate,
@@ -935,11 +956,12 @@ class PerformanceMonitoringOptimization:
         # Calculate throughput (tasks per minute)
         if self.task_allocator:
             current_time = datetime.now()
-            one_minute_ago = current_time - timedelta(minutes=1)
+            current_time - timedelta(minutes=1)
 
             # This would typically query the database for recent completions
             # For now, use a simple approximation
-            throughput = len(self.task_allocator.completed_tasks) / 60.0  # Tasks per minute
+            throughput = len(self.task_allocator.completed_tasks) / \
+                60.0  # Tasks per minute
 
             await self.record_metric(
                 PerformanceMetricType.THROUGHPUT,
@@ -950,9 +972,11 @@ class PerformanceMonitoringOptimization:
 
         # Calculate error rate
         if self.task_allocator:
-            total_tasks = len(self.task_allocator.completed_tasks) + len(self.task_allocator.failed_tasks)
+            total_tasks = len(self.task_allocator.completed_tasks) + \
+                len(self.task_allocator.failed_tasks)
             if total_tasks > 0:
-                error_rate = len(self.task_allocator.failed_tasks) / total_tasks
+                error_rate = len(
+                    self.task_allocator.failed_tasks) / total_tasks
                 await self.record_metric(
                     PerformanceMetricType.ERROR_RATE,
                     error_rate,
@@ -978,30 +1002,33 @@ class PerformanceMonitoringOptimization:
         threshold: PerformanceThreshold
     ) -> None:
         """Create a performance alert."""
-        alert_id = f"alert_{metric.metric_type.value}_{metric.timestamp.strftime('%Y%m%d_%H%M%S')}"
+        alert_id = f"alert_{
+            metric.metric_type.value}_{
+            metric.timestamp.strftime('%Y%m%d_%H%M%S')}"
 
         # Check if similar alert already exists
         for existing_alert in self.active_alerts.values():
             if (existing_alert.metric_type == metric.metric_type and
                 existing_alert.level == level and
-                not existing_alert.resolved):
+                    not existing_alert.resolved):
                 return  # Don't create duplicate alerts
 
         # Determine appropriate threshold value
-        threshold_value = (threshold.critical_threshold if level == AlertLevel.CRITICAL
-                          else threshold.warning_threshold)
+        threshold_value = (threshold.critical_threshold if level ==
+                           AlertLevel.CRITICAL else threshold.warning_threshold)
 
         alert = PerformanceAlert(
             alert_id=alert_id,
             metric_type=metric.metric_type,
             level=level,
-            message=f"{metric.metric_type.value} {threshold.comparison_operator} {threshold_value} "
-                   f"(current: {metric.value})",
+            message=f"{
+                metric.metric_type.value} {
+                threshold.comparison_operator} {threshold_value} " f"(current: {
+                metric.value})",
             value=metric.value,
             threshold=threshold_value,
             timestamp=metric.timestamp,
-            source=metric.source
-        )
+            source=metric.source)
 
         # Store alert
         self.active_alerts[alert_id] = alert
@@ -1021,7 +1048,8 @@ class PerformanceMonitoringOptimization:
             if alert.metric_type not in self.metric_history:
                 continue
 
-            recent_metrics = list(self.metric_history[alert.metric_type])[-5:]  # Last 5 metrics
+            recent_metrics = list(
+                self.metric_history[alert.metric_type])[-5:]  # Last 5 metrics
 
             if not recent_metrics:
                 continue
@@ -1068,17 +1096,20 @@ class PerformanceMonitoringOptimization:
                 health_scores.append(completion_rate)
 
         # System resource health
-        cpu_health = 1.0 - (self.system_resource_monitor.get_cpu_usage() / 100.0)
-        memory_health = 1.0 - (self.system_resource_monitor.get_memory_usage() / 100.0)
+        cpu_health = 1.0 - \
+            (self.system_resource_monitor.get_cpu_usage() / 100.0)
+        memory_health = 1.0 - \
+            (self.system_resource_monitor.get_memory_usage() / 100.0)
         health_scores.extend([cpu_health, memory_health])
 
         # Alert impact on health
-        critical_alerts = sum(1 for a in self.active_alerts.values()
-                             if a.level == AlertLevel.CRITICAL and not a.resolved)
-        warning_alerts = sum(1 for a in self.active_alerts.values()
-                            if a.level == AlertLevel.WARNING and not a.resolved)
+        critical_alerts = sum(1 for a in self.active_alerts.values(
+        ) if a.level == AlertLevel.CRITICAL and not a.resolved)
+        warning_alerts = sum(1 for a in self.active_alerts.values(
+        ) if a.level == AlertLevel.WARNING and not a.resolved)
 
-        alert_impact = max(0, 1.0 - (critical_alerts * 0.3 + warning_alerts * 0.1))
+        alert_impact = max(
+            0, 1.0 - (critical_alerts * 0.3 + warning_alerts * 0.1))
         health_scores.append(alert_impact)
 
         return statistics.mean(health_scores) if health_scores else 0.5
@@ -1090,7 +1121,8 @@ class PerformanceMonitoringOptimization:
         # Intelligence framework health
         if self.intelligence_framework:
             intelligence_summary = self.intelligence_framework.get_intelligence_summary()
-            decision_accuracy = intelligence_summary.get('performance_metrics', {}).get('decision_accuracy', 0.5)
+            decision_accuracy = intelligence_summary.get(
+                'performance_metrics', {}).get('decision_accuracy', 0.5)
             component_health['intelligence_framework'] = decision_accuracy
 
         # Task allocator health
@@ -1102,7 +1134,8 @@ class PerformanceMonitoringOptimization:
                 )
                 component_health['task_allocator'] = completion_rate
             else:
-                component_health['task_allocator'] = 0.8  # Default for new systems
+                # Default for new systems
+                component_health['task_allocator'] = 0.8
 
         # Coordination protocols health
         if self.coordination_protocols:
@@ -1110,16 +1143,18 @@ class PerformanceMonitoringOptimization:
             # Simple health based on message success rate
             if coordination_status['metrics']['messages_sent'] > 0:
                 success_rate = coordination_status['metrics']['messages_received'] / (
-                    coordination_status['metrics']['messages_sent'] + 1
-                )
+                    coordination_status['metrics']['messages_sent'] + 1)
                 component_health['coordination_protocols'] = success_rate
             else:
                 component_health['coordination_protocols'] = 0.8
 
         # System resources health
-        component_health['system_cpu'] = 1.0 - (self.system_resource_monitor.get_cpu_usage() / 100.0)
-        component_health['system_memory'] = 1.0 - (self.system_resource_monitor.get_memory_usage() / 100.0)
-        component_health['system_disk'] = 1.0 - (self.system_resource_monitor.get_disk_usage() / 100.0)
+        component_health['system_cpu'] = 1.0 - \
+            (self.system_resource_monitor.get_cpu_usage() / 100.0)
+        component_health['system_memory'] = 1.0 - \
+            (self.system_resource_monitor.get_memory_usage() / 100.0)
+        component_health['system_disk'] = 1.0 - \
+            (self.system_resource_monitor.get_disk_usage() / 100.0)
 
         return component_health
 
@@ -1133,7 +1168,8 @@ class PerformanceMonitoringOptimization:
 
         return recent_metrics
 
-    async def _get_top_recommendations(self, limit: int = 5) -> List[OptimizationRecommendation]:
+    async def _get_top_recommendations(
+            self, limit: int = 5) -> List[OptimizationRecommendation]:
         """Get top optimization recommendations."""
         return sorted(
             self.optimization_recommendations,
@@ -1206,7 +1242,8 @@ class PerformanceMonitoringOptimization:
 
         return recommendations
 
-    async def _execute_optimization(self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
+    async def _execute_optimization(
+            self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
         """Execute an optimization recommendation."""
         try:
             if recommendation.action == OptimizationAction.SCALE_UP:
@@ -1224,8 +1261,8 @@ class PerformanceMonitoringOptimization:
             else:
                 return {
                     'success': False,
-                    'message': f"Optimization action {recommendation.action.value} not implemented"
-                }
+                    'message': f"Optimization action {
+                        recommendation.action.value} not implemented"}
 
         except Exception as e:
             return {
@@ -1233,7 +1270,8 @@ class PerformanceMonitoringOptimization:
                 'message': f"Optimization execution failed: {str(e)}"
             }
 
-    async def _execute_scale_up(self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
+    async def _execute_scale_up(
+            self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
         """Execute scale up optimization."""
         # This would typically interact with the orchestration system
         # For now, return a simulation result
@@ -1246,7 +1284,8 @@ class PerformanceMonitoringOptimization:
             }
         }
 
-    async def _execute_rebalance_load(self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
+    async def _execute_rebalance_load(
+            self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
         """Execute load rebalancing optimization."""
         if self.task_allocator:
             # Trigger load rebalancing
@@ -1256,16 +1295,15 @@ class PerformanceMonitoringOptimization:
                 'message': 'Load rebalancing triggered',
                 'details': {
                     'action': 'workload_redistributed',
-                    'estimated_improvement': recommendation.estimated_improvement
-                }
-            }
+                    'estimated_improvement': recommendation.estimated_improvement}}
 
         return {
             'success': False,
             'message': 'Task allocator not available for rebalancing'
         }
 
-    async def _execute_adjust_parameters(self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
+    async def _execute_adjust_parameters(
+            self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
         """Execute parameter adjustment optimization."""
         # This would typically adjust system parameters
         return {
@@ -1277,7 +1315,8 @@ class PerformanceMonitoringOptimization:
             }
         }
 
-    async def _execute_reallocate_resources(self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
+    async def _execute_reallocate_resources(
+            self, recommendation: OptimizationRecommendation) -> Dict[str, Any]:
         """Execute resource reallocation optimization."""
         # This would typically interact with resource management
         return {
@@ -1295,18 +1334,19 @@ class PerformanceMonitoringOptimization:
             # Only auto-implement low-risk, high-confidence optimizations
             if (recommendation.resource_cost < 0.2 and
                 recommendation.confidence > 0.8 and
-                recommendation.implementation_complexity == "low"):
+                    recommendation.implementation_complexity == "low"):
 
                 result = await self.implement_optimization(recommendation.recommendation_id)
                 if result.get('success'):
-                    self.logger.info(f"Auto-implemented optimization: {recommendation.description}")
+                    self.logger.info(
+                        f"Auto-implemented optimization: {recommendation.description}")
 
     async def _store_metric(self, metric: PerformanceMetric) -> None:
         """Store metric in database."""
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             conn.execute("""
                 INSERT INTO performance_metrics VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (
@@ -1325,7 +1365,7 @@ class PerformanceMonitoringOptimization:
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             conn.execute("""
                 INSERT INTO performance_alerts VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
@@ -1342,12 +1382,13 @@ class PerformanceMonitoringOptimization:
             ))
             conn.commit()
 
-    async def _store_recommendation(self, recommendation: OptimizationRecommendation) -> None:
+    async def _store_recommendation(
+            self, recommendation: OptimizationRecommendation) -> None:
         """Store recommendation in database."""
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             conn.execute("""
                 INSERT INTO optimization_recommendations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
@@ -1372,7 +1413,7 @@ class PerformanceMonitoringOptimization:
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             conn.execute("""
                 UPDATE performance_alerts
                 SET resolved = ?, resolution_timestamp = ?
@@ -1380,12 +1421,13 @@ class PerformanceMonitoringOptimization:
             """, (True, alert.resolution_timestamp, alert.alert_id))
             conn.commit()
 
-    async def _update_recommendation_implemented(self, recommendation_id: str) -> None:
+    async def _update_recommendation_implemented(
+            self, recommendation_id: str) -> None:
         """Update recommendation as implemented in database."""
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
             conn.execute("""
                 UPDATE optimization_recommendations
                 SET implemented = ?, implementation_timestamp = ?
@@ -1393,41 +1435,44 @@ class PerformanceMonitoringOptimization:
             """, (True, datetime.now(), recommendation_id))
             conn.commit()
 
-    async def _store_health_snapshot(self, health_status: SystemHealthStatus) -> None:
+    async def _store_health_snapshot(
+            self, health_status: SystemHealthStatus) -> None:
         """Store health snapshot in database."""
         db_path = self.config.get('db_path', 'performance_monitoring.db')
 
         with sqlite3.connect(db_path,
-                           detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
-            conn.execute("""
+                             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+            conn.execute(
+                """
                 INSERT INTO system_health_snapshots VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                f"health_{health_status.timestamp.strftime('%Y%m%d_%H%M%S_%f')}",
-                health_status.overall_health,
-                json.dumps(health_status.component_health),
-                len(health_status.active_alerts),
-                health_status.timestamp,
-                json.dumps({
-                    'resource_health': getattr(health_status, 'resource_health', 0.0),
-                    'recommendations': [rec.to_dict() for rec in health_status.optimization_recommendations]
-                })
-            ))
+            """, (f"health_{
+                    health_status.timestamp.strftime('%Y%m%d_%H%M%S_%f')}", health_status.overall_health, json.dumps(
+                    health_status.component_health), len(
+                    health_status.active_alerts), health_status.timestamp, json.dumps(
+                    {
+                        'resource_health': getattr(
+                            health_status, 'resource_health', 0.0), 'recommendations': [
+                                rec.to_dict() for rec in health_status.optimization_recommendations]})))
             conn.commit()
 
-    async def _handle_critical_health_issue(self, health_status: SystemHealthStatus) -> None:
+    async def _handle_critical_health_issue(
+            self, health_status: SystemHealthStatus) -> None:
         """Handle critical system health issues."""
-        self.logger.critical(f"Critical system health issue detected: {health_status.overall_health}")
+        self.logger.critical(
+            f"Critical system health issue detected: {
+                health_status.overall_health}")
 
         # Create critical alert
         alert = PerformanceAlert(
-            alert_id=f"critical_health_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}",
+            alert_id=f"critical_health_{
+                datetime.now().strftime('%Y%m%d_%H%M%S_%f')}",
             metric_type=PerformanceMetricType.SYSTEM_HEALTH,
             level=AlertLevel.CRITICAL,
-            message=f"System health critically low: {health_status.overall_health:.2f}",
+            message=f"System health critically low: {
+                health_status.overall_health:.2f}",
             value=health_status.overall_health,
             threshold=0.5,
-            source="health_monitor"
-        )
+            source="health_monitor")
 
         self.active_alerts[alert.alert_id] = alert
         await self._store_alert(alert)
@@ -1436,7 +1481,8 @@ class PerformanceMonitoringOptimization:
         for recommendation in health_status.optimization_recommendations:
             if recommendation.priority == 1:  # Critical priority
                 # Auto-implement critical recommendations
-                self.logger.info(f"Auto-implementing critical recommendation: {recommendation.description}")
+                self.logger.info(
+                    f"Auto-implementing critical recommendation: {recommendation.description}")
                 # Here you would implement the recommendation logic
 
     def get_monitoring_summary(self) -> Dict[str, Any]:
@@ -1491,7 +1537,8 @@ class SystemResourceMonitor:
         if self.last_network_bytes is not None:
             bytes_diff = current_bytes - self.last_network_bytes
             # Assume 1 Gbps capacity and normalize to percentage
-            network_percent = min(100, (bytes_diff / 1024 / 1024 / 125) * 100)  # 125 MB/s = 1 Gbps
+            # 125 MB/s = 1 Gbps
+            network_percent = min(100, (bytes_diff / 1024 / 1024 / 125) * 100)
             self.network_bytes_history.append(network_percent)
         else:
             network_percent = 0
@@ -1520,7 +1567,8 @@ class PerformanceAnalytics:
             'count': len(values)
         }
 
-    def calculate_percentiles(self, values: List[float], percentiles: List[float]) -> Dict[str, float]:
+    def calculate_percentiles(
+            self, values: List[float], percentiles: List[float]) -> Dict[str, float]:
         """Calculate percentiles for a list of values."""
         if not values:
             return {}
@@ -1534,7 +1582,10 @@ class PerformanceAnalytics:
 
         return result
 
-    def detect_anomalies(self, values: List[float], threshold: float = 2.0) -> List[int]:
+    def detect_anomalies(
+            self,
+            values: List[float],
+            threshold: float = 2.0) -> List[int]:
         """Detect anomalies using standard deviation method."""
         if len(values) < 3:
             return []
@@ -1561,7 +1612,8 @@ class PerformanceAnalytics:
         x_mean = sum(x) / n
         y_mean = sum(values) / n
 
-        numerator = sum((x[i] - x_mean) * (values[i] - y_mean) for i in range(n))
+        numerator = sum((x[i] - x_mean) * (values[i] - y_mean)
+                        for i in range(n))
         denominator = sum((x[i] - x_mean) ** 2 for i in range(n))
 
         if denominator == 0:

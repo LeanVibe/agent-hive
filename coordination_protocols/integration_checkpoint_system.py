@@ -7,17 +7,25 @@ and integration milestones are achieved.
 """
 
 import asyncio
-import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Set, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import json
+import logging
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from .automated_coordination_orchestrator import CoordinationPhase, CoordinationStatus
-from .component_workflow import ComponentWorkflowManager, ComponentStatus
-from ..feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
+from ..feedback_loops import (
+    FeedbackPriority,
+    FeedbackSignal,
+    FeedbackType,
+    RealTimeFeedbackEngine,
+)
+from .automated_coordination_orchestrator import (
+    CoordinationPhase,
+    CoordinationStatus,
+)
+from .component_workflow import ComponentStatus, ComponentWorkflowManager
 
 
 class CheckpointType(Enum):
@@ -88,7 +96,8 @@ class IntegrationCheckpoint:
 
     # Progress tracking
     progress: float = 0.0
-    validation_results: Dict[str, ValidationResult] = field(default_factory=dict)
+    validation_results: Dict[str, ValidationResult] = field(
+        default_factory=dict)
 
     # Timing
     created_at: datetime = field(default_factory=datetime.now)
@@ -128,7 +137,9 @@ class IntegrationMilestone:
 class IntegrationCheckpointSystem:
     """System for managing integration checkpoints and milestones."""
 
-    def __init__(self, feedback_engine: Optional[RealTimeFeedbackEngine] = None):
+    def __init__(
+            self,
+            feedback_engine: Optional[RealTimeFeedbackEngine] = None):
         self.logger = logging.getLogger(__name__)
         self.feedback_engine = feedback_engine
 
@@ -166,9 +177,12 @@ class IntegrationCheckpointSystem:
         self.running = True
 
         # Start validation processing
-        self.validation_tasks.add(asyncio.create_task(self._validation_processing_loop()))
-        self.validation_tasks.add(asyncio.create_task(self._checkpoint_monitoring_loop()))
-        self.validation_tasks.add(asyncio.create_task(self._milestone_tracking_loop()))
+        self.validation_tasks.add(asyncio.create_task(
+            self._validation_processing_loop()))
+        self.validation_tasks.add(asyncio.create_task(
+            self._checkpoint_monitoring_loop()))
+        self.validation_tasks.add(asyncio.create_task(
+            self._milestone_tracking_loop()))
 
         self.logger.info("Integration checkpoint system started")
 
@@ -203,7 +217,8 @@ class IntegrationCheckpointSystem:
         # Milestone definitions
         self._create_integration_milestones(session_id)
 
-        self.logger.info(f"Initialized {len(self.checkpoints)} checkpoints for session {session_id}")
+        self.logger.info(
+            f"Initialized {len(self.checkpoints)} checkpoints for session {session_id}")
 
     def _create_communication_checkpoints(self, session_id: str) -> None:
         """Create communication-related checkpoints."""
@@ -231,25 +246,22 @@ class IntegrationCheckpointSystem:
                 validation_type="automated",
                 weight=1.0,
                 mandatory=True,
-                validation_timeout=timedelta(minutes=5)
-            ),
+                validation_timeout=timedelta(
+                    minutes=5)),
             CheckpointCriterion(
                 id="protocol_agreement",
                 name="Protocol Agreement",
                 description="Coordination protocol agreed upon by all agents",
                 validation_type="manual",
                 weight=0.8,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="real_time_communication",
                 name="Real-Time Communication",
                 description="Real-time communication channels established",
                 validation_type="automated",
                 weight=0.6,
-                mandatory=False
-            )
-        ]
+                mandatory=False)]
 
         self.checkpoints[comm_checkpoint.id] = comm_checkpoint
 
@@ -260,12 +272,15 @@ class IntegrationCheckpointSystem:
             description="Verify all agents understand PR #28 context and requirements",
             type=CheckpointType.COMMUNICATION,
             phase=CoordinationPhase.COMMUNICATION_SETUP,
-            depends_on=[comm_checkpoint.id],
+            depends_on=[
+                comm_checkpoint.id],
             responsible_agent="integration_agent",
             validation_agent="orchestration_agent",
             priority=2,
-            tags=["context", "understanding", "requirements"]
-        )
+            tags=[
+                "context",
+                "understanding",
+                "requirements"])
 
         context_checkpoint.criteria = [
             CheckpointCriterion(
@@ -274,25 +289,21 @@ class IntegrationCheckpointSystem:
                 description="Agents understand PR #28 size issue (8763 lines)",
                 validation_type="manual",
                 weight=1.0,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="breakdown_requirements",
                 name="Breakdown Requirements",
                 description="Agents understand component breakdown requirements",
                 validation_type="manual",
                 weight=1.0,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="quality_standards",
                 name="Quality Standards",
                 description="Agents understand quality and testing requirements",
                 validation_type="manual",
                 weight=0.9,
-                mandatory=True
-            )
-        ]
+                mandatory=True)]
 
         self.checkpoints[context_checkpoint.id] = context_checkpoint
 
@@ -321,33 +332,28 @@ class IntegrationCheckpointSystem:
                 description="5 components identified: API Gateway, Service Discovery, GitHub, Slack, Manager",
                 validation_type="automated",
                 weight=1.0,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="size_constraints",
                 name="Size Constraints",
                 description="Each component estimated to be under 1000 lines",
                 validation_type="automated",
                 weight=1.0,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="dependency_mapping",
                 name="Dependency Mapping",
                 description="Inter-component dependencies clearly mapped",
                 validation_type="manual",
                 weight=0.9,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="interface_definition",
                 name="Interface Definition",
                 description="Component interfaces and contracts defined",
                 validation_type="manual",
                 weight=0.8,
-                mandatory=True
-            )
-        ]
+                mandatory=True)]
 
         self.checkpoints[boundary_checkpoint.id] = boundary_checkpoint
 
@@ -358,12 +364,15 @@ class IntegrationCheckpointSystem:
             description="Define implementation sequence and strategy for components",
             type=CheckpointType.COMPONENT_ANALYSIS,
             phase=CoordinationPhase.COMPONENT_ANALYSIS,
-            depends_on=[boundary_checkpoint.id],
+            depends_on=[
+                boundary_checkpoint.id],
             responsible_agent="integration_agent",
             validation_agent="orchestration_agent",
             priority=2,
-            tags=["strategy", "implementation", "sequence"]
-        )
+            tags=[
+                "strategy",
+                "implementation",
+                "sequence"])
 
         strategy_checkpoint.criteria = [
             CheckpointCriterion(
@@ -372,25 +381,21 @@ class IntegrationCheckpointSystem:
                 description="Logical implementation sequence defined (API Gateway → Service Discovery → Integrations → Manager)",
                 validation_type="manual",
                 weight=1.0,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="timeline_estimation",
                 name="Timeline Estimation",
                 description="Realistic timeline estimated for each component",
                 validation_type="manual",
                 weight=0.8,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="resource_allocation",
                 name="Resource Allocation",
                 description="Resources allocated appropriately for each component",
                 validation_type="manual",
                 weight=0.7,
-                mandatory=False
-            )
-        ]
+                mandatory=False)]
 
         self.checkpoints[strategy_checkpoint.id] = strategy_checkpoint
 
@@ -419,33 +424,28 @@ class IntegrationCheckpointSystem:
                 description="80% test coverage requirement established for all components",
                 validation_type="automated",
                 weight=1.0,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="documentation_standards",
                 name="Documentation Standards",
                 description="Documentation standards defined and validated",
                 validation_type="manual",
                 weight=0.9,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="code_quality_metrics",
                 name="Code Quality Metrics",
                 description="Code quality metrics and thresholds established",
                 validation_type="automated",
                 weight=0.8,
-                mandatory=True
-            ),
+                mandatory=True),
             CheckpointCriterion(
                 id="integration_testing",
                 name="Integration Testing",
                 description="Integration testing framework established",
                 validation_type="automated",
                 weight=0.9,
-                mandatory=True
-            )
-        ]
+                mandatory=True)]
 
         self.checkpoints[framework_checkpoint.id] = framework_checkpoint
 
@@ -481,8 +481,7 @@ class IntegrationCheckpointSystem:
                     validation_type="automated",
                     weight=1.0,
                     mandatory=True,
-                    validation_command="pytest --cov-report=json --cov=."
-                ),
+                    validation_command="pytest --cov-report=json --cov=."),
                 CheckpointCriterion(
                     id=f"{component_id}_code_quality",
                     name="Code Quality",
@@ -490,16 +489,14 @@ class IntegrationCheckpointSystem:
                     validation_type="automated",
                     weight=1.0,
                     mandatory=True,
-                    validation_command="flake8 && bandit -r . && mypy ."
-                ),
+                    validation_command="flake8 && bandit -r . && mypy ."),
                 CheckpointCriterion(
                     id=f"{component_id}_documentation",
                     name="Documentation",
                     description="Component has complete documentation",
                     validation_type="manual",
                     weight=0.9,
-                    mandatory=True
-                ),
+                    mandatory=True),
                 CheckpointCriterion(
                     id=f"{component_id}_integration_tests",
                     name="Integration Tests",
@@ -507,9 +504,7 @@ class IntegrationCheckpointSystem:
                     validation_type="automated",
                     weight=0.9,
                     mandatory=True,
-                    validation_command="pytest tests/integration/"
-                )
-            ]
+                    validation_command="pytest tests/integration/")]
 
             self.checkpoints[quality_checkpoint.id] = quality_checkpoint
 
@@ -534,7 +529,8 @@ class IntegrationCheckpointSystem:
                 description=f"Integration of {component_name} component into system",
                 type=CheckpointType.INTEGRATION,
                 phase=CoordinationPhase.INTEGRATION_COORDINATION,
-                depends_on=[f"{session_id}_{component_id}_quality"] + ([previous_checkpoint] if previous_checkpoint else []),
+                depends_on=[f"{session_id}_{component_id}_quality"] +
+                ([previous_checkpoint] if previous_checkpoint else []),
                 responsible_agent="integration_agent",
                 validation_agent="orchestration_agent",
                 priority=sequence,
@@ -549,8 +545,7 @@ class IntegrationCheckpointSystem:
                     description="Component successfully deployed to integration environment",
                     validation_type="automated",
                     weight=1.0,
-                    mandatory=True
-                ),
+                    mandatory=True),
                 CheckpointCriterion(
                     id=f"{component_id}_health_check",
                     name="Health Check",
@@ -558,8 +553,7 @@ class IntegrationCheckpointSystem:
                     validation_type="automated",
                     weight=1.0,
                     mandatory=True,
-                    validation_command="curl -f http://localhost:8000/health"
-                ),
+                    validation_command="curl -f http://localhost:8000/health"),
                 CheckpointCriterion(
                     id=f"{component_id}_integration_tests",
                     name="Integration Tests",
@@ -567,17 +561,14 @@ class IntegrationCheckpointSystem:
                     validation_type="automated",
                     weight=1.0,
                     mandatory=True,
-                    validation_command="pytest tests/integration/"
-                ),
+                    validation_command="pytest tests/integration/"),
                 CheckpointCriterion(
                     id=f"{component_id}_performance",
                     name="Performance Validation",
                     description="Component meets performance requirements",
                     validation_type="automated",
                     weight=0.8,
-                    mandatory=True
-                )
-            ]
+                    mandatory=True)]
 
             self.checkpoints[integration_checkpoint.id] = integration_checkpoint
             previous_checkpoint = integration_checkpoint.id
@@ -644,18 +635,17 @@ class IntegrationCheckpointSystem:
             id=f"{session_id}_foundation_milestone",
             name="Foundation Components Ready",
             description="API Gateway and Service Discovery components integrated",
-            target_date=datetime.now() + timedelta(weeks=2),
+            target_date=datetime.now() +
+            timedelta(
+                weeks=2),
             required_checkpoints=[
                 f"{session_id}_api_gateway_integration",
-                f"{session_id}_service_discovery_integration"
-            ],
+                f"{session_id}_service_discovery_integration"],
             completion_criteria=[
                 "API Gateway fully operational",
                 "Service Discovery system integrated",
                 "Core routing functionality working",
-                "Basic health monitoring active"
-            ]
-        )
+                "Basic health monitoring active"])
 
         # External integrations milestone
         external_milestone = IntegrationMilestone(
@@ -707,12 +697,14 @@ class IntegrationCheckpointSystem:
 
             # Check if already in validation
             if checkpoint_id in self.active_validations:
-                self.logger.info(f"Checkpoint already being validated: {checkpoint_id}")
+                self.logger.info(
+                    f"Checkpoint already being validated: {checkpoint_id}")
                 return False
 
             # Check dependencies
             if not await self._check_checkpoint_dependencies(checkpoint):
-                self.logger.info(f"Dependencies not met for checkpoint: {checkpoint_id}")
+                self.logger.info(
+                    f"Dependencies not met for checkpoint: {checkpoint_id}")
                 return False
 
             # Start validation
@@ -729,7 +721,8 @@ class IntegrationCheckpointSystem:
             validation_results = await self._validate_checkpoint_criteria(checkpoint)
 
             # Calculate overall result
-            passed_count = sum(1 for result in validation_results.values() if result == ValidationResult.PASS)
+            passed_count = sum(1 for result in validation_results.values()
+                               if result == ValidationResult.PASS)
             total_count = len(validation_results)
             success_rate = passed_count / total_count if total_count > 0 else 0
 
@@ -764,14 +757,16 @@ class IntegrationCheckpointSystem:
             return validation_success
 
         except Exception as e:
-            self.logger.error(f"Error validating checkpoint {checkpoint_id}: {e}")
+            self.logger.error(
+                f"Error validating checkpoint {checkpoint_id}: {e}")
             checkpoint.status = CheckpointStatus.FAILED
             return False
 
         finally:
             self.active_validations.discard(checkpoint_id)
 
-    async def _check_checkpoint_dependencies(self, checkpoint: IntegrationCheckpoint) -> bool:
+    async def _check_checkpoint_dependencies(
+            self, checkpoint: IntegrationCheckpoint) -> bool:
         """Check if checkpoint dependencies are satisfied."""
         if not checkpoint.depends_on:
             return True
@@ -783,7 +778,8 @@ class IntegrationCheckpointSystem:
 
         return True
 
-    async def _validate_checkpoint_criteria(self, checkpoint: IntegrationCheckpoint) -> Dict[str, ValidationResult]:
+    async def _validate_checkpoint_criteria(
+            self, checkpoint: IntegrationCheckpoint) -> Dict[str, ValidationResult]:
         """Validate all criteria for a checkpoint."""
         validation_results = {}
 
@@ -801,12 +797,14 @@ class IntegrationCheckpointSystem:
                 criterion.last_validation = datetime.now()
 
             except Exception as e:
-                self.logger.error(f"Error validating criterion {criterion.id}: {e}")
+                self.logger.error(
+                    f"Error validating criterion {criterion.id}: {e}")
                 validation_results[criterion.id] = ValidationResult.FAIL
 
         return validation_results
 
-    async def _validate_criterion(self, criterion: CheckpointCriterion) -> ValidationResult:
+    async def _validate_criterion(
+            self, criterion: CheckpointCriterion) -> ValidationResult:
         """Validate a single criterion."""
         try:
             if criterion.validation_type == "automated":
@@ -816,14 +814,17 @@ class IntegrationCheckpointSystem:
             elif criterion.validation_type == "hybrid":
                 return await self._validate_hybrid_criterion(criterion)
             else:
-                self.logger.warning(f"Unknown validation type: {criterion.validation_type}")
+                self.logger.warning(
+                    f"Unknown validation type: {criterion.validation_type}")
                 return ValidationResult.SKIP
 
         except Exception as e:
-            self.logger.error(f"Error validating criterion {criterion.id}: {e}")
+            self.logger.error(
+                f"Error validating criterion {criterion.id}: {e}")
             return ValidationResult.FAIL
 
-    async def _validate_automated_criterion(self, criterion: CheckpointCriterion) -> ValidationResult:
+    async def _validate_automated_criterion(
+            self, criterion: CheckpointCriterion) -> ValidationResult:
         """Validate automated criterion."""
         if criterion.validation_command:
             try:
@@ -842,25 +843,34 @@ class IntegrationCheckpointSystem:
                 if process.returncode == 0:
                     return ValidationResult.PASS
                 else:
-                    self.logger.warning(f"Validation command failed for {criterion.id}: {stderr.decode()}")
+                    self.logger.warning(
+                        f"Validation command failed for {
+                            criterion.id}: {
+                            stderr.decode()}")
                     return ValidationResult.FAIL
 
             except asyncio.TimeoutError:
-                self.logger.warning(f"Validation timeout for criterion {criterion.id}")
+                self.logger.warning(
+                    f"Validation timeout for criterion {criterion.id}")
                 return ValidationResult.FAIL
             except Exception as e:
-                self.logger.error(f"Error executing validation command for {criterion.id}: {e}")
+                self.logger.error(
+                    f"Error executing validation command for {
+                        criterion.id}: {e}")
                 return ValidationResult.FAIL
         else:
             # Default automated validation (placeholder)
             return ValidationResult.PASS
 
-    async def _validate_manual_criterion(self, criterion: CheckpointCriterion) -> ValidationResult:
+    async def _validate_manual_criterion(
+            self, criterion: CheckpointCriterion) -> ValidationResult:
         """Validate manual criterion."""
-        # For now, assume manual criteria pass (in real implementation, this would wait for human validation)
+        # For now, assume manual criteria pass (in real implementation, this
+        # would wait for human validation)
         return ValidationResult.PASS
 
-    async def _validate_hybrid_criterion(self, criterion: CheckpointCriterion) -> ValidationResult:
+    async def _validate_hybrid_criterion(
+            self, criterion: CheckpointCriterion) -> ValidationResult:
         """Validate hybrid criterion."""
         # Combine automated and manual validation
         auto_result = await self._validate_automated_criterion(criterion)
@@ -870,7 +880,10 @@ class IntegrationCheckpointSystem:
         manual_result = await self._validate_manual_criterion(criterion)
         return manual_result
 
-    def _update_validation_metrics(self, checkpoint: IntegrationCheckpoint, success: bool) -> None:
+    def _update_validation_metrics(
+            self,
+            checkpoint: IntegrationCheckpoint,
+            success: bool) -> None:
         """Update validation metrics."""
         self.validation_metrics["total_checkpoints"] += 1
 
@@ -882,15 +895,21 @@ class IntegrationCheckpointSystem:
         # Update success rate
         total = self.validation_metrics["total_checkpoints"]
         passed = self.validation_metrics["passed_checkpoints"]
-        self.validation_metrics["success_rate"] = (passed / total) * 100 if total > 0 else 0
+        self.validation_metrics["success_rate"] = (
+            passed / total) * 100 if total > 0 else 0
 
         # Update average validation time
         if checkpoint.started_at and checkpoint.completed_at:
-            validation_time = (checkpoint.completed_at - checkpoint.started_at).total_seconds()
+            validation_time = (checkpoint.completed_at -
+                               checkpoint.started_at).total_seconds()
             current_avg = self.validation_metrics["average_validation_time"]
-            self.validation_metrics["average_validation_time"] = (current_avg + validation_time) / 2
+            self.validation_metrics["average_validation_time"] = (
+                current_avg + validation_time) / 2
 
-    async def _generate_checkpoint_feedback(self, checkpoint: IntegrationCheckpoint, success: bool) -> None:
+    async def _generate_checkpoint_feedback(
+            self,
+            checkpoint: IntegrationCheckpoint,
+            success: bool) -> None:
         """Generate feedback for checkpoint validation."""
         if not self.feedback_engine:
             return
@@ -942,10 +961,11 @@ class IntegrationCheckpointSystem:
                 for checkpoint in self.checkpoints.values():
                     if (checkpoint.status == CheckpointStatus.VALIDATING and
                         checkpoint.started_at and
-                        current_time - checkpoint.started_at > checkpoint.timeout):
+                            current_time - checkpoint.started_at > checkpoint.timeout):
 
                         checkpoint.status = CheckpointStatus.FAILED
-                        checkpoint.notes.append(f"Validation timeout at {current_time}")
+                        checkpoint.notes.append(
+                            f"Validation timeout at {current_time}")
 
                         await self._log_checkpoint_event("validation_timeout", {
                             "checkpoint_id": checkpoint.id,
@@ -964,7 +984,7 @@ class IntegrationCheckpointSystem:
         for checkpoint in self.checkpoints.values():
             if (checkpoint.status == CheckpointStatus.PENDING and
                 checkpoint.id not in self.active_validations and
-                await self._check_checkpoint_dependencies(checkpoint)):
+                    await self._check_checkpoint_dependencies(checkpoint)):
 
                 await self.validation_queue.put(checkpoint.id)
 
@@ -987,7 +1007,8 @@ class IntegrationCheckpointSystem:
                         if checkpoint and checkpoint.status == CheckpointStatus.PASSED:
                             completed_checkpoints += 1
 
-                    milestone.completion_percentage = (completed_checkpoints / total_checkpoints) * 100 if total_checkpoints > 0 else 0
+                    milestone.completion_percentage = (
+                        completed_checkpoints / total_checkpoints) * 100 if total_checkpoints > 0 else 0
 
                     # Check if milestone is complete
                     if completed_checkpoints == total_checkpoints:
@@ -1003,7 +1024,8 @@ class IntegrationCheckpointSystem:
                     # Check if milestone is delayed
                     elif datetime.now() > milestone.target_date and milestone.status == "pending":
                         milestone.status = "delayed"
-                        milestone.delay_reason = f"Missed target date by {datetime.now() - milestone.target_date}"
+                        milestone.delay_reason = f"Missed target date by {
+                            datetime.now() - milestone.target_date}"
 
                         await self._log_checkpoint_event("milestone_delayed", {
                             "milestone_id": milestone.id,
@@ -1015,7 +1037,8 @@ class IntegrationCheckpointSystem:
                 self.logger.error(f"Error in milestone tracking loop: {e}")
                 await asyncio.sleep(60)
 
-    async def _log_checkpoint_event(self, event_type: str, data: Dict[str, Any]) -> None:
+    async def _log_checkpoint_event(
+            self, event_type: str, data: Dict[str, Any]) -> None:
         """Log checkpoint event."""
         event = {
             "timestamp": datetime.now(),
@@ -1031,7 +1054,8 @@ class IntegrationCheckpointSystem:
         return {
             "total_checkpoints": len(self.checkpoints),
             "checkpoint_status": {
-                status.value: len([c for c in self.checkpoints.values() if c.status == status])
+                status.value: len(
+                    [c for c in self.checkpoints.values() if c.status == status])
                 for status in CheckpointStatus
             },
             "validation_metrics": self.validation_metrics,

@@ -6,18 +6,17 @@ This script provides a command-line interface for running interactive tutorials
 with progress tracking, validation, and guided learning.
 """
 
-import sys
-import os
 import argparse
-import asyncio
+import sys
 from pathlib import Path
+
+from framework.cli_interface import TutorialCLI
+from framework.tutorial_manager import DifficultyLevel, TutorialManager
+from framework.validation import StepValidator
 
 # Add the tutorial framework to the path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from framework.tutorial_manager import TutorialManager, DifficultyLevel
-from framework.cli_interface import TutorialCLI
-from framework.validation import StepValidator
 
 def main():
     """Main entry point for tutorial runner."""
@@ -82,9 +81,11 @@ Examples:
         cli.current_user = args.user
         cli.run()
 
+
 def list_tutorials(manager: TutorialManager, difficulty_filter: str = None):
     """List available tutorials."""
-    difficulty = DifficultyLevel(difficulty_filter) if difficulty_filter else None
+    difficulty = DifficultyLevel(
+        difficulty_filter) if difficulty_filter else None
     tutorials = manager.list_tutorials(difficulty)
 
     print("🎓 Available Tutorials:")
@@ -102,12 +103,24 @@ def list_tutorials(manager: TutorialManager, difficulty_filter: str = None):
         }
 
         print(f"{i}. {tutorial.metadata.title}")
-        print(f"   {difficulty_emoji[tutorial.metadata.difficulty]} {tutorial.metadata.difficulty.value.title()} • {tutorial.metadata.estimated_time} min")
+        print(
+            f"   {
+                difficulty_emoji[
+                    tutorial.metadata.difficulty]} {
+                tutorial.metadata.difficulty.value.title()} • {
+                    tutorial.metadata.estimated_time} min")
         print(f"   {tutorial.metadata.description}")
-        print(f"   Prerequisites: {', '.join(tutorial.metadata.prerequisites) if tutorial.metadata.prerequisites else 'None'}")
+        print(
+            f"   Prerequisites: {
+                ', '.join(
+                    tutorial.metadata.prerequisites) if tutorial.metadata.prerequisites else 'None'}")
         print()
 
-def run_specific_tutorial(manager: TutorialManager, tutorial_id: str, user_id: str):
+
+def run_specific_tutorial(
+        manager: TutorialManager,
+        tutorial_id: str,
+        user_id: str):
     """Run a specific tutorial by ID."""
     tutorial = manager.get_tutorial(tutorial_id)
     if not tutorial:
@@ -125,11 +138,12 @@ def run_specific_tutorial(manager: TutorialManager, tutorial_id: str, user_id: s
     else:
         print("❌ Failed to start tutorial.")
 
+
 def validate_tutorials(manager: TutorialManager):
     """Validate all tutorial content."""
     print("🔍 Validating tutorial content...")
 
-    validator = StepValidator()
+    StepValidator()
     all_valid = True
 
     for tutorial_id, tutorial in manager.tutorials.items():
@@ -151,7 +165,7 @@ def validate_tutorials(manager: TutorialManager):
         # Validate steps
         for step in tutorial.steps:
             if not step.step_id:
-                print(f"  ❌ Step missing step_id")
+                print("  ❌ Step missing step_id")
                 all_valid = False
 
             if not step.instructions:
@@ -161,9 +175,13 @@ def validate_tutorials(manager: TutorialManager):
             # Validate code examples syntax
             for example in step.code_examples:
                 try:
-                    compile(example, f"<tutorial-{tutorial_id}-{step.step_id}>", 'exec')
+                    compile(example,
+                            f"<tutorial-{tutorial_id}-{step.step_id}>",
+                            'exec')
                 except SyntaxError as e:
-                    print(f"  ❌ Step {step.step_id} code example syntax error: {e}")
+                    print(
+                        f"  ❌ Step {
+                            step.step_id} code example syntax error: {e}")
                     all_valid = False
 
         if all_valid:
@@ -174,6 +192,7 @@ def validate_tutorials(manager: TutorialManager):
     else:
         print("\n❌ Some tutorials have validation errors.")
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()

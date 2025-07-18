@@ -5,8 +5,6 @@ Tests extracted from hook_system.py to ensure functionality is preserved
 during refactoring process.
 """
 
-import json
-import pytest
 import sqlite3
 import sys
 import tempfile
@@ -14,10 +12,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+import pytest
+from intelligence.context_monitor import ContextGrowthPredictor, ContextMonitor
+
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / '.claude'))
-
-from intelligence.context_monitor import ContextMonitor, ContextGrowthPredictor
 
 
 class TestContextGrowthPredictor:
@@ -38,7 +37,7 @@ class TestContextGrowthPredictor:
 
     def test_init_creates_database_schema(self, temp_db):
         """Test that initialization creates proper database schema."""
-        predictor = ContextGrowthPredictor(temp_db)
+        ContextGrowthPredictor(temp_db)
 
         # Verify database file exists
         assert temp_db.exists()
@@ -48,15 +47,18 @@ class TestContextGrowthPredictor:
             cursor = conn.cursor()
 
             # Check context_history table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='context_history'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='context_history'")
             assert cursor.fetchone() is not None
 
             # Check prediction_accuracy table
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='prediction_accuracy'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='prediction_accuracy'")
             assert cursor.fetchone() is not None
 
             # Check indexes
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_context_history_agent_time'")
+            cursor.execute(
+                "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_context_history_agent_time'")
             assert cursor.fetchone() is not None
 
     def test_record_usage(self, predictor):
@@ -70,7 +72,8 @@ class TestContextGrowthPredictor:
         # Verify data was recorded
         with sqlite3.connect(predictor.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM context_history WHERE agent_id = ?", (agent_id,))
+            cursor.execute(
+                "SELECT * FROM context_history WHERE agent_id = ?", (agent_id,))
             result = cursor.fetchone()
 
             assert result is not None
@@ -157,7 +160,8 @@ class TestContextGrowthPredictor:
 
         assert stats["agent_id"] == "all"
         assert stats["total_records"] == 9  # 3 agents * 3 records each
-        assert abs(stats["avg_usage"] - 0.6) < 0.001  # Average of 0.4, 0.6, 0.8
+        # Average of 0.4, 0.6, 0.8
+        assert abs(stats["avg_usage"] - 0.6) < 0.001
 
     def test_cleanup_old_data(self, predictor):
         """Test cleanup of old data."""
@@ -187,10 +191,12 @@ class TestContextGrowthPredictor:
         # Verify recent data still exists
         with sqlite3.connect(predictor.db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM context_history WHERE usage_percent = 0.7")
+            cursor.execute(
+                "SELECT COUNT(*) FROM context_history WHERE usage_percent = 0.7")
             assert cursor.fetchone()[0] == 1
 
-            cursor.execute("SELECT COUNT(*) FROM context_history WHERE usage_percent = 0.5")
+            cursor.execute(
+                "SELECT COUNT(*) FROM context_history WHERE usage_percent = 0.5")
             assert cursor.fetchone()[0] == 0
 
 
@@ -274,7 +280,8 @@ class TestContextMonitor:
         """Test time to limit estimation."""
         # Test with positive growth
         time_to_limit = monitor._estimate_time_to_limit(0.5, 0.1)
-        assert abs(time_to_limit - 3.5) < 0.001  # (0.85 - 0.5) / 0.1 = 3.5 hours
+        # (0.85 - 0.5) / 0.1 = 3.5 hours
+        assert abs(time_to_limit - 3.5) < 0.001
 
         # Test with no growth
         time_to_limit = monitor._estimate_time_to_limit(0.8, 0.0)
@@ -323,11 +330,13 @@ class TestContextMonitor:
             'intelligence.context.default_growth_rate': 0.05
         }
         mock_get_config.return_value = Mock()
-        mock_get_config.return_value.get.side_effect = lambda key, default: mock_config.get(key, default)
+        mock_get_config.return_value.get.side_effect = lambda key, default: mock_config.get(
+            key, default)
 
         monitor = ContextMonitor(db_path=temp_db)
 
-        # Test with usage that should trigger monitor_closely with custom threshold
+        # Test with usage that should trigger monitor_closely with custom
+        # threshold
         result = monitor.check_context("config_agent", 0.6)
 
         # Should trigger monitor_closely with custom 50% threshold

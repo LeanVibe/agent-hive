@@ -8,31 +8,34 @@ import argparse
 import json
 import logging
 import subprocess
-import sys
-import time
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
+
 import requests
 
 try:
-    from github_app_auth import GitHubAppAuth, setup_github_auth, get_repository_info
+    from github_app_auth import get_repository_info, setup_github_auth
 except ImportError:
     # Fallback for when GitHub App auth is not available
     def setup_github_auth():
         return None
+
     def get_repository_info():
-        result = subprocess.run(['git', 'remote', 'get-url', 'origin'], capture_output=True, text=True)
+        result = subprocess.run(
+            ['git', 'remote', 'get-url', 'origin'], capture_output=True, text=True)
         remote_url = result.stdout.strip()
         if 'github.com' in remote_url:
             if remote_url.startswith('git@github.com:'):
-                repo_path = remote_url.replace('git@github.com:', '').replace('.git', '')
+                repo_path = remote_url.replace(
+                    'git@github.com:', '').replace('.git', '')
             else:
-                repo_path = remote_url.replace('https://github.com/', '').replace('.git', '')
+                repo_path = remote_url.replace(
+                    'https://github.com/', '').replace('.git', '')
             return repo_path.split('/', 1)
         raise ValueError(f"Not a GitHub repository: {remote_url}")
 
 logger = logging.getLogger(__name__)
+
 
 class PRIntegrationManager:
     """Manages automated PR integration workflow with quality gates."""
@@ -42,31 +45,41 @@ class PRIntegrationManager:
         self.owner, self.repo = get_repository_info()
 
         if not self.auth:
-            logger.warning("⚠️ GitHub App authentication not available - using GitHub CLI fallback")
+            logger.warning(
+                "⚠️ GitHub App authentication not available - using GitHub CLI fallback")
 
     def get_pr_info(self, pr_number: int) -> Dict:
         """Get PR information from GitHub API."""
         if self.auth:
             # Use GitHub App authentication
-            headers = self.auth.get_authenticated_headers(self.owner, self.repo)
+            headers = self.auth.get_authenticated_headers(
+                self.owner, self.repo)
             url = f"https://api.github.com/repos/{self.owner}/{self.repo}/pulls/{pr_number}"
             response = requests.get(url, headers=headers)
 
             if response.status_code == 200:
                 return response.json()
             else:
-                raise Exception(f"Failed to get PR info: {response.status_code} - {response.text}")
+                raise Exception(
+                    f"Failed to get PR info: {response.status_code} - {response.text}")
         else:
             # Fallback to GitHub CLI
             result = subprocess.run(
-                ['gh', 'pr', 'view', str(pr_number), '--json', 'number,title,state,headRefName,baseRefName,mergeable,statusCheckRollup'],
-                capture_output=True, text=True
-            )
+                [
+                    'gh',
+                    'pr',
+                    'view',
+                    str(pr_number),
+                    '--json',
+                    'number,title,state,headRefName,baseRefName,mergeable,statusCheckRollup'],
+                capture_output=True,
+                text=True)
 
             if result.returncode == 0:
                 return json.loads(result.stdout)
             else:
-                raise Exception(f"Failed to get PR info via gh CLI: {result.stderr}")
+                raise Exception(
+                    f"Failed to get PR info via gh CLI: {result.stderr}")
 
     def run_quality_gates(self, pr_number: int) -> Tuple[bool, List[str]]:
         """Run quality gates validation for PR."""
@@ -85,7 +98,8 @@ class PRIntegrationManager:
             if 'statusCheckRollup' in pr_info and pr_info['statusCheckRollup']:
                 status_checks = pr_info['statusCheckRollup']
                 if status_checks.get('state') not in ['SUCCESS', 'COMPLETED']:
-                    issues.append(f"CI checks not passing: {status_checks.get('state')}")
+                    issues.append(
+                        f"CI checks not passing: {status_checks.get('state')}")
 
             # Run local quality validation if needed
             if self._should_run_local_validation(pr_info):
@@ -93,7 +107,8 @@ class PRIntegrationManager:
                 issues.extend(local_issues)
 
             success = len(issues) == 0
-            logger.info(f"{'✅' if success else '❌'} Quality gates: {'PASSED' if success else 'FAILED'}")
+            logger.info(
+                f"{'✅' if success else '❌'} Quality gates: {'PASSED' if success else 'FAILED'}")
 
             return success, issues
 
@@ -121,7 +136,8 @@ class PRIntegrationManager:
                 )
 
                 if result.returncode != 0:
-                    issues.append(f"Local quality gate failed: {result.stderr}")
+                    issues.append(
+                        f"Local quality gate failed: {result.stderr}")
 
             # Check for test coverage if coverage file exists
             coverage_file = Path('coverage.xml')
@@ -161,14 +177,16 @@ class PRIntegrationManager:
         try:
             if self.auth:
                 # Use GitHub App authentication
-                headers = self.auth.get_authenticated_headers(self.owner, self.repo)
-                url = f"https://api.github.com/repos/{self.owner}/{self.repo}/pulls/{pr_number}/merge"
+                headers = self.auth.get_authenticated_headers(
+                    self.owner, self.repo)
+                url = f"https://api.github.com/repos/{
+                    self.owner}/{
+                    self.repo}/pulls/{pr_number}/merge"
 
                 data = {
                     'merge_method': merge_method,
                     'commit_title': f"Merge PR #{pr_number}",
-                    'commit_message': f"Automated merge via agent integration system"
-                }
+                    'commit_message': "Automated merge via agent integration system"}
 
                 response = requests.put(url, headers=headers, json=data)
 
@@ -183,20 +201,24 @@ class PRIntegrationManager:
 
                     return True
                 else:
-                    logger.error(f"❌ Failed to merge PR: {response.status_code} - {response.text}")
+                    logger.error(
+                        f"❌ Failed to merge PR: {response.status_code} - {response.text}")
                     return False
             else:
                 # Fallback to GitHub CLI
                 result = subprocess.run(
-                    ['gh', 'pr', 'merge', str(pr_number), '--squash', '--delete-branch'],
+                    ['gh', 'pr', 'merge', str(pr_number),
+                     '--squash', '--delete-branch'],
                     capture_output=True, text=True
                 )
 
                 if result.returncode == 0:
-                    logger.info(f"✅ PR #{pr_number} merged successfully via gh CLI")
+                    logger.info(
+                        f"✅ PR #{pr_number} merged successfully via gh CLI")
                     return True
                 else:
-                    logger.error(f"❌ Failed to merge PR via gh CLI: {result.stderr}")
+                    logger.error(
+                        f"❌ Failed to merge PR via gh CLI: {result.stderr}")
                     return False
 
         except Exception as e:
@@ -207,14 +229,19 @@ class PRIntegrationManager:
         """Delete remote branch after merge."""
         try:
             if self.auth:
-                headers = self.auth.get_authenticated_headers(self.owner, self.repo)
-                url = f"https://api.github.com/repos/{self.owner}/{self.repo}/git/refs/heads/{branch_name}"
+                headers = self.auth.get_authenticated_headers(
+                    self.owner, self.repo)
+                url = f"https://api.github.com/repos/{
+                    self.owner}/{
+                    self.repo}/git/refs/heads/{branch_name}"
                 response = requests.delete(url, headers=headers)
 
                 if response.status_code == 204:
                     logger.info(f"🗑️ Branch {branch_name} deleted")
                 else:
-                    logger.warning(f"⚠️ Could not delete branch {branch_name}: {response.status_code}")
+                    logger.warning(
+                        f"⚠️ Could not delete branch {branch_name}: {
+                            response.status_code}")
             else:
                 # CLI fallback - usually handled by merge command
                 pass
@@ -228,11 +255,14 @@ class PRIntegrationManager:
         try:
             # Step 1: Get PR information
             pr_info = self.get_pr_info(pr_number)
-            logger.info(f"📋 PR #{pr_number}: {pr_info.get('title', 'Unknown title')}")
+            logger.info(
+                f"📋 PR #{pr_number}: {pr_info.get('title', 'Unknown title')}")
 
             # Step 2: Validate PR state
             if pr_info.get('state') != 'open':
-                logger.error(f"❌ PR #{pr_number} is not open (state: {pr_info.get('state')})")
+                logger.error(
+                    f"❌ PR #{pr_number} is not open (state: {
+                        pr_info.get('state')})")
                 return False
 
             # Step 3: Run quality gates
@@ -248,10 +278,12 @@ class PRIntegrationManager:
             merge_success = self.merge_pr(pr_number)
 
             if merge_success:
-                logger.info(f"🎉 PR #{pr_number} integration completed successfully")
+                logger.info(
+                    f"🎉 PR #{pr_number} integration completed successfully")
                 return True
             else:
-                logger.error(f"❌ PR #{pr_number} integration failed during merge")
+                logger.error(
+                    f"❌ PR #{pr_number} integration failed during merge")
                 return False
 
         except Exception as e:
@@ -262,25 +294,29 @@ class PRIntegrationManager:
         """List all open PRs that are ready for integration."""
         try:
             if self.auth:
-                headers = self.auth.get_authenticated_headers(self.owner, self.repo)
+                headers = self.auth.get_authenticated_headers(
+                    self.owner, self.repo)
                 url = f"https://api.github.com/repos/{self.owner}/{self.repo}/pulls"
                 response = requests.get(url, headers=headers)
 
                 if response.status_code == 200:
                     prs = response.json()
                 else:
-                    raise Exception(f"Failed to list PRs: {response.status_code}")
+                    raise Exception(
+                        f"Failed to list PRs: {response.status_code}")
             else:
                 # Fallback to gh CLI
                 result = subprocess.run(
-                    ['gh', 'pr', 'list', '--json', 'number,title,headRefName,mergeable,statusCheckRollup'],
+                    ['gh', 'pr', 'list', '--json',
+                        'number,title,headRefName,mergeable,statusCheckRollup'],
                     capture_output=True, text=True
                 )
 
                 if result.returncode == 0:
                     prs = json.loads(result.stdout)
                 else:
-                    raise Exception(f"Failed to list PRs via CLI: {result.stderr}")
+                    raise Exception(
+                        f"Failed to list PRs via CLI: {result.stderr}")
 
             # Filter to component PRs that are ready
             mergeable_prs = []
@@ -296,14 +332,24 @@ class PRIntegrationManager:
             logger.error(f"❌ Failed to list mergeable PRs: {e}")
             return []
 
+
 def main():
     """Main CLI interface for PR integration."""
     parser = argparse.ArgumentParser(description="PR Integration Manager")
-    parser.add_argument('command', choices=['integrate', 'list', 'quality-check', 'test-auth'],
-                       help='Command to execute')
-    parser.add_argument('--pr', type=int, help='PR number for integration or quality check')
-    parser.add_argument('--batch', action='store_true', help='Integrate all ready PRs')
-    parser.add_argument('--dry-run', action='store_true', help='Show what would be done without executing')
+    parser.add_argument(
+        'command',
+        choices=[
+            'integrate',
+            'list',
+            'quality-check',
+            'test-auth'],
+        help='Command to execute')
+    parser.add_argument(
+        '--pr', type=int, help='PR number for integration or quality check')
+    parser.add_argument('--batch', action='store_true',
+                        help='Integrate all ready PRs')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Show what would be done without executing')
 
     args = parser.parse_args()
 
@@ -318,7 +364,8 @@ def main():
 
         if args.command == 'test-auth':
             if manager.auth:
-                success = manager.auth.test_authentication(manager.owner, manager.repo)
+                success = manager.auth.test_authentication(
+                    manager.owner, manager.repo)
                 return 0 if success else 1
             else:
                 logger.error("❌ GitHub App authentication not configured")
@@ -360,14 +407,20 @@ def main():
                 success_count = 0
                 for pr in prs:
                     if args.dry_run:
-                        logger.info(f"🔍 Would integrate PR #{pr['number']}: {pr['title']}")
+                        logger.info(
+                            f"🔍 Would integrate PR #{
+                                pr['number']}: {
+                                pr['title']}")
                         success_count += 1
                     else:
                         success = manager.integrate_pr(pr['number'])
                         if success:
                             success_count += 1
 
-                logger.info(f"📊 Integration summary: {success_count}/{len(prs)} PRs {'would be ' if args.dry_run else ''}integrated")
+                logger.info(
+                    f"📊 Integration summary: {success_count}/{
+                        len(prs)} PRs {
+                        'would be ' if args.dry_run else ''}integrated")
                 return 0 if success_count == len(prs) else 1
 
             elif args.pr:
@@ -380,7 +433,8 @@ def main():
                     return 0 if success else 1
 
             else:
-                logger.error("❌ --pr or --batch required for integrate command")
+                logger.error(
+                    "❌ --pr or --batch required for integrate command")
                 return 1
 
         else:
@@ -390,6 +444,7 @@ def main():
     except Exception as e:
         logger.error(f"❌ Command failed: {e}")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())

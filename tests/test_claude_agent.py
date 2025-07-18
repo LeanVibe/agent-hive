@@ -1,21 +1,18 @@
 """Integration tests for ClaudeAgent."""
 
 import asyncio
-import pytest
-import json
-import tempfile
 import os
-from datetime import datetime
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pytest
+from agents.base_agent import AgentStatus, Task
+from agents.claude_agent import ClaudeAgent
+from utils.logging_config import setup_logging
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent / '.claude'))
 
-from agents.claude_agent import ClaudeAgent
-from agents.base_agent import Task, AgentStatus
-from config.config_loader import get_config
-from utils.logging_config import setup_logging
 
 # Initialize logging for tests
 setup_logging(log_level="DEBUG", console_output=False)
@@ -46,8 +43,8 @@ class TestClaudeAgent:
             type="code_generation",
             description="Generate a simple Python function",
             priority=5,
-            data={"prompt": "Create a simple Python function that prints 'Hello, World!'"}
-        )
+            data={
+                "prompt": "Create a simple Python function that prints 'Hello, World!'"})
 
     def test_agent_initialization(self, claude_agent):
         """Test that agent initializes correctly."""
@@ -321,7 +318,8 @@ class TestClaudeAgentIntegration:
 
             # Check queue status
             queue_status = await orchestrator.get_queue_status()
-            assert queue_status["pending"] >= 0  # Task should be processed or pending
+            # Task should be processed or pending
+            assert queue_status["pending"] >= 0
 
             # Shutdown
             await orchestrator.shutdown()

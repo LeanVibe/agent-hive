@@ -6,17 +6,18 @@ Handles: Quality Gates → Gemini Review → Fixes → PR Creation → Merge →
 
 import argparse
 import asyncio
-import json
 import logging
 import subprocess
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class IntegrationWorkflowManager:
     """Manages complete integration workflow from pushed branch to merged cleanup"""
@@ -26,7 +27,8 @@ class IntegrationWorkflowManager:
 
     async def run_complete_integration(self, branch_name: str) -> bool:
         """Run complete integration workflow for a feature branch"""
-        logger.info(f"🚀 Starting complete integration workflow for {branch_name}")
+        logger.info(
+            f"🚀 Starting complete integration workflow for {branch_name}")
 
         try:
             # Step 1: Quality Gates Validation
@@ -37,22 +39,26 @@ class IntegrationWorkflowManager:
                 return False
 
             # Step 2: Gemini CLI Review
-            logger.info(f"🤖 Step 2: Running Gemini CLI review for {branch_name}")
+            logger.info(
+                f"🤖 Step 2: Running Gemini CLI review for {branch_name}")
             review_result = await self._run_gemini_review(branch_name)
 
             # Step 3: Implement Gemini suggestions (if any)
             if review_result.get("suggestions"):
-                logger.info(f"🔧 Step 3: Implementing Gemini suggestions for {branch_name}")
+                logger.info(
+                    f"🔧 Step 3: Implementing Gemini suggestions for {branch_name}")
                 fixes_applied = await self._apply_gemini_suggestions(branch_name, review_result["suggestions"])
 
                 if fixes_applied:
                     # Re-run quality gates after fixes
                     quality_passed = await self._run_quality_gates(branch_name)
                     if not quality_passed:
-                        logger.error(f"❌ Quality gates failed after fixes for {branch_name}")
+                        logger.error(
+                            f"❌ Quality gates failed after fixes for {branch_name}")
                         return False
             else:
-                logger.info(f"✅ No Gemini suggestions needed for {branch_name}")
+                logger.info(
+                    f"✅ No Gemini suggestions needed for {branch_name}")
 
             # Step 4: Create PR
             logger.info(f"📝 Step 4: Creating PR for {branch_name}")
@@ -72,11 +78,13 @@ class IntegrationWorkflowManager:
             logger.info(f"🧹 Step 6: Cleaning up {branch_name}")
             await self._cleanup_merged_branch(branch_name)
 
-            logger.info(f"✅ Complete integration workflow successful for {branch_name}")
+            logger.info(
+                f"✅ Complete integration workflow successful for {branch_name}")
             return True
 
         except Exception as e:
-            logger.error(f"❌ Integration workflow failed for {branch_name}: {e}")
+            logger.error(
+                f"❌ Integration workflow failed for {branch_name}: {e}")
             return False
 
     async def _run_quality_gates(self, branch_name: str) -> bool:
@@ -91,16 +99,24 @@ class IntegrationWorkflowManager:
             logger.info(f"🔍 Running quality gates in {worktree_path}")
 
             # Quality Gate 1: Python syntax and imports
-            cmd = ["python", "-m", "py_compile"] + list(Path(worktree_path).rglob("*.py"))
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            cmd = ["python", "-m", "py_compile"] + \
+                list(Path(worktree_path).rglob("*.py"))
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
             if result.returncode != 0:
                 logger.error(f"❌ Python syntax check failed: {result.stderr}")
                 return False
             logger.info("✅ Python syntax check passed")
 
             # Quality Gate 2: Test suite
-            cmd = ["python", "-m", "pytest", "tests/", "-x", "--tb=short", "-q"]
-            result = subprocess.run(cmd, cwd=worktree_path, capture_output=True, text=True, timeout=300)
+            cmd = ["python", "-m", "pytest",
+                   "tests/", "-x", "--tb=short", "-q"]
+            result = subprocess.run(
+                cmd,
+                cwd=worktree_path,
+                capture_output=True,
+                text=True,
+                timeout=300)
             if result.returncode != 0:
                 logger.warning(f"⚠️ Some tests failed: {result.stdout}")
                 # Don't fail integration for test failures - log for review
@@ -117,7 +133,8 @@ class IntegrationWorkflowManager:
                     content = f.read().lower()
                     for pattern in security_patterns:
                         if f"{pattern} =" in content or f'"{pattern}"' in content:
-                            logger.warning(f"⚠️ Potential security issue in {py_file}: {pattern}")
+                            logger.warning(
+                                f"⚠️ Potential security issue in {py_file}: {pattern}")
 
             logger.info("✅ Security check completed")
 
@@ -125,13 +142,20 @@ class IntegrationWorkflowManager:
             if Path(worktree_path / "cli.py").exists():
                 cmd = ["python", "cli.py", "--help"]
                 start_time = time.time()
-                result = subprocess.run(cmd, cwd=worktree_path, capture_output=True, text=True, timeout=30)
+                result = subprocess.run(
+                    cmd,
+                    cwd=worktree_path,
+                    capture_output=True,
+                    text=True,
+                    timeout=30)
                 execution_time = time.time() - start_time
 
                 if execution_time > 5.0:
-                    logger.warning(f"⚠️ CLI performance slow: {execution_time:.2f}s")
+                    logger.warning(
+                        f"⚠️ CLI performance slow: {execution_time:.2f}s")
                 else:
-                    logger.info(f"✅ CLI performance good: {execution_time:.2f}s")
+                    logger.info(
+                        f"✅ CLI performance good: {execution_time:.2f}s")
 
             return True
 
@@ -146,7 +170,8 @@ class IntegrationWorkflowManager:
 
             # Get diff for review
             cmd = ["git", "diff", "main", branch_name]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
 
             if result.returncode != 0:
                 logger.error(f"Failed to get diff for {branch_name}")
@@ -177,7 +202,8 @@ Focus on critical issues that could cause problems in production.
 
             # Run Gemini CLI review
             cmd = ["gemini", "--prompt", review_prompt]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=120)
 
             if result.returncode != 0:
                 logger.warning(f"Gemini CLI review failed: {result.stderr}")
@@ -186,14 +212,22 @@ Focus on critical issues that could cause problems in production.
             gemini_response = result.stdout
             logger.info(f"📝 Gemini review completed for {branch_name}")
 
-            # Parse suggestions (simplified - in practice would use more sophisticated parsing)
+            # Parse suggestions (simplified - in practice would use more
+            # sophisticated parsing)
             suggestions = []
-            if "suggestions:" in gemini_response.lower() or "issues:" in gemini_response.lower():
+            if "suggestions:" in gemini_response.lower(
+            ) or "issues:" in gemini_response.lower():
                 # Extract actionable suggestions
                 lines = gemini_response.split('\n')
                 for line in lines:
                     line = line.strip()
-                    if any(keyword in line.lower() for keyword in ["fix", "change", "add", "remove", "update"]):
+                    if any(
+                        keyword in line.lower() for keyword in [
+                            "fix",
+                            "change",
+                            "add",
+                            "remove",
+                            "update"]):
                         if len(line) > 20:  # Filter out too short suggestions
                             suggestions.append(line)
 
@@ -207,38 +241,47 @@ Focus on critical issues that could cause problems in production.
             logger.error(f"Gemini review error: {e}")
             return {"suggestions": []}
 
-    async def _apply_gemini_suggestions(self, branch_name: str, suggestions: List[str]) -> bool:
+    async def _apply_gemini_suggestions(
+            self,
+            branch_name: str,
+            suggestions: List[str]) -> bool:
         """Apply actionable Gemini suggestions"""
         try:
             worktree_path = self._find_worktree_for_branch(branch_name)
             if not worktree_path:
                 return False
 
-            logger.info(f"🔧 Applying {len(suggestions)} Gemini suggestions to {branch_name}")
+            logger.info(
+                f"🔧 Applying {
+                    len(suggestions)} Gemini suggestions to {branch_name}")
 
             applied_changes = []
 
             for i, suggestion in enumerate(suggestions, 1):
-                logger.info(f"Processing suggestion {i}: {suggestion[:100]}...")
+                logger.info(
+                    f"Processing suggestion {i}: {suggestion[:100]}...")
 
                 # Simple pattern matching for common fixes
                 if "import" in suggestion.lower() and "unused" in suggestion.lower():
                     # Remove unused imports
                     success = await self._remove_unused_imports(worktree_path)
                     if success:
-                        applied_changes.append(f"Removed unused imports")
+                        applied_changes.append("Removed unused imports")
 
                 elif "variable" in suggestion.lower() and "rename" in suggestion.lower():
                     # Variable naming improvements (simplified)
-                    logger.info("Variable naming suggestion noted for manual review")
+                    logger.info(
+                        "Variable naming suggestion noted for manual review")
 
                 elif "performance" in suggestion.lower():
                     # Performance improvements (simplified)
-                    logger.info("Performance suggestion noted for manual review")
+                    logger.info(
+                        "Performance suggestion noted for manual review")
 
                 elif "security" in suggestion.lower():
                     # Security improvements
-                    logger.warning("Security suggestion requires manual review")
+                    logger.warning(
+                        "Security suggestion requires manual review")
 
                 # Add more pattern matching as needed
 
@@ -247,19 +290,27 @@ Focus on critical issues that could cause problems in production.
                 cmd = ["git", "add", "."]
                 subprocess.run(cmd, cwd=worktree_path, timeout=30)
 
-                commit_msg = f"fix: Apply Gemini CLI suggestions\n\n" + "\n".join(f"- {change}" for change in applied_changes)
+                commit_msg = "fix: Apply Gemini CLI suggestions\n\n" + \
+                    "\n".join(f"- {change}" for change in applied_changes)
                 cmd = ["git", "commit", "-m", commit_msg]
-                result = subprocess.run(cmd, cwd=worktree_path, capture_output=True, text=True, timeout=30)
+                result = subprocess.run(
+                    cmd,
+                    cwd=worktree_path,
+                    capture_output=True,
+                    text=True,
+                    timeout=30)
 
                 if result.returncode == 0:
                     # Push the fixes
                     cmd = ["git", "push", "origin", branch_name]
                     subprocess.run(cmd, cwd=worktree_path, timeout=60)
 
-                    logger.info(f"✅ Applied and pushed {len(applied_changes)} fixes")
+                    logger.info(
+                        f"✅ Applied and pushed {len(applied_changes)} fixes")
                     return True
 
-            logger.info("ℹ️ No automatic fixes applied - suggestions require manual review")
+            logger.info(
+                "ℹ️ No automatic fixes applied - suggestions require manual review")
             return False
 
         except Exception as e:
@@ -269,10 +320,12 @@ Focus on critical issues that could cause problems in production.
     async def _remove_unused_imports(self, worktree_path: Path) -> bool:
         """Remove unused imports using autoflake"""
         try:
-            cmd = ["python", "-m", "autoflake", "--remove-all-unused-imports", "--in-place", "--recursive", "."]
-            result = subprocess.run(cmd, cwd=worktree_path, capture_output=True, text=True, timeout=60)
+            cmd = ["python", "-m", "autoflake", "--remove-all-unused-imports",
+                   "--in-place", "--recursive", "."]
+            result = subprocess.run(cmd, cwd=worktree_path,
+                                    capture_output=True, text=True, timeout=60)
             return result.returncode == 0
-        except:
+        except BaseException:
             return False
 
     async def _create_pull_request(self, branch_name: str) -> Optional[str]:
@@ -307,7 +360,8 @@ Production ready implementation for {component} with quality gates passed.
                 "--base", "main"
             ]
 
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
 
             if result.returncode == 0:
                 pr_url = result.stdout.strip()
@@ -329,13 +383,15 @@ Production ready implementation for {component} with quality gates passed.
 
             # Auto-merge with squash
             cmd = ["gh", "pr", "merge", pr_number, "--squash", "--auto"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=60)
 
             if result.returncode == 0:
                 logger.info(f"✅ PR #{pr_number} merged successfully")
                 return True
             else:
-                logger.warning(f"⚠️ Auto-merge failed, may require manual review: {result.stderr}")
+                logger.warning(
+                    f"⚠️ Auto-merge failed, may require manual review: {result.stderr}")
                 # Don't return False - PR still exists for manual review
                 return True
 
@@ -355,7 +411,8 @@ Production ready implementation for {component} with quality gates passed.
 
             # Delete remote branch
             cmd = ["git", "push", "origin", "--delete", branch_name]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=30)
             if result.returncode == 0:
                 logger.info(f"🧹 Deleted remote branch: {branch_name}")
 
@@ -383,11 +440,13 @@ Production ready implementation for {component} with quality gates passed.
         worktrees = list(Path("new-worktrees").glob(pattern))
         return worktrees[0] if worktrees else None
 
-    async def run_batch_integration(self, branch_names: List[str]) -> Dict[str, bool]:
+    async def run_batch_integration(
+            self, branch_names: List[str]) -> Dict[str, bool]:
         """Run integration workflow for multiple branches"""
         results = {}
 
-        logger.info(f"🚀 Starting batch integration for {len(branch_names)} branches")
+        logger.info(
+            f"🚀 Starting batch integration for {len(branch_names)} branches")
 
         for branch_name in branch_names:
             logger.info(f"📝 Processing {branch_name}...")
@@ -403,16 +462,22 @@ Production ready implementation for {component} with quality gates passed.
         success_count = sum(1 for success in results.values() if success)
         total_count = len(results)
 
-        logger.info(f"📊 Batch Integration Results: {success_count}/{total_count} successful")
+        logger.info(
+            f"📊 Batch Integration Results: {success_count}/{total_count} successful")
 
         return results
 
 
 async def main():
-    parser = argparse.ArgumentParser(description="Integration Workflow Manager")
+    parser = argparse.ArgumentParser(
+        description="Integration Workflow Manager")
     parser.add_argument("--branch", help="Single branch to integrate")
-    parser.add_argument("--batch", action="store_true", help="Run batch integration for current feature branches")
-    parser.add_argument("--branches", nargs="+", help="Specific branches to integrate")
+    parser.add_argument(
+        "--batch",
+        action="store_true",
+        help="Run batch integration for current feature branches")
+    parser.add_argument("--branches", nargs="+",
+                        help="Specific branches to integrate")
 
     args = parser.parse_args()
 
@@ -428,10 +493,12 @@ async def main():
         result = subprocess.run(cmd, capture_output=True, text=True)
 
         if result.returncode == 0:
-            branches = [line.strip().replace("origin/", "") for line in result.stdout.split('\n') if line.strip()]
+            branches = [line.strip().replace("origin/", "")
+                        for line in result.stdout.split('\n') if line.strip()]
             if branches:
                 results = await manager.run_batch_integration(branches)
-                success_count = sum(1 for success in results.values() if success)
+                success_count = sum(
+                    1 for success in results.values() if success)
                 sys.exit(0 if success_count == len(branches) else 1)
             else:
                 print("No feature branches found")

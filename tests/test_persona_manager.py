@@ -6,30 +6,27 @@ Comprehensive test suite for the persona management components including
 context compression, quality validation, and performance optimization.
 """
 
-import pytest
-import json
 import tempfile
-import os
-from datetime import datetime
-from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 
+import pytest
+
 from personas.persona_manager import (
-    PersonaManager,
-    PersonaType,
+    CompressionLevel,
+    ContextCompressor,
+    PersonaCapability,
     PersonaConfig,
     PersonaContext,
+    PersonaManager,
     PersonaPerformanceMetrics,
-    ContextCompressor,
+    PersonaType,
     QualityValidator,
-    CompressionLevel,
-    PersonaCapability,
-    persona_manager,
     activate_persona,
-    switch_persona,
     find_optimal_persona,
     get_persona_capabilities,
-    get_system_metrics
+    get_system_metrics,
+    persona_manager,
+    switch_persona,
 )
 
 
@@ -85,7 +82,8 @@ class TestPersonaContext:
 
     def test_persona_context_creation(self):
         """Test persona context creation."""
-        original_context = {"task": "design system", "requirements": ["scalability"]}
+        original_context = {"task": "design system",
+                            "requirements": ["scalability"]}
         compressed_context = {"task": "design system"}
         compression_stats = {"token_reduction": 0.3, "compression_time": 0.1}
 
@@ -130,7 +128,8 @@ class TestContextCompressor:
 
     def test_token_estimation(self):
         """Test token count estimation."""
-        context = {"description": "This is a test description", "code": "print('hello')"}
+        context = {"description": "This is a test description",
+                   "code": "print('hello')"}
         token_count = self.compressor._estimate_tokens(context)
 
         assert token_count > 0
@@ -145,7 +144,8 @@ class TestContextCompressor:
             "system_design": "microservices architecture"
         }
 
-        compressed_context, compression_stats = self.compressor.compress_context(context, self.test_config)
+        compressed_context, compression_stats = self.compressor.compress_context(
+            context, self.test_config)
 
         assert isinstance(compressed_context, dict)
         assert isinstance(compression_stats, dict)
@@ -163,7 +163,8 @@ class TestContextCompressor:
             "irrelevant_data": "some random information"
         }
 
-        compressed = self.compressor._compress_architecture_context(context, self.test_config)
+        compressed = self.compressor._compress_architecture_context(
+            context, self.test_config)
 
         assert "system_design" in compressed
         assert "architecture_patterns" in compressed
@@ -186,13 +187,15 @@ class TestContextCompressor:
         )
 
         context = {
-            "security_requirements": ["authentication", "authorization"],
+            "security_requirements": [
+                "authentication",
+                "authorization"],
             "threat_model": "OWASP Top 10",
             "code": "def authenticate(user, password):\n    return check_credentials(user, password)",
-            "random_data": "irrelevant information"
-        }
+            "random_data": "irrelevant information"}
 
-        compressed = self.compressor._compress_security_context(context, security_config)
+        compressed = self.compressor._compress_security_context(
+            context, security_config)
 
         assert "security_requirements" in compressed
         assert "threat_model" in compressed
@@ -255,7 +258,8 @@ class TestQualityValidator:
         original = {"key1": "value1", "key2": "value2"}
         compressed = {"key1": "value1", "key2": "value2"}
 
-        quality_score = self.validator.validate_compression_quality(original, compressed)
+        quality_score = self.validator.validate_compression_quality(
+            original, compressed)
 
         assert quality_score == 1.0
 
@@ -264,7 +268,8 @@ class TestQualityValidator:
         original = {"key1": "value1", "key2": "value2", "key3": "value3"}
         compressed = {"key1": "value1", "key2": "modified_value2"}
 
-        quality_score = self.validator.validate_compression_quality(original, compressed)
+        quality_score = self.validator.validate_compression_quality(
+            original, compressed)
 
         assert 0.0 < quality_score < 1.0
 
@@ -273,7 +278,8 @@ class TestQualityValidator:
         original = {"key1": "value1", "key2": "value2"}
         compressed = {"key3": "value3", "key4": "value4"}
 
-        quality_score = self.validator.validate_compression_quality(original, compressed)
+        quality_score = self.validator.validate_compression_quality(
+            original, compressed)
 
         assert quality_score >= 0.0
 
@@ -282,16 +288,19 @@ class TestQualityValidator:
         original = {"key1": "value1", "key2": "value2"}
         compressed = {"key1": "value1", "key2": "different_value"}
 
-        preservation = self.validator._calculate_content_preservation(original, compressed)
+        preservation = self.validator._calculate_content_preservation(
+            original, compressed)
 
         assert 0.0 < preservation < 1.0
 
     def test_essential_info_score(self):
         """Test essential information scoring."""
-        original = {"description": "test", "code": "print('hello')", "other": "data"}
+        original = {"description": "test",
+                    "code": "print('hello')", "other": "data"}
         compressed = {"description": "test", "code": "print('hello')"}
 
-        score = self.validator._calculate_essential_info_score(original, compressed)
+        score = self.validator._calculate_essential_info_score(
+            original, compressed)
 
         assert score == 1.0  # Both essential keys preserved
 
@@ -370,10 +379,12 @@ class TestPersonaManager:
         context2 = {"description": "Security analysis"}
 
         # Activate first persona
-        persona_context1 = self.manager.activate_persona("architect", context1, "session1")
+        self.manager.activate_persona(
+            "architect", context1, "session1")
 
         # Switch to second persona
-        persona_context2 = self.manager.switch_persona("architect", "security", context2, "session1")
+        persona_context2 = self.manager.switch_persona(
+            "architect", "security", context2, "session1")
 
         assert persona_context2.persona_name == "security"
         assert persona_context2.session_id == "session1"
@@ -397,11 +408,13 @@ class TestPersonaManager:
         """Test finding optimal persona for capabilities."""
         required_capabilities = ["architecture", "design", "scalability"]
 
-        optimal_persona = self.manager.find_optimal_persona(required_capabilities)
+        optimal_persona = self.manager.find_optimal_persona(
+            required_capabilities)
 
         assert optimal_persona is not None
         assert optimal_persona in self.manager.personas
-        # Should likely return "architect" for architecture-related capabilities
+        # Should likely return "architect" for architecture-related
+        # capabilities
 
     def test_find_optimal_persona_no_requirements(self):
         """Test finding optimal persona with no requirements."""
@@ -458,7 +471,8 @@ class TestPersonaManager:
             "compression_time": 0.1
         }
 
-        self.manager._update_performance_metrics("architect", 0.95, compression_stats)
+        self.manager._update_performance_metrics(
+            "architect", 0.95, compression_stats)
 
         updated_metrics = self.manager.performance_metrics["architect"]
         assert updated_metrics.total_tasks == initial_tasks + 1
@@ -520,10 +534,12 @@ class TestGlobalFunctions:
         context2 = {"description": "Security analysis"}
 
         # Activate first persona
-        persona_context1 = activate_persona("architect", context1, "global_session")
+        activate_persona(
+            "architect", context1, "global_session")
 
         # Switch to second persona
-        persona_context2 = switch_persona("architect", "security", context2, "global_session")
+        persona_context2 = switch_persona(
+            "architect", "security", context2, "global_session")
 
         assert persona_context2.persona_name == "security"
         assert persona_context2.session_id == "global_session"
@@ -559,7 +575,10 @@ class TestIntegration:
         # Define test context
         context = {
             "description": "Design a scalable microservices architecture",
-            "requirements": ["high availability", "performance", "fault tolerance"],
+            "requirements": [
+                "high availability",
+                "performance",
+                "fault tolerance"],
             "code": """
 class ServiceRegistry:
     def __init__(self):
@@ -571,11 +590,13 @@ class ServiceRegistry:
     def discover_service(self, service_name):
         return self.services.get(service_name)
 """,
-            "constraints": ["budget limitations", "timeline constraints"]
-        }
+            "constraints": [
+                "budget limitations",
+                "timeline constraints"]}
 
         # Find optimal persona
-        optimal_persona = find_optimal_persona(["architecture", "microservices", "scalability"])
+        optimal_persona = find_optimal_persona(
+            ["architecture", "microservices", "scalability"])
         assert optimal_persona is not None
 
         # Activate persona
@@ -596,12 +617,16 @@ class ServiceRegistry:
         security_context = {
             "description": "Analyze security vulnerabilities in the architecture",
             "threat_model": "OWASP Top 10",
-            "security_requirements": ["authentication", "authorization", "encryption"]
-        }
+            "security_requirements": [
+                "authentication",
+                "authorization",
+                "encryption"]}
 
         security_persona_context = switch_persona(
-            optimal_persona, "security", security_context, persona_context.session_id
-        )
+            optimal_persona,
+            "security",
+            security_context,
+            persona_context.session_id)
 
         assert security_persona_context.persona_name == "security"
         assert security_persona_context.session_id == persona_context.session_id

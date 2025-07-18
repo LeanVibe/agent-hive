@@ -8,8 +8,8 @@ on business impact and actionable insights.
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Any
 from enum import Enum
+from typing import Dict, List, Optional
 
 
 class AgentStatus(Enum):
@@ -58,13 +58,14 @@ class GitHubIssueTemplate:
             'executive_summary': self.generate_executive_summary
         }
 
-    def generate_agent_progress_update(self,
-                                     agent_name: str,
-                                     status: AgentStatus,
-                                     metrics: AgentMetrics,
-                                     next_milestone: str,
-                                     action_items: List[ActionItem],
-                                     detailed_progress: Optional[str] = None) -> str:
+    def generate_agent_progress_update(
+            self,
+            agent_name: str,
+            status: AgentStatus,
+            metrics: AgentMetrics,
+            next_milestone: str,
+            action_items: List[ActionItem],
+            detailed_progress: Optional[str] = None) -> str:
         """Generate a structured agent progress update."""
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -92,7 +93,9 @@ class GitHubIssueTemplate:
         else:
             template += "- [ ] Actions needed:\n"
             for item in action_items:
-                template += f"  - [ ] {item.description} (Priority: {item.priority})\n"
+                template += f"  - [ ] {
+                    item.description} (Priority: {
+                    item.priority})\n"
 
         if detailed_progress:
             template += f"""
@@ -118,11 +121,11 @@ class GitHubIssueTemplate:
         return template
 
     def generate_milestone_completion(self,
-                                    agent_name: str,
-                                    milestone_name: str,
-                                    achievements: List[str],
-                                    business_impact: str,
-                                    next_phase: str) -> str:
+                                      agent_name: str,
+                                      milestone_name: str,
+                                      achievements: List[str],
+                                      business_impact: str,
+                                      next_phase: str) -> str:
         """Generate milestone completion template."""
 
         template = f"""## 🎉 Milestone Completed: {milestone_name}
@@ -157,11 +160,11 @@ class GitHubIssueTemplate:
         return template
 
     def generate_blocker_report(self,
-                              agent_name: str,
-                              blocker_description: str,
-                              impact_assessment: str,
-                              suggested_solutions: List[str],
-                              escalation_level: str) -> str:
+                                agent_name: str,
+                                blocker_description: str,
+                                impact_assessment: str,
+                                suggested_solutions: List[str],
+                                escalation_level: str) -> str:
         """Generate blocker report template."""
 
         template = f"""## 🚨 Agent Blocker Report
@@ -199,11 +202,11 @@ class GitHubIssueTemplate:
         return template
 
     def generate_executive_summary(self,
-                                 agents_data: List[Dict],
-                                 overall_progress: int,
-                                 key_achievements: List[str],
-                                 business_impact: Dict[str, str],
-                                 strategic_recommendations: List[str]) -> str:
+                                   agents_data: List[Dict],
+                                   overall_progress: int,
+                                   key_achievements: List[str],
+                                   business_impact: Dict[str, str],
+                                   strategic_recommendations: List[str]) -> str:
         """Generate executive summary template."""
 
         template = f"""## 📊 Executive Summary - Agent Hive Status
@@ -226,13 +229,21 @@ class GitHubIssueTemplate:
         for metric, value in business_impact.items():
             template += f"- **{metric}**: {value}\n"
 
-        template += f"""
+        template += """
 ### 👥 Agent Status Overview
 """
 
         for agent in agents_data:
-            progress_bar = self._create_text_progress_bar(agent.get('progress', 0))
-            template += f"- **{agent['name']}**: {progress_bar} {agent.get('progress', 0)}% ({agent.get('status', 'Unknown')})\n"
+            progress_bar = self._create_text_progress_bar(
+                agent.get('progress', 0))
+            template += f"- **{
+                agent['name']}**: {progress_bar} {
+                agent.get(
+                    'progress',
+                    0)}% ({
+                agent.get(
+                    'status',
+                    'Unknown')})\n"
 
         template += """
 ### 🎯 Strategic Recommendations
@@ -253,7 +264,10 @@ class GitHubIssueTemplate:
 
         return template
 
-    def _get_immediate_next_step(self, status: AgentStatus, metrics: AgentMetrics) -> str:
+    def _get_immediate_next_step(
+            self,
+            status: AgentStatus,
+            metrics: AgentMetrics) -> str:
         """Get immediate next step based on status."""
         if status == AgentStatus.BLOCKED:
             return "Resolve current blocker"
@@ -286,7 +300,7 @@ class GitHubIssueTemplate:
         elif estimated_hours < 24:
             return f"{estimated_hours:.0f} hours"
         else:
-            return f"{estimated_hours/24:.1f} days"
+            return f"{estimated_hours / 24:.1f} days"
 
     def _estimate_next_phase_timeline(self) -> str:
         """Estimate timeline for next phase."""
@@ -304,7 +318,8 @@ class GitHubIssueTemplate:
 
     def _get_next_week_priority(self, agents_data: List[Dict]) -> str:
         """Get next week's priority based on agent status."""
-        complete_agents = [agent for agent in agents_data if agent.get('progress', 0) >= 100]
+        complete_agents = [
+            agent for agent in agents_data if agent.get('progress', 0) >= 100]
         if complete_agents:
             return "PR reviews and production deployment"
         else:
@@ -320,7 +335,9 @@ class GitHubIssueTemplate:
 
     def _get_risk_mitigation_plan(self, agents_data: List[Dict]) -> str:
         """Get risk mitigation plan."""
-        blocked_agents = [agent for agent in agents_data if 'blocked' in agent.get('status', '').lower()]
+        blocked_agents = [
+            agent for agent in agents_data if 'blocked' in agent.get(
+                'status', '').lower()]
         if blocked_agents:
             return "Focus on unblocking agents and preventing similar issues"
         else:

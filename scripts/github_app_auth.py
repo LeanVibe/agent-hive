@@ -5,19 +5,20 @@ Provides secure authentication for agents to interact with GitHub API
 """
 
 import base64
-import json
-import subprocess
-import time
 import logging
 import os
+import subprocess
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Dict
+
 import jwt
 import requests
 from cryptography.hazmat.primitives import serialization
 
 logger = logging.getLogger(__name__)
+
 
 class GitHubAppAuth:
     """GitHub App authentication manager for agent PR operations."""
@@ -31,10 +32,12 @@ class GitHubAppAuth:
             private_key_path: Path to private key file (defaults to env var GITHUB_APP_PRIVATE_KEY_PATH)
         """
         self.app_id = app_id or os.getenv('GITHUB_APP_ID')
-        self.private_key_path = private_key_path or os.getenv('GITHUB_APP_PRIVATE_KEY_PATH', '.github/app-private-key.pem')
+        self.private_key_path = private_key_path or os.getenv(
+            'GITHUB_APP_PRIVATE_KEY_PATH', '.github/app-private-key.pem')
 
         if not self.app_id:
-            raise ValueError("GitHub App ID not provided. Set GITHUB_APP_ID environment variable.")
+            raise ValueError(
+                "GitHub App ID not provided. Set GITHUB_APP_ID environment variable.")
 
         self.private_key = self._load_private_key()
         self.installation_token_cache = {}
@@ -74,7 +77,8 @@ class GitHubAppAuth:
         """Generate JWT for GitHub App authentication."""
         now = int(time.time())
         payload = {
-            'iat': now - 60,  # Issued at (60 seconds ago to account for clock skew)
+            # Issued at (60 seconds ago to account for clock skew)
+            'iat': now - 60,
             'exp': now + 600,  # Expires (10 minutes from now)
             'iss': self.app_id  # Issuer (GitHub App ID)
         }
@@ -118,7 +122,8 @@ class GitHubAppAuth:
             self.installation_id_cache[cache_key] = installation_id
             return installation_id
 
-        raise Exception(f"Could not find GitHub App installation for {owner}/{repo}: {response.text}")
+        raise Exception(
+            f"Could not find GitHub App installation for {owner}/{repo}: {response.text}")
 
     def get_installation_token(self, owner: str, repo: str) -> str:
         """Get installation access token for repository operations."""
@@ -128,7 +133,8 @@ class GitHubAppAuth:
         cache_key = f"{owner}/{repo}"
         if cache_key in self.installation_token_cache:
             token_data = self.installation_token_cache[cache_key]
-            expires_at = datetime.fromisoformat(token_data['expires_at'].replace('Z', '+00:00'))
+            expires_at = datetime.fromisoformat(
+                token_data['expires_at'].replace('Z', '+00:00'))
 
             # Return cached token if it's valid for more than 5 minutes
             if expires_at > datetime.now().astimezone() + timedelta(minutes=5):
@@ -149,9 +155,11 @@ class GitHubAppAuth:
             self.installation_token_cache[cache_key] = token_data
             return token_data['token']
 
-        raise Exception(f"Could not create installation token: {response.text}")
+        raise Exception(
+            f"Could not create installation token: {response.text}")
 
-    def get_authenticated_headers(self, owner: str, repo: str) -> Dict[str, str]:
+    def get_authenticated_headers(
+            self, owner: str, repo: str) -> Dict[str, str]:
         """Get headers with installation token for API requests."""
         token = self.get_installation_token(owner, repo)
         return {
@@ -168,14 +176,17 @@ class GitHubAppAuth:
             response = requests.get(url, headers=headers)
 
             if response.status_code == 200:
-                logger.info(f"✅ GitHub App authentication successful for {owner}/{repo}")
+                logger.info(
+                    f"✅ GitHub App authentication successful for {owner}/{repo}")
                 return True
             else:
-                logger.error(f"❌ GitHub App authentication failed: {response.status_code} - {response.text}")
+                logger.error(
+                    f"❌ GitHub App authentication failed: {response.status_code} - {response.text}")
                 return False
         except Exception as e:
             logger.error(f"❌ GitHub App authentication error: {e}")
             return False
+
 
 def setup_github_auth() -> GitHubAppAuth:
     """Setup GitHub App authentication with fallbacks."""
@@ -184,11 +195,14 @@ def setup_github_auth() -> GitHubAppAuth:
     except (ValueError, FileNotFoundError) as e:
         logger.warning(f"⚠️ GitHub App authentication not available: {e}")
         logger.info("📝 To enable GitHub App authentication:")
-        logger.info("   1. Create a GitHub App at https://github.com/settings/apps")
+        logger.info(
+            "   1. Create a GitHub App at https://github.com/settings/apps")
         logger.info("   2. Set GITHUB_APP_ID environment variable")
-        logger.info("   3. Save private key to .github/app-private-key.pem or set GITHUB_APP_PRIVATE_KEY_BASE64")
+        logger.info(
+            "   3. Save private key to .github/app-private-key.pem or set GITHUB_APP_PRIVATE_KEY_BASE64")
         logger.info("   4. Install the app on your repository")
         return None
+
 
 def get_repository_info() -> tuple:
     """Get current repository owner and name from git remote."""
@@ -204,24 +218,29 @@ def get_repository_info() -> tuple:
         if 'github.com' in remote_url:
             if remote_url.startswith('git@github.com:'):
                 # SSH format: git@github.com:owner/repo.git
-                repo_path = remote_url.replace('git@github.com:', '').replace('.git', '')
+                repo_path = remote_url.replace(
+                    'git@github.com:', '').replace('.git', '')
             elif remote_url.startswith('https://github.com/'):
                 # HTTPS format: https://github.com/owner/repo.git
-                repo_path = remote_url.replace('https://github.com/', '').replace('.git', '')
+                repo_path = remote_url.replace(
+                    'https://github.com/', '').replace('.git', '')
             else:
                 raise ValueError(f"Unexpected GitHub URL format: {remote_url}")
 
             owner, repo = repo_path.split('/', 1)
             return owner, repo
         else:
-            raise ValueError(f"Remote is not a GitHub repository: {remote_url}")
+            raise ValueError(
+                f"Remote is not a GitHub repository: {remote_url}")
 
     except subprocess.CalledProcessError as e:
         raise Exception(f"Could not get git remote: {e}")
 
+
 def main():
     """Test GitHub App authentication."""
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s')
 
     try:
         # Setup authentication
@@ -240,6 +259,7 @@ def main():
     except Exception as e:
         logger.error(f"❌ Authentication test failed: {e}")
         return 1
+
 
 if __name__ == "__main__":
     exit(main())

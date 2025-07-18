@@ -11,16 +11,13 @@ Usage:
 """
 
 import argparse
-import asyncio
-import os
 import re
+import subprocess
 import sys
-import tempfile
-import traceback
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import subprocess
+from typing import List, Optional, Tuple
+
 
 @dataclass
 class CodeTestResult:
@@ -32,6 +29,7 @@ class CodeTestResult:
     execution_time: float
     output: Optional[str] = None
     error: Optional[str] = None
+
 
 class CodeExampleTester:
     """Framework for testing code examples in documentation."""
@@ -45,8 +43,10 @@ class CodeExampleTester:
         """Setup Python path and test environment."""
         if not self.test_environment_setup:
             sys.path.insert(0, str(self.project_root))
-            sys.path.insert(0, str(self.project_root / "advanced_orchestration"))
-            sys.path.insert(0, str(self.project_root / "intelligence_framework"))
+            sys.path.insert(
+                0, str(self.project_root / "advanced_orchestration"))
+            sys.path.insert(
+                0, str(self.project_root / "intelligence_framework"))
             sys.path.insert(0, str(self.project_root / "external_api"))
             sys.path.insert(0, str(self.project_root / "ml_enhancements"))
             self.test_environment_setup = True
@@ -60,7 +60,8 @@ class CodeExampleTester:
         examples = []
 
         # Find all Python code blocks
-        python_blocks = re.findall(r'```(?:python|py)\n(.*?)\n```', content, re.DOTALL)
+        python_blocks = re.findall(
+            r'```(?:python|py)\n(.*?)\n```', content, re.DOTALL)
 
         for i, code_block in enumerate(python_blocks):
             # Skip examples that are clearly not executable
@@ -94,7 +95,7 @@ class CodeExampleTester:
             ]):
                 continue
 
-            example_id = f"{file_path.name}_example_{i+1}"
+            example_id = f"{file_path.name}_example_{i + 1}"
             examples.append((example_id, code_block))
 
         return examples
@@ -143,7 +144,11 @@ except Exception as e:
                 indented_lines.append('')
         return '\n'.join(indented_lines)
 
-    def test_code_example(self, example_id: str, code: str, file_name: str) -> CodeTestResult:
+    def test_code_example(
+            self,
+            example_id: str,
+            code: str,
+            file_name: str) -> CodeTestResult:
         """Test a single code example."""
         import time
         start_time = time.time()
@@ -239,7 +244,7 @@ except Exception as e:
         examples = self.extract_code_examples(file_path)
 
         if not examples:
-            print(f"    ℹ️  No testable examples found")
+            print("    ℹ️  No testable examples found")
             return results
 
         for example_id, code in examples:
@@ -293,7 +298,8 @@ except Exception as e:
 
         # Calculate statistics
         total_tests = len(self.results)
-        pass_rate = (status_counts["pass"] / total_tests * 100) if total_tests > 0 else 0
+        pass_rate = (status_counts["pass"] / total_tests *
+                     100) if total_tests > 0 else 0
         total_time = sum(result.execution_time for result in self.results)
         avg_time = total_time / total_tests if total_tests > 0 else 0
 
@@ -305,9 +311,10 @@ except Exception as e:
         report.append("")
 
         # Summary
-        report.append(f"📊 TESTING SUMMARY:")
+        report.append("📊 TESTING SUMMARY:")
         report.append(f"   Total Examples Tested: {total_tests}")
-        report.append(f"   ✅ Passed: {status_counts['pass']} ({pass_rate:.1f}%)")
+        report.append(
+            f"   ✅ Passed: {status_counts['pass']} ({pass_rate:.1f}%)")
         report.append(f"   ❌ Failed: {status_counts['fail']}")
         report.append(f"   ⏭️ Skipped: {status_counts['skip']}")
         report.append(f"   ⏱️ Total Execution Time: {total_time:.2f}s")
@@ -316,13 +323,16 @@ except Exception as e:
 
         # Overall status
         if status_counts["fail"] == 0:
-            report.append("🎉 OVERALL STATUS: EXCELLENT - All code examples work!")
+            report.append(
+                "🎉 OVERALL STATUS: EXCELLENT - All code examples work!")
         elif status_counts["fail"] <= 2:
             report.append("✅ OVERALL STATUS: GOOD - Minor issues to fix")
         elif status_counts["fail"] <= 5:
-            report.append("⚠️ OVERALL STATUS: NEEDS ATTENTION - Several examples failing")
+            report.append(
+                "⚠️ OVERALL STATUS: NEEDS ATTENTION - Several examples failing")
         else:
-            report.append("❌ OVERALL STATUS: CRITICAL - Many examples not working")
+            report.append(
+                "❌ OVERALL STATUS: CRITICAL - Many examples not working")
 
         report.append("")
 
@@ -336,7 +346,8 @@ except Exception as e:
         for file_name, file_results in sorted(results_by_file.items()):
             report.append(f"📄 {file_name}:")
             for result in file_results:
-                report.append(f"   {result.message} ({result.execution_time:.2f}s)")
+                report.append(
+                    f"   {result.message} ({result.execution_time:.2f}s)")
                 if result.status == "fail" and result.error:
                     report.append(f"      Error: {result.error}")
             report.append("")
@@ -344,22 +355,33 @@ except Exception as e:
         # Recommendations
         report.append("💡 RECOMMENDATIONS:")
         if status_counts["fail"] > 0:
-            report.append("   1. Fix failing code examples by updating syntax or adding proper imports")
-            report.append("   2. Consider wrapping async examples in asyncio.run() or async functions")
+            report.append(
+                "   1. Fix failing code examples by updating syntax or adding proper imports")
+            report.append(
+                "   2. Consider wrapping async examples in asyncio.run() or async functions")
         if pass_rate < 90:
-            report.append("   3. Improve code example quality to achieve >90% pass rate")
-        report.append("   4. Add this testing to CI/CD pipeline for continuous validation")
-        report.append("   5. Consider adding expected output comments to examples")
+            report.append(
+                "   3. Improve code example quality to achieve >90% pass rate")
+        report.append(
+            "   4. Add this testing to CI/CD pipeline for continuous validation")
+        report.append(
+            "   5. Consider adding expected output comments to examples")
 
         return "\n".join(report)
 
+
 def main():
     """Main code example testing entry point."""
-    parser = argparse.ArgumentParser(description="Test LeanVibe Agent Hive code examples")
-    parser.add_argument("--all", action="store_true", help="Test all code examples")
-    parser.add_argument("--api-reference", action="store_true", help="Test API reference examples")
-    parser.add_argument("--readme", action="store_true", help="Test README examples")
-    parser.add_argument("--output", type=str, help="Output file for test report")
+    parser = argparse.ArgumentParser(
+        description="Test LeanVibe Agent Hive code examples")
+    parser.add_argument("--all", action="store_true",
+                        help="Test all code examples")
+    parser.add_argument("--api-reference", action="store_true",
+                        help="Test API reference examples")
+    parser.add_argument("--readme", action="store_true",
+                        help="Test README examples")
+    parser.add_argument("--output", type=str,
+                        help="Output file for test report")
 
     args = parser.parse_args()
 
@@ -378,9 +400,11 @@ def main():
     else:
         results = []
         if args.api_reference:
-            results.extend(tester.test_file_examples(project_root / "API_REFERENCE.md"))
+            results.extend(tester.test_file_examples(
+                project_root / "API_REFERENCE.md"))
         if args.readme:
-            results.extend(tester.test_file_examples(project_root / "README.md"))
+            results.extend(tester.test_file_examples(
+                project_root / "README.md"))
 
     # Generate and display report
     report = tester.generate_report()
@@ -398,8 +422,9 @@ def main():
         print(f"\n❌ Testing failed with {failed_tests} failing examples")
         sys.exit(1)
     else:
-        print(f"\n✅ All code examples tested successfully!")
+        print("\n✅ All code examples tested successfully!")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

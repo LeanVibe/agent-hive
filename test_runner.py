@@ -7,14 +7,13 @@ performance benchmarking, and quality gate validation.
 """
 
 import argparse
+import json
 import subprocess
 import sys
-import os
-import json
 import time
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 
 class TestRunner:
     """Comprehensive test runner with quality gates."""
@@ -52,7 +51,8 @@ class TestRunner:
         ]
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=300)
             duration = time.time() - start_time
 
             # Parse pytest output
@@ -74,9 +74,11 @@ class TestRunner:
                 "coverage": coverage_data
             }
 
-            self.results["duration"] = float(self.results["duration"]) + duration
+            self.results["duration"] = float(
+                self.results["duration"]) + duration
             if coverage_data:
-                self.results["coverage"] = coverage_data.get("totals", {}).get("percent_covered", 0)
+                self.results["coverage"] = coverage_data.get(
+                    "totals", {}).get("percent_covered", 0)
 
             return test_result
 
@@ -102,7 +104,8 @@ class TestRunner:
         ]
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=600)
             duration = time.time() - start_time
 
             return {
@@ -136,7 +139,8 @@ class TestRunner:
         ]
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=300)
             duration = time.time() - start_time
 
             return {
@@ -162,11 +166,17 @@ class TestRunner:
         start_time = time.time()
 
         cmd = [
-            "bandit", "-r", ".claude/", "-f", "json", "-o", "security_report.json"
-        ]
+            "bandit",
+            "-r",
+            ".claude/",
+            "-f",
+            "json",
+            "-o",
+            "security_report.json"]
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=180)
             duration = time.time() - start_time
 
             # Load security report
@@ -196,7 +206,8 @@ class TestRunner:
                 "error": "bandit not installed"
             }
 
-    def validate_quality_gates(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def validate_quality_gates(
+            self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Validate quality gates based on test results."""
         print("🚪 Validating quality gates...")
 
@@ -236,7 +247,8 @@ class TestRunner:
         gates.append(performance_gate)
 
         # Security gate
-        security_result = next((r for r in results if r["type"] == "security_tests"), None)
+        security_result = next(
+            (r for r in results if r["type"] == "security_tests"), None)
         security_gate = {
             "name": "Security",
             "threshold": 0,  # No high-severity issues
@@ -315,7 +327,8 @@ class TestRunner:
         gates_passed = all(gate["passed"] for gate in quality_gates)
         overall_passed = all_passed and gates_passed
 
-        print(f"\n🎯 Overall Result: {'✅ PASS' if overall_passed else '❌ FAIL'}")
+        print(
+            f"\n🎯 Overall Result: {'✅ PASS' if overall_passed else '❌ FAIL'}")
 
         # Save detailed report
         with open("test_report.json", "w") as f:
@@ -364,13 +377,20 @@ class TestRunner:
 
 def main() -> int:
     """Main entry point."""
-    parser = argparse.ArgumentParser(description="Comprehensive test runner for LeanVibe Quality Agent")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
-    parser.add_argument("--unit-only", action="store_true", help="Run only unit tests")
-    parser.add_argument("--integration-only", action="store_true", help="Run only integration tests")
-    parser.add_argument("--performance-only", action="store_true", help="Run only performance tests")
-    parser.add_argument("--security-only", action="store_true", help="Run only security tests")
-    parser.add_argument("--pattern", default="tests/", help="Test pattern to run")
+    parser = argparse.ArgumentParser(
+        description="Comprehensive test runner for LeanVibe Quality Agent")
+    parser.add_argument("--verbose", "-v",
+                        action="store_true", help="Verbose output")
+    parser.add_argument("--unit-only", action="store_true",
+                        help="Run only unit tests")
+    parser.add_argument("--integration-only", action="store_true",
+                        help="Run only integration tests")
+    parser.add_argument("--performance-only", action="store_true",
+                        help="Run only performance tests")
+    parser.add_argument("--security-only", action="store_true",
+                        help="Run only security tests")
+    parser.add_argument("--pattern", default="tests/",
+                        help="Test pattern to run")
 
     args = parser.parse_args()
 

@@ -4,41 +4,49 @@ Pytest configuration and fixtures for LeanVibe Orchestrator tests.
 This module provides common fixtures and configurations used across all tests.
 """
 
-import pytest
-import pytest_asyncio
 import asyncio
-import tempfile
 import shutil
-from pathlib import Path
-from typing import Dict, Any, AsyncGenerator
-from unittest.mock import AsyncMock, MagicMock
-from datetime import datetime
 
 # Add project root and .claude to path for imports
 import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
+from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+import pytest_asyncio
+
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
 
 # Import components for testing
 try:
-    from task_queue_module.task_queue import Task, TaskQueue
-    from agents.base_agent import BaseAgent, AgentStatus, AgentInfo  # Fixed: AgentStatus is the enum
+    # Fixed: AgentStatus is the enum
+    from agents.base_agent import AgentInfo, AgentStatus, BaseAgent
     from config.config_loader import ConfigLoader
-    from utils.logging_config import get_logger
+    from task_queue_module.task_queue import Task, TaskQueue
 except ImportError as e:
     print(f"Import error in conftest: {e}")
     # Create minimal mock classes for testing
+
     class Task:
         pass
+
     class TaskQueue:
         pass
+
     class BaseAgent:
         pass
+
     class AgentStatus:
         pass
+
     class AgentInfo:
         pass
+
     class ConfigLoader:
         pass
 
@@ -104,7 +112,8 @@ def mock_agent():
     """Create a mock agent for testing."""
     agent = AsyncMock(spec=BaseAgent)
     agent.agent_id = "mock-agent-001"
-    agent.get_capabilities.return_value = ["code_generation", "text_processing"]
+    agent.get_capabilities.return_value = [
+        "code_generation", "text_processing"]
     agent.can_handle_task.return_value = True
     agent.get_status.return_value = AgentInfo(
         id="mock-agent-001",
@@ -149,8 +158,10 @@ def mock_config():
     }
 
     config = MagicMock(spec=ConfigLoader)
-    config.get.side_effect = lambda key, default=None: _get_nested_value(config_data, key, default)
-    config.get_agent_config.side_effect = lambda agent: config_data.get("agents", {}).get(agent, {})
+    config.get.side_effect = lambda key, default=None: _get_nested_value(
+        config_data, key, default)
+    config.get_agent_config.side_effect = lambda agent: config_data.get(
+        "agents", {}).get(agent, {})
     config.should_use_mock_cli.return_value = True
     config.is_development_mode.return_value = True
     config.get_cli_path.side_effect = lambda agent: f"/mock/{agent}_test"
@@ -158,7 +169,8 @@ def mock_config():
     return config
 
 
-def _get_nested_value(data: Dict[str, Any], key: str, default: Any = None) -> Any:
+def _get_nested_value(data: Dict[str, Any],
+                      key: str, default: Any = None) -> Any:
     """Helper function to get nested dictionary values using dot notation."""
     keys = key.split('.')
     current = data

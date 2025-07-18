@@ -12,16 +12,15 @@ Usage:
     python scripts/emergency_complete.py --template-type "feature" --evidence-level "high"
 """
 
-import os
-import sys
-import json
-import subprocess
 import argparse
+import json
 import logging
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+import os
+import subprocess
+import sys
 from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -210,12 +209,13 @@ class EmergencyCompletion:
         # Git status and changes
         try:
             result = subprocess.run(['git', 'status', '--porcelain'],
-                                  capture_output=True, text=True, check=True)
+                                    capture_output=True, text=True, check=True)
             self.evidence.files_changed = [
                 line.strip()[3:] for line in result.stdout.strip().split('\n')
                 if line.strip()
             ]
-            self.evidence.success_indicators.append(f"Files tracked: {len(self.evidence.files_changed)}")
+            self.evidence.success_indicators.append(
+                f"Files tracked: {len(self.evidence.files_changed)}")
         except subprocess.CalledProcessError as e:
             self.evidence.errors.append(f"Git status failed: {e}")
 
@@ -228,28 +228,37 @@ class EmergencyCompletion:
         # Performance metrics
         self._collect_performance_evidence()
 
-        self.logger.info(f"✅ Evidence collection complete: {len(self.evidence.success_indicators)} success indicators")
+        self.logger.info(
+            f"✅ Evidence collection complete: {len(self.evidence.success_indicators)} success indicators")
 
     def _collect_test_evidence(self) -> None:
         """Collect test execution evidence."""
         test_commands = [
             ("Python Syntax", ["python", "-m", "py_compile", "**/*.py"]),
-            ("ML Tests", ["python", "-c", "import ml_enhancements.models; print('ML imports successful')"]),
+            ("ML Tests", [
+             "python", "-c", "import ml_enhancements.models; print('ML imports successful')"]),
             ("CLI Tests", ["python", "cli.py", "--help"])
         ]
 
         for test_name, command in test_commands:
             try:
-                result = subprocess.run(command, capture_output=True, text=True,
-                                      timeout=30, cwd=".")
+                result = subprocess.run(
+                    command,
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    cwd=".")
                 if result.returncode == 0:
                     self.evidence.tests_status[test_name] = "PASSED"
-                    self.evidence.success_indicators.append(f"{test_name} validation passed")
+                    self.evidence.success_indicators.append(
+                        f"{test_name} validation passed")
                 else:
                     self.evidence.tests_status[test_name] = f"FAILED: {result.stderr[:100]}"
                     self.evidence.errors.append(f"{test_name} failed")
             except Exception as e:
-                self.evidence.tests_status[test_name] = f"ERROR: {str(e)[:100]}"
+                self.evidence.tests_status[test_name] = f"ERROR: {
+                    str(e)[
+                        :100]}"
                 self.evidence.errors.append(f"{test_name} error: {e}")
 
     def _collect_quality_evidence(self) -> None:
@@ -263,7 +272,8 @@ class EmergencyCompletion:
 
         self.evidence.quality_gates.update(quality_checks)
         passed_gates = sum(1 for passed in quality_checks.values() if passed)
-        self.evidence.success_indicators.append(f"Quality gates: {passed_gates}/{len(quality_checks)} passed")
+        self.evidence.success_indicators.append(
+            f"Quality gates: {passed_gates}/{len(quality_checks)} passed")
 
     def _collect_performance_evidence(self) -> None:
         """Collect performance metrics."""
@@ -271,13 +281,14 @@ class EmergencyCompletion:
             # CLI performance test
             start_time = datetime.now()
             result = subprocess.run(['python', 'cli.py', '--help'],
-                                  capture_output=True, text=True, timeout=10)
+                                    capture_output=True, text=True, timeout=10)
             end_time = datetime.now()
 
             if result.returncode == 0:
                 duration = (end_time - start_time).total_seconds() * 1000
                 self.evidence.performance_metrics["cli_response_ms"] = duration
-                self.evidence.success_indicators.append(f"CLI performance: {duration:.0f}ms")
+                self.evidence.success_indicators.append(
+                    f"CLI performance: {duration:.0f}ms")
 
         except Exception as e:
             self.evidence.errors.append(f"Performance test failed: {e}")
@@ -290,36 +301,43 @@ class EmergencyCompletion:
             for file in key_files:
                 if os.path.exists(file):
                     subprocess.run(['python', '-m', 'py_compile', file],
-                                 check=True, capture_output=True)
+                                   check=True, capture_output=True)
             return True
-        except:
+        except BaseException:
             return False
 
     def _check_imports(self) -> bool:
         """Check if critical imports work."""
         try:
-            subprocess.run(['python', '-c', 'import intelligence_framework; import ml_enhancements.models'],
-                         check=True, capture_output=True)
+            subprocess.run(['python',
+                            '-c',
+                            'import intelligence_framework; import ml_enhancements.models'],
+                           check=True,
+                           capture_output=True)
             return True
-        except:
+        except BaseException:
             return False
 
     def _check_structure(self) -> bool:
         """Check project structure."""
-        required_files = ["cli.py", "intelligence_framework.py", "ml_enhancements/", "scripts/"]
+        required_files = ["cli.py", "intelligence_framework.py",
+                          "ml_enhancements/", "scripts/"]
         return all(os.path.exists(f) for f in required_files)
 
     def _check_staging(self) -> bool:
         """Check if changes are staged."""
         try:
             result = subprocess.run(['git', 'diff', '--cached', '--name-only'],
-                                  capture_output=True, text=True, check=True)
+                                    capture_output=True, text=True, check=True)
             return bool(result.stdout.strip())
-        except:
+        except BaseException:
             return False
 
-    def execute_emergency_commit(self, title: str, template_type: str = "emergency",
-                                reason: str = "Workflow deadline") -> str:
+    def execute_emergency_commit(
+            self,
+            title: str,
+            template_type: str = "emergency",
+            reason: str = "Workflow deadline") -> str:
         """Execute emergency commit with evidence."""
         self.logger.info(f"⚡ Executing emergency commit: {title}")
 
@@ -337,7 +355,8 @@ class EmergencyCompletion:
         )
 
         if self.dry_run:
-            self.logger.info(f"DRY RUN: Would commit with message:\n{commit_message}")
+            self.logger.info(
+                f"DRY RUN: Would commit with message:\n{commit_message}")
             return "dry-run-commit"
 
         try:
@@ -346,16 +365,17 @@ class EmergencyCompletion:
                 subprocess.run(['git', 'add', '.'], check=True)
 
             # Commit
-            result = subprocess.run(['git', 'commit', '-m', commit_message],
-                                  capture_output=True, text=True, check=True)
+            subprocess.run(['git', 'commit', '-m', commit_message],
+                                    capture_output=True, text=True, check=True)
 
             # Get commit hash
             hash_result = subprocess.run(['git', 'rev-parse', 'HEAD'],
-                                       capture_output=True, text=True, check=True)
+                                         capture_output=True, text=True, check=True)
             commit_hash = hash_result.stdout.strip()
             self.evidence.commit_hash = commit_hash
 
-            self.logger.info(f"✅ Emergency commit successful: {commit_hash[:8]}")
+            self.logger.info(
+                f"✅ Emergency commit successful: {commit_hash[:8]}")
             return commit_hash
 
         except subprocess.CalledProcessError as e:
@@ -375,7 +395,7 @@ class EmergencyCompletion:
         try:
             # Get current branch
             result = subprocess.run(['git', 'branch', '--show-current'],
-                                  capture_output=True, text=True, check=True)
+                                    capture_output=True, text=True, check=True)
             branch = result.stdout.strip()
 
             # Push with force-with-lease if force mode
@@ -393,9 +413,12 @@ class EmergencyCompletion:
             self.logger.error(error_msg)
             return False
 
-    def create_emergency_pr(self, title: str, description: str,
-                           template_type: str = "emergency",
-                           reason: str = "Workflow deadline") -> Optional[str]:
+    def create_emergency_pr(
+            self,
+            title: str,
+            description: str,
+            template_type: str = "emergency",
+            reason: str = "Workflow deadline") -> Optional[str]:
         """Create emergency PR with evidence."""
         self.logger.info(f"📝 Creating emergency PR: {title}")
 
@@ -415,7 +438,8 @@ class EmergencyCompletion:
         ])
 
         files_changed = "\n".join([
-            f"- `{file}`" for file in self.evidence.files_changed[:10]  # Limit to 10 files
+            # Limit to 10 files
+            f"- `{file}`" for file in self.evidence.files_changed[:10]
         ])
 
         pr_body = template.format(
@@ -463,34 +487,40 @@ class EmergencyCompletion:
                 "commit_hash": self.evidence.commit_hash,
                 "pr_url": self.evidence.pr_url,
                 "evidence_summary": {
-                    "files_changed": len(self.evidence.files_changed),
-                    "tests_executed": len(self.evidence.tests_status),
-                    "quality_gates_passed": sum(1 for passed in self.evidence.quality_gates.values() if passed),
-                    "success_indicators": len(self.evidence.success_indicators),
-                    "errors_encountered": len(self.evidence.errors)
-                },
+                    "files_changed": len(
+                        self.evidence.files_changed),
+                    "tests_executed": len(
+                        self.evidence.tests_status),
+                    "quality_gates_passed": sum(
+                        1 for passed in self.evidence.quality_gates.values() if passed),
+                    "success_indicators": len(
+                        self.evidence.success_indicators),
+                    "errors_encountered": len(
+                        self.evidence.errors)},
                 "detailed_evidence": {
                     "files_changed": self.evidence.files_changed,
                     "test_results": self.evidence.tests_status,
                     "quality_gates": self.evidence.quality_gates,
                     "performance_metrics": self.evidence.performance_metrics,
                     "success_indicators": self.evidence.success_indicators,
-                    "errors": self.evidence.errors
-                }
-            }
-        }
+                    "errors": self.evidence.errors}}}
 
         # Save to file
-        report_file = f"emergency_completion_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        report_file = f"emergency_completion_report_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_file, 'w') as f:
             json.dump(report, f, indent=2)
 
         self.logger.info(f"📊 Evidence report saved: {report_file}")
         return report_file
 
-    def execute_full_emergency_workflow(self, title: str, description: str,
-                                      phase: str = "1.3", template_type: str = "emergency",
-                                      reason: str = "Workflow deadline") -> Dict[str, str]:
+    def execute_full_emergency_workflow(self,
+                                        title: str,
+                                        description: str,
+                                        phase: str = "1.3",
+                                        template_type: str = "emergency",
+                                        reason: str = "Workflow deadline") -> Dict[str,
+                                                                                   str]:
         """Execute complete emergency workflow."""
         self.logger.info(f"🚨 EXECUTING FULL EMERGENCY WORKFLOW: {title}")
 
@@ -508,7 +538,8 @@ class EmergencyCompletion:
 
         try:
             # Step 1: Emergency commit
-            commit_hash = self.execute_emergency_commit(title, template_type, reason)
+            commit_hash = self.execute_emergency_commit(
+                title, template_type, reason)
             results["commit_hash"] = commit_hash
             results["status"] = "committed"
 
@@ -519,7 +550,8 @@ class EmergencyCompletion:
                 results["status"] = "pushed"
 
             # Step 3: Create PR
-            pr_url = self.create_emergency_pr(title, description, template_type, reason)
+            pr_url = self.create_emergency_pr(
+                title, description, template_type, reason)
             results["pr_url"] = pr_url
             if pr_url:
                 results["status"] = "pr_created"
@@ -555,25 +587,42 @@ Examples:
 
   # Dry run to test workflow
   python scripts/emergency_complete.py --task "Test Task" --dry-run
-        """
-    )
+        """)
 
-    parser.add_argument('--task', required=True, help='Task description for completion')
-    parser.add_argument('--description', default='Emergency completion executed',
-                       help='Detailed description')
+    parser.add_argument('--task', required=True,
+                        help='Task description for completion')
+    parser.add_argument(
+        '--description',
+        default='Emergency completion executed',
+        help='Detailed description')
     parser.add_argument('--phase', default='1.3', help='Phase identifier')
-    parser.add_argument('--template-type', choices=['feature', 'emergency', 'milestone', 'hotfix'],
-                       default='emergency', help='Template type for commit/PR')
+    parser.add_argument(
+        '--template-type',
+        choices=[
+            'feature',
+            'emergency',
+            'milestone',
+            'hotfix'],
+        default='emergency',
+        help='Template type for commit/PR')
     parser.add_argument('--reason', default='Workflow deadline',
-                       help='Reason for emergency completion')
+                        help='Reason for emergency completion')
     parser.add_argument('--force', action='store_true',
-                       help='Force mode - stage all changes and force push')
+                        help='Force mode - stage all changes and force push')
     parser.add_argument('--emergency', action='store_true',
-                       help='Emergency mode - bypass some validations')
-    parser.add_argument('--dry-run', action='store_true',
-                       help='Dry run - show what would be done without executing')
-    parser.add_argument('--evidence-level', choices=['basic', 'standard', 'comprehensive'],
-                       default='standard', help='Level of evidence collection')
+                        help='Emergency mode - bypass some validations')
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Dry run - show what would be done without executing')
+    parser.add_argument(
+        '--evidence-level',
+        choices=[
+            'basic',
+            'standard',
+            'comprehensive'],
+        default='standard',
+        help='Level of evidence collection')
 
     args = parser.parse_args()
 
@@ -593,9 +642,9 @@ Examples:
     )
 
     # Print results
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🚨 EMERGENCY COMPLETION RESULTS")
-    print("="*60)
+    print("=" * 60)
     print(f"Status: {results['status'].upper()}")
     if results['commit_hash']:
         print(f"Commit: {results['commit_hash'][:8]}")
@@ -611,7 +660,7 @@ Examples:
         for error in results['errors']:
             print(f"  - {error}")
 
-    print("="*60)
+    print("=" * 60)
 
     # Exit with appropriate code
     sys.exit(0 if results['status'] in ['complete', 'pr_created'] else 1)

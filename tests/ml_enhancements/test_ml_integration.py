@@ -2,20 +2,19 @@
 Integration tests for ML Enhancement components working together.
 """
 
-import json
-import pytest
 import tempfile
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from ml_enhancements import (
+    AdaptiveLearning,
+    MLConfig,
     PatternOptimizer,
     PredictiveAnalytics,
-    AdaptiveLearning,
-    MLConfig
 )
-from advanced_orchestration import MultiAgentCoordinator
 
 
 class TestMLComponentsIntegration:
@@ -134,7 +133,8 @@ class TestMLComponentsIntegration:
             'task_complexity': 2.0
         }
 
-        prediction_result = predictive_analytics.predict_performance(test_features)
+        prediction_result = predictive_analytics.predict_performance(
+            test_features)
 
         # Verify integration
         assert len(workflow_metrics) == 5
@@ -183,7 +183,8 @@ class TestMLComponentsIntegration:
             # Provide feedback to adaptive learning based on prediction accuracy
             # Simulate actual vs predicted performance
             actual_performance = 0.8 + i * 0.03
-            prediction_accuracy = 1.0 - abs(actual_performance - prediction.predicted_value)
+            prediction_accuracy = 1.0 - \
+                abs(actual_performance - prediction.predicted_value)
 
             adaptive_learning.provide_feedback(
                 session_id=session_id,
@@ -298,8 +299,7 @@ class TestMLComponentsIntegration:
                 task_completion_rate=initial_workflows[i]['performance']['success_rate'],
                 error_rate=initial_workflows[i]['performance']['error_count'],
                 response_time=initial_workflows[i]['performance']['completion_time'],
-                throughput=10.0 - i
-            )
+                throughput=10.0 - i)
 
             # Make performance prediction
             prediction = predictive_analytics.predict_performance({
@@ -317,7 +317,8 @@ class TestMLComponentsIntegration:
             )
 
         # 5. Adapt learning models
-        learning_training_data = [wf['features'] for wf in initial_workflows[:4]]
+        learning_training_data = [wf['features']
+                                  for wf in initial_workflows[:4]]
         learning_target_values = [
             pattern_optimizer._calculate_performance_score(wf['performance'])
             for wf in initial_workflows[:4]
@@ -338,10 +339,7 @@ class TestMLComponentsIntegration:
         }
 
         prediction_result, confidence, needs_adaptation = adaptive_learning.predict_with_adaptation(
-            'performance_optimizer',
-            improved_features,
-            confidence_threshold=0.6
-        )
+            'performance_optimizer', improved_features, confidence_threshold=0.6)
 
         # 7. End learning session
         session_summary = adaptive_learning.end_learning_session(session_id)
@@ -357,7 +355,8 @@ class TestMLComponentsIntegration:
         """Test ML configuration validation across components."""
         # Test invalid configuration
         with pytest.raises(ValueError):
-            invalid_config = MLConfig(learning_rate=1.5)  # Invalid learning rate
+            # Invalid learning rate
+            MLConfig(learning_rate=1.5)
 
         # Test valid configuration
         valid_config = MLConfig(
@@ -368,9 +367,12 @@ class TestMLComponentsIntegration:
         )
 
         # Create components with valid config
-        pattern_optimizer = PatternOptimizer(config=valid_config, db_path=temp_dbs['pattern'])
-        predictive_analytics = PredictiveAnalytics(config=valid_config, db_path=temp_dbs['analytics'])
-        adaptive_learning = AdaptiveLearning(config=valid_config, db_path=temp_dbs['learning'])
+        pattern_optimizer = PatternOptimizer(
+            config=valid_config, db_path=temp_dbs['pattern'])
+        predictive_analytics = PredictiveAnalytics(
+            config=valid_config, db_path=temp_dbs['analytics'])
+        adaptive_learning = AdaptiveLearning(
+            config=valid_config, db_path=temp_dbs['learning'])
 
         # Verify all components use the same configuration
         assert pattern_optimizer.config.learning_rate == 0.02
@@ -435,14 +437,17 @@ class TestMLComponentsIntegration:
                 success=True
             )
         except Exception as e:
-            pytest.fail(f"Pattern optimizer should handle empty data gracefully: {e}")
+            pytest.fail(
+                f"Pattern optimizer should handle empty data gracefully: {e}")
 
         # Test predictive analytics with edge cases
         try:
-            result = predictive_analytics.predict_performance({})  # Empty features
+            result = predictive_analytics.predict_performance(
+                {})  # Empty features
             assert result.predicted_value >= 0  # Should return valid result
         except Exception as e:
-            pytest.fail(f"Predictive analytics should handle empty features: {e}")
+            pytest.fail(
+                f"Predictive analytics should handle empty features: {e}")
 
         # Test adaptive learning with invalid model type
         session_id = adaptive_learning.start_learning_session(
@@ -465,16 +470,19 @@ class TestMLComponentsIntegration:
         adaptive_learning = ml_system['adaptive_learning']
 
         # Create old data in all components
-        old_time = datetime.now() - timedelta(days=40)
+        datetime.now() - timedelta(days=40)
 
         # Pattern optimizer cleanup
-        pattern_deleted = pattern_optimizer.cleanup_old_patterns(days_to_keep=30)
+        pattern_deleted = pattern_optimizer.cleanup_old_patterns(
+            days_to_keep=30)
 
         # Analytics cleanup
-        analytics_deleted = predictive_analytics.cleanup_old_data(days_to_keep=30)
+        analytics_deleted = predictive_analytics.cleanup_old_data(
+            days_to_keep=30)
 
         # Learning cleanup
-        learning_deleted = adaptive_learning.cleanup_old_learning_data(days_to_keep=30)
+        learning_deleted = adaptive_learning.cleanup_old_learning_data(
+            days_to_keep=30)
 
         # Verify cleanup operations completed
         assert pattern_deleted >= 0
@@ -520,10 +528,16 @@ class TestMLComponentsIntegration:
 
         # Record corresponding system metrics
         predictive_analytics.record_system_metrics(
-            cpu_usage=0.7, memory_usage=0.6, disk_usage=0.4, network_usage=0.3,
-            active_agents=workflow_data['agent_count'], queue_size=2,
-            task_completion_rate=0.92, error_rate=0.08, response_time=1.5, throughput=10.0
-        )
+            cpu_usage=0.7,
+            memory_usage=0.6,
+            disk_usage=0.4,
+            network_usage=0.3,
+            active_agents=workflow_data['agent_count'],
+            queue_size=2,
+            task_completion_rate=0.92,
+            error_rate=0.08,
+            response_time=1.5,
+            throughput=10.0)
 
         # Get optimization recommendations
         recommendations = pattern_optimizer.get_optimization_recommendations(
@@ -564,7 +578,8 @@ class TestMLComponentsIntegration:
                     execution_id=f"concurrent_pattern_{i}",
                     workflow_type="concurrent_test",
                     features={'task_complexity': 1.0 + i, 'agent_count': 2},
-                    performance_metrics={'completion_time': 1.0, 'success_rate': 0.9},
+                    performance_metrics={
+                        'completion_time': 1.0, 'success_rate': 0.9},
                     execution_time=1.0,
                     success=True
                 )
@@ -574,10 +589,16 @@ class TestMLComponentsIntegration:
         def analytics_worker():
             for i in range(3):
                 metric_id = predictive_analytics.record_system_metrics(
-                    cpu_usage=0.6 + i * 0.1, memory_usage=0.5, disk_usage=0.3, network_usage=0.2,
-                    active_agents=2, queue_size=i, task_completion_rate=0.9,
-                    error_rate=0.05, response_time=1.0, throughput=8.0
-                )
+                    cpu_usage=0.6 + i * 0.1,
+                    memory_usage=0.5,
+                    disk_usage=0.3,
+                    network_usage=0.2,
+                    active_agents=2,
+                    queue_size=i,
+                    task_completion_rate=0.9,
+                    error_rate=0.05,
+                    response_time=1.0,
+                    throughput=8.0)
                 results['analytics'].append(metric_id)
                 time.sleep(0.01)
 

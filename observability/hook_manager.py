@@ -9,16 +9,14 @@ enabling real-time monitoring and observability of agent behavior.
 import asyncio
 import json
 import logging
-import time
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, asdict
-from enum import Enum
-import threading
 import queue
+import time
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
+
 import websockets
-import aiohttp
-from contextlib import asynccontextmanager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -97,7 +95,10 @@ class EventStream:
         # Start HTTP server
         await self.start_http_server()
 
-        logger.info(f"Event streaming started - WebSocket: {self.websocket_port}, HTTP: {self.http_port}")
+        logger.info(
+            f"Event streaming started - WebSocket: {
+                self.websocket_port}, HTTP: {
+                self.http_port}")
 
     async def stop(self):
         """Stop the event streaming servers."""
@@ -125,7 +126,8 @@ class EventStream:
             pass
         finally:
             self.websocket_clients.remove(websocket)
-            logger.info(f"WebSocket client disconnected: {websocket.remote_address}")
+            logger.info(
+                f"WebSocket client disconnected: {websocket.remote_address}")
 
     async def start_http_server(self):
         """Start HTTP server for event streaming."""
@@ -150,7 +152,8 @@ class EventStream:
             return web.json_response({'status': 'success'})
         except Exception as e:
             logger.error(f"HTTP event handling error: {e}")
-            return web.json_response({'status': 'error', 'message': str(e)}, status=500)
+            return web.json_response(
+                {'status': 'error', 'message': str(e)}, status=500)
 
     async def handle_http_stream(self, request):
         """Handle HTTP Server-Sent Events streaming."""
@@ -213,8 +216,12 @@ class AgentMonitor:
         # Analyze behavior patterns
         self.analyze_behavior_pattern(agent_id, state, previous_state)
 
-    def analyze_behavior_pattern(self, agent_id: str, current_state: Dict[str, Any],
-                                previous_state: Optional[Dict[str, Any]]):
+    def analyze_behavior_pattern(self,
+                                 agent_id: str,
+                                 current_state: Dict[str,
+                                                     Any],
+                                 previous_state: Optional[Dict[str,
+                                                               Any]]):
         """Analyze agent behavior patterns."""
         if agent_id not in self.behavior_patterns:
             self.behavior_patterns[agent_id] = {
@@ -229,11 +236,13 @@ class AgentMonitor:
         # Track tool usage
         if 'tool_name' in current_state:
             tool_name = current_state['tool_name']
-            patterns['tool_usage'][tool_name] = patterns['tool_usage'].get(tool_name, 0) + 1
+            patterns['tool_usage'][tool_name] = patterns['tool_usage'].get(
+                tool_name, 0) + 1
 
         # Track session duration
         if 'session_start' in current_state:
-            session_duration = (datetime.now() - current_state['session_start']).total_seconds()
+            session_duration = (datetime.now() -
+                                current_state['session_start']).total_seconds()
             patterns['session_duration'].append(session_duration)
 
         # Track error patterns
@@ -291,7 +300,8 @@ class HookManager:
     """Main hook manager for real-time observability."""
 
     def __init__(self, websocket_port: int = 8765, http_port: int = 8766):
-        self.hooks: Dict[HookType, List[Callable]] = {hook_type: [] for hook_type in HookType}
+        self.hooks: Dict[HookType, List[Callable]] = {
+            hook_type: [] for hook_type in HookType}
         self.event_stream = EventStream(websocket_port, http_port)
         self.agent_monitor = AgentMonitor()
         self.running = False
@@ -349,12 +359,19 @@ class HookManager:
         # Log performance
         execution_time = time.time() - start_time
         if execution_time > 0.1:  # Log if execution takes more than 100ms
-            logger.warning(f"Hook execution took {execution_time:.3f}s for {event.hook_type.value}")
+            logger.warning(
+                f"Hook execution took {
+                    execution_time:.3f}s for {
+                    event.hook_type.value}")
 
-    async def create_and_process_event(self, hook_type: HookType, agent_id: str,
-                                     session_id: str, context: Dict[str, Any],
-                                     priority: EventPriority = EventPriority.MEDIUM,
-                                     **kwargs):
+    async def create_and_process_event(self,
+                                       hook_type: HookType,
+                                       agent_id: str,
+                                       session_id: str,
+                                       context: Dict[str,
+                                                     Any],
+                                       priority: EventPriority = EventPriority.MEDIUM,
+                                       **kwargs):
         """Create and process a hook event."""
         event = HookEvent(
             event_id=f"{agent_id}_{session_id}_{int(time.time() * 1000)}",
@@ -375,25 +392,28 @@ class HookManager:
         return {
             'hook_manager': {
                 'running': self.running,
-                'event_history_size': len(self.event_history),
-                'registered_hooks': {hook_type.value: len(callbacks) for hook_type, callbacks in self.hooks.items()}
-            },
+                'event_history_size': len(
+                    self.event_history),
+                'registered_hooks': {
+                    hook_type.value: len(callbacks) for hook_type,
+                    callbacks in self.hooks.items()}},
             'event_stream': {
-                'websocket_clients': len(self.event_stream.websocket_clients),
+                'websocket_clients': len(
+                    self.event_stream.websocket_clients),
                 'websocket_port': self.event_stream.websocket_port,
-                'http_port': self.event_stream.http_port
-            },
+                'http_port': self.event_stream.http_port},
             'agent_monitor': {
-                'tracked_agents': len(self.agent_monitor.agent_states),
-                'behavior_patterns': len(self.agent_monitor.behavior_patterns)
-            }
-        }
+                'tracked_agents': len(
+                    self.agent_monitor.agent_states),
+                'behavior_patterns': len(
+                    self.agent_monitor.behavior_patterns)}}
 
     def get_agent_metrics(self, agent_id: str) -> Dict[str, Any]:
         """Get metrics for a specific agent."""
         return self.agent_monitor.get_agent_metrics(agent_id)
 
-    def get_event_history(self, limit: int = 100, agent_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_event_history(self, limit: int = 100,
+                          agent_id: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get event history with optional filtering."""
         events = self.event_history
 
@@ -434,7 +454,7 @@ def register_notification_hook(callback: Callable):
 
 
 async def track_tool_use(agent_id: str, session_id: str, tool_name: str,
-                        tool_args: Dict[str, Any], is_pre_use: bool = True):
+                         tool_args: Dict[str, Any], is_pre_use: bool = True):
     """Track tool usage event."""
     hook_type = HookType.PRE_TOOL_USE if is_pre_use else HookType.POST_TOOL_USE
 
@@ -450,7 +470,7 @@ async def track_tool_use(agent_id: str, session_id: str, tool_name: str,
 
 
 async def track_agent_error(agent_id: str, session_id: str, error_message: str,
-                           context: Dict[str, Any]):
+                            context: Dict[str, Any]):
     """Track agent error event."""
     await hook_manager.create_and_process_event(
         hook_type=HookType.ERROR,
@@ -463,7 +483,7 @@ async def track_agent_error(agent_id: str, session_id: str, error_message: str,
 
 
 async def track_performance_metrics(agent_id: str, session_id: str,
-                                   metrics: Dict[str, float]):
+                                    metrics: Dict[str, float]):
     """Track performance metrics."""
     await hook_manager.create_and_process_event(
         hook_type=HookType.PERFORMANCE,
@@ -483,10 +503,12 @@ if __name__ == "__main__":
 
         # Register some example hooks
         def example_pre_tool_hook(event: HookEvent):
-            print(f"Pre-tool hook: {event.tool_name} for agent {event.agent_id}")
+            print(
+                f"Pre-tool hook: {event.tool_name} for agent {event.agent_id}")
 
         def example_post_tool_hook(event: HookEvent):
-            print(f"Post-tool hook: {event.tool_name} completed for agent {event.agent_id}")
+            print(
+                f"Post-tool hook: {event.tool_name} completed for agent {event.agent_id}")
 
         register_pre_tool_use_hook(example_pre_tool_hook)
         register_post_tool_use_hook(example_post_tool_hook)

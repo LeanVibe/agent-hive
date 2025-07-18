@@ -10,7 +10,8 @@ def test_import_orchestrator():
         assert LeanVibeOrchestrator is not None
     except ImportError as e:
         # For now, expect this to fail until we implement missing classes
-        assert "IntelligentStateManager" in str(e) or "SmartContextManager" in str(e)
+        assert "IntelligentStateManager" in str(
+            e) or "SmartContextManager" in str(e)
 
 
 def test_import_state_manager():

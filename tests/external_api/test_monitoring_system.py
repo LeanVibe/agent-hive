@@ -2,19 +2,20 @@
 Tests for Monitoring System component.
 """
 
-import pytest
 import asyncio
 import json
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from external_api.monitoring_system import (
-    MonitoringSystem,
-    MetricData,
-    MetricType,
     Alert,
     AlertRule,
-    AlertSeverity
+    AlertSeverity,
+    MetricData,
+    MetricType,
+    MonitoringSystem,
 )
 
 
@@ -48,7 +49,8 @@ class TestMonitoringSystem:
             component="test"
         )
 
-    async def test_monitoring_system_initialization(self, monitoring_system, monitoring_config):
+    async def test_monitoring_system_initialization(
+            self, monitoring_system, monitoring_config):
         """Test monitoring system initialization."""
         assert monitoring_system.config == monitoring_config
         assert monitoring_system.metrics == {}
@@ -101,7 +103,8 @@ class TestMonitoringSystem:
     async def test_record_metric_with_tags(self, monitoring_system):
         """Test metric recording with tags."""
         tags = {"service": "test", "environment": "dev"}
-        monitoring_system.record_metric("test.metric", 100.0, MetricType.COUNTER, tags)
+        monitoring_system.record_metric(
+            "test.metric", 100.0, MetricType.COUNTER, tags)
 
         metric = monitoring_system.metrics["test.metric"][0]
         assert metric.tags == tags
@@ -132,7 +135,8 @@ class TestMonitoringSystem:
         assert monitoring_system.metrics["test.timer"][0].value == 150.5
         assert monitoring_system.metrics["test.timer"][0].metric_type == MetricType.TIMER
 
-    async def test_add_remove_alert_rule(self, monitoring_system, sample_alert_rule):
+    async def test_add_remove_alert_rule(
+            self, monitoring_system, sample_alert_rule):
         """Test adding and removing alert rules."""
         # Add rule
         monitoring_system.add_alert_rule(sample_alert_rule)
@@ -180,12 +184,14 @@ class TestMonitoringSystem:
         monitoring_system.record_metric("test.metric", 10.0)
 
         # Get metrics with time filter
-        metrics = monitoring_system.get_metrics("test.metric", start_time=hour_ago)
+        metrics = monitoring_system.get_metrics(
+            "test.metric", start_time=hour_ago)
         assert len(metrics) == 1
 
         # Get metrics with future start time
         future_time = now + timedelta(hours=1)
-        metrics = monitoring_system.get_metrics("test.metric", start_time=future_time)
+        metrics = monitoring_system.get_metrics(
+            "test.metric", start_time=future_time)
         assert len(metrics) == 0
 
     async def test_get_metrics_nonexistent(self, monitoring_system):
@@ -215,13 +221,15 @@ class TestMonitoringSystem:
         assert summary["min"] == 0
         assert summary["max"] == 0
 
-    async def test_alert_creation_and_resolution(self, monitoring_system, sample_alert_rule):
+    async def test_alert_creation_and_resolution(
+            self, monitoring_system, sample_alert_rule):
         """Test alert creation and resolution."""
         # Add alert rule
         monitoring_system.add_alert_rule(sample_alert_rule)
 
         # Record metric that should trigger alert
-        monitoring_system.record_metric("test.metric", 150.0)  # > threshold of 100
+        monitoring_system.record_metric(
+            "test.metric", 150.0)  # > threshold of 100
 
         # Wait for alert processing
         await asyncio.sleep(0.1)
@@ -265,8 +273,10 @@ class TestMonitoringSystem:
 
     async def test_get_component_health_all(self, monitoring_system):
         """Test getting health for all components."""
-        monitoring_system.update_component_health("service1", {"healthy": True})
-        monitoring_system.update_component_health("service2", {"healthy": False})
+        monitoring_system.update_component_health(
+            "service1", {"healthy": True})
+        monitoring_system.update_component_health(
+            "service2", {"healthy": False})
 
         all_health = monitoring_system.get_component_health()
         assert "service1" in all_health
@@ -282,12 +292,19 @@ class TestMonitoringSystem:
     @patch('psutil.cpu_percent')
     @patch('psutil.virtual_memory')
     @patch('psutil.disk_usage')
-    async def test_get_system_metrics(self, mock_disk, mock_memory, mock_cpu, monitoring_system):
+    async def test_get_system_metrics(
+            self,
+            mock_disk,
+            mock_memory,
+            mock_cpu,
+            monitoring_system):
         """Test getting system metrics."""
         # Mock psutil responses
         mock_cpu.return_value = 50.0
-        mock_memory.return_value = MagicMock(percent=75.0, used=4000000000, total=8000000000)
-        mock_disk.return_value = MagicMock(percent=60.0, used=50000000000, total=100000000000)
+        mock_memory.return_value = MagicMock(
+            percent=75.0, used=4000000000, total=8000000000)
+        mock_disk.return_value = MagicMock(
+            percent=60.0, used=50000000000, total=100000000000)
 
         metrics = monitoring_system.get_system_metrics()
 
@@ -311,7 +328,8 @@ class TestMonitoringSystem:
         """Test exporting metrics in JSON format."""
         # Record some test data
         monitoring_system.record_metric("test.metric", 42.0)
-        monitoring_system.update_component_health("test-service", {"healthy": True})
+        monitoring_system.update_component_health(
+            "test-service", {"healthy": True})
 
         exported = monitoring_system.export_metrics("json")
         data = json.loads(exported)

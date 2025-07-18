@@ -16,8 +16,8 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
-import urllib.parse
+from typing import Dict, List, Optional, Set
+
 
 @dataclass
 class LinkValidationResult:
@@ -29,6 +29,7 @@ class LinkValidationResult:
     message: str
     line_number: Optional[int] = None
     context: Optional[str] = None
+
 
 class LinkValidator:
     """Comprehensive link and cross-reference validation."""
@@ -111,7 +112,8 @@ class LinkValidator:
             anchors = self.extract_anchors(file_path)
             self.anchor_map[rel_path] = anchors
 
-        total_anchors = sum(len(anchors) for anchors in self.anchor_map.values())
+        total_anchors = sum(len(anchors)
+                            for anchors in self.anchor_map.values())
         print(f"   Found {total_anchors} total anchors")
 
     def validate_internal_links(self) -> List[LinkValidationResult]:
@@ -134,23 +136,28 @@ class LinkValidator:
                     link_target = match.group(2)
 
                     # Skip external links
-                    if link_target.startswith(('http://', 'https://', 'mailto:')):
+                    if link_target.startswith(
+                            ('http://', 'https://', 'mailto:')):
                         continue
 
                     # Skip images (alt text)
-                    if match.start() > 0 and line[match.start()-1] == '!':
+                    if match.start() > 0 and line[match.start() - 1] == '!':
                         continue
 
                     # Validate internal link
                     result = self.validate_single_link(
-                        rel_path, link_target, link_text, line_num, line.strip()
-                    )
+                        rel_path, link_target, link_text, line_num, line.strip())
                     results.append(result)
 
         return results
 
-    def validate_single_link(self, source_file: str, target: str, link_text: str,
-                           line_num: int, context: str) -> LinkValidationResult:
+    def validate_single_link(
+            self,
+            source_file: str,
+            target: str,
+            link_text: str,
+            line_num: int,
+            context: str) -> LinkValidationResult:
         """Validate a single internal link."""
 
         # Parse the target
@@ -210,8 +217,7 @@ class LinkValidator:
                             status="broken",
                             message=f"❌ Anchor not found: #{anchor_part} in {file_part}",
                             line_number=line_num,
-                            context=context
-                        )
+                            context=context)
                 else:
                     # File exists but no anchors mapped (not markdown?)
                     return LinkValidationResult(
@@ -221,8 +227,7 @@ class LinkValidator:
                         status="warning",
                         message=f"⚠️ Cannot validate anchor in non-markdown file: {file_part}",
                         line_number=line_num,
-                        context=context
-                    )
+                        context=context)
         else:
             # Anchor-only reference (same file)
             if anchor_part:
@@ -236,8 +241,7 @@ class LinkValidator:
                             status="broken",
                             message=f"❌ Anchor not found in current file: #{anchor_part}",
                             line_number=line_num,
-                            context=context
-                        )
+                            context=context)
 
         # If we get here, the link is valid
         return LinkValidationResult(
@@ -260,7 +264,8 @@ class LinkValidator:
         ref_patterns = [
             (r'see\s+\[([^\]]+)\]\(([^)]+)\)', "see_reference"),
             (r'refer\s+to\s+\[([^\]]+)\]\(([^)]+)\)', "refer_reference"),
-            (r'documented\s+in\s+\[([^\]]+)\]\(([^)]+)\)', "documentation_reference"),
+            (r'documented\s+in\s+\[([^\]]+)\]\(([^)]+)\)',
+             "documentation_reference"),
             (r'\*\*\[([^\]]+)\]\(([^)]+)\)\*\*', "important_reference"),
         ]
 
@@ -281,8 +286,7 @@ class LinkValidator:
 
                         # Validate the cross-reference
                         result = self.validate_single_link(
-                            rel_path, link_target, link_text, line_num, line.strip()
-                        )
+                            rel_path, link_target, link_text, line_num, line.strip())
                         result.link_type = ref_type
                         results.append(result)
 
@@ -315,15 +319,22 @@ class LinkValidator:
                             file_ref = match.group(1)
 
                         # Skip obvious non-file references
-                        if any(skip in file_ref.lower() for skip in [
-                            'example', 'placeholder', 'your-', '<', '>', 'https://', 'http://'
-                        ]):
+                        if any(
+                            skip in file_ref.lower() for skip in [
+                                'example',
+                                'placeholder',
+                                'your-',
+                                '<',
+                                '>',
+                                'https://',
+                                'http://']):
                             continue
 
                         # Try to find the file
                         found = False
                         for project_file in self.all_files:
-                            if str(project_file).endswith(file_ref) or file_ref in str(project_file):
+                            if str(project_file).endswith(
+                                    file_ref) or file_ref in str(project_file):
                                 found = True
                                 break
 
@@ -342,25 +353,25 @@ class LinkValidator:
                             if any(future_indicator in line.lower() for future_indicator in [
                                 'planned', 'future', 'todo', 'not yet', 'will be', 'coming'
                             ]):
-                                results.append(LinkValidationResult(
-                                    source_file=rel_path,
-                                    link_type=ref_type,
-                                    target=file_ref,
-                                    status="warning",
-                                    message=f"⚠️ Future file reference: {file_ref}",
-                                    line_number=line_num,
-                                    context=line.strip()
-                                ))
+                                results.append(
+                                    LinkValidationResult(
+                                        source_file=rel_path,
+                                        link_type=ref_type,
+                                        target=file_ref,
+                                        status="warning",
+                                        message=f"⚠️ Future file reference: {file_ref}",
+                                        line_number=line_num,
+                                        context=line.strip()))
                             else:
-                                results.append(LinkValidationResult(
-                                    source_file=rel_path,
-                                    link_type=ref_type,
-                                    target=file_ref,
-                                    status="broken",
-                                    message=f"❌ File reference not found: {file_ref}",
-                                    line_number=line_num,
-                                    context=line.strip()
-                                ))
+                                results.append(
+                                    LinkValidationResult(
+                                        source_file=rel_path,
+                                        link_type=ref_type,
+                                        target=file_ref,
+                                        status="broken",
+                                        message=f"❌ File reference not found: {file_ref}",
+                                        line_number=line_num,
+                                        context=line.strip()))
 
         return results
 
@@ -392,12 +403,14 @@ class LinkValidator:
         for result in self.results:
             status_counts[result.status] += 1
             if result.link_type not in type_counts:
-                type_counts[result.link_type] = {"valid": 0, "broken": 0, "warning": 0}
+                type_counts[result.link_type] = {
+                    "valid": 0, "broken": 0, "warning": 0}
             type_counts[result.link_type][result.status] += 1
 
         # Calculate statistics
         total_links = len(self.results)
-        validity_rate = (status_counts["valid"] / total_links * 100) if total_links > 0 else 0
+        validity_rate = (status_counts["valid"] /
+                         total_links * 100) if total_links > 0 else 0
 
         # Generate report
         report = []
@@ -407,19 +420,22 @@ class LinkValidator:
         report.append("")
 
         # Summary
-        report.append(f"📊 VALIDATION SUMMARY:")
+        report.append("📊 VALIDATION SUMMARY:")
         report.append(f"   Total Links Checked: {total_links}")
-        report.append(f"   ✅ Valid: {status_counts['valid']} ({validity_rate:.1f}%)")
+        report.append(
+            f"   ✅ Valid: {status_counts['valid']} ({validity_rate:.1f}%)")
         report.append(f"   ❌ Broken: {status_counts['broken']}")
         report.append(f"   ⚠️ Warnings: {status_counts['warning']}")
         report.append("")
 
         # Breakdown by type
-        report.append(f"📋 BREAKDOWN BY LINK TYPE:")
+        report.append("📋 BREAKDOWN BY LINK TYPE:")
         for link_type, counts in sorted(type_counts.items()):
             total_type = sum(counts.values())
-            type_validity = (counts["valid"] / total_type * 100) if total_type > 0 else 0
-            report.append(f"   {link_type}: {counts['valid']}/{total_type} valid ({type_validity:.1f}%)")
+            type_validity = (counts["valid"] / total_type *
+                             100) if total_type > 0 else 0
+            report.append(
+                f"   {link_type}: {counts['valid']}/{total_type} valid ({type_validity:.1f}%)")
             if counts["broken"] > 0:
                 report.append(f"      ❌ {counts['broken']} broken")
             if counts["warning"] > 0:
@@ -432,9 +448,11 @@ class LinkValidator:
         elif status_counts["broken"] <= 3:
             report.append("✅ OVERALL STATUS: GOOD - Minor link issues to fix")
         elif status_counts["broken"] <= 10:
-            report.append("⚠️ OVERALL STATUS: NEEDS ATTENTION - Several broken links")
+            report.append(
+                "⚠️ OVERALL STATUS: NEEDS ATTENTION - Several broken links")
         else:
-            report.append("❌ OVERALL STATUS: CRITICAL - Many broken links found")
+            report.append(
+                "❌ OVERALL STATUS: CRITICAL - Many broken links found")
 
         report.append("")
 
@@ -453,10 +471,12 @@ class LinkValidator:
             for file_name, file_broken in sorted(broken_by_file.items()):
                 report.append(f"   📄 {file_name}:")
                 for result in file_broken:
-                    line_info = f" (line {result.line_number})" if result.line_number else ""
+                    line_info = f" (line {
+                        result.line_number})" if result.line_number else ""
                     report.append(f"      {result.message}{line_info}")
                     if result.context:
-                        report.append(f"         Context: {result.context[:80]}...")
+                        report.append(
+                            f"         Context: {result.context[:80]}...")
             report.append("")
 
         # Warnings
@@ -464,7 +484,8 @@ class LinkValidator:
         if warnings:
             report.append(f"⚠️ WARNINGS ({len(warnings)}):")
             for result in warnings[:10]:  # Show first 10
-                line_info = f" (line {result.line_number})" if result.line_number else ""
+                line_info = f" (line {
+                    result.line_number})" if result.line_number else ""
                 report.append(f"   {result.message}{line_info}")
 
             if len(warnings) > 10:
@@ -475,22 +496,31 @@ class LinkValidator:
         report.append("💡 RECOMMENDATIONS:")
         if status_counts["broken"] > 0:
             report.append("   1. Fix all broken internal links immediately")
-            report.append("   2. Update file references to match actual project structure")
+            report.append(
+                "   2. Update file references to match actual project structure")
         if status_counts["warning"] > 0:
             report.append("   3. Review warnings for potential issues")
         report.append("   4. Add this validation to pre-commit hooks")
-        report.append("   5. Consider using relative paths for better portability")
+        report.append(
+            "   5. Consider using relative paths for better portability")
 
         return "\\n".join(report)
 
+
 def main():
     """Main link validation entry point."""
-    parser = argparse.ArgumentParser(description="Validate LeanVibe Agent Hive links and references")
-    parser.add_argument("--all", action="store_true", help="Run all link validation checks")
-    parser.add_argument("--internal-links", action="store_true", help="Validate internal markdown links")
-    parser.add_argument("--cross-references", action="store_true", help="Validate cross-references")
-    parser.add_argument("--file-existence", action="store_true", help="Validate file references")
-    parser.add_argument("--output", type=str, help="Output file for validation report")
+    parser = argparse.ArgumentParser(
+        description="Validate LeanVibe Agent Hive links and references")
+    parser.add_argument("--all", action="store_true",
+                        help="Run all link validation checks")
+    parser.add_argument("--internal-links", action="store_true",
+                        help="Validate internal markdown links")
+    parser.add_argument("--cross-references", action="store_true",
+                        help="Validate cross-references")
+    parser.add_argument("--file-existence", action="store_true",
+                        help="Validate file references")
+    parser.add_argument("--output", type=str,
+                        help="Output file for validation report")
 
     args = parser.parse_args()
 
@@ -504,7 +534,8 @@ def main():
     validator = LinkValidator(project_root)
 
     # Run validation
-    if args.all or not any([args.internal_links, args.cross_references, args.file_existence]):
+    if args.all or not any(
+            [args.internal_links, args.cross_references, args.file_existence]):
         results = validator.validate_all_links()
     else:
         results = []
@@ -534,8 +565,9 @@ def main():
         print(f"\\n❌ Link validation failed with {broken_links} broken links")
         sys.exit(1)
     else:
-        print(f"\\n✅ All links validated successfully!")
+        print("\\n✅ All links validated successfully!")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

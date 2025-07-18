@@ -8,23 +8,22 @@ data and coordination patterns.
 
 import asyncio
 import logging
-import json
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any, Callable, Set
-from dataclasses import dataclass, field
-from enum import Enum
-from collections import defaultdict, deque
 import statistics
-import uuid
-import threading
-from concurrent.futures import ThreadPoolExecutor
+import time
+from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
-from .performance_monitor import PerformanceMonitor, PerformanceMetric, PerformanceMetricType
-from .continuous_improvement import ContinuousImprovementEngine, ImprovementOpportunity
-from .models import (
-    AgentSpecialization, WorkflowType, CoordinationMetrics,
-    AgentCapabilities, TaskDependency, DependencyType
+from .continuous_improvement import (
+    ContinuousImprovementEngine,
+    ImprovementOpportunity,
+)
+from .performance_monitor import (
+    PerformanceMetric,
+    PerformanceMetricType,
+    PerformanceMonitor,
 )
 
 
@@ -130,8 +129,12 @@ class AdaptiveFeedbackController:
             "error_rate": 0.02
         }
 
-    def calculate_control_signal(self, current_metrics: Dict[str, float],
-                               target_metrics: Dict[str, float] = None) -> Dict[str, float]:
+    def calculate_control_signal(self,
+                                 current_metrics: Dict[str,
+                                                       float],
+                                 target_metrics: Dict[str,
+                                                      float] = None) -> Dict[str,
+                                                                             float]:
         """Calculate control signals for adaptive feedback."""
         if target_metrics is None:
             target_metrics = self.target_metrics
@@ -147,7 +150,8 @@ class AdaptiveFeedbackController:
             error = target_value - current_value
 
             # Calculate control signal using PID-like approach
-            proportional = error * self.control_parameters["response_sensitivity"]
+            proportional = error * \
+                self.control_parameters["response_sensitivity"]
 
             # Get derivative from history
             derivative = self._calculate_derivative(metric_name, current_value)
@@ -173,7 +177,10 @@ class AdaptiveFeedbackController:
 
         return control_signals
 
-    def _calculate_derivative(self, metric_name: str, current_value: float) -> float:
+    def _calculate_derivative(
+            self,
+            metric_name: str,
+            current_value: float) -> float:
         """Calculate derivative component for control signal."""
         if len(self.adaptation_history) < 2:
             return 0.0
@@ -182,7 +189,8 @@ class AdaptiveFeedbackController:
         for entry in reversed(self.adaptation_history):
             if metric_name in entry.get("current_metrics", {}):
                 last_value = entry["current_metrics"][metric_name]
-                time_diff = (datetime.now() - entry["timestamp"]).total_seconds()
+                time_diff = (datetime.now() -
+                             entry["timestamp"]).total_seconds()
                 if time_diff > 0:
                     return (current_value - last_value) / time_diff
 
@@ -205,7 +213,8 @@ class AdaptiveFeedbackController:
                 count += 1
 
         if count > 0:
-            return error_sum / count * self.control_parameters["adaptation_rate"]
+            return error_sum / count * \
+                self.control_parameters["adaptation_rate"]
 
         return 0.0
 
@@ -248,7 +257,8 @@ class RealTimeFeedbackEngine:
 
         # Real-time metrics
         self.current_metrics: Dict[str, float] = {}
-        self.metric_trends: Dict[str, deque] = defaultdict(lambda: deque(maxlen=50))
+        self.metric_trends: Dict[str, deque] = defaultdict(
+            lambda: deque(maxlen=50))
         self.correlation_matrix: Dict[Tuple[str, str], float] = {}
 
         # Configuration
@@ -266,10 +276,14 @@ class RealTimeFeedbackEngine:
         self.running = True
 
         # Start feedback processing tasks
-        self.feedback_tasks.add(asyncio.create_task(self._feedback_processing_loop()))
-        self.feedback_tasks.add(asyncio.create_task(self._metrics_collection_loop()))
-        self.feedback_tasks.add(asyncio.create_task(self._correlation_analysis_loop()))
-        self.feedback_tasks.add(asyncio.create_task(self._adaptive_control_loop()))
+        self.feedback_tasks.add(asyncio.create_task(
+            self._feedback_processing_loop()))
+        self.feedback_tasks.add(asyncio.create_task(
+            self._metrics_collection_loop()))
+        self.feedback_tasks.add(asyncio.create_task(
+            self._correlation_analysis_loop()))
+        self.feedback_tasks.add(asyncio.create_task(
+            self._adaptive_control_loop()))
 
         self.logger.info("Real-time feedback engine started")
 
@@ -294,7 +308,8 @@ class RealTimeFeedbackEngine:
             id="performance_degradation",
             name="Performance Degradation Detection",
             type=FeedbackType.PERFORMANCE_FEEDBACK,
-            condition=lambda signal: signal.data.get("performance_delta", 0) < -0.1,
+            condition=lambda signal: signal.data.get(
+                "performance_delta", 0) < -0.1,
             action=FeedbackAction.IMMEDIATE_ADJUSTMENT,
             handler=self._handle_performance_degradation,
             priority=FeedbackPriority.HIGH
@@ -304,7 +319,8 @@ class RealTimeFeedbackEngine:
             id="coordination_inefficiency",
             name="Coordination Inefficiency Detection",
             type=FeedbackType.COORDINATION_FEEDBACK,
-            condition=lambda signal: signal.data.get("coordination_efficiency", 1.0) < 0.6,
+            condition=lambda signal: signal.data.get(
+                "coordination_efficiency", 1.0) < 0.6,
             action=FeedbackAction.COORDINATION_REBALANCING,
             handler=self._handle_coordination_inefficiency,
             priority=FeedbackPriority.HIGH
@@ -314,7 +330,8 @@ class RealTimeFeedbackEngine:
             id="resource_saturation",
             name="Resource Saturation Detection",
             type=FeedbackType.RESOURCE_FEEDBACK,
-            condition=lambda signal: signal.data.get("resource_utilization", 0) > 0.85,
+            condition=lambda signal: signal.data.get(
+                "resource_utilization", 0) > 0.85,
             action=FeedbackAction.RESOURCE_REALLOCATION,
             handler=self._handle_resource_saturation,
             priority=FeedbackPriority.CRITICAL
@@ -324,7 +341,8 @@ class RealTimeFeedbackEngine:
             id="quality_decline",
             name="Quality Decline Detection",
             type=FeedbackType.QUALITY_FEEDBACK,
-            condition=lambda signal: signal.data.get("quality_score", 1.0) < 0.7,
+            condition=lambda signal: signal.data.get(
+                "quality_score", 1.0) < 0.7,
             action=FeedbackAction.QUALITY_ENHANCEMENT,
             handler=self._handle_quality_decline,
             priority=FeedbackPriority.MEDIUM
@@ -344,7 +362,8 @@ class RealTimeFeedbackEngine:
             id="workflow_bottleneck",
             name="Workflow Bottleneck Detection",
             type=FeedbackType.WORKFLOW_FEEDBACK,
-            condition=lambda signal: signal.data.get("bottleneck_detected", False),
+            condition=lambda signal: signal.data.get(
+                "bottleneck_detected", False),
             action=FeedbackAction.GRADUAL_OPTIMIZATION,
             handler=self._handle_workflow_bottleneck,
             priority=FeedbackPriority.MEDIUM
@@ -354,7 +373,8 @@ class RealTimeFeedbackEngine:
             id="predictive_alert",
             name="Predictive Issue Detection",
             type=FeedbackType.PREDICTIVE_FEEDBACK,
-            condition=lambda signal: signal.data.get("prediction_confidence", 0) > 0.8,
+            condition=lambda signal: signal.data.get(
+                "prediction_confidence", 0) > 0.8,
             action=FeedbackAction.ALERT_GENERATION,
             handler=self._handle_predictive_alert,
             priority=FeedbackPriority.MEDIUM
@@ -364,7 +384,8 @@ class RealTimeFeedbackEngine:
             id="adaptive_learning",
             name="Adaptive Learning Update",
             type=FeedbackType.ADAPTIVE_FEEDBACK,
-            condition=lambda signal: signal.data.get("learning_opportunity", False),
+            condition=lambda signal: signal.data.get(
+                "learning_opportunity", False),
             action=FeedbackAction.LEARNING_UPDATE,
             handler=self._handle_adaptive_learning,
             priority=FeedbackPriority.LOW
@@ -408,7 +429,8 @@ class RealTimeFeedbackEngine:
             matching_rules = self._find_matching_rules(signal)
 
             if not matching_rules:
-                self.logger.debug(f"No matching rules for feedback signal: {signal.id}")
+                self.logger.debug(
+                    f"No matching rules for feedback signal: {signal.id}")
                 return
 
             # Sort rules by priority
@@ -451,10 +473,12 @@ class RealTimeFeedbackEngine:
             # Update processing stats
             self.processing_stats[signal.type.value] += 1
 
-            self.logger.debug(f"Processed feedback signal: {signal.id} with rule: {rule.id}")
+            self.logger.debug(
+                f"Processed feedback signal: {signal.id} with rule: {rule.id}")
 
         except Exception as e:
-            self.logger.error(f"Error processing feedback signal {signal.id}: {e}")
+            self.logger.error(
+                f"Error processing feedback signal {signal.id}: {e}")
             signal.processed = True
             signal.result = {"error": str(e)}
 
@@ -462,7 +486,9 @@ class RealTimeFeedbackEngine:
             # Remove from active feedbacks
             self.active_feedbacks.pop(signal.id, None)
 
-    def _find_matching_rules(self, signal: FeedbackSignal) -> List[FeedbackRule]:
+    def _find_matching_rules(
+            self,
+            signal: FeedbackSignal) -> List[FeedbackRule]:
         """Find rules that match the feedback signal."""
         matching_rules = []
 
@@ -479,7 +505,8 @@ class RealTimeFeedbackEngine:
                 if rule.condition(signal):
                     matching_rules.append(rule)
             except Exception as e:
-                self.logger.warning(f"Error evaluating rule condition {rule.id}: {e}")
+                self.logger.warning(
+                    f"Error evaluating rule condition {rule.id}: {e}")
 
         return matching_rules
 
@@ -491,7 +518,10 @@ class RealTimeFeedbackEngine:
         time_since_last = datetime.now() - rule.last_triggered
         return time_since_last >= rule.cooldown_period
 
-    async def _execute_rule_handler(self, rule: FeedbackRule, signal: FeedbackSignal) -> Optional[FeedbackResponse]:
+    async def _execute_rule_handler(
+            self,
+            rule: FeedbackRule,
+            signal: FeedbackSignal) -> Optional[FeedbackResponse]:
         """Execute rule handler with timeout."""
         try:
             # Create timeout task
@@ -543,7 +573,8 @@ class RealTimeFeedbackEngine:
                 real_time_metrics = self.performance_monitor.get_real_time_metrics()
 
                 # Update current metrics
-                for metric_name, metric_data in real_time_metrics.get("metrics", {}).items():
+                for metric_name, metric_data in real_time_metrics.get(
+                        "metrics", {}).items():
                     current_value = metric_data.get("current", 0.0)
                     self.current_metrics[metric_name] = current_value
                     self.metric_trends[metric_name].append(current_value)
@@ -567,7 +598,9 @@ class RealTimeFeedbackEngine:
 
                 if trend < -0.2:  # Significant negative trend
                     signal = FeedbackSignal(
-                        id=f"perf_degradation_{metric_name}_{int(time.time())}",
+                        id=f"perf_degradation_{metric_name}_{
+    int(
+        time.time())}",
                         type=FeedbackType.PERFORMANCE_FEEDBACK,
                         priority=FeedbackPriority.HIGH,
                         source="metrics_collector",
@@ -585,7 +618,9 @@ class RealTimeFeedbackEngine:
             if metric_name in ["cpu_usage", "memory_usage", "disk_usage"]:
                 if current_value > 0.85:
                     signal = FeedbackSignal(
-                        id=f"resource_saturation_{metric_name}_{int(time.time())}",
+                        id=f"resource_saturation_{metric_name}_{
+    int(
+        time.time())}",
                         type=FeedbackType.RESOURCE_FEEDBACK,
                         priority=FeedbackPriority.CRITICAL,
                         source="metrics_collector",
@@ -637,7 +672,7 @@ class RealTimeFeedbackEngine:
         metric_names = list(self.metric_trends.keys())
 
         for i, metric1 in enumerate(metric_names):
-            for j, metric2 in enumerate(metric_names[i+1:], i+1):
+            for j, metric2 in enumerate(metric_names[i + 1:], i + 1):
                 values1 = list(self.metric_trends[metric1])
                 values2 = list(self.metric_trends[metric2])
 
@@ -651,7 +686,10 @@ class RealTimeFeedbackEngine:
                     correlation = self._calculate_correlation(values1, values2)
                     self.correlation_matrix[(metric1, metric2)] = correlation
 
-    def _calculate_correlation(self, x_values: List[float], y_values: List[float]) -> float:
+    def _calculate_correlation(
+            self,
+            x_values: List[float],
+            y_values: List[float]) -> float:
         """Calculate correlation coefficient."""
         if len(x_values) != len(y_values) or len(x_values) < 2:
             return 0.0
@@ -664,7 +702,8 @@ class RealTimeFeedbackEngine:
         sum_y2 = sum(y * y for y in y_values)
 
         numerator = n * sum_xy - sum_x * sum_y
-        denominator = ((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y)) ** 0.5
+        denominator = ((n * sum_x2 - sum_x * sum_x) *
+                       (n * sum_y2 - sum_y * sum_y)) ** 0.5
 
         if denominator == 0:
             return 0.0
@@ -677,13 +716,18 @@ class RealTimeFeedbackEngine:
         for (metric1, metric2), correlation in self.correlation_matrix.items():
             if abs(correlation) > 0.8:  # Strong correlation
                 # Check if one metric is trending towards problem
-                trend1 = self._calculate_trend(list(self.metric_trends[metric1])[-10:])
-                trend2 = self._calculate_trend(list(self.metric_trends[metric2])[-10:])
+                trend1 = self._calculate_trend(
+                    list(self.metric_trends[metric1])[-10:])
+                trend2 = self._calculate_trend(
+                    list(self.metric_trends[metric2])[-10:])
 
-                # If one is trending bad and correlation is positive, predict the other will too
+                # If one is trending bad and correlation is positive, predict
+                # the other will too
                 if correlation > 0.8 and (trend1 < -0.1 or trend2 < -0.1):
                     signal = FeedbackSignal(
-                        id=f"predictive_correlation_{metric1}_{metric2}_{int(time.time())}",
+                        id=f"predictive_correlation_{metric1}_{metric2}_{
+    int(
+        time.time())}",
                         type=FeedbackType.PREDICTIVE_FEEDBACK,
                         priority=FeedbackPriority.MEDIUM,
                         source="correlation_analyzer",
@@ -705,8 +749,7 @@ class RealTimeFeedbackEngine:
             try:
                 # Calculate control signals
                 control_signals = self.adaptive_controller.calculate_control_signal(
-                    self.current_metrics
-                )
+                    self.current_metrics)
 
                 # Apply control signals
                 await self._apply_control_signals(control_signals)
@@ -717,7 +760,8 @@ class RealTimeFeedbackEngine:
                 self.logger.error(f"Error in adaptive control loop: {e}")
                 await asyncio.sleep(10)
 
-    async def _apply_control_signals(self, control_signals: Dict[str, float]) -> None:
+    async def _apply_control_signals(
+            self, control_signals: Dict[str, float]) -> None:
         """Apply control signals to adjust system behavior."""
         for metric_name, signal_value in control_signals.items():
             if abs(signal_value) > 0.1:  # Significant control signal
@@ -737,12 +781,14 @@ class RealTimeFeedbackEngine:
                 await self.submit_feedback(feedback_signal)
 
     # Feedback handlers
-    async def _handle_performance_degradation(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_performance_degradation(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle performance degradation feedback."""
         metric_name = signal.data.get("metric_name")
         performance_delta = signal.data.get("performance_delta", 0)
 
-        self.logger.warning(f"Performance degradation detected in {metric_name}: {performance_delta}")
+        self.logger.warning(
+            f"Performance degradation detected in {metric_name}: {performance_delta}")
 
         # Record performance metric
         self.performance_monitor.record_metric(
@@ -787,11 +833,13 @@ class RealTimeFeedbackEngine:
             "improvement_opportunity": opportunity.id
         }
 
-    async def _handle_coordination_inefficiency(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_coordination_inefficiency(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle coordination inefficiency feedback."""
         efficiency = signal.data.get("coordination_efficiency", 0.0)
 
-        self.logger.warning(f"Coordination inefficiency detected: {efficiency}")
+        self.logger.warning(
+            f"Coordination inefficiency detected: {efficiency}")
 
         # Trigger coordination rebalancing
         rebalancing_actions = [
@@ -806,12 +854,15 @@ class RealTimeFeedbackEngine:
             "rebalancing_actions": rebalancing_actions
         }
 
-    async def _handle_resource_saturation(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_resource_saturation(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle resource saturation feedback."""
         utilization = signal.data.get("resource_utilization", 0.0)
         metric_name = signal.data.get("metric_name", "unknown")
 
-        self.logger.critical(f"Resource saturation detected: {metric_name} at {utilization:.1%}")
+        self.logger.critical(
+            f"Resource saturation detected: {metric_name} at {
+                utilization:.1%}")
 
         # Immediate resource reallocation
         reallocation_actions = [
@@ -827,7 +878,8 @@ class RealTimeFeedbackEngine:
             "reallocation_actions": reallocation_actions
         }
 
-    async def _handle_quality_decline(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_quality_decline(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle quality decline feedback."""
         quality_score = signal.data.get("quality_score", 0.0)
 
@@ -846,12 +898,14 @@ class RealTimeFeedbackEngine:
             "enhancement_actions": enhancement_actions
         }
 
-    async def _handle_agent_overload(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_agent_overload(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle agent overload feedback."""
         agent_load = signal.data.get("agent_load", 0.0)
         agent_id = signal.source
 
-        self.logger.warning(f"Agent overload detected: {agent_id} at {agent_load:.1%}")
+        self.logger.warning(
+            f"Agent overload detected: {agent_id} at {agent_load:.1%}")
 
         # Predictive scaling actions
         scaling_actions = [
@@ -867,7 +921,8 @@ class RealTimeFeedbackEngine:
             "scaling_actions": scaling_actions
         }
 
-    async def _handle_workflow_bottleneck(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_workflow_bottleneck(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle workflow bottleneck feedback."""
         bottleneck_info = signal.data.get("bottleneck_info", {})
 
@@ -886,13 +941,15 @@ class RealTimeFeedbackEngine:
             "optimization_actions": optimization_actions
         }
 
-    async def _handle_predictive_alert(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_predictive_alert(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle predictive alert feedback."""
         prediction_confidence = signal.data.get("prediction_confidence", 0.0)
         metric1 = signal.data.get("metric1")
         metric2 = signal.data.get("metric2")
 
-        self.logger.info(f"Predictive alert: {metric1} -> {metric2} correlation (confidence: {prediction_confidence:.2f})")
+        self.logger.info(
+            f"Predictive alert: {metric1} -> {metric2} correlation (confidence: {prediction_confidence:.2f})")
 
         # Generate alert
         alert_info = {
@@ -907,12 +964,14 @@ class RealTimeFeedbackEngine:
             "alert_info": alert_info
         }
 
-    async def _handle_adaptive_learning(self, signal: FeedbackSignal) -> Dict[str, Any]:
+    async def _handle_adaptive_learning(
+            self, signal: FeedbackSignal) -> Dict[str, Any]:
         """Handle adaptive learning feedback."""
         metric_name = signal.data.get("metric_name")
         control_signal = signal.data.get("control_signal", 0.0)
 
-        self.logger.debug(f"Adaptive learning update: {metric_name} control signal: {control_signal}")
+        self.logger.debug(
+            f"Adaptive learning update: {metric_name} control signal: {control_signal}")
 
         # Update learning parameters
         learning_updates = {
@@ -946,13 +1005,13 @@ class RealTimeFeedbackEngine:
         # Calculate rule success rates
         rule_analytics = {}
         for rule_id, rule in self.feedback_rules.items():
-            success_rate = rule.success_count / rule.trigger_count if rule.trigger_count > 0 else 0.0
+            success_rate = rule.success_count / \
+                rule.trigger_count if rule.trigger_count > 0 else 0.0
             rule_analytics[rule_id] = {
                 "trigger_count": rule.trigger_count,
                 "success_count": rule.success_count,
                 "success_rate": success_rate,
-                "last_triggered": rule.last_triggered.isoformat() if rule.last_triggered else None
-            }
+                "last_triggered": rule.last_triggered.isoformat() if rule.last_triggered else None}
 
         # Calculate feedback type distribution
         type_distribution = defaultdict(int)

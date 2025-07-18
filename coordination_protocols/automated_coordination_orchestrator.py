@@ -7,17 +7,32 @@ throughout the component development process.
 """
 
 import asyncio
-import logging
 import json
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Set
-from dataclasses import dataclass, field
-from enum import Enum
+import logging
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set
 
-from .cross_agent_protocols import CrossAgentCoordinator, CoordinationMessage, CoordinationMessageType, MessagePriority, AgentRole
-from .component_workflow import ComponentWorkflowManager, ComponentStatus, ComponentPriority
-from ..feedback_loops import RealTimeFeedbackEngine, FeedbackSignal, FeedbackType, FeedbackPriority
+from ..feedback_loops import (
+    FeedbackPriority,
+    FeedbackSignal,
+    FeedbackType,
+    RealTimeFeedbackEngine,
+)
+from .component_workflow import (
+    ComponentPriority,
+    ComponentStatus,
+    ComponentWorkflowManager,
+)
+from .cross_agent_protocols import (
+    AgentRole,
+    CoordinationMessage,
+    CoordinationMessageType,
+    CrossAgentCoordinator,
+    MessagePriority,
+)
 
 
 class CoordinationPhase(Enum):
@@ -81,7 +96,9 @@ class CoordinationCheckpoint:
 class AutomatedCoordinationOrchestrator:
     """Automated orchestrator for PR #28 breakdown coordination."""
 
-    def __init__(self, feedback_engine: Optional[RealTimeFeedbackEngine] = None):
+    def __init__(
+            self,
+            feedback_engine: Optional[RealTimeFeedbackEngine] = None):
         self.logger = logging.getLogger(__name__)
         self.feedback_engine = feedback_engine
 
@@ -110,11 +127,16 @@ class AutomatedCoordinationOrchestrator:
 
         self.logger.info("AutomatedCoordinationOrchestrator initialized")
 
-    async def start_pr_breakdown_coordination(self, pr_info: Dict[str, Any]) -> str:
+    async def start_pr_breakdown_coordination(
+            self, pr_info: Dict[str, Any]) -> str:
         """Start the automated PR breakdown coordination process."""
         try:
             # Create coordination session
-            session_id = f"pr_breakdown_{pr_info.get('number', 'unknown')}_{int(datetime.now().timestamp())}"
+            session_id = f"pr_breakdown_{
+                pr_info.get(
+                    'number', 'unknown')}_{
+                int(
+                    datetime.now().timestamp())}"
             self.active_session_id = session_id
 
             # Initialize coordination session
@@ -124,14 +146,16 @@ class AutomatedCoordinationOrchestrator:
                 "started_at": datetime.now(),
                 "current_phase": CoordinationPhase.INITIALIZATION,
                 "status": "active",
-                "agents_involved": [AgentRole.ORCHESTRATOR, AgentRole.INTEGRATION],
-                "coordination_protocols": []
-            }
+                "agents_involved": [
+                    AgentRole.ORCHESTRATOR,
+                    AgentRole.INTEGRATION],
+                "coordination_protocols": []}
 
             self.coordination_sessions[session_id] = coordination_session
 
             # Create PR breakdown workflow
-            workflow_result = self.component_workflow_manager.create_pr_breakdown_workflow(pr_info)
+            workflow_result = self.component_workflow_manager.create_pr_breakdown_workflow(
+                pr_info)
 
             # Initialize coordination activities
             await self._initialize_coordination_activities(session_id, pr_info)
@@ -155,14 +179,17 @@ class AutomatedCoordinationOrchestrator:
                 "initial_phase": CoordinationPhase.COMMUNICATION_SETUP.value
             })
 
-            self.logger.info(f"Started PR breakdown coordination: {session_id}")
+            self.logger.info(
+                f"Started PR breakdown coordination: {session_id}")
             return session_id
 
         except Exception as e:
-            self.logger.error(f"Failed to start PR breakdown coordination: {e}")
+            self.logger.error(
+                f"Failed to start PR breakdown coordination: {e}")
             raise
 
-    async def _initialize_coordination_activities(self, session_id: str, pr_info: Dict[str, Any]) -> None:
+    async def _initialize_coordination_activities(
+            self, session_id: str, pr_info: Dict[str, Any]) -> None:
         """Initialize coordination activities for the session."""
 
         # Communication Setup Activities
@@ -253,7 +280,8 @@ class AutomatedCoordinationOrchestrator:
         for activity in activities:
             self.coordination_activities[activity.id] = activity
 
-    async def _initialize_coordination_checkpoints(self, session_id: str) -> None:
+    async def _initialize_coordination_checkpoints(
+            self, session_id: str) -> None:
         """Initialize coordination checkpoints for progress tracking."""
 
         checkpoints = [
@@ -347,7 +375,8 @@ class AutomatedCoordinationOrchestrator:
         for checkpoint in checkpoints:
             self.coordination_checkpoints[checkpoint.id] = checkpoint
 
-    async def _execute_coordination_phase(self, phase: CoordinationPhase) -> None:
+    async def _execute_coordination_phase(
+            self, phase: CoordinationPhase) -> None:
         """Execute activities for a specific coordination phase."""
         try:
             self.current_phase = phase
@@ -357,10 +386,14 @@ class AutomatedCoordinationOrchestrator:
             ]
 
             if not phase_activities:
-                self.logger.info(f"No activities found for phase: {phase.value}")
+                self.logger.info(
+                    f"No activities found for phase: {phase.value}")
                 return
 
-            self.logger.info(f"Starting coordination phase: {phase.value} with {len(phase_activities)} activities")
+            self.logger.info(
+                f"Starting coordination phase: {
+                    phase.value} with {
+                    len(phase_activities)} activities")
 
             # Execute activities
             for activity in phase_activities:
@@ -374,15 +407,18 @@ class AutomatedCoordinationOrchestrator:
             })
 
         except Exception as e:
-            self.logger.error(f"Error executing coordination phase {phase.value}: {e}")
+            self.logger.error(
+                f"Error executing coordination phase {phase.value}: {e}")
             raise
 
-    async def _execute_coordination_activity(self, activity: CoordinationActivity) -> None:
+    async def _execute_coordination_activity(
+            self, activity: CoordinationActivity) -> None:
         """Execute a specific coordination activity."""
         try:
             # Check dependencies
             if not await self._check_activity_dependencies(activity):
-                self.logger.info(f"Dependencies not met for activity: {activity.name}")
+                self.logger.info(
+                    f"Dependencies not met for activity: {activity.name}")
                 return
 
             # Update activity status
@@ -420,18 +456,25 @@ class AutomatedCoordinationOrchestrator:
                 # Store communication
                 self._store_communication(activity, message)
 
-                self.logger.info(f"Coordination activity initiated: {activity.name}")
+                self.logger.info(
+                    f"Coordination activity initiated: {activity.name}")
             else:
                 activity.status = CoordinationStatus.FAILED
-                activity.notes.append(f"Failed to send coordination message at {datetime.now()}")
-                self.logger.error(f"Failed to initiate coordination activity: {activity.name}")
+                activity.notes.append(
+                    f"Failed to send coordination message at {datetime.now()}")
+                self.logger.error(
+                    f"Failed to initiate coordination activity: {
+                        activity.name}")
 
         except Exception as e:
             activity.status = CoordinationStatus.FAILED
-            activity.notes.append(f"Execution error: {str(e)} at {datetime.now()}")
-            self.logger.error(f"Error executing coordination activity {activity.name}: {e}")
+            activity.notes.append(
+                f"Execution error: {str(e)} at {datetime.now()}")
+            self.logger.error(
+                f"Error executing coordination activity {activity.name}: {e}")
 
-    async def _check_activity_dependencies(self, activity: CoordinationActivity) -> bool:
+    async def _check_activity_dependencies(
+            self, activity: CoordinationActivity) -> bool:
         """Check if activity dependencies are satisfied."""
         if not activity.dependencies:
             return True
@@ -443,7 +486,10 @@ class AutomatedCoordinationOrchestrator:
 
         return True
 
-    def _store_communication(self, activity: CoordinationActivity, message: CoordinationMessage) -> None:
+    def _store_communication(
+            self,
+            activity: CoordinationActivity,
+            message: CoordinationMessage) -> None:
         """Store communication for tracking."""
         communication_record = {
             "timestamp": datetime.now(),
@@ -468,9 +514,11 @@ class AutomatedCoordinationOrchestrator:
             }
 
         self.agent_communications[message.recipient]["messages_sent"] += 1
-        self.agent_communications[message.recipient]["last_contact"] = datetime.now()
+        self.agent_communications[message.recipient]["last_contact"] = datetime.now(
+        )
 
-    async def handle_coordination_response(self, response_message: CoordinationMessage) -> None:
+    async def handle_coordination_response(
+            self, response_message: CoordinationMessage) -> None:
         """Handle response to coordination message."""
         try:
             # Find original message
@@ -481,7 +529,9 @@ class AutomatedCoordinationOrchestrator:
                     break
 
             if not original_message:
-                self.logger.warning(f"No pending message found for response: {response_message.id}")
+                self.logger.warning(
+                    f"No pending message found for response: {
+                        response_message.id}")
                 return
 
             # Find associated activity
@@ -489,7 +539,8 @@ class AutomatedCoordinationOrchestrator:
             activity = self.coordination_activities.get(activity_id)
 
             if not activity:
-                self.logger.warning(f"No activity found for response: {activity_id}")
+                self.logger.warning(
+                    f"No activity found for response: {activity_id}")
                 return
 
             # Process response
@@ -497,7 +548,10 @@ class AutomatedCoordinationOrchestrator:
             if response_data.get("status") == "accepted":
                 activity.status = CoordinationStatus.ACTIVE
                 activity.progress = response_data.get("progress", 0.0)
-                activity.notes.append(f"Activity accepted by {response_message.sender.value} at {datetime.now()}")
+                activity.notes.append(
+                    f"Activity accepted by {
+                        response_message.sender.value} at {
+                        datetime.now()}")
 
                 # Update agent communication status
                 if response_message.sender in self.agent_communications:
@@ -508,7 +562,10 @@ class AutomatedCoordinationOrchestrator:
                 activity.status = CoordinationStatus.COMPLETED
                 activity.completed_at = datetime.now()
                 activity.progress = 100.0
-                activity.notes.append(f"Activity completed by {response_message.sender.value} at {datetime.now()}")
+                activity.notes.append(
+                    f"Activity completed by {
+                        response_message.sender.value} at {
+                        datetime.now()}")
 
                 # Check if this completes a checkpoint
                 await self._check_checkpoint_completion()
@@ -519,7 +576,8 @@ class AutomatedCoordinationOrchestrator:
             elif response_data.get("status") == "failed":
                 activity.status = CoordinationStatus.FAILED
                 failure_reason = response_data.get("reason", "Unknown failure")
-                activity.notes.append(f"Activity failed: {failure_reason} at {datetime.now()}")
+                activity.notes.append(
+                    f"Activity failed: {failure_reason} at {datetime.now()}")
 
                 # Handle failure
                 await self._handle_coordination_failure(activity, failure_reason)
@@ -557,7 +615,8 @@ class AutomatedCoordinationOrchestrator:
                     all_completed = False
 
             # Update completion percentage
-            checkpoint.completion_percentage = (completion_count / len(checkpoint.required_activities)) * 100
+            checkpoint.completion_percentage = (
+                completion_count / len(checkpoint.required_activities)) * 100
 
             if all_completed:
                 checkpoint.status = "completed"
@@ -594,7 +653,9 @@ class AutomatedCoordinationOrchestrator:
                 # All phases complete
                 await self._complete_coordination_session()
 
-    def _get_next_phase(self, current_phase: CoordinationPhase) -> Optional[CoordinationPhase]:
+    def _get_next_phase(
+            self,
+            current_phase: CoordinationPhase) -> Optional[CoordinationPhase]:
         """Get the next coordination phase."""
         phase_order = [
             CoordinationPhase.INITIALIZATION,
@@ -624,7 +685,8 @@ class AutomatedCoordinationOrchestrator:
         if session:
             session["status"] = "completed"
             session["completed_at"] = datetime.now()
-            session["duration"] = (datetime.now() - session["started_at"]).total_seconds()
+            session["duration"] = (
+                datetime.now() - session["started_at"]).total_seconds()
 
         await self._log_coordination_event("session_completed", {
             "session_id": self.active_session_id,
@@ -634,16 +696,24 @@ class AutomatedCoordinationOrchestrator:
             "completed_checkpoints": len([c for c in self.coordination_checkpoints.values() if c.status == "completed"])
         })
 
-        self.logger.info(f"Coordination session completed: {self.active_session_id}")
+        self.logger.info(
+            f"Coordination session completed: {self.active_session_id}")
 
-    async def _handle_coordination_failure(self, activity: CoordinationActivity, reason: str) -> None:
+    async def _handle_coordination_failure(
+            self,
+            activity: CoordinationActivity,
+            reason: str) -> None:
         """Handle coordination activity failure."""
-        self.logger.error(f"Coordination failure in activity {activity.name}: {reason}")
+        self.logger.error(
+            f"Coordination failure in activity {activity.name}: {reason}")
 
         # Generate feedback signal if feedback engine available
         if self.feedback_engine:
             feedback_signal = FeedbackSignal(
-                id=f"coordination_failure_{activity.id}_{int(datetime.now().timestamp())}",
+                id=f"coordination_failure_{
+    activity.id}_{
+        int(
+            datetime.now().timestamp())}",
                 type=FeedbackType.COORDINATION_FEEDBACK,
                 priority=FeedbackPriority.HIGH,
                 source="coordination_orchestrator",
@@ -661,17 +731,23 @@ class AutomatedCoordinationOrchestrator:
         # Attempt recovery
         await self._attempt_coordination_recovery(activity)
 
-    async def _attempt_coordination_recovery(self, failed_activity: CoordinationActivity) -> None:
+    async def _attempt_coordination_recovery(
+            self, failed_activity: CoordinationActivity) -> None:
         """Attempt to recover from coordination failure."""
         # Simple recovery: reset activity to pending for retry
         failed_activity.status = CoordinationStatus.PENDING
         failed_activity.started_at = None
-        failed_activity.notes.append(f"Recovery attempt initiated at {datetime.now()}")
+        failed_activity.notes.append(
+            f"Recovery attempt initiated at {datetime.now()}")
 
         # Schedule retry after delay
-        asyncio.create_task(self._retry_coordination_activity(failed_activity, delay=300))  # 5 minute delay
+        asyncio.create_task(self._retry_coordination_activity(
+            failed_activity, delay=300))  # 5 minute delay
 
-    async def _retry_coordination_activity(self, activity: CoordinationActivity, delay: int) -> None:
+    async def _retry_coordination_activity(
+            self,
+            activity: CoordinationActivity,
+            delay: int) -> None:
         """Retry a failed coordination activity after delay."""
         await asyncio.sleep(delay)
 
@@ -694,7 +770,8 @@ class AutomatedCoordinationOrchestrator:
                 await self._generate_progress_feedback()
 
             except Exception as e:
-                self.logger.error(f"Error in coordination monitoring loop: {e}")
+                self.logger.error(
+                    f"Error in coordination monitoring loop: {e}")
                 await asyncio.sleep(60)
 
     async def _check_coordination_timeouts(self) -> None:
@@ -704,7 +781,7 @@ class AutomatedCoordinationOrchestrator:
         for activity in self.coordination_activities.values():
             if (activity.status == CoordinationStatus.WAITING_RESPONSE and
                 activity.started_at and
-                current_time - activity.started_at > activity.timeout):
+                    current_time - activity.started_at > activity.timeout):
 
                 activity.status = CoordinationStatus.FAILED
                 activity.notes.append(f"Activity timed out at {current_time}")
@@ -714,18 +791,23 @@ class AutomatedCoordinationOrchestrator:
     async def _update_coordination_metrics(self) -> None:
         """Update coordination performance metrics."""
         total_activities = len(self.coordination_activities)
-        completed_activities = len([a for a in self.coordination_activities.values() if a.status == CoordinationStatus.COMPLETED])
-        failed_activities = len([a for a in self.coordination_activities.values() if a.status == CoordinationStatus.FAILED])
+        completed_activities = len([a for a in self.coordination_activities.values(
+        ) if a.status == CoordinationStatus.COMPLETED])
+        failed_activities = len([a for a in self.coordination_activities.values(
+        ) if a.status == CoordinationStatus.FAILED])
 
-        self.coordination_metrics.update({
-            "total_activities": total_activities,
-            "completed_activities": completed_activities,
-            "failed_activities": failed_activities,
-            "success_rate": (completed_activities / total_activities) * 100 if total_activities > 0 else 0,
-            "current_phase": self.current_phase.value,
-            "session_id": self.active_session_id,
-            "last_updated": datetime.now()
-        })
+        self.coordination_metrics.update(
+            {
+                "total_activities": total_activities,
+                "completed_activities": completed_activities,
+                "failed_activities": failed_activities,
+                "success_rate": (
+                    completed_activities /
+                    total_activities) *
+                100 if total_activities > 0 else 0,
+                "current_phase": self.current_phase.value,
+                "session_id": self.active_session_id,
+                "last_updated": datetime.now()})
 
     async def _generate_progress_feedback(self) -> None:
         """Generate progress feedback signals."""
@@ -754,7 +836,8 @@ class AutomatedCoordinationOrchestrator:
 
         await self.feedback_engine.submit_feedback(feedback_signal)
 
-    async def _log_coordination_event(self, event_type: str, data: Dict[str, Any]) -> None:
+    async def _log_coordination_event(
+            self, event_type: str, data: Dict[str, Any]) -> None:
         """Log coordination event."""
         event = {
             "timestamp": datetime.now(),
@@ -800,8 +883,10 @@ class AutomatedCoordinationOrchestrator:
         return {
             "session_summary": self.coordination_sessions.get(self.active_session_id, {}),
             "coordination_status": self.get_coordination_status(),
-            "communication_history": self.communication_history[-20:],  # Last 20 communications
-            "coordination_events": self.coordination_events[-50:],  # Last 50 events
+            # Last 20 communications
+            "communication_history": self.communication_history[-20:],
+            # Last 50 events
+            "coordination_events": self.coordination_events[-50:],
             "performance_summary": {
                 "total_communications": len(self.communication_history),
                 "active_responses_pending": len(self.pending_responses),
@@ -819,14 +904,20 @@ class AutomatedCoordinationOrchestrator:
         next_actions = []
 
         # Check for pending activities
-        pending_activities = [a for a in self.coordination_activities.values() if a.status == CoordinationStatus.PENDING]
+        pending_activities = [a for a in self.coordination_activities.values(
+        ) if a.status == CoordinationStatus.PENDING]
         if pending_activities:
-            next_actions.append(f"Execute {len(pending_activities)} pending coordination activities")
+            next_actions.append(
+                f"Execute {
+                    len(pending_activities)} pending coordination activities")
 
         # Check for failed activities
-        failed_activities = [a for a in self.coordination_activities.values() if a.status == CoordinationStatus.FAILED]
+        failed_activities = [a for a in self.coordination_activities.values(
+        ) if a.status == CoordinationStatus.FAILED]
         if failed_activities:
-            next_actions.append(f"Address {len(failed_activities)} failed coordination activities")
+            next_actions.append(
+                f"Address {
+                    len(failed_activities)} failed coordination activities")
 
         # Check for unresponsive agents
         unresponsive_agents = [
@@ -834,13 +925,17 @@ class AutomatedCoordinationOrchestrator:
             if status.get("status") == "unknown" or not status.get("last_contact")
         ]
         if unresponsive_agents:
-            next_actions.append(f"Establish communication with unresponsive agents: {', '.join(unresponsive_agents)}")
+            next_actions.append(
+                f"Establish communication with unresponsive agents: {
+                    ', '.join(unresponsive_agents)}")
 
         # Phase-specific actions
         if self.current_phase == CoordinationPhase.COMMUNICATION_SETUP:
-            next_actions.append("Await integration agent acknowledgment and proceed to component analysis")
+            next_actions.append(
+                "Await integration agent acknowledgment and proceed to component analysis")
         elif self.current_phase == CoordinationPhase.COMPONENT_ANALYSIS:
-            next_actions.append("Complete component boundary analysis and dependency mapping")
+            next_actions.append(
+                "Complete component boundary analysis and dependency mapping")
         elif self.current_phase == CoordinationPhase.BREAKDOWN_IMPLEMENTATION:
             next_actions.append("Begin PR component breakdown implementation")
 

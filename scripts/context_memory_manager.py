@@ -8,18 +8,18 @@ import argparse
 import hashlib
 import json
 import logging
-import os
 import re
 import subprocess
 import sys
 import tempfile
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class ContextMemoryManager:
     """Manages context window usage and automatic memory consolidation"""
@@ -42,7 +42,11 @@ class ContextMemoryManager:
         """Calculate SHA-256 checksum of content"""
         return hashlib.sha256(content.encode('utf-8')).hexdigest()
 
-    def _atomic_write_file(self, file_path: Path, content: str, backup: bool = True) -> bool:
+    def _atomic_write_file(
+            self,
+            file_path: Path,
+            content: str,
+            backup: bool = True) -> bool:
         """
         Write file atomically using temp file and rename.
         Includes checksum generation and optional backup.
@@ -57,7 +61,8 @@ class ContextMemoryManager:
                 try:
                     data = json.loads(content)
                     # Calculate checksum of original data (without metadata)
-                    original_checksum = self._calculate_checksum(json.dumps(data, separators=(',', ':'), sort_keys=True))
+                    original_checksum = self._calculate_checksum(
+                        json.dumps(data, separators=(',', ':'), sort_keys=True))
                     data['_checksum'] = original_checksum
                     data['_timestamp'] = datetime.now().isoformat()
                     final_content = json.dumps(data, indent=2)
@@ -66,7 +71,8 @@ class ContextMemoryManager:
                     final_content = content
             else:
                 # For markdown/text files, add checksum as comment
-                final_content = f"{content}\n\n<!-- Checksum: {checksum} -->\n<!-- Timestamp: {datetime.now().isoformat()} -->"
+                final_content = f"{content}\n\n<!-- Checksum: {checksum} -->\n<!-- Timestamp: {
+                    datetime.now().isoformat()} -->"
 
             # Write to temporary file first
             with tempfile.NamedTemporaryFile(
@@ -114,27 +120,36 @@ class ContextMemoryManager:
                     if stored_checksum:
                         # Remove checksum and timestamp for verification
                         verification_data = {k: v for k, v in data.items()
-                                           if not k.startswith('_')}
-                        # Use consistent JSON formatting (no indent for checksum calculation)
-                        verification_content = json.dumps(verification_data, separators=(',', ':'), sort_keys=True)
-                        calculated_checksum = self._calculate_checksum(verification_content)
+                                             if not k.startswith('_')}
+                        # Use consistent JSON formatting (no indent for
+                        # checksum calculation)
+                        verification_content = json.dumps(
+                            verification_data, separators=(
+                                ',', ':'), sort_keys=True)
+                        calculated_checksum = self._calculate_checksum(
+                            verification_content)
                         logger.debug(f"Stored checksum: {stored_checksum}")
-                        logger.debug(f"Calculated checksum: {calculated_checksum}")
+                        logger.debug(
+                            f"Calculated checksum: {calculated_checksum}")
                         return stored_checksum == calculated_checksum
                 except json.JSONDecodeError:
                     pass
             else:
                 # For markdown/text files, extract checksum from comment
-                checksum_match = re.search(r'<!-- Checksum: ([a-f0-9]{64}) -->', content)
+                checksum_match = re.search(
+                    r'<!-- Checksum: ([a-f0-9]{64}) -->', content)
                 if checksum_match:
                     stored_checksum = checksum_match.group(1)
                     # Remove checksum and timestamp lines for verification
-                    clean_content = re.sub(r'\n\n<!-- Checksum: [a-f0-9]{64} -->\n<!-- Timestamp: .* -->', '', content)
-                    calculated_checksum = self._calculate_checksum(clean_content)
+                    clean_content = re.sub(
+                        r'\n\n<!-- Checksum: [a-f0-9]{64} -->\n<!-- Timestamp: .* -->', '', content)
+                    calculated_checksum = self._calculate_checksum(
+                        clean_content)
                     return stored_checksum == calculated_checksum
 
             # If no checksum found, consider file valid but warn
-            logger.warning(f"⚠️ No checksum found in {file_path} - consider it valid but unverified")
+            logger.warning(
+                f"⚠️ No checksum found in {file_path} - consider it valid but unverified")
             return True
 
         except Exception as e:
@@ -147,7 +162,8 @@ class ContextMemoryManager:
         """
         try:
             # Try to extract from Claude Code interface
-            # This is a simplified version - in practice would need Claude Code API
+            # This is a simplified version - in practice would need Claude Code
+            # API
 
             # For now, estimate based on conversation length and complexity
             # In a real implementation, this would query Claude Code directly
@@ -158,7 +174,8 @@ class ContextMemoryManager:
                 files = list(self.project_root.rglob(file_type))
                 total_size += sum(f.stat().st_size for f in files if f.exists())
 
-            # Rough estimation: >50MB of active files suggests high context usage
+            # Rough estimation: >50MB of active files suggests high context
+            # usage
             estimated_usage = min(90, (total_size / (50 * 1024 * 1024)) * 70)
 
             logger.info(f"📊 Estimated context usage: {estimated_usage:.1f}%")
@@ -223,8 +240,13 @@ class ContextMemoryManager:
 
         try:
             # Get agent status
-            cmd = ["python", "scripts/check_agent_status.py", "--format", "json"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            cmd = [
+                "python",
+                "scripts/check_agent_status.py",
+                "--format",
+                "json"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=30)
             if result.returncode == 0:
                 try:
                     state["agent_status"] = json.loads(result.stdout)
@@ -233,28 +255,34 @@ class ContextMemoryManager:
 
             # Get git status
             cmd = ["git", "status", "--porcelain"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
                 state["project_status"]["uncommitted_changes"] = result.stdout.strip()
 
             # Get recent commits
             cmd = ["git", "log", "--oneline", "-10"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
                 state["project_status"]["recent_commits"] = result.stdout.strip()
 
             # Get PR status
-            cmd = ["gh", "pr", "list", "--state", "open", "--json", "number,title,headRefName"]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            cmd = ["gh", "pr", "list", "--state", "open",
+                   "--json", "number,title,headRefName"]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=15)
             if result.returncode == 0:
                 try:
-                    state["project_status"]["open_prs"] = json.loads(result.stdout)
+                    state["project_status"]["open_prs"] = json.loads(
+                        result.stdout)
                 except json.JSONDecodeError:
                     pass
 
             # Check active agent worktrees
             worktree_paths = list(Path("new-worktrees").glob("*"))
-            state["active_work"]["worktrees"] = [str(p) for p in worktree_paths]
+            state["active_work"]["worktrees"] = [
+                str(p) for p in worktree_paths]
 
         except Exception as e:
             logger.warning(f"Error capturing state: {e}")
@@ -266,7 +294,8 @@ class ContextMemoryManager:
         essential_file = self.memory_dir / "ESSENTIAL_WORKFLOW_KNOWLEDGE.md"
 
         if not essential_file.exists():
-            logger.warning("Essential knowledge file not found - creating new one")
+            logger.warning(
+                "Essential knowledge file not found - creating new one")
             return
 
         try:
@@ -277,13 +306,15 @@ class ContextMemoryManager:
             # Update timestamp
             updated_content = re.sub(
                 r'\*Last Updated: [^*]+\*',
-                f'*Last Updated: {datetime.now().strftime("%Y-%m-%d")} - Auto-updated by context manager*',
+                f'*Last Updated: {
+    datetime.now().strftime("%Y-%m-%d")} - Auto-updated by context manager*',
                 content
             )
 
             # Add current project status if significantly changed
             if current_state.get("project_status", {}).get("recent_commits"):
-                recent_work = current_state["project_status"]["recent_commits"].split('\n')[0]
+                recent_work = current_state["project_status"]["recent_commits"].split('\n')[
+                    0]
                 if "## 📋 CURRENT PROJECT STATUS" in updated_content:
                     # Update the current status section
                     status_pattern = r'(## 📋 CURRENT PROJECT STATUS.*?)(### |\## |$)'
@@ -291,8 +322,7 @@ class ContextMemoryManager:
                         status_pattern,
                         f'\\1\n### **Latest Work** \\n- {recent_work}\\n\\n\\2',
                         updated_content,
-                        flags=re.DOTALL
-                    )
+                        flags=re.DOTALL)
 
             # Write updated content
             with open(essential_file, 'w') as f:
@@ -326,12 +356,14 @@ class ContextMemoryManager:
                 for agent, status in current_state["agent_status"].items():
                     insights.append(f"- {agent}: {status}")
             else:
-                insights.append(f"- Status check: {str(current_state['agent_status'])[:200]}...")
+                insights.append(
+                    f"- Status check: {str(current_state['agent_status'])[:200]}...")
 
         # Add recent work
         if current_state.get("project_status", {}).get("recent_commits"):
             insights.append("\n### Recent Work")
-            for commit in current_state["project_status"]["recent_commits"].split('\n')[:3]:
+            for commit in current_state["project_status"]["recent_commits"].split('\n')[
+                    :3]:
                 if commit.strip():
                     insights.append(f"- {commit}")
 
@@ -342,7 +374,8 @@ class ContextMemoryManager:
 
     async def _deep_consolidation(self, current_state: Dict):
         """Deep memory consolidation - comprehensive state preservation"""
-        consolidation_file = self.memory_dir / f"DEEP_CONSOLIDATION_{datetime.now().strftime('%Y%m%d_%H%M')}.md"
+        consolidation_file = self.memory_dir / \
+            f"DEEP_CONSOLIDATION_{datetime.now().strftime('%Y%m%d_%H%M')}.md"
 
         comprehensive_state = {
             "consolidation_type": "deep",
@@ -376,9 +409,7 @@ class ContextMemoryManager:
                 "Read .claude/memory/ESSENTIAL_WORKFLOW_KNOWLEDGE.md immediately",
                 "Check agent status with scripts/check_agent_status.py",
                 "Verify current work with git status and PR status",
-                "Resume coordination using proper communication scripts"
-            ]
-        }
+                "Resume coordination using proper communication scripts"]}
 
         with open(snapshot_file, 'w') as f:
             json.dump(snapshot, f, indent=2)
@@ -415,10 +446,12 @@ class ContextMemoryManager:
 
                 wake_summary["memory_snapshot_restored"] = True
                 wake_summary["last_consolidation"] = snapshot.get("timestamp")
-                wake_summary["consolidation_level"] = snapshot.get("consolidation_level")
+                wake_summary["consolidation_level"] = snapshot.get(
+                    "consolidation_level")
 
                 # Include wake instructions
-                wake_summary["wake_instructions"] = snapshot.get("wake_instructions", [])
+                wake_summary["wake_instructions"] = snapshot.get(
+                    "wake_instructions", [])
                 logger.info("✅ Memory snapshot restored")
 
             # 3. Verify current state
@@ -444,7 +477,8 @@ class ContextMemoryManager:
 
     async def monitor_context_continuous(self, check_interval: int = 300):
         """Continuously monitor context usage and trigger consolidation"""
-        logger.info(f"👁️ Starting continuous context monitoring (interval: {check_interval}s)")
+        logger.info(
+            f"👁️ Starting continuous context monitoring (interval: {check_interval}s)")
 
         while True:
             try:
@@ -454,16 +488,20 @@ class ContextMemoryManager:
                     logger.warning(f"🚨 Context threshold reached: {level}")
 
                     if level == "emergency":
-                        logger.critical("🔴 EMERGENCY: Immediate sleep/wake cycle required")
+                        logger.critical(
+                            "🔴 EMERGENCY: Immediate sleep/wake cycle required")
                         await self.consolidate_memory("emergency")
-                        # In practice, would trigger Claude Code sleep/wake here
+                        # In practice, would trigger Claude Code sleep/wake
+                        # here
 
                     elif level == "critical":
-                        logger.warning("🟠 CRITICAL: Memory consolidation required")
+                        logger.warning(
+                            "🟠 CRITICAL: Memory consolidation required")
                         await self.consolidate_memory("critical")
 
                     elif level == "warning":
-                        logger.info("🟡 WARNING: Preparing memory consolidation")
+                        logger.info(
+                            "🟡 WARNING: Preparing memory consolidation")
                         await self.consolidate_memory("normal")
 
                 await asyncio.sleep(check_interval)
@@ -475,11 +513,21 @@ class ContextMemoryManager:
 
 async def main():
     parser = argparse.ArgumentParser(description="Context Memory Manager")
-    parser.add_argument("--check", action="store_true", help="Check current context usage")
-    parser.add_argument("--consolidate", choices=["normal", "critical", "emergency"], help="Force memory consolidation")
-    parser.add_argument("--wake", action="store_true", help="Wake from memory (restore essential knowledge)")
-    parser.add_argument("--monitor", action="store_true", help="Start continuous monitoring")
-    parser.add_argument("--interval", type=int, default=300, help="Monitoring interval in seconds")
+    parser.add_argument("--check", action="store_true",
+                        help="Check current context usage")
+    parser.add_argument(
+        "--consolidate",
+        choices=[
+            "normal",
+            "critical",
+            "emergency"],
+        help="Force memory consolidation")
+    parser.add_argument("--wake", action="store_true",
+                        help="Wake from memory (restore essential knowledge)")
+    parser.add_argument("--monitor", action="store_true",
+                        help="Start continuous monitoring")
+    parser.add_argument("--interval", type=int, default=300,
+                        help="Monitoring interval in seconds")
 
     args = parser.parse_args()
 
@@ -489,17 +537,19 @@ async def main():
         usage = manager.get_context_usage()
         needs_action, level = manager.check_context_threshold()
 
-        print(f"📊 Context Usage: {usage:.1f}%" if usage else "Context usage unknown")
+        print(
+            f"📊 Context Usage: {
+                usage:.1f}%" if usage else "Context usage unknown")
         print(f"🎯 Threshold Status: {level}")
         if needs_action:
-            print(f"⚠️ Action Required: Memory consolidation recommended")
+            print("⚠️ Action Required: Memory consolidation recommended")
 
     elif args.consolidate:
         success = await manager.consolidate_memory(args.consolidate)
         if success:
             print(f"✅ Memory consolidation completed ({args.consolidate})")
         else:
-            print(f"❌ Memory consolidation failed")
+            print("❌ Memory consolidation failed")
             sys.exit(1)
 
     elif args.wake:
@@ -510,7 +560,6 @@ async def main():
                 print(f"  {key}: {value}")
 
     elif args.monitor:
-        import asyncio
         await manager.monitor_context_continuous(args.interval)
 
     else:

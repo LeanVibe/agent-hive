@@ -6,22 +6,16 @@ system events to external consumers and handling event processing.
 """
 
 import asyncio
+import gzip
 import json
 import logging
-import time
 import uuid
-import gzip
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Callable, AsyncGenerator, Deque
-from dataclasses import asdict
 from collections import deque
+from dataclasses import asdict
+from datetime import datetime
+from typing import Any, Callable, Deque, Dict, List, Optional
 
-from .models import (
-    EventStreamConfig,
-    StreamEvent,
-    EventPriority
-)
-
+from .models import EventPriority, EventStreamConfig, StreamEvent
 
 logger = logging.getLogger(__name__)
 
@@ -77,12 +71,14 @@ class EventBuffer:
         """Get buffer statistics."""
         async with self.lock:
             return {
-                "current_size": len(self.buffer),
+                "current_size": len(
+                    self.buffer),
                 "max_size": self.max_size,
                 "total_events": self._total_events,
                 "dropped_events": self._dropped_events,
-                "utilization": len(self.buffer) / self.max_size if self.max_size > 0 else 0
-            }
+                "utilization": len(
+                    self.buffer) /
+                self.max_size if self.max_size > 0 else 0}
 
 
 class EventStreaming:
@@ -114,7 +110,8 @@ class EventStreaming:
             "compression_ratio": 0.0
         }
 
-        logger.info(f"EventStreaming initialized for stream: {config.stream_name}")
+        logger.info(
+            f"EventStreaming initialized for stream: {config.stream_name}")
 
     async def start_streaming(self) -> None:
         """Start the event streaming system."""
@@ -123,7 +120,8 @@ class EventStreaming:
             return
 
         try:
-            logger.info(f"Starting event streaming for: {self.config.stream_name}")
+            logger.info(
+                f"Starting event streaming for: {self.config.stream_name}")
 
             self.stream_active = True
             self.flush_task = asyncio.create_task(self._flush_loop())
@@ -161,9 +159,14 @@ class EventStreaming:
             logger.error(f"Error stopping event streaming: {e}")
             raise
 
-    async def publish_event(self, event_type: str, data: Dict[str, Any],
-                          partition_key: str, priority: EventPriority = EventPriority.MEDIUM,
-                          tags: Optional[Dict[str, str]] = None) -> bool:
+    async def publish_event(self,
+                            event_type: str,
+                            data: Dict[str,
+                                       Any],
+                            partition_key: str,
+                            priority: EventPriority = EventPriority.MEDIUM,
+                            tags: Optional[Dict[str,
+                                                str]] = None) -> bool:
         """
         Publish an event to the stream.
 
@@ -195,17 +198,21 @@ class EventStreaming:
             # Apply filters
             for filter_name, filter_func in self.filters.items():
                 if not await filter_func(event):
-                    logger.debug(f"Event {event.event_id} filtered out by {filter_name}")
+                    logger.debug(
+                        f"Event {
+                            event.event_id} filtered out by {filter_name}")
                     return False
 
             # Add to buffer
             success = await self.buffer.add_event(event)
             if success:
                 self.stats["events_processed"] += 1
-                logger.debug(f"Published event {event.event_id} of type {event_type}")
+                logger.debug(
+                    f"Published event {event.event_id} of type {event_type}")
             else:
                 self.stats["events_failed"] += 1
-                logger.warning(f"Failed to buffer event {event.event_id}: buffer full")
+                logger.warning(
+                    f"Failed to buffer event {event.event_id}: buffer full")
 
             return success
 
@@ -214,7 +221,10 @@ class EventStreaming:
             self.stats["events_failed"] += 1
             return False
 
-    def register_consumer(self, consumer_id: str, consumer_func: Callable) -> None:
+    def register_consumer(
+            self,
+            consumer_id: str,
+            consumer_func: Callable) -> None:
         """
         Register an event consumer.
 
@@ -310,7 +320,8 @@ class EventStreaming:
         except Exception as e:
             logger.error(f"Error flushing events: {e}")
 
-    def _group_events_by_priority(self, events: List[StreamEvent]) -> Dict[EventPriority, List[StreamEvent]]:
+    def _group_events_by_priority(
+            self, events: List[StreamEvent]) -> Dict[EventPriority, List[StreamEvent]]:
         """Group events by priority level."""
         groups: Dict[EventPriority, List[StreamEvent]] = {}
         for event in events:
@@ -319,7 +330,8 @@ class EventStreaming:
             groups[event.priority].append(event)
         return groups
 
-    async def _prepare_batch(self, events: List[StreamEvent]) -> Dict[str, Any]:
+    async def _prepare_batch(
+            self, events: List[StreamEvent]) -> Dict[str, Any]:
         """
         Prepare batch data for delivery.
 
@@ -343,7 +355,8 @@ class EventStreaming:
 
         return batch_data
 
-    async def _compress_batch(self, batch_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _compress_batch(
+            self, batch_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Compress batch data.
 
@@ -360,10 +373,12 @@ class EventStreaming:
                     return obj.isoformat()
                 elif hasattr(obj, 'value'):  # Handle enums
                     return obj.value
-                raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+                raise TypeError(
+                    f"Object of type {type(obj)} is not JSON serializable")
 
             # Serialize to JSON with custom encoder
-            json_data = json.dumps(batch_data, default=json_serializer).encode('utf-8')
+            json_data = json.dumps(
+                batch_data, default=json_serializer).encode('utf-8')
             original_size = len(json_data)
 
             # Compress with gzip
@@ -400,7 +415,8 @@ class EventStreaming:
 
         for consumer_id, consumer_func in self.consumers.items():
             task = asyncio.create_task(
-                self._deliver_to_consumer(consumer_id, consumer_func, batch_data)
+                self._deliver_to_consumer(
+                    consumer_id, consumer_func, batch_data)
             )
             delivery_tasks.append(task)
 
@@ -409,14 +425,18 @@ class EventStreaming:
             results = await asyncio.gather(*delivery_tasks, return_exceptions=True)
 
             # Count successful deliveries
-            successful = sum(1 for result in results if not isinstance(result, Exception))
+            successful = sum(
+                1 for result in results if not isinstance(result, Exception))
             failed = len(results) - successful
 
             self.stats["events_delivered"] += successful
             self.stats["events_failed"] += failed
 
-    async def _deliver_to_consumer(self, consumer_id: str, consumer_func: Callable,
-                                 batch_data: Dict[str, Any]) -> None:
+    async def _deliver_to_consumer(self,
+                                   consumer_id: str,
+                                   consumer_func: Callable,
+                                   batch_data: Dict[str,
+                                                    Any]) -> None:
         """
         Deliver batch to a specific consumer with retries.
 
@@ -432,12 +452,16 @@ class EventStreaming:
                 return
 
             except Exception as e:
-                logger.error(f"Delivery attempt {attempt + 1} failed for consumer {consumer_id}: {e}")
+                logger.error(
+                    f"Delivery attempt {
+                        attempt +
+                        1} failed for consumer {consumer_id}: {e}")
 
                 if attempt < self.config.max_retries:
                     await asyncio.sleep(self.config.retry_delay * (attempt + 1))
                 else:
-                    logger.error(f"All delivery attempts failed for consumer {consumer_id}")
+                    logger.error(
+                        f"All delivery attempts failed for consumer {consumer_id}")
                     raise
 
     def get_stream_info(self) -> Dict[str, Any]:

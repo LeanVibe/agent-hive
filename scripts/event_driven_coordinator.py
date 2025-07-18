@@ -5,16 +5,14 @@ Real-time coordination system built on accountability infrastructure
 Monitors coordination_alerts.json and triggers intelligent responses
 """
 
-import os
-import json
 import asyncio
+import json
 import logging
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Set
-import time
 import signal
 import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Set
 
 # Setup logging
 logging.basicConfig(
@@ -23,6 +21,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger('event_coordinator')
+
 
 class EventDrivenCoordinator:
     """
@@ -88,7 +87,8 @@ class EventDrivenCoordinator:
         try:
             while self.running:
                 await self._check_for_new_events()
-                await asyncio.sleep(0.5)  # Check every 500ms for responsiveness
+                # Check every 500ms for responsiveness
+                await asyncio.sleep(0.5)
 
         except KeyboardInterrupt:
             logger.info("🛑 Coordinator stopped by user")
@@ -109,7 +109,8 @@ class EventDrivenCoordinator:
         logger.info("📊 Event-Driven Coordinator Statistics:")
         logger.info(f"   Uptime: {uptime}")
         logger.info(f"   Events processed: {self.stats['events_processed']}")
-        logger.info(f"   Coordination crises: {self.stats['coordination_crises']}")
+        logger.info(
+            f"   Coordination crises: {self.stats['coordination_crises']}")
         logger.info(f"   Deadline warnings: {self.stats['deadline_warnings']}")
         logger.info(f"   Responses sent: {self.stats['responses_sent']}")
         logger.info(f"   Errors: {self.stats['errors_encountered']}")
@@ -176,24 +177,35 @@ class EventDrivenCoordinator:
                         events.append(event)
                         self.processed_events.add(event_id)
                 except json.JSONDecodeError as e:
-                    logger.warning(f"Failed to parse event line: {line[:100]}... - {e}")
+                    logger.warning(
+                        f"Failed to parse event line: {line[:100]}... - {e}")
         return events
 
     def _get_event_id(self, event: Dict[str, Any]) -> str:
         """Generate unique event ID to prevent duplicate processing."""
-        return f"{event.get('type', 'unknown')}_{event.get('timestamp', '')}_{event.get('task_id', '')}"
+        return f"{
+            event.get(
+                'type',
+                'unknown')}_{
+            event.get(
+                'timestamp',
+                '')}_{
+                    event.get(
+                        'task_id',
+                        '')}"
 
     async def _process_event(self, event: Dict[str, Any]):
         """Process a single coordination event."""
         event_type = event.get('type', 'UNKNOWN')
-        timestamp = event.get('timestamp', '')
+        event.get('_timestamp', '')
         task_id = event.get('task_id', 'unknown')
         agent_id = event.get('agent_id', 'unknown')
 
         self.stats["events_processed"] += 1
         self.stats["last_event_time"] = datetime.now()
 
-        logger.info(f"🎯 Processing {event_type} | Task: {task_id} | Agent: {agent_id}")
+        logger.info(
+            f"🎯 Processing {event_type} | Task: {task_id} | Agent: {agent_id}")
 
         # Route to appropriate handler
         try:
@@ -226,10 +238,12 @@ class EventDrivenCoordinator:
         escalation_level = event.get('escalation_level', 'unknown')
         description = event.get('description', 'No description')
 
-        logger.critical(f"🚨 COORDINATION CRISIS | Level: {escalation_level} | Task: {task_id}")
+        logger.critical(
+            f"🚨 COORDINATION CRISIS | Level: {escalation_level} | Task: {task_id}")
 
         # Critical response protocol
-        priority = self.response_config["escalation_thresholds"].get(escalation_level, "HIGH")
+        self.response_config["escalation_thresholds"].get(
+            escalation_level, "HIGH")
 
         responses = []
 
@@ -241,7 +255,8 @@ class EventDrivenCoordinator:
                     f"Agent {agent_id} unresponsive. Immediate intervention required. "
                     f"Details: {description}"
                 ),
-                self._ping_agent(agent_id, f"URGENT: Coordination crisis for task {task_id}"),
+                self._ping_agent(
+                    agent_id, f"URGENT: Coordination crisis for task {task_id}"),
                 self._log_crisis_event(event, "CRITICAL")
             ])
             self.stats["escalations_triggered"] += 1
@@ -268,7 +283,8 @@ class EventDrivenCoordinator:
         agent_id = event.get('agent_id', 'unknown')
         time_remaining = event.get('time_remaining', 'unknown')
 
-        logger.warning(f"⏰ DEADLINE WARNING | Task: {task_id} | Time: {time_remaining}")
+        logger.warning(
+            f"⏰ DEADLINE WARNING | Task: {task_id} | Time: {time_remaining}")
 
         # Deadline response protocol
         await asyncio.gather(
@@ -291,10 +307,12 @@ class EventDrivenCoordinator:
         agent_id = event.get('agent_id', 'unknown')
         last_activity = event.get('last_activity', 'unknown')
 
-        logger.warning(f"😴 AGENT UNRESPONSIVE | Agent: {agent_id} | Last: {last_activity}")
+        logger.warning(
+            f"😴 AGENT UNRESPONSIVE | Agent: {agent_id} | Last: {last_activity}")
 
         await asyncio.gather(
-            self._send_notification(f"Agent {agent_id} unresponsive since {last_activity}"),
+            self._send_notification(
+                f"Agent {agent_id} unresponsive since {last_activity}"),
             self._ping_agent(agent_id, "Health check - please respond"),
             return_exceptions=True
         )
@@ -305,10 +323,12 @@ class EventDrivenCoordinator:
         old_agent = event.get('old_agent', 'unknown')
         new_agent = event.get('new_agent', 'unknown')
 
-        logger.info(f"🔄 TASK REASSIGNMENT | Task: {task_id} | {old_agent} → {new_agent}")
+        logger.info(
+            f"🔄 TASK REASSIGNMENT | Task: {task_id} | {old_agent} → {new_agent}")
 
         await asyncio.gather(
-            self._send_notification(f"Task {task_id} reassigned from {old_agent} to {new_agent}"),
+            self._send_notification(
+                f"Task {task_id} reassigned from {old_agent} to {new_agent}"),
             self._notify_new_assignment(new_agent, task_id),
             return_exceptions=True
         )
@@ -318,7 +338,8 @@ class EventDrivenCoordinator:
         escalation_level = event.get('escalation_level', 'unknown')
         reason = event.get('reason', 'No reason provided')
 
-        logger.warning(f"📈 ESCALATION | Level: {escalation_level} | Reason: {reason}")
+        logger.warning(
+            f"📈 ESCALATION | Level: {escalation_level} | Reason: {reason}")
         self.stats["escalations_triggered"] += 1
 
         await self._send_notification(f"Escalation triggered: {escalation_level} - {reason}")
@@ -460,7 +481,8 @@ class EventDrivenCoordinator:
 
         if last_sent:
             time_since = datetime.now() - last_sent
-            if time_since.total_seconds() < self.response_config["notification_cooldown"]:
+            if time_since.total_seconds(
+            ) < self.response_config["notification_cooldown"]:
                 return True
 
         return False
@@ -484,6 +506,8 @@ class EventDrivenCoordinator:
         }
 
 # Signal handlers for graceful shutdown
+
+
 def signal_handler(coordinator):
     """Handle shutdown signals."""
     def handler(signum, frame):
@@ -491,11 +515,13 @@ def signal_handler(coordinator):
         coordinator.stop()
     return handler
 
+
 async def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Event-Driven Coordination System")
+    parser = argparse.ArgumentParser(
+        description="Event-Driven Coordination System")
     parser.add_argument(
         '--alerts-file',
         default='coordination_alerts.json',

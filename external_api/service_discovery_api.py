@@ -8,15 +8,13 @@ Supports external access to the service discovery functionality.
 import asyncio
 import logging
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 import uvicorn
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel, Field
 
-from .service_discovery import ServiceDiscovery, ServiceInstance, ServiceStatus
-
+from .service_discovery import ServiceDiscovery, ServiceInstance
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +26,10 @@ class ServiceInstanceRequest(BaseModel):
     service_name: str = Field(..., description="Service name")
     host: str = Field(..., description="Service host/IP")
     port: int = Field(..., ge=1, le=65535, description="Service port")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Service metadata")
-    health_check_url: Optional[str] = Field(None, description="Health check endpoint URL")
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict, description="Service metadata")
+    health_check_url: Optional[str] = Field(
+        None, description="Health check endpoint URL")
     tags: List[str] = Field(default_factory=list, description="Service tags")
     version: str = Field(default="1.0.0", description="Service version")
 
@@ -73,7 +73,11 @@ class ServiceDiscoveryAPI:
     service discovery functionality.
     """
 
-    def __init__(self, service_discovery: ServiceDiscovery, host: str = "0.0.0.0", port: int = 8000):
+    def __init__(
+            self,
+            service_discovery: ServiceDiscovery,
+            host: str = "0.0.0.0",
+            port: int = 8000):
         """
         Initialize Service Discovery API.
 
@@ -88,8 +92,7 @@ class ServiceDiscoveryAPI:
         self.app = FastAPI(
             title="Service Discovery API",
             description="REST API for service registration, discovery, and health monitoring",
-            version="1.0.0"
-        )
+            version="1.0.0")
         self.server = None
 
         # Setup routes
@@ -103,7 +106,9 @@ class ServiceDiscoveryAPI:
         @self.app.get("/health", response_model=Dict[str, str])
         async def health_check():
             """API health check endpoint."""
-            return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+            return {
+                "status": "healthy",
+                "timestamp": datetime.now().isoformat()}
 
         @self.app.post("/services/register", response_model=Dict[str, Any])
         async def register_service(request: ServiceInstanceRequest):
@@ -141,7 +146,8 @@ class ServiceDiscoveryAPI:
                     detail=f"Registration failed: {str(e)}"
                 )
 
-        @self.app.delete("/services/{service_id}", response_model=Dict[str, Any])
+        @self.app.delete("/services/{service_id}",
+                         response_model=Dict[str, Any])
         async def deregister_service(service_id: str):
             """Deregister a service instance."""
             try:
@@ -168,8 +174,11 @@ class ServiceDiscoveryAPI:
                     detail=f"Deregistration failed: {str(e)}"
                 )
 
-        @self.app.get("/services/discover/{service_name}", response_model=ServiceDiscoveryResponse)
-        async def discover_services(service_name: str, healthy_only: bool = True):
+        @self.app.get("/services/discover/{service_name}",
+                      response_model=ServiceDiscoveryResponse)
+        async def discover_services(
+                service_name: str,
+                healthy_only: bool = True):
             """Discover services by name."""
             try:
                 instances = await self.service_discovery.discover_services(service_name, healthy_only)
@@ -177,21 +186,22 @@ class ServiceDiscoveryAPI:
                 service_responses = []
                 for instance in instances:
                     # Get registration info for status and timestamps
-                    registration = self.service_discovery.services.get(instance.service_id)
+                    registration = self.service_discovery.services.get(
+                        instance.service_id)
                     if registration:
-                        service_responses.append(ServiceInstanceResponse(
-                            service_id=instance.service_id,
-                            service_name=instance.service_name,
-                            host=instance.host,
-                            port=instance.port,
-                            metadata=instance.metadata,
-                            health_check_url=instance.health_check_url,
-                            tags=instance.tags,
-                            version=instance.version,
-                            status=registration.status.value,
-                            registered_at=registration.registered_at.isoformat(),
-                            last_heartbeat=registration.last_heartbeat.isoformat()
-                        ))
+                        service_responses.append(
+                            ServiceInstanceResponse(
+                                service_id=instance.service_id,
+                                service_name=instance.service_name,
+                                host=instance.host,
+                                port=instance.port,
+                                metadata=instance.metadata,
+                                health_check_url=instance.health_check_url,
+                                tags=instance.tags,
+                                version=instance.version,
+                                status=registration.status.value,
+                                registered_at=registration.registered_at.isoformat(),
+                                last_heartbeat=registration.last_heartbeat.isoformat()))
 
                 return ServiceDiscoveryResponse(
                     services=service_responses,
@@ -205,7 +215,8 @@ class ServiceDiscoveryAPI:
                     detail=f"Service discovery failed: {str(e)}"
                 )
 
-        @self.app.get("/services/{service_id}", response_model=ServiceInstanceResponse)
+        @self.app.get("/services/{service_id}",
+                      response_model=ServiceInstanceResponse)
         async def get_service(service_id: str):
             """Get service by ID."""
             try:
@@ -230,8 +241,7 @@ class ServiceDiscoveryAPI:
                     version=instance.version,
                     status=registration.status.value if registration else "unknown",
                     registered_at=registration.registered_at.isoformat() if registration else "",
-                    last_heartbeat=registration.last_heartbeat.isoformat() if registration else ""
-                )
+                    last_heartbeat=registration.last_heartbeat.isoformat() if registration else "")
 
             except HTTPException:
                 raise
@@ -242,7 +252,8 @@ class ServiceDiscoveryAPI:
                     detail=f"Failed to get service: {str(e)}"
                 )
 
-        @self.app.post("/services/{service_id}/heartbeat", response_model=Dict[str, Any])
+        @self.app.post("/services/{service_id}/heartbeat",
+                       response_model=Dict[str, Any])
         async def service_heartbeat(service_id: str):
             """Send heartbeat for a service."""
             try:
@@ -269,7 +280,9 @@ class ServiceDiscoveryAPI:
                     detail=f"Heartbeat failed: {str(e)}"
                 )
 
-        @self.app.get("/services", response_model=Dict[str, List[ServiceInstanceResponse]])
+        @self.app.get("/services",
+                      response_model=Dict[str,
+                                          List[ServiceInstanceResponse]])
         async def list_all_services():
             """List all registered services."""
             try:
@@ -325,7 +338,8 @@ class ServiceDiscoveryAPI:
                     detail=f"Failed to get system info: {str(e)}"
                 )
 
-        @self.app.get("/services/{service_id}/status", response_model=Dict[str, Any])
+        @self.app.get("/services/{service_id}/status",
+                      response_model=Dict[str, Any])
         async def get_service_status(service_id: str):
             """Get service status."""
             try:
@@ -352,7 +366,8 @@ class ServiceDiscoveryAPI:
                     detail=f"Failed to get service status: {str(e)}"
                 )
 
-        @self.app.get("/services/healthy/{service_name}", response_model=ServiceInstanceResponse)
+        @self.app.get("/services/healthy/{service_name}",
+                      response_model=ServiceInstanceResponse)
         async def get_healthy_instance(service_name: str):
             """Get a healthy instance of a service."""
             try:
@@ -364,7 +379,8 @@ class ServiceDiscoveryAPI:
                         detail="No healthy instances found"
                     )
 
-                registration = self.service_discovery.services.get(instance.service_id)
+                registration = self.service_discovery.services.get(
+                    instance.service_id)
 
                 return ServiceInstanceResponse(
                     service_id=instance.service_id,
@@ -377,8 +393,7 @@ class ServiceDiscoveryAPI:
                     version=instance.version,
                     status=registration.status.value if registration else "unknown",
                     registered_at=registration.registered_at.isoformat() if registration else "",
-                    last_heartbeat=registration.last_heartbeat.isoformat() if registration else ""
-                )
+                    last_heartbeat=registration.last_heartbeat.isoformat() if registration else "")
 
             except HTTPException:
                 raise
@@ -392,7 +407,10 @@ class ServiceDiscoveryAPI:
     async def start_server(self) -> None:
         """Start the API server."""
         try:
-            logger.info(f"Starting Service Discovery API server on {self.host}:{self.port}")
+            logger.info(
+                f"Starting Service Discovery API server on {
+                    self.host}:{
+                    self.port}")
 
             # Start the service discovery system if not already running
             if not self.service_discovery._running:

@@ -10,16 +10,23 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 import click
 
 from .enhanced_coordination import EnhancedCoordinationProtocol
-from .workflow_coordinator import WorkflowCoordinator
 from .models import (
-    WorkflowDefinition, AgentCapabilities, QualityGate, TaskDependency,
-    WorkflowType, AgentSpecialization, TaskPriority, DependencyType,
-    CoordinatorConfig, ResourceLimits, IntelligentRouting
+    AgentCapabilities,
+    AgentSpecialization,
+    CoordinatorConfig,
+    DependencyType,
+    QualityGate,
+    ResourceLimits,
+    TaskDependency,
+    WorkflowDefinition,
+    WorkflowType,
 )
+from .workflow_coordinator import WorkflowCoordinator
 
 
 class EnhancedOrchestrationCLI:
@@ -38,28 +45,36 @@ class EnhancedOrchestrationCLI:
             coordinator_config = CoordinatorConfig(
                 max_agents=config.get('max_agents', 10) if config else 10,
                 min_agents=config.get('min_agents', 2) if config else 2,
-                health_check_interval=config.get('health_check_interval', 30.0) if config else 30.0,
-                load_balance_interval=config.get('load_balance_interval', 60.0) if config else 60.0,
-                enable_auto_scaling=config.get('enable_auto_scaling', True) if config else True,
+                health_check_interval=config.get(
+                    'health_check_interval', 30.0) if config else 30.0,
+                load_balance_interval=config.get(
+                    'load_balance_interval', 60.0) if config else 60.0,
+                enable_auto_scaling=config.get(
+                    'enable_auto_scaling', True) if config else True,
                 resource_limits=ResourceLimits(
                     max_agents=config.get('max_agents', 10) if config else 10,
-                    max_cpu_cores=config.get('max_cpu_cores', 8) if config else 8,
-                    max_memory_mb=config.get('max_memory_mb', 8192) if config else 8192
+                    max_cpu_cores=config.get(
+                        'max_cpu_cores', 8) if config else 8,
+                    max_memory_mb=config.get(
+                        'max_memory_mb', 8192) if config else 8192
                 )
             )
 
             # Initialize enhanced coordination protocol
-            self.enhanced_coordination = EnhancedCoordinationProtocol(coordinator_config)
+            self.enhanced_coordination = EnhancedCoordinationProtocol(
+                coordinator_config)
             await self.enhanced_coordination.start()
 
             # Get workflow coordinator reference
             self.workflow_coordinator = self.enhanced_coordination.workflow_coordinator
             self.running = True
 
-            self.logger.info("Enhanced multi-agent orchestration system initialized with intelligent coordination")
+            self.logger.info(
+                "Enhanced multi-agent orchestration system initialized with intelligent coordination")
 
         except Exception as e:
-            self.logger.error(f"Failed to initialize enhanced orchestration system: {e}")
+            self.logger.error(
+                f"Failed to initialize enhanced orchestration system: {e}")
             raise
 
     async def shutdown(self) -> None:
@@ -69,12 +84,14 @@ class EnhancedOrchestrationCLI:
             self.running = False
             self.logger.info("Enhanced orchestration system shutdown complete")
 
-    async def create_documentation_workflow(self, workflow_id: str = None) -> str:
+    async def create_documentation_workflow(
+            self, workflow_id: str = None) -> str:
         """Create the documentation workflow from the plan."""
         if not self.workflow_coordinator:
             raise RuntimeError("Orchestration system not initialized")
 
-        workflow_id = workflow_id or f"documentation-workflow-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        workflow_id = workflow_id or f"documentation-workflow-{
+            datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
         # Create workflow definition based on the plan
         workflow_def = WorkflowDefinition(
@@ -136,56 +153,97 @@ class EnhancedOrchestrationCLI:
             ],
             dependencies=[
                 # Track A dependencies
-                TaskDependency("A.1.2-categorize-documents", "A.1.1-documentation-inventory", DependencyType.BLOCKING),
-                TaskDependency("A.1.3-create-archive-structure", "A.1.2-categorize-documents", DependencyType.BLOCKING),
-                TaskDependency("A.1.4-update-readme-index", "A.1.3-create-archive-structure", DependencyType.BLOCKING),
-                TaskDependency("A.2.1-update-api-reference", "A.1.4-update-readme-index", DependencyType.SOFT),
-                TaskDependency("A.2.2-enhance-deployment-docs", "A.2.1-update-api-reference", DependencyType.SOFT),
-                TaskDependency("A.2.3-expand-troubleshooting", "A.2.2-enhance-deployment-docs", DependencyType.SOFT),
-                TaskDependency("A.2.4-modernize-development-docs", "A.2.3-expand-troubleshooting", DependencyType.SOFT),
+                TaskDependency("A.1.2-categorize-documents",
+                               "A.1.1-documentation-inventory", DependencyType.BLOCKING),
+                TaskDependency("A.1.3-create-archive-structure",
+                               "A.1.2-categorize-documents", DependencyType.BLOCKING),
+                TaskDependency("A.1.4-update-readme-index",
+                               "A.1.3-create-archive-structure", DependencyType.BLOCKING),
+                TaskDependency("A.2.1-update-api-reference",
+                               "A.1.4-update-readme-index", DependencyType.SOFT),
+                TaskDependency("A.2.2-enhance-deployment-docs",
+                               "A.2.1-update-api-reference", DependencyType.SOFT),
+                TaskDependency("A.2.3-expand-troubleshooting",
+                               "A.2.2-enhance-deployment-docs", DependencyType.SOFT),
+                TaskDependency("A.2.4-modernize-development-docs",
+                               "A.2.3-expand-troubleshooting", DependencyType.SOFT),
 
                 # Track B dependencies
-                TaskDependency("B.1.2-project-initialization", "B.1.1-tutorial-environment-setup", DependencyType.BLOCKING),
-                TaskDependency("B.2.1-user-authentication-system", "B.1.2-project-initialization", DependencyType.BLOCKING),
-                TaskDependency("B.2.2-article-management-system", "B.2.1-user-authentication-system", DependencyType.BLOCKING),
-                TaskDependency("B.2.3-social-features-realtime", "B.2.2-article-management-system", DependencyType.BLOCKING),
-                TaskDependency("B.3.1-docker-containerization", "B.2.3-social-features-realtime", DependencyType.BLOCKING),
-                TaskDependency("B.3.2-monitoring-observability", "B.3.1-docker-containerization", DependencyType.BLOCKING),
-                TaskDependency("B.3.3-cicd-pipeline", "B.3.2-monitoring-observability", DependencyType.BLOCKING),
-                TaskDependency("B.3.4-tutorial-validation", "B.3.3-cicd-pipeline", DependencyType.BLOCKING),
+                TaskDependency("B.1.2-project-initialization",
+                               "B.1.1-tutorial-environment-setup", DependencyType.BLOCKING),
+                TaskDependency("B.2.1-user-authentication-system",
+                               "B.1.2-project-initialization", DependencyType.BLOCKING),
+                TaskDependency("B.2.2-article-management-system",
+                               "B.2.1-user-authentication-system", DependencyType.BLOCKING),
+                TaskDependency("B.2.3-social-features-realtime",
+                               "B.2.2-article-management-system", DependencyType.BLOCKING),
+                TaskDependency("B.3.1-docker-containerization",
+                               "B.2.3-social-features-realtime", DependencyType.BLOCKING),
+                TaskDependency("B.3.2-monitoring-observability",
+                               "B.3.1-docker-containerization", DependencyType.BLOCKING),
+                TaskDependency("B.3.3-cicd-pipeline",
+                               "B.3.2-monitoring-observability", DependencyType.BLOCKING),
+                TaskDependency("B.3.4-tutorial-validation",
+                               "B.3.3-cicd-pipeline", DependencyType.BLOCKING),
 
                 # Track C dependencies
-                TaskDependency("C.1.2-project-integration-config", "C.1.1-repository-setup-docs", DependencyType.BLOCKING),
-                TaskDependency("C.1.3-git-hooks-setup", "C.1.2-project-integration-config", DependencyType.BLOCKING),
-                TaskDependency("C.1.4-agent-specialization-config", "C.1.3-git-hooks-setup", DependencyType.BLOCKING),
-                TaskDependency("C.2.1-cli-commands-reference", "C.1.4-agent-specialization-config", DependencyType.BLOCKING),
-                TaskDependency("C.2.2-workflow-coordination-patterns", "C.2.1-cli-commands-reference", DependencyType.BLOCKING),
-                TaskDependency("C.2.3-prompt-engineering-guide", "C.2.2-workflow-coordination-patterns", DependencyType.BLOCKING),
-                TaskDependency("C.2.4-validation-examples", "C.2.3-prompt-engineering-guide", DependencyType.BLOCKING),
+                TaskDependency("C.1.2-project-integration-config",
+                               "C.1.1-repository-setup-docs", DependencyType.BLOCKING),
+                TaskDependency("C.1.3-git-hooks-setup",
+                               "C.1.2-project-integration-config", DependencyType.BLOCKING),
+                TaskDependency("C.1.4-agent-specialization-config",
+                               "C.1.3-git-hooks-setup", DependencyType.BLOCKING),
+                TaskDependency("C.2.1-cli-commands-reference",
+                               "C.1.4-agent-specialization-config", DependencyType.BLOCKING),
+                TaskDependency("C.2.2-workflow-coordination-patterns",
+                               "C.2.1-cli-commands-reference", DependencyType.BLOCKING),
+                TaskDependency("C.2.3-prompt-engineering-guide",
+                               "C.2.2-workflow-coordination-patterns", DependencyType.BLOCKING),
+                TaskDependency("C.2.4-validation-examples",
+                               "C.2.3-prompt-engineering-guide", DependencyType.BLOCKING),
 
-                # Track D dependencies (validation tasks depend on respective track completions)
-                TaskDependency("D.1.1-documentation-validation", "A.2.4-modernize-development-docs", DependencyType.SOFT),
-                TaskDependency("D.1.2-code-example-testing", "D.1.1-documentation-validation", DependencyType.BLOCKING),
-                TaskDependency("D.1.3-link-validation", "D.1.2-code-example-testing", DependencyType.BLOCKING),
-                TaskDependency("D.1.4-accuracy-verification", "D.1.3-link-validation", DependencyType.BLOCKING),
-                TaskDependency("D.2.1-fresh-environment-testing", "B.3.4-tutorial-validation", DependencyType.SOFT),
-                TaskDependency("D.2.2-step-by-step-validation", "D.2.1-fresh-environment-testing", DependencyType.BLOCKING),
-                TaskDependency("D.2.3-performance-benchmarking", "D.2.2-step-by-step-validation", DependencyType.BLOCKING),
-                TaskDependency("D.2.4-troubleshooting-testing", "D.2.3-performance-benchmarking", DependencyType.BLOCKING),
+                # Track D dependencies (validation tasks depend on respective
+                # track completions)
+                TaskDependency("D.1.1-documentation-validation",
+                               "A.2.4-modernize-development-docs", DependencyType.SOFT),
+                TaskDependency("D.1.2-code-example-testing",
+                               "D.1.1-documentation-validation", DependencyType.BLOCKING),
+                TaskDependency("D.1.3-link-validation",
+                               "D.1.2-code-example-testing", DependencyType.BLOCKING),
+                TaskDependency("D.1.4-accuracy-verification",
+                               "D.1.3-link-validation", DependencyType.BLOCKING),
+                TaskDependency("D.2.1-fresh-environment-testing",
+                               "B.3.4-tutorial-validation", DependencyType.SOFT),
+                TaskDependency("D.2.2-step-by-step-validation",
+                               "D.2.1-fresh-environment-testing", DependencyType.BLOCKING),
+                TaskDependency("D.2.3-performance-benchmarking",
+                               "D.2.2-step-by-step-validation", DependencyType.BLOCKING),
+                TaskDependency("D.2.4-troubleshooting-testing",
+                               "D.2.3-performance-benchmarking", DependencyType.BLOCKING),
 
                 # Track E dependencies
-                TaskDependency("E.1.2-cleanup-duplicates", "E.1.1-archive-historical-docs", DependencyType.BLOCKING),
-                TaskDependency("E.1.3-create-archive-structure", "E.1.2-cleanup-duplicates", DependencyType.BLOCKING),
-                TaskDependency("E.1.4-update-git-history", "E.1.3-create-archive-structure", DependencyType.BLOCKING),
-                TaskDependency("E.2.1-automated-update-triggers", "E.1.4-update-git-history", DependencyType.BLOCKING),
-                TaskDependency("E.2.2-community-feedback-integration", "E.2.1-automated-update-triggers", DependencyType.BLOCKING),
-                TaskDependency("E.2.3-version-sync-monitoring", "E.2.2-community-feedback-integration", DependencyType.BLOCKING),
-                TaskDependency("E.2.4-sustainability-planning", "E.2.3-version-sync-monitoring", DependencyType.BLOCKING),
+                TaskDependency("E.1.2-cleanup-duplicates",
+                               "E.1.1-archive-historical-docs", DependencyType.BLOCKING),
+                TaskDependency("E.1.3-create-archive-structure",
+                               "E.1.2-cleanup-duplicates", DependencyType.BLOCKING),
+                TaskDependency("E.1.4-update-git-history",
+                               "E.1.3-create-archive-structure", DependencyType.BLOCKING),
+                TaskDependency("E.2.1-automated-update-triggers",
+                               "E.1.4-update-git-history", DependencyType.BLOCKING),
+                TaskDependency("E.2.2-community-feedback-integration",
+                               "E.2.1-automated-update-triggers", DependencyType.BLOCKING),
+                TaskDependency("E.2.3-version-sync-monitoring",
+                               "E.2.2-community-feedback-integration", DependencyType.BLOCKING),
+                TaskDependency("E.2.4-sustainability-planning",
+                               "E.2.3-version-sync-monitoring", DependencyType.BLOCKING),
 
                 # Cross-track integration dependencies
-                TaskDependency("C.1.1-repository-setup-docs", "A.1.4-update-readme-index", DependencyType.SOFT),
-                TaskDependency("B.1.1-tutorial-environment-setup", "A.1.4-update-readme-index", DependencyType.SOFT),
-                TaskDependency("E.1.1-archive-historical-docs", "A.1.2-categorize-documents", DependencyType.BLOCKING),
+                TaskDependency("C.1.1-repository-setup-docs",
+                               "A.1.4-update-readme-index", DependencyType.SOFT),
+                TaskDependency("B.1.1-tutorial-environment-setup",
+                               "A.1.4-update-readme-index", DependencyType.SOFT),
+                TaskDependency("E.1.1-archive-historical-docs",
+                               "A.1.2-categorize-documents", DependencyType.BLOCKING),
             ],
             agent_assignments={
                 # Track A: Documentation Agent
@@ -272,7 +330,8 @@ class EnhancedOrchestrationCLI:
                     "A.2.4-modernize-development-docs"
                 ],
                 quality_threshold=0.9,
-                validation_criteria=["completeness", "accuracy", "consistency"],
+                validation_criteria=["completeness",
+                                     "accuracy", "consistency"],
                 blocking=True
             ),
 
@@ -292,7 +351,8 @@ class EnhancedOrchestrationCLI:
                     "B.3.4-tutorial-validation"
                 ],
                 quality_threshold=0.85,
-                validation_criteria=["functionality", "performance", "usability"],
+                validation_criteria=["functionality",
+                                     "performance", "usability"],
                 blocking=True
             ),
 
@@ -306,7 +366,8 @@ class EnhancedOrchestrationCLI:
                     "E.2.4-sustainability-planning"
                 ],
                 quality_threshold=0.95,
-                validation_criteria=["integration", "completeness", "production-readiness"],
+                validation_criteria=["integration",
+                                     "completeness", "production-readiness"],
                 blocking=True
             )
         ]
@@ -327,7 +388,8 @@ class EnhancedOrchestrationCLI:
                 supported_workflows=[WorkflowType.DOCUMENTATION],
                 max_concurrent_tasks=3,
                 preferred_task_types=["documentation", "writing", "editing"],
-                performance_metrics={"speed": 0.8, "quality": 0.9, "accuracy": 0.95},
+                performance_metrics={"speed": 0.8,
+                                     "quality": 0.9, "accuracy": 0.95},
                 learning_rate=0.1,
                 adaptation_score=0.8
             ),
@@ -335,10 +397,12 @@ class EnhancedOrchestrationCLI:
             "tutorial-agent": AgentCapabilities(
                 specialization=AgentSpecialization.TUTORIAL,
                 skill_level=0.85,
-                supported_workflows=[WorkflowType.TUTORIAL, WorkflowType.DEVELOPMENT],
+                supported_workflows=[
+                    WorkflowType.TUTORIAL, WorkflowType.DEVELOPMENT],
                 max_concurrent_tasks=2,
                 preferred_task_types=["tutorial", "development", "testing"],
-                performance_metrics={"speed": 0.9, "quality": 0.8, "practical": 0.9},
+                performance_metrics={"speed": 0.9,
+                                     "quality": 0.8, "practical": 0.9},
                 learning_rate=0.15,
                 adaptation_score=0.7
             ),
@@ -346,10 +410,13 @@ class EnhancedOrchestrationCLI:
             "integration-agent": AgentCapabilities(
                 specialization=AgentSpecialization.INTEGRATION,
                 skill_level=0.88,
-                supported_workflows=[WorkflowType.INTEGRATION, WorkflowType.DEPLOYMENT],
+                supported_workflows=[
+                    WorkflowType.INTEGRATION, WorkflowType.DEPLOYMENT],
                 max_concurrent_tasks=2,
-                preferred_task_types=["integration", "configuration", "deployment"],
-                performance_metrics={"speed": 0.85, "quality": 0.9, "reliability": 0.95},
+                preferred_task_types=["integration",
+                                      "configuration", "deployment"],
+                performance_metrics={"speed": 0.85,
+                                     "quality": 0.9, "reliability": 0.95},
                 learning_rate=0.12,
                 adaptation_score=0.85
             ),
@@ -357,10 +424,13 @@ class EnhancedOrchestrationCLI:
             "quality-agent": AgentCapabilities(
                 specialization=AgentSpecialization.QUALITY,
                 skill_level=0.92,
-                supported_workflows=[WorkflowType.QUALITY, WorkflowType.TESTING],
+                supported_workflows=[
+                    WorkflowType.QUALITY, WorkflowType.TESTING],
                 max_concurrent_tasks=4,
-                preferred_task_types=["testing", "validation", "quality-assurance"],
-                performance_metrics={"speed": 0.8, "quality": 0.95, "thoroughness": 0.9},
+                preferred_task_types=["testing",
+                                      "validation", "quality-assurance"],
+                performance_metrics={"speed": 0.8,
+                                     "quality": 0.95, "thoroughness": 0.9},
                 learning_rate=0.08,
                 adaptation_score=0.9
             ),
@@ -370,8 +440,10 @@ class EnhancedOrchestrationCLI:
                 skill_level=0.8,
                 supported_workflows=[WorkflowType.ARCHIVE],
                 max_concurrent_tasks=3,
-                preferred_task_types=["archival", "organization", "maintenance"],
-                performance_metrics={"speed": 0.9, "quality": 0.8, "organization": 0.95},
+                preferred_task_types=["archival",
+                                      "organization", "maintenance"],
+                performance_metrics={"speed": 0.9,
+                                     "quality": 0.8, "organization": 0.95},
                 learning_rate=0.1,
                 adaptation_score=0.75
             )
@@ -381,7 +453,9 @@ class EnhancedOrchestrationCLI:
         for agent_id, capabilities in agent_capabilities.items():
             success = await self.workflow_coordinator.register_agent_capabilities(agent_id, capabilities)
             if success:
-                self.logger.info(f"Registered {agent_id} with {capabilities.specialization} specialization")
+                self.logger.info(
+                    f"Registered {agent_id} with {
+                        capabilities.specialization} specialization")
             else:
                 self.logger.error(f"Failed to register {agent_id}")
 
@@ -400,17 +474,17 @@ class EnhancedOrchestrationCLI:
             "workflow_id": workflow_state.workflow_id,
             "status": workflow_state.status,
             "progress": workflow_state.progress_percentage,
-            "active_tasks": len(workflow_state.active_tasks),
-            "completed_tasks": len(workflow_state.completed_tasks),
+            "active_tasks": len(
+                workflow_state.active_tasks),
+            "completed_tasks": len(
+                workflow_state.completed_tasks),
             "estimated_completion": workflow_state.estimated_completion.isoformat(),
             "started_at": workflow_state.started_at.isoformat(),
             "enhanced_features": {
                 "intelligent_routing": True,
                 "dynamic_dependencies": True,
                 "parallel_optimization": True,
-                "real_time_monitoring": True
-            }
-        }
+                "real_time_monitoring": True}}
 
     async def get_workflow_status(self, workflow_id: str) -> Dict[str, Any]:
         """Get current workflow status."""
@@ -473,12 +547,10 @@ class EnhancedOrchestrationCLI:
                     "task_distribution_balance": coordination_metrics.task_distribution_balance,
                     "quality_consistency": coordination_metrics.quality_consistency,
                     "dependency_resolution_time": coordination_metrics.dependency_resolution_time,
-                    "coordination_overhead": coordination_metrics.coordination_overhead
-                },
+                    "coordination_overhead": coordination_metrics.coordination_overhead},
                 "agent_utilization": coordination_metrics.agent_utilization,
                 "performance_metrics": real_time_metrics,
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat()}
         except Exception as e:
             self.logger.warning(f"Error getting coordination metrics: {e}")
             return {
@@ -509,13 +581,12 @@ class EnhancedOrchestrationCLI:
                 "coordination_events": coordination_stats["coordination_events"],
                 "performance_alerts": coordination_stats["performance_alerts"],
                 "ml_prediction_enabled": self.enhanced_coordination.intelligent_routing.use_ml_prediction,
-                "learning_enabled": self.enhanced_coordination.intelligent_routing.learning_enabled
-            },
+                "learning_enabled": self.enhanced_coordination.intelligent_routing.learning_enabled},
             "recent_events": coordination_stats["recent_events"],
-            "timestamp": datetime.now().isoformat()
-        }
+            "timestamp": datetime.now().isoformat()}
 
-    async def optimize_workflow_dependencies(self, workflow_id: str, task_id: str) -> Dict[str, Any]:
+    async def optimize_workflow_dependencies(
+            self, workflow_id: str, task_id: str) -> Dict[str, Any]:
         """Optimize dependencies for a specific workflow task."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
@@ -532,7 +603,8 @@ class EnhancedOrchestrationCLI:
             "timestamp": datetime.now().isoformat()
         }
 
-    async def analyze_parallel_execution(self, workflow_id: str) -> Dict[str, Any]:
+    async def analyze_parallel_execution(
+            self, workflow_id: str) -> Dict[str, Any]:
         """Analyze parallel execution opportunities for a workflow."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
@@ -551,23 +623,27 @@ class EnhancedOrchestrationCLI:
             "optimization_metrics": {
                 "original_group_count": len(task_groups),
                 "optimized_group_count": len(optimized_groups),
-                "parallel_efficiency_improvement": self._calculate_parallel_improvement(task_groups, optimized_groups)
-            },
-            "timestamp": datetime.now().isoformat()
-        }
+                "parallel_efficiency_improvement": self._calculate_parallel_improvement(
+                    task_groups,
+                    optimized_groups)},
+            "timestamp": datetime.now().isoformat()}
 
-    def _calculate_parallel_improvement(self, original_groups: List[List[str]], optimized_groups: List[List[str]]) -> float:
+    def _calculate_parallel_improvement(self,
+                                        original_groups: List[List[str]],
+                                        optimized_groups: List[List[str]]) -> float:
         """Calculate parallel execution improvement percentage."""
         if not original_groups or not optimized_groups:
             return 0.0
 
-        original_efficiency = len(original_groups) / sum(len(group) for group in original_groups)
-        optimized_efficiency = len(optimized_groups) / sum(len(group) for group in optimized_groups)
+        original_efficiency = len(original_groups) / \
+            sum(len(group) for group in original_groups)
+        optimized_efficiency = len(optimized_groups) / \
+            sum(len(group) for group in optimized_groups)
 
         return (optimized_efficiency - original_efficiency) * 100
 
     async def get_analytics_dashboard(self, view_type: str = "overview",
-                                    hours: int = 24) -> Dict[str, Any]:
+                                      hours: int = 24) -> Dict[str, Any]:
         """Get analytics dashboard data."""
         if not self.enhanced_coordination:
             raise RuntimeError("Enhanced orchestration system not initialized")
@@ -655,7 +731,8 @@ class EnhancedOrchestrationCLI:
         time_range = (start_time, end_time)
 
         # Generate performance report
-        report = self.enhanced_coordination.performance_monitor.generate_performance_report(time_range)
+        report = self.enhanced_coordination.performance_monitor.generate_performance_report(
+            time_range)
 
         return {
             "report_id": report.report_id,
@@ -696,7 +773,9 @@ def orchestration_cli(ctx):
 
 
 @orchestration_cli.command()
-@click.option('--config-file', type=click.Path(exists=True), help='Configuration file path')
+@click.option('--config-file',
+              type=click.Path(exists=True),
+              help='Configuration file path')
 @click.pass_context
 def start(ctx, config_file):
     """Start the orchestration system."""
@@ -711,7 +790,8 @@ def start(ctx, config_file):
         try:
             await cli.initialize(config)
             await cli.register_specialized_agents()
-            click.echo("✅ Enhanced multi-agent orchestration system started successfully")
+            click.echo(
+                "✅ Enhanced multi-agent orchestration system started successfully")
 
             # Keep running until interrupted
             while True:
@@ -737,7 +817,8 @@ def create_documentation_workflow(ctx, workflow_id):
     async def run():
         try:
             workflow_id_result = await cli.create_documentation_workflow(workflow_id)
-            click.echo(f"✅ Documentation workflow created: {workflow_id_result}")
+            click.echo(
+                f"✅ Documentation workflow created: {workflow_id_result}")
             return workflow_id_result
         except Exception as e:
             click.echo(f"❌ Error creating workflow: {e}")
@@ -758,10 +839,11 @@ def execute(ctx, workflow_id):
     async def run():
         try:
             result = await cli.execute_workflow(workflow_id)
-            click.echo(f"✅ Workflow execution started")
+            click.echo("✅ Workflow execution started")
             click.echo(f"📊 Status: {result['status']}")
             click.echo(f"📈 Progress: {result['progress']:.1f}%")
-            click.echo(f"⏱️  Estimated completion: {result['estimated_completion']}")
+            click.echo(
+                f"⏱️  Estimated completion: {result['estimated_completion']}")
             return result
         except Exception as e:
             click.echo(f"❌ Error executing workflow: {e}")
@@ -792,15 +874,21 @@ def status(ctx, workflow_id, watch):
                 click.echo(f"📊 Status: {result['status']}")
                 click.echo(f"📈 Progress: {result['progress']:.1f}%")
                 click.echo(f"⚡ Active tasks: {len(result['active_tasks'])}")
-                click.echo(f"✅ Completed tasks: {len(result['completed_tasks'])}")
+                click.echo(
+                    f"✅ Completed tasks: {len(result['completed_tasks'])}")
                 click.echo(f"❌ Failed tasks: {len(result['failed_tasks'])}")
                 click.echo(f"🚫 Blocked tasks: {len(result['blocked_tasks'])}")
 
                 if result['coordination_metrics']:
                     metrics = result['coordination_metrics']
-                    click.echo(f"🔗 Parallel efficiency: {metrics['parallel_efficiency']:.1%}")
-                    click.echo(f"🎯 Quality consistency: {metrics['quality_consistency']:.1%}")
-                    click.echo(f"👥 Agent utilization: {len(metrics['agent_utilization'])} agents")
+                    click.echo(
+                        f"🔗 Parallel efficiency: {
+                            metrics['parallel_efficiency']:.1%}")
+                    click.echo(
+                        f"🎯 Quality consistency: {
+                            metrics['quality_consistency']:.1%}")
+                    click.echo(
+                        f"👥 Agent utilization: {len(metrics['agent_utilization'])} agents")
 
                 if not watch:
                     break
@@ -826,25 +914,40 @@ def stats(ctx):
             result = await cli.get_system_statistics()
 
             click.echo(f"🚀 System running: {result['system_running']}")
-            click.echo(f"📊 Enhanced Coordination Statistics:")
+            click.echo("📊 Enhanced Coordination Statistics:")
 
             stats = result['coordination_stats']
             enhanced_stats = result['enhanced_coordination_stats']
 
-            click.echo(f"  • Workflows executed: {stats['workflows_executed']}")
-            click.echo(f"  • Parallel tasks executed: {stats['parallel_tasks_executed']}")
-            click.echo(f"  • Quality gates passed: {stats['quality_gates_passed']}")
-            click.echo(f"  • Quality gates failed: {stats['quality_gates_failed']}")
+            click.echo(
+                f"  • Workflows executed: {stats['workflows_executed']}")
+            click.echo(
+                f"  • Parallel tasks executed: {
+                    stats['parallel_tasks_executed']}")
+            click.echo(
+                f"  • Quality gates passed: {stats['quality_gates_passed']}")
+            click.echo(
+                f"  • Quality gates failed: {stats['quality_gates_failed']}")
             click.echo(f"  • Active workflows: {stats['active_workflows']}")
             click.echo(f"  • Total tasks: {stats['total_tasks']}")
             click.echo(f"  • Registered agents: {stats['registered_agents']}")
 
-            click.echo(f"🧠 Enhanced Features:")
-            click.echo(f"  • Coordination events: {enhanced_stats['coordination_events']}")
-            click.echo(f"  • Performance alerts: {enhanced_stats['performance_alerts']}")
-            click.echo(f"  • Routing cache size: {enhanced_stats['routing_cache_size']}")
-            click.echo(f"  • Dependency cache size: {enhanced_stats['dependency_cache_size']}")
-            click.echo(f"  • Agent performance tracked: {enhanced_stats['agent_performance_tracked']}")
+            click.echo("🧠 Enhanced Features:")
+            click.echo(
+                f"  • Coordination events: {
+                    enhanced_stats['coordination_events']}")
+            click.echo(
+                f"  • Performance alerts: {
+                    enhanced_stats['performance_alerts']}")
+            click.echo(
+                f"  • Routing cache size: {
+                    enhanced_stats['routing_cache_size']}")
+            click.echo(
+                f"  • Dependency cache size: {
+                    enhanced_stats['dependency_cache_size']}")
+            click.echo(
+                f"  • Agent performance tracked: {
+                    enhanced_stats['agent_performance_tracked']}")
 
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
 
@@ -867,14 +970,26 @@ def metrics(ctx):
             click.echo("📈 Real-time Coordination Metrics:")
             metrics = result['real_time_metrics']
 
-            click.echo(f"  • Workflow completion rate: {metrics['workflow_completion_rate']:.1%}")
-            click.echo(f"  • Parallel efficiency: {metrics['parallel_efficiency']:.1%}")
-            click.echo(f"  • Task distribution balance: {metrics['task_distribution_balance']:.1%}")
-            click.echo(f"  • Quality consistency: {metrics['quality_consistency']:.1%}")
-            click.echo(f"  • Dependency resolution time: {metrics['dependency_resolution_time']:.1f}s")
-            click.echo(f"  • Coordination overhead: {metrics['coordination_overhead']:.1%}")
+            click.echo(
+                f"  • Workflow completion rate: {
+                    metrics['workflow_completion_rate']:.1%}")
+            click.echo(
+                f"  • Parallel efficiency: {
+                    metrics['parallel_efficiency']:.1%}")
+            click.echo(
+                f"  • Task distribution balance: {
+                    metrics['task_distribution_balance']:.1%}")
+            click.echo(
+                f"  • Quality consistency: {
+                    metrics['quality_consistency']:.1%}")
+            click.echo(
+                f"  • Dependency resolution time: {
+                    metrics['dependency_resolution_time']:.1f}s")
+            click.echo(
+                f"  • Coordination overhead: {
+                    metrics['coordination_overhead']:.1%}")
 
-            click.echo(f"👥 Agent Utilization:")
+            click.echo("👥 Agent Utilization:")
             for agent_id, utilization in result['agent_utilization'].items():
                 click.echo(f"  • {agent_id}: {utilization:.1%}")
 
@@ -900,15 +1015,29 @@ def routing(ctx):
             analytics = result['routing_analytics']
 
             click.echo(f"  • Cache size: {analytics['cache_size']}")
-            click.echo(f"  • Dependency cache size: {analytics['dependency_cache_size']}")
-            click.echo(f"  • Coordination events: {analytics['coordination_events']}")
-            click.echo(f"  • Performance alerts: {analytics['performance_alerts']}")
-            click.echo(f"  • ML prediction enabled: {analytics['ml_prediction_enabled']}")
-            click.echo(f"  • Learning enabled: {analytics['learning_enabled']}")
+            click.echo(
+                f"  • Dependency cache size: {
+                    analytics['dependency_cache_size']}")
+            click.echo(
+                f"  • Coordination events: {analytics['coordination_events']}")
+            click.echo(
+                f"  • Performance alerts: {analytics['performance_alerts']}")
+            click.echo(
+                f"  • ML prediction enabled: {
+                    analytics['ml_prediction_enabled']}")
+            click.echo(
+                f"  • Learning enabled: {analytics['learning_enabled']}")
 
-            click.echo(f"📋 Recent Events:")
+            click.echo("📋 Recent Events:")
             for event in result['recent_events'][-5:]:  # Show last 5 events
-                click.echo(f"  • {event.get('type', 'unknown')}: {event.get('timestamp', 'no timestamp')}")
+                click.echo(
+                    f"  • {
+                        event.get(
+                            'type',
+                            'unknown')}: {
+                        event.get(
+                            'timestamp',
+                            'no timestamp')}")
 
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
 
@@ -930,11 +1059,14 @@ def optimize_deps(ctx, workflow_id, task_id):
         try:
             result = await cli.optimize_workflow_dependencies(workflow_id, task_id)
 
-            click.echo(f"🔧 Dependency Optimization Results:")
+            click.echo("🔧 Dependency Optimization Results:")
             click.echo(f"  • Workflow ID: {result['workflow_id']}")
             click.echo(f"  • Task ID: {result['task_id']}")
-            click.echo(f"  • Optimization applied: {result['optimization_applied']}")
-            click.echo(f"  • Optimized dependencies: {result['optimized_dependencies']}")
+            click.echo(
+                f"  • Optimization applied: {result['optimization_applied']}")
+            click.echo(
+                f"  • Optimized dependencies: {
+                    result['optimized_dependencies']}")
 
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
 
@@ -955,16 +1087,21 @@ def analyze_parallel(ctx, workflow_id):
         try:
             result = await cli.analyze_parallel_execution(workflow_id)
 
-            click.echo(f"⚡ Parallel Execution Analysis:")
+            click.echo("⚡ Parallel Execution Analysis:")
             click.echo(f"  • Workflow ID: {result['workflow_id']}")
             click.echo(f"  • Original groups: {result['original_groups']}")
             click.echo(f"  • Optimized groups: {result['optimized_groups']}")
 
             metrics = result['optimization_metrics']
-            click.echo(f"📊 Optimization Metrics:")
-            click.echo(f"  • Original group count: {metrics['original_group_count']}")
-            click.echo(f"  • Optimized group count: {metrics['optimized_group_count']}")
-            click.echo(f"  • Efficiency improvement: {metrics['parallel_efficiency_improvement']:.1f}%")
+            click.echo("📊 Optimization Metrics:")
+            click.echo(
+                f"  • Original group count: {metrics['original_group_count']}")
+            click.echo(
+                f"  • Optimized group count: {
+                    metrics['optimized_group_count']}")
+            click.echo(
+                f"  • Efficiency improvement: {
+                    metrics['parallel_efficiency_improvement']:.1f}%")
 
             click.echo(f"⏰ Timestamp: {result['timestamp']}")
 

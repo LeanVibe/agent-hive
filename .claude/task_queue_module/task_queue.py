@@ -3,13 +3,13 @@
 
 import asyncio
 import heapq
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
 from enum import Enum
-import logging
+from typing import Any, Dict, List, Optional, Set
 
-from agents.base_agent import Task, AgentInfo
+from agents.base_agent import Task
 
 logger = logging.getLogger(__name__)
 
@@ -83,10 +83,14 @@ class TaskQueue:
                         self._dependents[dep_id] = set()
                     self._dependents[dep_id].add(task.id)
 
-            logger.info(f"Task {task.id} added to queue with priority {task.priority}")
+            logger.info(
+    f"Task {
+        task.id} added to queue with priority {
+            task.priority}")
             return True
 
-    async def get_next_task(self, agent_capabilities: List[str]) -> Optional[Task]:
+    async def get_next_task(
+        self, agent_capabilities: List[str]) -> Optional[Task]:
         """Get the next available task for an agent.
 
         Args:
@@ -107,7 +111,8 @@ class TaskQueue:
             if not available_tasks:
                 return None
 
-            # Sort by priority (already handled by heapq, but let's be explicit)
+            # Sort by priority (already handled by heapq, but let's be
+            # explicit)
             available_tasks.sort(key=lambda x: x.task.priority, reverse=True)
 
             # Return the highest priority task
@@ -118,7 +123,8 @@ class TaskQueue:
             logger.info(f"Task {selected_task.task.id} assigned to agent")
             return selected_task.task
 
-    def _can_execute_task(self, queued_task: QueuedTask, agent_capabilities: List[str]) -> bool:
+    def _can_execute_task(self, queued_task: QueuedTask,
+                          agent_capabilities: List[str]) -> bool:
         """Check if a task can be executed by an agent.
 
         Args:
@@ -171,7 +177,8 @@ class TaskQueue:
             queued_task.assigned_agent = agent_id
             queued_task.attempts += 1
 
-            logger.info(f"Task {task_id} marked as in progress by agent {agent_id}")
+            logger.info(
+    f"Task {task_id} marked as in progress by agent {agent_id}")
             return True
 
     async def mark_task_completed(self, task_id: str) -> bool:
@@ -198,7 +205,8 @@ class TaskQueue:
             logger.info(f"Task {task_id} marked as completed")
             return True
 
-    async def mark_task_failed(self, task_id: str, can_retry: bool = True) -> bool:
+    async def mark_task_failed(self, task_id: str,
+                               can_retry: bool = True) -> bool:
         """Mark a task as failed.
 
         Args:
@@ -218,17 +226,22 @@ class TaskQueue:
                 # Reset to pending for retry
                 queued_task.status = TaskStatus.PENDING
                 queued_task.assigned_agent = None
-                logger.info(f"Task {task_id} reset for retry (attempt {queued_task.attempts})")
+                logger.info(
+    f"Task {task_id} reset for retry (attempt {
+        queued_task.attempts})")
             else:
                 # Mark as permanently failed
                 queued_task.status = TaskStatus.FAILED
                 queued_task.completed_at = datetime.now()
 
                 # Remove from priority queue
-                self._queue = [qt for qt in self._queue if qt.task.id != task_id]
+                self._queue = [
+    qt for qt in self._queue if qt.task.id != task_id]
                 heapq.heapify(self._queue)
 
-                logger.error(f"Task {task_id} marked as failed after {queued_task.attempts} attempts")
+                logger.error(
+    f"Task {task_id} marked as failed after {
+        queued_task.attempts} attempts")
 
             return True
 
@@ -298,7 +311,8 @@ class TaskQueue:
             tasks_to_remove = []
 
             for task_id, queued_task in self._tasks.items():
-                if queued_task.status in [TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED]:
+                if queued_task.status in [
+                    TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED]:
                     tasks_to_remove.append(task_id)
 
             for task_id in tasks_to_remove:
@@ -393,7 +407,8 @@ class TaskQueue:
                     priority=task_info["priority"],
                     data=task_info["data"],
                     created_at=datetime.fromisoformat(task_info["created_at"]),
-                    deadline=datetime.fromisoformat(task_info["deadline"]) if task_info["deadline"] else None,
+                    deadline=datetime.fromisoformat(
+    task_info["deadline"]) if task_info["deadline"] else None,
                     dependencies=task_info["dependencies"],
                     timeout_seconds=task_info["timeout_seconds"]
                 )
@@ -406,8 +421,10 @@ class TaskQueue:
                     attempts=task_data["attempts"],
                     max_attempts=task_data["max_attempts"],
                     created_at=datetime.fromisoformat(task_data["created_at"]),
-                    started_at=datetime.fromisoformat(task_data["started_at"]) if task_data["started_at"] else None,
-                    completed_at=datetime.fromisoformat(task_data["completed_at"]) if task_data["completed_at"] else None
+                    started_at=datetime.fromisoformat(
+    task_data["started_at"]) if task_data["started_at"] else None,
+                    completed_at=datetime.fromisoformat(
+    task_data["completed_at"]) if task_data["completed_at"] else None
                 )
 
                 self._tasks[task_id] = queued_task
@@ -415,7 +432,11 @@ class TaskQueue:
                     heapq.heappush(self._queue, queued_task)
 
             # Restore dependencies
-            self._dependencies = {k: set(v) for k, v in state.get("dependencies", {}).items()}
-            self._dependents = {k: set(v) for k, v in state.get("dependents", {}).items()}
+            self._dependencies = {
+    k: set(v) for k, v in state.get(
+        "dependencies", {}).items()}
+            self._dependents = {
+    k: set(v) for k, v in state.get(
+        "dependents", {}).items()}
 
             logger.info(f"Restored queue state with {len(self._tasks)} tasks")

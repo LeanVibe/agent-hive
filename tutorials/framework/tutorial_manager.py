@@ -4,12 +4,12 @@ Tutorial Manager for Interactive Tutorial Framework
 Handles tutorial loading, progress tracking, and user management.
 """
 
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
-from enum import Enum
 import json
 import os
+from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class TutorialStatus(Enum):
@@ -176,11 +176,14 @@ class TutorialManager:
         """Get tutorial by ID."""
         return self.tutorials.get(tutorial_id)
 
-    def list_tutorials(self, difficulty: Optional[DifficultyLevel] = None) -> List[Tutorial]:
+    def list_tutorials(
+            self,
+            difficulty: Optional[DifficultyLevel] = None) -> List[Tutorial]:
         """List available tutorials, optionally filtered by difficulty."""
         tutorials = list(self.tutorials.values())
         if difficulty:
-            tutorials = [t for t in tutorials if t.metadata.difficulty == difficulty]
+            tutorials = [
+                t for t in tutorials if t.metadata.difficulty == difficulty]
         return sorted(tutorials, key=lambda t: t.metadata.estimated_time)
 
     def start_tutorial(self, user_id: str, tutorial_id: str) -> bool:
@@ -204,11 +207,18 @@ class TutorialManager:
         self.save_progress(user_id)
         return True
 
-    def get_progress(self, user_id: str, tutorial_id: str) -> Optional[UserProgress]:
+    def get_progress(
+            self,
+            user_id: str,
+            tutorial_id: str) -> Optional[UserProgress]:
         """Get user progress for a tutorial."""
         return self.user_progress.get(user_id, {}).get(tutorial_id)
 
-    def complete_step(self, user_id: str, tutorial_id: str, step_id: str) -> bool:
+    def complete_step(
+            self,
+            user_id: str,
+            tutorial_id: str,
+            step_id: str) -> bool:
         """Mark a step as completed."""
         progress = self.get_progress(user_id, tutorial_id)
         if not progress:
@@ -233,7 +243,8 @@ class TutorialManager:
         progress_file = os.path.join(progress_dir, f"{user_id}.json")
 
         progress_data = {}
-        for tutorial_id, progress in self.user_progress.get(user_id, {}).items():
+        for tutorial_id, progress in self.user_progress.get(
+                user_id, {}).items():
             progress_data[tutorial_id] = {
                 "user_id": progress.user_id,
                 "tutorial_id": progress.tutorial_id,
@@ -241,10 +252,11 @@ class TutorialManager:
                 "status": progress.status.value,
                 "started_at": progress.started_at.isoformat(),
                 "completed_at": progress.completed_at.isoformat() if progress.completed_at else None,
-                "step_progress": {k: v.value for k, v in progress.step_progress.items()},
+                "step_progress": {
+                    k: v.value for k,
+                    v in progress.step_progress.items()},
                 "hints_used": progress.hints_used,
-                "time_spent": progress.time_spent
-            }
+                "time_spent": progress.time_spent}
 
         with open(progress_file, 'w') as f:
             json.dump(progress_data, f, indent=2)

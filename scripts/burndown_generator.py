@@ -7,15 +7,14 @@ This module generates burndown charts for sprint tracking and provides
 real-time progress visualization for XP methodology enforcement.
 """
 
-import json
 import sqlite3
 import sys
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from dataclasses import dataclass
-import os
+from datetime import datetime, timedelta
+from typing import List, Optional
+
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 
 
 @dataclass
@@ -53,7 +52,10 @@ class BurndownGenerator:
     def __init__(self, db_path: str = "sprint_data.db"):
         self.db_path = db_path
 
-    def calculate_ideal_burndown(self, total_points: int, sprint_days: int) -> List[int]:
+    def calculate_ideal_burndown(
+            self,
+            total_points: int,
+            sprint_days: int) -> List[int]:
         """Calculate ideal burndown line."""
         if sprint_days == 0:
             return [total_points]
@@ -108,7 +110,8 @@ class BurndownGenerator:
         remaining_days = max(0, (end_dt - current_dt).days)
 
         # Calculate ideal burndown
-        ideal_burndown = self.calculate_ideal_burndown(total_points, sprint_days)
+        ideal_burndown = self.calculate_ideal_burndown(
+            total_points, sprint_days)
 
         # Calculate daily progress
         burndown_points = []
@@ -147,16 +150,21 @@ class BurndownGenerator:
         # Calculate current metrics
         current_completed = sum(s[1] for s in stories if s[2] == 'completed')
         current_remaining = total_points - current_completed
-        progress_percentage = (current_completed / total_points) * 100 if total_points > 0 else 0
+        progress_percentage = (current_completed / total_points) * \
+            100 if total_points > 0 else 0
 
         # Calculate current velocity (last 3 days average)
         recent_velocities = [p.daily_velocity for p in burndown_points[-3:]]
-        current_velocity = sum(recent_velocities) / len(recent_velocities) if recent_velocities else 0
+        current_velocity = sum(recent_velocities) / \
+            len(recent_velocities) if recent_velocities else 0
 
         # Project completion date
         if current_velocity > 0:
             days_to_completion = current_remaining / current_velocity
-            projected_completion = (current_dt + timedelta(days=days_to_completion)).strftime("%Y-%m-%d")
+            projected_completion = (
+                current_dt +
+                timedelta(
+                    days=days_to_completion)).strftime("%Y-%m-%d")
         else:
             projected_completion = end_date
 
@@ -189,7 +197,10 @@ class BurndownGenerator:
             risk_level=risk_level
         )
 
-    def generate_burndown_chart(self, burndown_data: BurndownData, output_file: str = None) -> str:
+    def generate_burndown_chart(
+            self,
+            burndown_data: BurndownData,
+            output_file: str = None) -> str:
         """Generate burndown chart visualization."""
         if not burndown_data.points:
             return "No data available for burndown chart"
@@ -203,16 +214,20 @@ class BurndownGenerator:
         plt.figure(figsize=(12, 8))
 
         # Plot lines
-        plt.plot(dates, actual_remaining, 'b-', linewidth=2, label='Actual Burndown', marker='o')
-        plt.plot(dates, ideal_remaining, 'r--', linewidth=2, label='Ideal Burndown', alpha=0.7)
+        plt.plot(dates, actual_remaining, 'b-', linewidth=2,
+                 label='Actual Burndown', marker='o')
+        plt.plot(dates, ideal_remaining, 'r--', linewidth=2,
+                 label='Ideal Burndown', alpha=0.7)
 
         # Add zero line
-        plt.axhline(y=0, color='green', linestyle='-', alpha=0.5, label='Sprint Goal')
+        plt.axhline(y=0, color='green', linestyle='-',
+                    alpha=0.5, label='Sprint Goal')
 
         # Add today's date line
         today = datetime.now()
         if dates[0] <= today <= dates[-1]:
-            plt.axvline(x=today, color='orange', linestyle=':', alpha=0.7, label='Today')
+            plt.axvline(x=today, color='orange', linestyle=':',
+                        alpha=0.7, label='Today')
 
         # Formatting
         plt.xlabel('Date')
@@ -228,21 +243,44 @@ class BurndownGenerator:
 
         # Add annotations
         risk_color = {'low': 'green', 'medium': 'orange', 'high': 'red'}
-        plt.text(0.02, 0.98, f'Progress: {burndown_data.progress_percentage:.1f}%',
-                transform=plt.gca().transAxes, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
+        plt.text(
+            0.02,
+            0.98,
+            f'Progress: {
+                burndown_data.progress_percentage:.1f}%',
+            transform=plt.gca().transAxes,
+            verticalalignment='top',
+            bbox=dict(
+                boxstyle='round',
+                facecolor='lightblue',
+                alpha=0.8))
 
-        plt.text(0.02, 0.92, f'Risk Level: {burndown_data.risk_level.upper()}',
-                transform=plt.gca().transAxes, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor=risk_color[burndown_data.risk_level], alpha=0.8))
+        plt.text(0.02,
+                 0.92,
+                 f'Risk Level: {burndown_data.risk_level.upper()}',
+                 transform=plt.gca().transAxes,
+                 verticalalignment='top',
+                 bbox=dict(boxstyle='round',
+                           facecolor=risk_color[burndown_data.risk_level],
+                           alpha=0.8))
 
-        plt.text(0.02, 0.86, f'Current Velocity: {burndown_data.current_velocity:.1f} pts/day',
-                transform=plt.gca().transAxes, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.8))
+        plt.text(
+            0.02,
+            0.86,
+            f'Current Velocity: {
+                burndown_data.current_velocity:.1f} pts/day',
+            transform=plt.gca().transAxes,
+            verticalalignment='top',
+            bbox=dict(
+                boxstyle='round',
+                facecolor='lightyellow',
+                alpha=0.8))
 
         # Save the chart
         if not output_file:
-            output_file = f"burndown_{burndown_data.sprint_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            output_file = f"burndown_{
+                burndown_data.sprint_id}_{
+                datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
 
         plt.tight_layout()
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
@@ -250,7 +288,10 @@ class BurndownGenerator:
 
         return output_file
 
-    def generate_velocity_trend_chart(self, sprint_id: str, output_file: str = None) -> str:
+    def generate_velocity_trend_chart(
+            self,
+            sprint_id: str,
+            output_file: str = None) -> str:
         """Generate velocity trend chart for the sprint."""
         burndown_data = self.get_sprint_progress(sprint_id)
         if not burndown_data or not burndown_data.points:
@@ -259,13 +300,15 @@ class BurndownGenerator:
         # Prepare velocity data
         dates = [datetime.fromisoformat(p.date) for p in burndown_data.points]
         daily_velocities = [p.daily_velocity for p in burndown_data.points]
-        cumulative_velocities = [p.cumulative_velocity for p in burndown_data.points]
+        cumulative_velocities = [
+            p.cumulative_velocity for p in burndown_data.points]
 
         # Create the plot
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
 
         # Daily velocity chart
-        ax1.bar(dates, daily_velocities, alpha=0.7, color='skyblue', label='Daily Velocity')
+        ax1.bar(dates, daily_velocities, alpha=0.7,
+                color='skyblue', label='Daily Velocity')
         ax1.set_xlabel('Date')
         ax1.set_ylabel('Story Points Completed')
         ax1.set_title(f'Daily Velocity: {burndown_data.sprint_name}')
@@ -278,7 +321,8 @@ class BurndownGenerator:
         plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
 
         # Cumulative velocity chart
-        ax2.plot(dates, cumulative_velocities, 'g-', linewidth=2, marker='o', label='Cumulative Velocity')
+        ax2.plot(dates, cumulative_velocities, 'g-', linewidth=2,
+                 marker='o', label='Cumulative Velocity')
         ax2.set_xlabel('Date')
         ax2.set_ylabel('Average Points per Day')
         ax2.set_title('Cumulative Velocity Trend')
@@ -292,7 +336,9 @@ class BurndownGenerator:
 
         # Save the chart
         if not output_file:
-            output_file = f"velocity_trend_{burndown_data.sprint_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            output_file = f"velocity_trend_{
+                burndown_data.sprint_id}_{
+                datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
 
         plt.tight_layout()
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
@@ -312,14 +358,16 @@ class BurndownGenerator:
 
         # Calculate additional metrics
         total_days = len(burndown_data.points)
-        working_days = sum(1 for p in burndown_data.points if p.daily_velocity > 0)
+        working_days = sum(
+            1 for p in burndown_data.points if p.daily_velocity > 0)
 
         # Risk assessment
         risk_indicators = []
         if burndown_data.risk_level == "high":
             risk_indicators.append("Sprint is significantly behind schedule")
         if burndown_data.current_velocity < 1.0:
-            risk_indicators.append("Current velocity is below sustainable pace")
+            risk_indicators.append(
+                "Current velocity is below sustainable pace")
         if burndown_data.days_remaining < 3 and burndown_data.progress_percentage < 80:
             risk_indicators.append("Sprint unlikely to complete on time")
 
@@ -354,7 +402,7 @@ class BurndownGenerator:
         else:
             report += "✅ Sprint is on track with no significant risks identified\n"
 
-        report += f"""
+        report += """
 ## Recommendations
 """
 
@@ -396,12 +444,15 @@ class BurndownGenerator:
    - Plan for next sprint based on current velocity
 """
 
-        report += f"""
+        report += """
 ## Daily Progress Tracking
 """
 
         for point in burndown_data.points[-7:]:  # Last 7 days
-            report += f"- **{point.date}**: {point.daily_velocity:.1f} points completed, {point.actual_remaining} remaining\n"
+            report += f"- **{
+                point.date}**: {
+                point.daily_velocity:.1f} points completed, {
+                point.actual_remaining} remaining\n"
 
         report += f"""
 ## Charts Generated
@@ -427,9 +478,12 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python burndown_generator.py <command> [options]")
         print("Commands:")
-        print("  chart <sprint_id> [output_file]     - Generate burndown chart")
-        print("  velocity <sprint_id> [output_file]  - Generate velocity trend chart")
-        print("  report <sprint_id>                  - Generate comprehensive burndown report")
+        print(
+            "  chart <sprint_id> [output_file]     - Generate burndown chart")
+        print(
+            "  velocity <sprint_id> [output_file]  - Generate velocity trend chart")
+        print(
+            "  report <sprint_id>                  - Generate comprehensive burndown report")
         print("  progress <sprint_id>                - Show current sprint progress")
         sys.exit(1)
 
@@ -438,7 +492,8 @@ def main():
 
     if command == "chart":
         if len(sys.argv) < 3:
-            print("Usage: python burndown_generator.py chart <sprint_id> [output_file]")
+            print(
+                "Usage: python burndown_generator.py chart <sprint_id> [output_file]")
             sys.exit(1)
 
         sprint_id = sys.argv[2]
@@ -449,18 +504,21 @@ def main():
             print(f"❌ No data found for sprint: {sprint_id}")
             sys.exit(1)
 
-        chart_file = generator.generate_burndown_chart(burndown_data, output_file)
+        chart_file = generator.generate_burndown_chart(
+            burndown_data, output_file)
         print(f"✅ Burndown chart generated: {chart_file}")
 
     elif command == "velocity":
         if len(sys.argv) < 3:
-            print("Usage: python burndown_generator.py velocity <sprint_id> [output_file]")
+            print(
+                "Usage: python burndown_generator.py velocity <sprint_id> [output_file]")
             sys.exit(1)
 
         sprint_id = sys.argv[2]
         output_file = sys.argv[3] if len(sys.argv) > 3 else None
 
-        chart_file = generator.generate_velocity_trend_chart(sprint_id, output_file)
+        chart_file = generator.generate_velocity_trend_chart(
+            sprint_id, output_file)
         print(f"✅ Velocity trend chart generated: {chart_file}")
 
     elif command == "report":
@@ -472,7 +530,8 @@ def main():
         report = generator.generate_burndown_report(sprint_id)
 
         # Save report to file
-        report_file = f"burndown_report_{sprint_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        report_file = f"burndown_report_{sprint_id}_{
+            datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(report_file, 'w') as f:
             f.write(report)
 
@@ -494,7 +553,9 @@ def main():
         print(f"Sprint Progress: {burndown_data.sprint_name}")
         print(f"Completion: {burndown_data.progress_percentage:.1f}%")
         print(f"Days Remaining: {burndown_data.days_remaining}")
-        print(f"Current Velocity: {burndown_data.current_velocity:.1f} points/day")
+        print(
+            f"Current Velocity: {
+                burndown_data.current_velocity:.1f} points/day")
         print(f"Risk Level: {burndown_data.risk_level.upper()}")
         print(f"Projected Completion: {burndown_data.projected_completion}")
 
