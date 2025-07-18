@@ -8645,3 +8645,5 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-18 12:29:31 INFO     personas.persona_manager                                Loaded 5 personas
 2025-07-18 12:29:45 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
 2025-07-18 12:29:46 INFO     personas.persona_manager                                Loaded 5 personas
+2025-07-18 14:55:43 INFO     leanvibe.startup                                    Logging initialized with level DEBUG
+2025-07-18 14:55:43 INFO     personas.persona_manager                                Loaded 5 personas
