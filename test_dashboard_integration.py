@@ -9,7 +9,6 @@ import json
 import aiohttp
 import websockets
 from datetime import datetime
-import time
 
 class DashboardIntegrationTest:
     """Test complete dashboard integration data flow"""

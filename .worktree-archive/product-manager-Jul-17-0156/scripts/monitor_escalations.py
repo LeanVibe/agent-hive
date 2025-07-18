@@ -5,9 +5,7 @@ Escalation Monitor
 Monitors for human escalation files and provides notifications.
 """
 
-import os
 import time
-import glob
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict

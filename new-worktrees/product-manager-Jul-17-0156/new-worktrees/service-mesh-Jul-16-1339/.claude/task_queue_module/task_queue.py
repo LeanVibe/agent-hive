@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Set
 from enum import Enum
 import logging
 
-from agents.base_agent import Task, AgentInfo
+from agents.base_agent import Task
 
 logger = logging.getLogger(__name__)
 

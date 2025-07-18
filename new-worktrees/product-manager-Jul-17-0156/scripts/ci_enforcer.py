@@ -10,13 +10,11 @@ CI/CD pipeline health for XP methodology compliance.
 import json
 import os
 import sqlite3
-import subprocess
 import sys
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from typing import Dict, Optional
+from dataclasses import dataclass
 import yaml
 
 
@@ -527,14 +525,14 @@ class CIEnforcer:
 """
 
             if config_analysis['violations']:
-                report += f"""
+                report += """
 #### ⚠️ Configuration Violations
 """
                 for i, violation in enumerate(config_analysis['violations'], 1):
                     report += f"{i}. {violation}\n"
 
             if config_analysis['recommendations']:
-                report += f"""
+                report += """
 #### 💡 Improvement Recommendations
 """
                 for i, rec in enumerate(config_analysis['recommendations'], 1):

@@ -14,11 +14,10 @@ import sqlite3
 import json
 import time
 import logging
-import os
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
 
 # Configure logging

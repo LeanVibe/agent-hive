@@ -17,8 +17,8 @@ from .enhanced_coordination import EnhancedCoordinationProtocol
 from .workflow_coordinator import WorkflowCoordinator
 from .models import (
     WorkflowDefinition, AgentCapabilities, QualityGate, TaskDependency,
-    WorkflowType, AgentSpecialization, TaskPriority, DependencyType,
-    CoordinatorConfig, ResourceLimits, IntelligentRouting
+    WorkflowType, AgentSpecialization, DependencyType,
+    CoordinatorConfig, ResourceLimits
 )
 
 
@@ -758,7 +758,7 @@ def execute(ctx, workflow_id):
     async def run():
         try:
             result = await cli.execute_workflow(workflow_id)
-            click.echo(f"✅ Workflow execution started")
+            click.echo("✅ Workflow execution started")
             click.echo(f"📊 Status: {result['status']}")
             click.echo(f"📈 Progress: {result['progress']:.1f}%")
             click.echo(f"⏱️  Estimated completion: {result['estimated_completion']}")
@@ -826,7 +826,7 @@ def stats(ctx):
             result = await cli.get_system_statistics()
 
             click.echo(f"🚀 System running: {result['system_running']}")
-            click.echo(f"📊 Enhanced Coordination Statistics:")
+            click.echo("📊 Enhanced Coordination Statistics:")
 
             stats = result['coordination_stats']
             enhanced_stats = result['enhanced_coordination_stats']
@@ -839,7 +839,7 @@ def stats(ctx):
             click.echo(f"  • Total tasks: {stats['total_tasks']}")
             click.echo(f"  • Registered agents: {stats['registered_agents']}")
 
-            click.echo(f"🧠 Enhanced Features:")
+            click.echo("🧠 Enhanced Features:")
             click.echo(f"  • Coordination events: {enhanced_stats['coordination_events']}")
             click.echo(f"  • Performance alerts: {enhanced_stats['performance_alerts']}")
             click.echo(f"  • Routing cache size: {enhanced_stats['routing_cache_size']}")
@@ -874,7 +874,7 @@ def metrics(ctx):
             click.echo(f"  • Dependency resolution time: {metrics['dependency_resolution_time']:.1f}s")
             click.echo(f"  • Coordination overhead: {metrics['coordination_overhead']:.1%}")
 
-            click.echo(f"👥 Agent Utilization:")
+            click.echo("👥 Agent Utilization:")
             for agent_id, utilization in result['agent_utilization'].items():
                 click.echo(f"  • {agent_id}: {utilization:.1%}")
 
@@ -906,7 +906,7 @@ def routing(ctx):
             click.echo(f"  • ML prediction enabled: {analytics['ml_prediction_enabled']}")
             click.echo(f"  • Learning enabled: {analytics['learning_enabled']}")
 
-            click.echo(f"📋 Recent Events:")
+            click.echo("📋 Recent Events:")
             for event in result['recent_events'][-5:]:  # Show last 5 events
                 click.echo(f"  • {event.get('type', 'unknown')}: {event.get('timestamp', 'no timestamp')}")
 
@@ -930,7 +930,7 @@ def optimize_deps(ctx, workflow_id, task_id):
         try:
             result = await cli.optimize_workflow_dependencies(workflow_id, task_id)
 
-            click.echo(f"🔧 Dependency Optimization Results:")
+            click.echo("🔧 Dependency Optimization Results:")
             click.echo(f"  • Workflow ID: {result['workflow_id']}")
             click.echo(f"  • Task ID: {result['task_id']}")
             click.echo(f"  • Optimization applied: {result['optimization_applied']}")
@@ -955,13 +955,13 @@ def analyze_parallel(ctx, workflow_id):
         try:
             result = await cli.analyze_parallel_execution(workflow_id)
 
-            click.echo(f"⚡ Parallel Execution Analysis:")
+            click.echo("⚡ Parallel Execution Analysis:")
             click.echo(f"  • Workflow ID: {result['workflow_id']}")
             click.echo(f"  • Original groups: {result['original_groups']}")
             click.echo(f"  • Optimized groups: {result['optimized_groups']}")
 
             metrics = result['optimization_metrics']
-            click.echo(f"📊 Optimization Metrics:")
+            click.echo("📊 Optimization Metrics:")
             click.echo(f"  • Original group count: {metrics['original_group_count']}")
             click.echo(f"  • Optimized group count: {metrics['optimized_group_count']}")
             click.echo(f"  • Efficiency improvement: {metrics['parallel_efficiency_improvement']:.1f}%")

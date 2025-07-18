@@ -12,15 +12,13 @@ import logging
 import os
 import subprocess
 import sys
-import tempfile
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple, Set
+from typing import Dict, Any, List, Optional, Tuple
 from enum import Enum
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
-from config.security_config import get_security_config
 
 
 logger = logging.getLogger(__name__)
@@ -1037,7 +1035,7 @@ if __name__ == "__main__":
         total_issues = sum(len(result.issues) for result in results.values())
         critical_issues = sum(1 for result in results.values() for issue in result.issues if issue.severity == SeverityLevel.CRITICAL)
         
-        print(f"\nSecurity Quality Gates Summary:")
+        print("\nSecurity Quality Gates Summary:")
         print(f"Total Issues: {total_issues}")
         print(f"Critical Issues: {critical_issues}")
         

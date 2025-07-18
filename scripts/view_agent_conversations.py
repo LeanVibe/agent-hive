@@ -5,7 +5,6 @@ Agent Conversation History Viewer
 Views message history and conversations between agents.
 """
 
-import json
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path

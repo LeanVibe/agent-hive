@@ -9,12 +9,11 @@ Provides comprehensive permission management with:
 - Distributed permission synchronization
 """
 
-import asyncio
 import json
 import logging
 import time
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Set, Tuple, Union
+from datetime import datetime
+from typing import Dict, Any, Optional, List, Set, Tuple
 from dataclasses import asdict
 import redis
 import pickle
@@ -22,8 +21,8 @@ import hashlib
 from contextlib import asynccontextmanager
 
 from .rbac_framework import (
-    RBACManager, User, Role, Permission, ResourceType, ActionType, 
-    PermissionScope, AuthorizationEvaluator
+    RBACManager, Permission, ResourceType, ActionType, 
+    PermissionScope
 )
 
 logger = logging.getLogger(__name__)

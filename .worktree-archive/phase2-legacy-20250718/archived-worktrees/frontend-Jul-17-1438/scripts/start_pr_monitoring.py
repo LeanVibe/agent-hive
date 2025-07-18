@@ -8,8 +8,6 @@ once all feedback is implemented.
 
 import subprocess
 import sys
-import time
-from pathlib import Path
 
 def start_pr_monitoring():
     """Start PR monitoring in background"""

@@ -32,31 +32,31 @@ def review_prompts():
         if prompt.error_message:
             print(f"❌ Error: {prompt.error_message}")
 
-        print(f"\n💬 Prompt:")
+        print("\n💬 Prompt:")
         print("-" * 40)
         print(prompt.prompt_text)
         print("-" * 40)
 
         if prompt.response_text:
-            print(f"\n🤖 Response:")
+            print("\n🤖 Response:")
             print("-" * 40)
             print(prompt.response_text[:200] + ("..." if len(prompt.response_text) > 200 else ""))
             print("-" * 40)
 
         if prompt.gemini_feedback:
-            print(f"\n🧠 Gemini Feedback:")
+            print("\n🧠 Gemini Feedback:")
             print(prompt.gemini_feedback)
 
         # Auto-review based on common patterns
         auto_review = generate_auto_review(prompt)
-        print(f"\n🤖 Auto-Review Suggestion:")
+        print("\n🤖 Auto-Review Suggestion:")
         print(auto_review['review'])
-        print(f"\n💡 Suggested Improvement:")
+        print("\n💡 Suggested Improvement:")
         print(auto_review['improvement'])
 
         # Option to accept auto-review or provide custom review
         try:
-            choice = input(f"\n[A]ccept auto-review, [C]ustom review, [S]kip? (a/c/s): ").lower()
+            choice = input("\n[A]ccept auto-review, [C]ustom review, [S]kip? (a/c/s): ").lower()
 
             if choice == 'a':
                 prompt_logger.add_pm_review(
@@ -83,7 +83,7 @@ def review_prompts():
             print("\n\n👋 End of input")
             break
 
-    print(f"\n✨ Review complete!")
+    print("\n✨ Review complete!")
 
 def generate_auto_review(prompt):
     """Generate automatic review based on prompt patterns"""
@@ -155,7 +155,7 @@ def show_statistics():
     print(f"Total prompts: {stats['total_prompts']}")
     print(f"Success rate: {stats['success_rate']:.1%}")
     print(f"Needs review: {stats['needs_review']}")
-    print(f"\nAgent breakdown:")
+    print("\nAgent breakdown:")
     for agent, count in stats['agent_stats'].items():
         print(f"  {agent}: {count}")
 

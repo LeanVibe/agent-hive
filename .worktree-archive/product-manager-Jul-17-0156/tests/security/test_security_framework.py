@@ -15,16 +15,14 @@ import json
 import tempfile
 import os
 import sys
-import hashlib
 import re
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-from unittest.mock import Mock, patch
+from typing import Dict, List, Any
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
 
-from state.state_manager import StateManager, AgentState, TaskState
+from state.state_manager import StateManager, AgentState
 from task_queue_module.task_queue import TaskQueue, Task
 
 

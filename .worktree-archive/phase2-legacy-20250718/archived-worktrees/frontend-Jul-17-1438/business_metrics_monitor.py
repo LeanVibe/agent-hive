@@ -8,11 +8,10 @@ Tracks critical business metrics for multi-agent coordination including:
 - Cross-agent dependency resolution times
 """
 
-import asyncio
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import statistics

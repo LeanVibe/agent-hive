@@ -5,25 +5,19 @@ This module provides advanced task allocation and prioritization capabilities
 using machine learning and intelligent decision-making algorithms.
 """
 
-import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple, Set
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 import json
 import sqlite3
 import numpy as np
-from collections import defaultdict, deque
-import heapq
+from collections import defaultdict
 import uuid
 
 from advanced_orchestration.models import (
-    AgentInfo, TaskAssignment, TaskStatus, AgentStatus, ResourceRequirements
-)
-from ml_enhancements.models import MLConfig
-from agent_coordination_protocols import (
-    AgentCoordinationProtocols, MessageType, Priority, CoordinationStrategy
+    AgentInfo, ResourceRequirements
 )
 
 

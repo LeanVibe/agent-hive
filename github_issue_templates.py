@@ -8,7 +8,7 @@ on business impact and actionable insights.
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from enum import Enum
 
 
@@ -226,7 +226,7 @@ class GitHubIssueTemplate:
         for metric, value in business_impact.items():
             template += f"- **{metric}**: {value}\n"
 
-        template += f"""
+        template += """
 ### 👥 Agent Status Overview
 """
 

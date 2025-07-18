@@ -6,14 +6,13 @@ Handles: Quality Gates → Gemini Review → Fixes → PR Creation → Merge →
 
 import argparse
 import asyncio
-import json
 import logging
 import subprocess
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -226,7 +225,7 @@ Focus on critical issues that could cause problems in production.
                     # Remove unused imports
                     success = await self._remove_unused_imports(worktree_path)
                     if success:
-                        applied_changes.append(f"Removed unused imports")
+                        applied_changes.append("Removed unused imports")
 
                 elif "variable" in suggestion.lower() and "rename" in suggestion.lower():
                     # Variable naming improvements (simplified)
@@ -247,7 +246,7 @@ Focus on critical issues that could cause problems in production.
                 cmd = ["git", "add", "."]
                 subprocess.run(cmd, cwd=worktree_path, timeout=30)
 
-                commit_msg = f"fix: Apply Gemini CLI suggestions\n\n" + "\n".join(f"- {change}" for change in applied_changes)
+                commit_msg = "fix: Apply Gemini CLI suggestions\n\n" + "\n".join(f"- {change}" for change in applied_changes)
                 cmd = ["git", "commit", "-m", commit_msg]
                 result = subprocess.run(cmd, cwd=worktree_path, capture_output=True, text=True, timeout=30)
 

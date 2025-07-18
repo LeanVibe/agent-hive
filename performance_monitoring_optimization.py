@@ -8,17 +8,15 @@ optimization capabilities for the intelligent agent system.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import json
 import sqlite3
-import numpy as np
 import psutil
 import time
 from collections import defaultdict, deque
 import statistics
-import threading
 from concurrent.futures import ThreadPoolExecutor
 
 from intelligence_framework import IntelligenceFramework

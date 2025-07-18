@@ -6,28 +6,23 @@ with Redis caching, ensuring seamless coordination between components.
 """
 
 import pytest
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import Mock, AsyncMock
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import redis
-import tempfile
-import os
 
 # Import Security Agent's database models
 import sys
 sys.path.append('../security-Jul-17-0944')
 from external_api.database_models import (
     Base, User, Role, PermissionModel, ResourceType, ActionType, PermissionScope,
-    setup_default_rbac, create_default_roles, create_default_permissions
+    setup_default_rbac
 )
 
 # Import our RBAC components
 from external_api.rbac_postgres_manager import PostgreSQLRBACManager
 from external_api.rbac_postgres_middleware import PostgreSQLRBACMiddleware
-from external_api.rbac_framework import Permission as RBACPermission, Role as RBACRole
-from external_api.models import ApiRequest
+from external_api.rbac_framework import Permission as RBACPermission
 from external_api.auth_middleware import AuthenticationMiddleware, AuthResult
 
 
@@ -698,7 +693,6 @@ class TestIntegrationScenarios:
     def test_concurrent_operations(self, rbac_manager):
         """Test concurrent operations."""
         import threading
-        import time
         
         results = []
         errors = []

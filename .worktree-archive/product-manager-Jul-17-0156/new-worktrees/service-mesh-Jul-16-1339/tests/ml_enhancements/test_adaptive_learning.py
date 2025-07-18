@@ -2,13 +2,12 @@
 Comprehensive tests for AdaptiveLearning ML component.
 """
 
-import json
 import pytest
 import sqlite3
 import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from ml_enhancements.adaptive_learning import AdaptiveLearning
 from ml_enhancements.models import MLConfig, LearningMetrics

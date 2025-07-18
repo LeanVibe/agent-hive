@@ -5,7 +5,6 @@ This module provides a comprehensive analytics dashboard for monitoring,
 analyzing, and optimizing multi-agent coordination performance.
 """
 
-import asyncio
 import json
 import logging
 from datetime import datetime, timedelta
@@ -13,10 +12,8 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 import statistics
-import math
 
-from .performance_monitor import PerformanceMonitor, PerformanceMetricType, PerformanceAlert
-from .models import AgentSpecialization, WorkflowType, CoordinationMetrics
+from .performance_monitor import PerformanceMonitor
 
 
 class DashboardView(Enum):

@@ -8,15 +8,13 @@ import argparse
 import hashlib
 import json
 import logging
-import os
 import re
 import subprocess
 import sys
 import tempfile
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -492,14 +490,14 @@ async def main():
         print(f"📊 Context Usage: {usage:.1f}%" if usage else "Context usage unknown")
         print(f"🎯 Threshold Status: {level}")
         if needs_action:
-            print(f"⚠️ Action Required: Memory consolidation recommended")
+            print("⚠️ Action Required: Memory consolidation recommended")
 
     elif args.consolidate:
         success = await manager.consolidate_memory(args.consolidate)
         if success:
             print(f"✅ Memory consolidation completed ({args.consolidate})")
         else:
-            print(f"❌ Memory consolidation failed")
+            print("❌ Memory consolidation failed")
             sys.exit(1)
 
     elif args.wake:
@@ -510,7 +508,6 @@ async def main():
                 print(f"  {key}: {value}")
 
     elif args.monitor:
-        import asyncio
         await manager.monitor_context_continuous(args.interval)
 
     else:

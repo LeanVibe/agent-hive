@@ -8,7 +8,7 @@ inter-agent communication in the LeanVibe Agent Hive system.
 import uuid
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone, timedelta
-from enum import Enum, auto
+from enum import Enum
 from typing import Dict, Any, Optional, List
 
 

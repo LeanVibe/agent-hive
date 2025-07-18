@@ -4,10 +4,9 @@ Database models for authentication and user management.
 Provides SQLAlchemy models for persistent storage of users, API keys, and JWT tokens.
 """
 
-from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Any
+from datetime import datetime
+from typing import Optional, Dict, Any
 import uuid
-import json
 
 from sqlalchemy import (
     Column, String, Integer, DateTime, Boolean, Text, JSON, 
@@ -18,7 +17,6 @@ from sqlalchemy.orm import relationship, Session
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from .auth_middleware import Permission as AuthPermission
 from enum import Enum
 
 Base = declarative_base()

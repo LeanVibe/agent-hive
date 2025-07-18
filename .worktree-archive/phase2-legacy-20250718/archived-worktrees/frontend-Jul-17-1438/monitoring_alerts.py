@@ -7,7 +7,6 @@ Focused alert system with threshold management and notification handling.
 Compliant micro-component: <300 lines alert functionality.
 """
 
-import json
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
@@ -248,7 +247,7 @@ if __name__ == "__main__":
     
     # Get summary
     summary = get_alert_summary()
-    print(f"\nAlert Summary:")
+    print("\nAlert Summary:")
     print(f"Active Alerts: {summary['active_alerts_total']}")
     print(f"Critical: {summary['active_by_level']['critical']}")
     print(f"Warning: {summary['active_by_level']['warning']}")

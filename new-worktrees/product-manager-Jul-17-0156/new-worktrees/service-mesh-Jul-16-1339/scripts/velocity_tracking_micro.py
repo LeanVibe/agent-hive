@@ -7,10 +7,9 @@ This micro-component handles ONLY velocity tracking and trend analysis.
 Follows XP Small Releases principle: ≤300 lines, single responsibility.
 """
 
-import json
 import sqlite3
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 import statistics
 
@@ -229,7 +228,7 @@ def main():
         team_size = int(sys.argv[2]) if len(sys.argv) > 2 else 3
         prediction = tracker.predict_capacity(team_size)
 
-        print(f"Capacity Prediction:")
+        print("Capacity Prediction:")
         print(f"  Predicted Points: {prediction['predicted_points']}")
         print(f"  Confidence: {prediction['confidence_percentage']}%")
         print(f"  Based on Velocity: {prediction['based_on_velocity']:.1f}")

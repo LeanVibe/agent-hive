@@ -7,13 +7,11 @@ Essential system monitoring with SQLite storage.
 Compliant micro-component: <300 lines core functionality.
 """
 
-import time
 import sqlite3
 import psutil
 import logging
 from datetime import datetime
 from typing import Dict, Any
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 

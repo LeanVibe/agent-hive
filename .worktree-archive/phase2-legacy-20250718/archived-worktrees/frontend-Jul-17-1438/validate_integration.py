@@ -8,11 +8,9 @@ meet performance targets without requiring complex test setup.
 """
 
 import sys
-import os
 import asyncio
 import time
 from unittest.mock import Mock, AsyncMock
-from typing import Dict, Any
 
 # Add the main repository to Python path
 sys.path.insert(0, '/Users/bogdan/work/leanvibe-dev/agent-hive')
@@ -50,7 +48,7 @@ def validate_configuration():
         config = get_security_config()
         performance_targets = get_performance_targets()
         
-        print(f"✅ Configuration loaded successfully")
+        print("✅ Configuration loaded successfully")
         print(f"🎯 Performance targets: {performance_targets}")
         print(f"🔐 JWT algorithm: {config['jwt']['algorithm']}")
         print(f"🛡️ RBAC enabled: {config['rbac']['enable_role_hierarchy']}")
@@ -67,7 +65,7 @@ async def validate_integration():
     print("\n🔗 Validating integration...")
     
     try:
-        from security_integration import IntegratedSecurityManager, SecurityValidationResult
+        from security_integration import IntegratedSecurityManager
         from config.unified_security_config import get_security_config
         
         # Create mock dependencies
@@ -104,7 +102,7 @@ async def validate_performance():
     print("\n⚡ Validating performance...")
     
     try:
-        from security_integration import IntegratedSecurityManager, SecurityValidationResult
+        from security_integration import IntegratedSecurityManager
         from config.unified_security_config import get_security_config, get_performance_targets
         
         # Create mock dependencies

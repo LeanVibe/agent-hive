@@ -9,7 +9,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 class QualityGateEnforcement:
     """Enhanced quality gate enforcement with strict PR size limits"""

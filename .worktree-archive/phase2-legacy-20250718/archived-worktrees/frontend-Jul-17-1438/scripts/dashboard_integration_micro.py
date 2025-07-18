@@ -7,11 +7,10 @@ This micro-component handles ONLY integration with enhanced dashboard.
 Follows XP Small Releases principle: ≤400 lines, single responsibility.
 """
 
-import json
 import requests
 import sqlite3
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 
 
@@ -101,7 +100,7 @@ class DashboardIntegrationMicro:
                     "dashboard_url": self.dashboard_url,
                     "response_time_ms": response.elapsed.total_seconds() * 1000
                 }
-        except Exception as e:
+        except Exception:
             pass
 
         return {

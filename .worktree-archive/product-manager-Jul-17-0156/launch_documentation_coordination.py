@@ -10,15 +10,13 @@ import asyncio
 import logging
 import sys
 from datetime import datetime
-from pathlib import Path
 
 # Add the orchestration agent path
 sys.path.append('/Users/bogdan/work/leanvibe-dev/agent-hive/worktrees/orchestration-agent')
 
-from advanced_orchestration import EnhancedCoordinationProtocol, EnhancedOrchestrationCLI
+from advanced_orchestration import EnhancedOrchestrationCLI
 from advanced_orchestration.models import (
-    CoordinatorConfig, ResourceLimits, WorkflowDefinition, WorkflowType,
-    AgentSpecialization, TaskDependency, DependencyType, AgentCapabilities
+    CoordinatorConfig, ResourceLimits
 )
 
 # Configure logging
@@ -96,7 +94,7 @@ async def main():
 
         # Get workflow status
         workflow_status = await cli.get_workflow_status(workflow_id)
-        print(f"\n📋 Workflow Status:")
+        print("\n📋 Workflow Status:")
         print(f"  • Status: {workflow_status['status']}")
         print(f"  • Progress: {workflow_status['progress']:.1f}%")
         print(f"  • Active tasks: {len(workflow_status['active_tasks'])}")

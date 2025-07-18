@@ -5,12 +5,12 @@ Tests for the enhanced workflow coordinator.
 import asyncio
 import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 from advanced_orchestration.workflow_coordinator import WorkflowCoordinator
 from advanced_orchestration.models import (
     WorkflowDefinition, EnhancedTaskAssignment, AgentCapabilities,
-    CoordinationMetrics, IntelligentRouting, QualityGate, WorkflowState,
+    CoordinationMetrics, QualityGate, WorkflowState,
     TaskDependency, TaskStatus, TaskPriority, AgentSpecialization,
     WorkflowType, DependencyType, CoordinatorConfig, ResourceLimits
 )

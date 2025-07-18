@@ -13,12 +13,11 @@ This script provides comprehensive quality monitoring with:
 
 import json
 import subprocess
-import sys
 import time
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional
 import logging
 import statistics
 

@@ -10,18 +10,14 @@ import pytest
 import ast
 import sys
 import tempfile
-import subprocess
 import importlib
-import types
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
-from unittest.mock import Mock, patch
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
 
-from state.state_manager import StateManager, AgentState, TaskState
 
 
 @dataclass

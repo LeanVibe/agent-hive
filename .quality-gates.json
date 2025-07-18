@@ -1,7 +1,7 @@
 {
-  "agent_name": "integration-specialist",
+  "agent_name": "performance",
   "task_description": "main",
-  "created_at": "2025-07-18T18:30:45.373239",
+  "created_at": "2025-07-18T18:32:01.193837",
   "quality_gates": {
     "max_pr_size": 500,
     "required_tests": true,

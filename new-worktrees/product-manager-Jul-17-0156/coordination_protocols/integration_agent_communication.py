@@ -9,7 +9,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -275,9 +275,9 @@ def initiate_integration_agent_coordination():
 
         print("✅ COORDINATION INITIATED SUCCESSFULLY")
         print("=" * 60)
-        print(f"📋 Coordination Request: coordination_protocols/integration_agent_coordination_request.json")
-        print(f"📋 Acknowledgment Template: coordination_protocols/integration_agent_acknowledgment_template.json")
-        print(f"📊 Status Report: coordination_protocols/coordination_status_report.json")
+        print("📋 Coordination Request: coordination_protocols/integration_agent_coordination_request.json")
+        print("📋 Acknowledgment Template: coordination_protocols/integration_agent_acknowledgment_template.json")
+        print("📊 Status Report: coordination_protocols/coordination_status_report.json")
         print("")
         print("🎯 AWAITING INTEGRATION AGENT RESPONSE")
         print("⏰ Response Timeout: 30 minutes")

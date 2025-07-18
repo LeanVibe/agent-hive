@@ -10,7 +10,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 import logging
 
 # Setup logging
@@ -231,12 +231,12 @@ class TechnicalDebtEnforcer:
             print(f"  {gate_emoji} {gate_name.title()}: {result.get('recommendation', 'No issues')}")
 
         if report['summary']['recommendations']:
-            print(f"\n💡 Recommendations:")
+            print("\n💡 Recommendations:")
             for rec in report['summary']['recommendations']:
                 if rec:
                     print(f"  • {rec}")
 
-        print(f"\n📄 Full report saved to: analysis_reports/quality_gates_report.json")
+        print("\n📄 Full report saved to: analysis_reports/quality_gates_report.json")
 
 
 class AutomatedCodeFixer:

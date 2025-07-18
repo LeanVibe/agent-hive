@@ -583,7 +583,7 @@ async def main():
     # Stop monitoring
     await monitor.stop_monitoring()
 
-    print(f"\n📄 Progress reports saved to coordination_protocols/")
+    print("\n📄 Progress reports saved to coordination_protocols/")
     print("✅ Progress monitoring demonstration complete")
 
 

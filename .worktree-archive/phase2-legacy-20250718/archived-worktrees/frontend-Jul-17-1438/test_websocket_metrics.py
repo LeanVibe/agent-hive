@@ -75,7 +75,7 @@ async def test_websocket_metrics():
                 timeout=5
             )
             if response.status_code in [200, 201]:
-                print(f"✅ Metric sent successfully")
+                print("✅ Metric sent successfully")
             else:
                 print(f"❌ Failed to send metric: {response.status_code}")
             

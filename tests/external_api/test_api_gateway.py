@@ -5,7 +5,6 @@ Tests for ApiGateway component.
 import pytest
 import asyncio
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
 
 from external_api.api_gateway import ApiGateway
 from external_api.models import (

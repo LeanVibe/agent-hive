@@ -11,7 +11,7 @@ import tempfile
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import Mock, patch
 import json
 import sys
 

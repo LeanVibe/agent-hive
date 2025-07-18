@@ -10,9 +10,9 @@ velocity-based recommendations for sprint planning and capacity management.
 import json
 import sqlite3
 import subprocess
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass, asdict
+from datetime import datetime
+from typing import List, Optional, Tuple
+from dataclasses import dataclass
 import statistics
 import sys
 
@@ -369,9 +369,9 @@ class VelocityTracker:
         elif trend.velocity_trend == "decreasing":
             report += f"📉 **Declining Trend**: Team velocity is decreasing (strength: {trend.trend_strength:.2f})\n"
         else:
-            report += f"📊 **Stable Trend**: Team velocity is consistent\n"
+            report += "📊 **Stable Trend**: Team velocity is consistent\n"
 
-        report += f"""
+        report += """
 ## Recommendations
 """
 
@@ -381,7 +381,7 @@ class VelocityTracker:
         if not trend.recommendations:
             report += "No specific recommendations - team performance is satisfactory.\n"
 
-        report += f"""
+        report += """
 ## Historical Performance
 """
 

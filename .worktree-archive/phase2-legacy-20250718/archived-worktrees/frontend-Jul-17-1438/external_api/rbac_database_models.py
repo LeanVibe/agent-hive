@@ -6,7 +6,6 @@ with ResourceType/ActionType granular permissions, hierarchical roles, and permi
 """
 
 import uuid
-import json
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any, Set
 
@@ -14,7 +13,6 @@ from sqlalchemy import (
     Column, String, Integer, DateTime, Boolean, Text, JSON, 
     ForeignKey, Table, Index, UniqueConstraint, Enum as SQLEnum
 )
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -23,7 +21,7 @@ import enum
 # Import Security Agent's base models
 import sys
 sys.path.append('../security-Jul-17-0944')
-from external_api.database_models import Base, User as SecurityUser, Role as SecurityRole, PermissionModel
+from external_api.database_models import Base, User as SecurityUser
 
 # Import our RBAC enums
 from .rbac_framework import ResourceType, ActionType, PermissionScope

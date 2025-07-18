@@ -7,7 +7,7 @@ Tests configuration loading with environment variable overrides.
 import pytest
 import os
 import yaml
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 from pathlib import Path
 
 # Import the component under test
@@ -16,7 +16,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
 
-from config.config_loader import ConfigLoader, get_config, reload_config
+from config.config_loader import ConfigLoader, get_config
 
 
 class TestConfigLoader:

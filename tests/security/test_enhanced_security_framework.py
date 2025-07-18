@@ -7,21 +7,20 @@ quality gates, and vulnerability scanning components.
 """
 
 import pytest
-import asyncio
 import tempfile
 import os
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import patch
 
 # Import new security components
-from security.auth_service import AuthenticationService, UserRole, User, UserSession
-from security.token_manager import SecureTokenManager, TokenType, TokenStatus
-from security.quality_gates import SecurityQualityGates, SeverityLevel, QualityGateStatus
+from security.auth_service import AuthenticationService, UserRole
+from security.token_manager import SecureTokenManager, TokenType
+from security.quality_gates import SecurityQualityGates, SeverityLevel
 from security.vulnerability_scanner import VulnerabilityScanner
-from security.enhanced_middleware import EnhancedSecurityMiddleware, SecurityLevel
-from external_api.auth_middleware import AuthenticationMiddleware, Permission, AuthResult
+from security.enhanced_middleware import EnhancedSecurityMiddleware
+from external_api.auth_middleware import Permission, AuthResult
 from external_api.models import ApiRequest
 
 

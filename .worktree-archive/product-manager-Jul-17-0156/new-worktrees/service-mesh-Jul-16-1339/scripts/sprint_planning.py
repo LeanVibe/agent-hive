@@ -8,14 +8,12 @@ velocity tracking, and story point estimation for XP methodology enforcement.
 """
 
 import json
-import os
 import subprocess
 import sys
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 import sqlite3
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from dataclasses import dataclass
 
 
 @dataclass
@@ -458,7 +456,7 @@ def main():
 
         sprint_plan = planner.create_sprint_plan(sprint_name, goal, duration_days)
 
-        print(f"\n✅ Sprint created successfully!")
+        print("\n✅ Sprint created successfully!")
         print(f"Sprint ID: {sprint_plan.sprint_id}")
         print(f"Planned Points: {sprint_plan.planned_points}")
         print(f"Stories: {len(sprint_plan.stories)}")

@@ -8,21 +8,16 @@ components work together correctly and maintain proper interfaces.
 import pytest
 import asyncio
 import tempfile
-import json
 import time
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, AsyncMock
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
 
 # Add the .claude directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
 
-from state.state_manager import StateManager, AgentState, TaskState, SystemState
+from state.state_manager import StateManager, AgentState, TaskState
 from task_queue_module.task_queue import TaskQueue, Task
-from agents.base_agent import BaseAgent, AgentStatus, AgentInfo
-from config.config_loader import ConfigLoader
 
 
 @pytest.mark.integration

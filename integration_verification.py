@@ -7,11 +7,7 @@ without requiring full database/Redis setup.
 """
 
 import asyncio
-import json
 import time
-from datetime import datetime, timedelta
-from typing import Dict, Any
-from unittest.mock import Mock, AsyncMock
 
 
 class MockSecurityValidationResult:
@@ -92,7 +88,7 @@ class IntegrationVerifier:
         """Test database models support RBAC integration."""
         try:
             from external_api.database_models import (
-                User, Role, PermissionModel, ResourceType, ActionType, PermissionScope
+                PermissionModel, ResourceType, ActionType, PermissionScope
             )
             
             # Check RBAC enums exist
@@ -119,7 +115,7 @@ class IntegrationVerifier:
     def test_auth_middleware_rbac_features(self):
         """Test authentication middleware RBAC features."""
         try:
-            from external_api.auth_middleware import AuthenticationMiddleware, Permission
+            from external_api.auth_middleware import AuthenticationMiddleware
             
             # Check if enhanced JWT methods exist
             auth_middleware = AuthenticationMiddleware({

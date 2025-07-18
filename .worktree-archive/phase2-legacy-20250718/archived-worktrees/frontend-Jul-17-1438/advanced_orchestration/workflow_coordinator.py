@@ -12,17 +12,15 @@ This module provides advanced workflow coordination capabilities including:
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any, Set
+from typing import Dict, List, Optional, Any, Set
 from collections import defaultdict
-import uuid
-import json
 
 from .models import (
     WorkflowDefinition, EnhancedTaskAssignment, AgentCapabilities,
     CoordinationMetrics, IntelligentRouting, QualityGate, WorkflowState,
     TaskDependency, TaskStatus, TaskPriority, AgentSpecialization,
-    WorkflowType, DependencyType, AgentInfo, CoordinatorConfig,
-    TaskDistributionException, CoordinatorException
+    CoordinatorConfig,
+    CoordinatorException
 )
 from .multi_agent_coordinator import MultiAgentCoordinator
 

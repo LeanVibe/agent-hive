@@ -8,17 +8,12 @@ enforcement components into a unified monitoring and reporting system.
 """
 
 import json
-import os
 import sqlite3
-import subprocess
 import sys
-import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Set
-from dataclasses import dataclass, asdict
-from pathlib import Path
+from typing import Dict, List
+from dataclasses import dataclass
 import statistics
-from collections import defaultdict
 
 # Import our XP enforcement modules
 from sprint_planning import SprintPlanningSystem
@@ -611,7 +606,7 @@ class XPMethodologyDashboard:
         else:
             report += "- ✅ No critical alerts\n"
 
-        report += f"""
+        report += """
 ### ⚠️ Warnings
 """
 
@@ -621,7 +616,7 @@ class XPMethodologyDashboard:
         else:
             report += "- ✅ No warnings\n"
 
-        report += f"""
+        report += """
 ---
 
 ## 🎯 Risk Assessment
@@ -655,7 +650,7 @@ class XPMethodologyDashboard:
         else:
             report += "✅ No immediate improvements needed\n"
 
-        report += f"""
+        report += """
 ### 📈 Focus Areas
 """
 
@@ -763,7 +758,7 @@ XP Practices Monitored: 12
         else:
             exec_summary += "**Status**: ✅ No critical issues\n"
 
-        exec_summary += f"""
+        exec_summary += """
 ## 💡 Recommendations
 """
 
@@ -850,8 +845,8 @@ def main():
         print(f"  Overall Score: {score.overall_score:.1f}%")
         print(f"  Team Velocity: {score.team_velocity:.1f}")
         print(f"  Score Trend: {score.score_trend}")
-        print(f"  ")
-        print(f"  Practice Scores:")
+        print("  ")
+        print("  Practice Scores:")
         print(f"    Planning Game: {score.planning_game_score:.1f}%")
         print(f"    Small Releases: {score.small_releases_score:.1f}%")
         print(f"    Testing: {score.testing_score:.1f}%")

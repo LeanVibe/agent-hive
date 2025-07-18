@@ -10,16 +10,11 @@ Advanced JWT token management with security features including:
 """
 
 import asyncio
-import hashlib
-import hmac
-import json
 import logging
-import secrets
-import time
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List, Tuple, Set
 from enum import Enum
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 import uuid
 
 import jwt
@@ -29,7 +24,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from external_api.auth_middleware import AuthenticationMiddleware, Permission, AuthResult
-from config.security_config import get_security_config
 
 
 logger = logging.getLogger(__name__)

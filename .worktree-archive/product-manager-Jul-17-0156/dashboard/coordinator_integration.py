@@ -8,7 +8,7 @@ to provide unified agent management and monitoring capabilities.
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Dict, Any
 from pathlib import Path
 import sys
 
@@ -16,7 +16,7 @@ import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
 from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
-from advanced_orchestration.models import CoordinatorConfig, AgentInfo, TaskAssignment, ResourceLimits
+from advanced_orchestration.models import CoordinatorConfig, ResourceLimits
 from dashboard.enhanced_server import EnhancedDashboardServer
 from dashboard.prompt_logger import prompt_logger
 

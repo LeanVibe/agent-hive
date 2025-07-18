@@ -3,7 +3,6 @@ Tests for Simple Service Discovery.
 """
 
 import pytest
-from datetime import datetime
 
 from external_api.simple_discovery import SimpleServiceDiscovery, Service
 

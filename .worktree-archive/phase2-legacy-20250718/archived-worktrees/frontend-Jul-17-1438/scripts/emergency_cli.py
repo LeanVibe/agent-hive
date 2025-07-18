@@ -13,7 +13,6 @@ Usage:
 
 import sys
 import subprocess
-from pathlib import Path
 
 def main():
     """Quick emergency completion wrapper."""

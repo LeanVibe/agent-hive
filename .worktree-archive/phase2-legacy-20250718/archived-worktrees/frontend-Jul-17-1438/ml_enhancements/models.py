@@ -5,7 +5,7 @@ Data structures and type definitions for the ML enhancement components.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any
 from datetime import datetime
 import numpy as np
 

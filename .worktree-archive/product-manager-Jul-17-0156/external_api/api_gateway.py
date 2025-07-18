@@ -6,10 +6,8 @@ the LeanVibe Agent Hive orchestration system.
 """
 
 import asyncio
-import json
 import logging
 import time
-import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional, List, Callable
 from dataclasses import asdict
