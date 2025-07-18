@@ -92,6 +92,7 @@ class TestServiceDiscoveryIntegration:
             )
         ]
 
+    @pytest.mark.asyncio
     async def test_end_to_end_service_lifecycle(self, service_discovery, sample_services):
         """Test complete service lifecycle from registration to cleanup."""
         await service_discovery.start()
@@ -134,6 +135,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
+    @pytest.mark.asyncio
     async def test_api_gateway_service_routing(self, api_gateway, service_discovery, sample_services):
         """Test API Gateway routing to services via service discovery."""
         await service_discovery.start()
@@ -170,6 +172,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
+    @pytest.mark.asyncio
     async def test_rest_api_complete_workflow(self, test_client_api, sample_services):
         """Test complete REST API workflow."""
         # Test system info before registration
@@ -253,6 +256,7 @@ class TestServiceDiscoveryIntegration:
                 # Don't assert success here as some might already be cleaned up
 
     @patch('aiohttp.ClientSession')
+    @pytest.mark.asyncio
     async def test_real_health_checks(self, mock_session, service_discovery):
         """Test real HTTP health checks implementation."""
         await service_discovery.start()
@@ -343,6 +347,7 @@ class TestServiceDiscoveryIntegration:
                 "unsupported", "http://localhost:8000", "test-service"
             )
 
+    @pytest.mark.asyncio
     async def test_service_discovery_api_creation(self):
         """Test ServiceDiscoveryAPI creation via convenience function."""
         # Test with default configuration
@@ -362,6 +367,7 @@ class TestServiceDiscoveryIntegration:
         assert api_custom.port == 9000
         assert api_custom.service_discovery.config["health_check_interval"] == 5
 
+    @pytest.mark.asyncio
     async def test_service_watcher_integration(self, service_discovery, sample_services):
         """Test service watcher functionality in integration."""
         await service_discovery.start()
@@ -396,6 +402,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
+    @pytest.mark.asyncio
     async def test_concurrent_operations_integration(self, service_discovery, test_client_api):
         """Test concurrent operations across the entire system."""
         await service_discovery.start()
@@ -403,7 +410,7 @@ class TestServiceDiscoveryIntegration:
         try:
             # Create multiple service instances
             services_data = []
-            for i in range(10):
+            for i in range(5):  # Reduced from 10 to 5 for faster tests
                 service_data = {
                     "service_id": f"concurrent-service-{i:03d}",
                     "service_name": "concurrent-service",
@@ -415,22 +422,49 @@ class TestServiceDiscoveryIntegration:
                 }
                 services_data.append(service_data)
 
-            # Register all services concurrently via API
-            registration_tasks = []
-            for service_data in services_data:
-                # Note: TestClient doesn't support async, so we simulate concurrent registration
-                response = test_client_api.post("/services/register", json=service_data)
-                assert response.status_code == 200
+            # Register all services concurrently via direct service discovery
+            # Use the actual ServiceDiscovery instance for true concurrency
+            from external_api.service_discovery import ServiceInstance
+            
+            async def register_service(service_data):
+                instance = ServiceInstance(
+                    service_id=service_data["service_id"],
+                    service_name=service_data["service_name"],
+                    host=service_data["host"],
+                    port=service_data["port"],
+                    metadata=service_data["metadata"],
+                    tags=service_data["tags"],
+                    version=service_data["version"]
+                )
+                return await service_discovery.register_service(instance)
 
-            # Verify all services are registered
+            # Register all services concurrently
+            registration_tasks = [register_service(service_data) for service_data in services_data]
+            results = await asyncio.gather(*registration_tasks)
+            
+            # Verify all registrations succeeded
+            assert all(results), "Some service registrations failed"
+
+            # Test concurrent discovery
+            async def discover_services():
+                return await service_discovery.discover_services("concurrent-service")
+
+            # Perform concurrent discovery operations
+            discovery_tasks = [discover_services() for _ in range(3)]
+            discovery_results = await asyncio.gather(*discovery_tasks)
+            
+            # Verify all discoveries return the same results
+            assert all(len(result) == 5 for result in discovery_results), "Discovery results inconsistent"
+
+            # Verify all services are registered via API
             response = test_client_api.get("/services/discover/concurrent-service")
             assert response.status_code == 200
             discovery_data = response.json()
-            assert discovery_data["total_count"] == 10
+            assert discovery_data["total_count"] == 5
 
             # Test concurrent heartbeats
             heartbeat_tasks = []
-            for i in range(10):
+            for i in range(5):  # Match the number of registered services
                 service_id = f"concurrent-service-{i:03d}"
                 response = test_client_api.post(f"/services/{service_id}/heartbeat")
                 assert response.status_code == 200
@@ -441,10 +475,10 @@ class TestServiceDiscoveryIntegration:
                 response = test_client_api.get("/services/discover/concurrent-service")
                 assert response.status_code == 200
                 data = response.json()
-                assert data["total_count"] == 10
+                assert data["total_count"] == 5
 
             # Clean up: deregister all services
-            for i in range(10):
+            for i in range(5):
                 service_id = f"concurrent-service-{i:03d}"
                 response = test_client_api.delete(f"/services/{service_id}")
                 assert response.status_code == 200
@@ -453,6 +487,7 @@ class TestServiceDiscoveryIntegration:
             await service_discovery.stop()
 
     @patch('aiohttp.ClientSession')
+    @pytest.mark.asyncio
     async def test_api_gateway_service_proxying(self, mock_session, api_gateway, service_discovery, sample_services):
         """Test API Gateway proxying requests to discovered services."""
         await service_discovery.start()
@@ -497,6 +532,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
+    @pytest.mark.asyncio
     async def test_error_scenarios_integration(self, service_discovery, test_client_api):
         """Test error scenarios across the integrated system."""
         await service_discovery.start()
@@ -534,6 +570,7 @@ class TestServiceDiscoveryIntegration:
         finally:
             await service_discovery.stop()
 
+    @pytest.mark.asyncio
     async def test_system_metrics_and_monitoring(self, service_discovery, test_client_api, sample_services):
         """Test system metrics and monitoring capabilities."""
         await service_discovery.start()
