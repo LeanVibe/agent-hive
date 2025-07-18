@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-07-18T18:36:20.101723",
+  "all_passed": false,
+  "critical_failed": true,
+  "gates": {
+    "Memory Usage": {
+      "passed": true,
+      "critical": true,
+      "threshold": 80.0,
+      "result": {
+        "memory_percent": 58.4,
+        "cpu_percent": 6.4,
+        "collection_time": 1.0910837650299072,
+        "python_files": 615,
+        "total_lines": 282004
+      },
+      "check_time": 7.700920104980469e-05
+    },
+    "Code Quality": {
+      "passed": false,
+      "critical": true,
+      "threshold": 10.0,
+      "result": {
+        "pylint_score": 0,
+        "mypy_errors": 34,
+        "flake8_issues": 1311,
+        "complexity_issues": 0,
+        "pylint_issues": 1389
+      },
+      "check_time": 0.001867055892944336
+    },
+    "Security": {
+      "passed": false,
+      "critical": true,
+      "threshold": 0.0,
+      "result": {
+        "error": "Expecting value: line 3 column 1 (char 2)"
+      },
+      "check_time": 0.003776073455810547
+    }
+  },
+  "summary": {
+    "total_gates": 3,
+    "passed": 1,
+    "failed": 2,
+    "critical_failed": 2
+  }
+}
