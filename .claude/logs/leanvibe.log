@@ -10929,3 +10929,6 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-07-18 18:40:57 INFO     external_api.auth_middleware                                Created API key for user test_user
 2025-07-18 18:47:26 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-18 18:48:30 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:50:03 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:50:03 WARNING  leanvibe.claude_agent                                Circuit breaker opened after 3 failures
+2025-07-18 18:50:03 WARNING  leanvibe.claude_agent                                Circuit breaker opened after 3 failures
