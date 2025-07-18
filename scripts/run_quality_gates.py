@@ -39,7 +39,8 @@ class QualityGatesRunner:
 
         try:
             with open(config_file, 'r') as f:
-                return json.load(f)
+                loaded_data = json.load(f)
+            return loaded_data if isinstance(loaded_data, dict) else {"quality_gates": {"max_pr_size": 500, "min_coverage": 85}}
         except (json.JSONDecodeError, IOError):
             print("⚠️ Invalid quality gates configuration, using defaults")
             return {"quality_gates": {"max_pr_size": 500, "min_coverage": 85}}
@@ -308,8 +309,8 @@ class QualityGatesRunner:
                         content = f.read()
                         if '"""' in content or "'''" in content:
                             documented_files += 1
-                except:
-                    pass
+                except (IOError, UnicodeDecodeError):
+                    pass  # Skip files that can't be read
 
             if not readme_files and python_files:
                 return {
@@ -360,8 +361,8 @@ class QualityGatesRunner:
                         if "password" in content.lower() and "=" in content:
                             security_issues.append(f"Potential hardcoded password in {py_file}")
 
-                except:
-                    pass
+                except (IOError, UnicodeDecodeError):
+                    pass  # Skip files that can't be read
 
             if security_issues:
                 return {
@@ -405,8 +406,8 @@ class QualityGatesRunner:
                     if max_indent > max_complexity:
                         complex_files.append(f"{py_file} (complexity: {max_indent})")
 
-                except:
-                    pass
+                except (IOError, UnicodeDecodeError):
+                    pass  # Skip files that can't be read
 
             if complex_files:
                 return {
@@ -454,7 +455,7 @@ class QualityGatesRunner:
             for error in results["errors"]:
                 print(f"  - {error}")
 
-def main():
+def main() -> None:
     """Main entry point"""
     worktree_path = sys.argv[1] if len(sys.argv) > 1 else "."
 
