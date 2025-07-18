@@ -33,29 +33,9 @@ class ApiGateway:
     Provides authentication, rate limiting, request validation,
     and response formatting for the orchestration system.
     """
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
-    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
-||||||| 64640d5
-    
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/frontend-Jul-17-0824
-    def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
-=======
     
     def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None,
                  auth_middleware: Optional[AuthenticationMiddleware] = None):
->>>>>>> new-work/security-Jul-17-0944
         """
         Initialize API gateway.
 
@@ -74,13 +54,8 @@ class ApiGateway:
         self.api_keys: Dict[str, Dict[str, Any]] = {}
         self.server_started = False
         self._request_count = 0
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-||||||| 64640d5
         
-=======
+        # Security headers for enhanced protection
         self.security_headers = {
             "X-Content-Type-Options": "nosniff",
             "X-Frame-Options": "DENY",
@@ -98,41 +73,11 @@ class ApiGateway:
             "/api/v1/configuration"
         }
         
->>>>>>> new-work/security-Jul-17-0944
-||||||| 48e9100
-        
-=======
-
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-        
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
         if service_discovery:
             logger.info("Service discovery integration enabled")
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-||||||| 64640d5
-    
-=======
         if auth_middleware:
             logger.info("Authentication middleware integrated")
-    
->>>>>>> new-work/security-Jul-17-0944
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/frontend-Jul-17-0824
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
     async def start_server(self) -> None:
         """Start the API gateway server."""
         if self.server_started:
@@ -490,44 +435,6 @@ class ApiGateway:
                 start_time
             )
 
-    async def _authenticate_request(self, request: ApiRequest) -> Dict[str, Any]:
-        """
-        Authenticate API request using API key.
-
-        Args:
-            request: API request to authenticate
-
-        Returns:
-            Authentication result
-        """
-        api_key = request.headers.get(self.config.api_key_header)
-
-        if not api_key:
-            return {
-                "success": False,
-                "message": f"Missing {self.config.api_key_header} header"
-            }
-
-        if api_key not in self.api_keys:
-            return {
-                "success": False,
-                "message": "Invalid API key"
-            }
-
-        # Check if API key is active
-        key_data = self.api_keys[api_key]
-        if key_data.get("active", True) is False:
-            return {
-                "success": False,
-                "message": "API key is inactive"
-            }
-
-        return {
-            "success": True,
-            "message": "Authentication successful",
-            "key_data": key_data
-        }
-
     async def _check_rate_limit(self, request: ApiRequest) -> Dict[str, Any]:
         """
         Check if request is within rate limits.
@@ -625,25 +532,6 @@ class ApiGateway:
             })
 
         return headers
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/performance-Jul-17-0823
-    def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
-||||||| 64640d5
-    
-||||||| 48e9100
-    
-=======
-
->>>>>>> new-work/frontend-Jul-17-0824
-    def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
-=======
     
     def _requires_authentication(self, path: str) -> bool:
         """Check if path requires authentication."""
@@ -730,7 +618,6 @@ class ApiGateway:
     
     def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float, 
                               extra_headers: Optional[Dict[str, str]] = None) -> ApiResponse:
->>>>>>> new-work/security-Jul-17-0944
         """Create error response."""
         headers = self._get_response_headers()
         if extra_headers:

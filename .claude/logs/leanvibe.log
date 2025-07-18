@@ -9983,3 +9983,319 @@ task: <Task pending name='Task-54' coro=<MultiAgentCoordinator._scaling_monitor(
 2025-07-18 08:16:33 INFO     advanced_orchestration.multi_agent_coordinator                                Task 2393605b-6e85-4291-9b0f-e30aa66700bd reassigned from failed agent agent-1
 2025-07-18 08:16:33 INFO     advanced_orchestration.multi_agent_coordinator                                Task c614b19f-1c94-4833-a761-6b7d33199fe3 reassigned from failed agent agent-1
 >>>>>>> new-work/performance-Jul-17-0823
+2025-07-18 18:33:39 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:36:00 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:36:28 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:36:28 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:43 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:36:43 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Starting API gateway on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                API gateway started successfully
+2025-07-18 18:36:48 WARNING  external_api.api_gateway                                API gateway already started
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Stopping API gateway...
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                API gateway stopped
+2025-07-18 18:36:48 WARNING  external_api.api_gateway                                API gateway not running
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Registered route: POST /test
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Unregistered route: GET /test
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Unregistered route: POST /test
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Added middleware: test_middleware
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Registered API key with metadata: ['name', 'permissions', 'rate_limit']
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                Processed request req-123 in 0.04ms
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:36:48 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:01 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:37:01 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:01 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:01 INFO     external_api.api_gateway                                Starting API gateway on localhost:8081
+2025-07-18 18:37:01 INFO     external_api.api_gateway                                API gateway started successfully
+2025-07-18 18:37:01 WARNING  external_api.api_gateway                                API gateway already started
+2025-07-18 18:37:01 INFO     external_api.api_gateway                                Stopping API gateway...
+2025-07-18 18:37:01 INFO     external_api.api_gateway                                API gateway stopped
+2025-07-18 18:37:01 WARNING  external_api.api_gateway                                API gateway not running
+2025-07-18 18:37:01 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered route: POST /test
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Unregistered route: GET /test
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Unregistered route: POST /test
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Added middleware: test_middleware
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered API key with metadata: ['name', 'permissions', 'rate_limit']
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.03ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered API key with metadata: ['name']
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.02ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:02 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Starting API gateway on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                API gateway started successfully
+2025-07-18 18:37:14 WARNING  external_api.api_gateway                                API gateway already started
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Stopping API gateway...
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                API gateway stopped
+2025-07-18 18:37:14 WARNING  external_api.api_gateway                                API gateway not running
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered route: GET /test
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered route: POST /test
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Unregistered route: GET /test
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Unregistered route: POST /test
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Added middleware: test_middleware
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered API key with metadata: ['name', 'permissions', 'rate_limit']
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.02ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered API key with metadata: ['name']
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.02ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.00ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Processed request req-123 in 0.01ms
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:14 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:44 ERROR    external_api.api_gateway                                Request timeout for req-123
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:44 ERROR    external_api.api_gateway                                Error handling request req-123: Test error
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Added middleware: middleware1
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Added middleware: middleware2
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Processed request req-123 in 0.04ms
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Added middleware: stopping_middleware
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Registered route: GET /tasks
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Registered route: GET /route1
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Registered route: POST /route1
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Registered route: GET /route2
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                Starting API gateway on localhost:8081
+2025-07-18 18:37:44 INFO     external_api.api_gateway                                API gateway started successfully
+2025-07-18 18:37:50 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:37:51 INFO     external_api.api_gateway                                ApiGateway initialized on localhost:8081
