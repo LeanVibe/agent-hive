@@ -122,8 +122,8 @@ class SecureGitOperations:
             if any(pattern in arg for pattern in ['`', '$', ';', '&', '>', '<']):
                 raise SecurityError(f"Dangerous characters in argument: {arg}")
             
-            # Validate branch/ref names
-            if arg.startswith('refs/') or ('/' in arg and not arg.startswith('-')):
+            # Validate branch/ref names only for actual refs, not commit messages
+            if arg.startswith('refs/') or (arg.startswith('origin/') and '/' in arg):
                 if not re.match(r'^[a-zA-Z0-9/_\-\.]+$', arg):
                     raise SecurityError(f"Invalid ref/branch name: {arg}")
             

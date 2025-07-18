@@ -122,7 +122,7 @@ class TestSecureGitOperations(unittest.TestCase):
         """Test argument validation with invalid arguments"""
         git_ops = SecureGitOperations(self.repo_path)
         
-        invalid_args = ['--oneline; rm -rf /', 'main && echo pwned', 'HEAD~1 | nc']
+        invalid_args = ['--oneline; rm -rf /', 'main && echo pwned', 'HEAD~1 | nc', 'refs/heads/malicious; rm -rf /']
         for arg in invalid_args:
             with self.assertRaises(SecurityError):
                 git_ops._validate_git_args([arg])
