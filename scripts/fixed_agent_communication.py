@@ -30,11 +30,24 @@ def send_message_to_agent_fixed(
 
     session_name = "agent-hive"
 
-    # Try both naming conventions
+    # Try multiple naming conventions including current window names
     window_names_to_try = [
         f"agent-{agent_name}",  # New convention
         agent_name,  # Current convention
     ]
+    
+    # Add current window mappings (including dynamic names)
+    agent_window_mapping = {
+        'security': ['SEC-Input-⏳', 'SEC-Audit-🚨', 'SEC-Audit-🎯🚨'],
+        'performance': ['PERF-Input-⏳', 'PERF-Test-🚨', 'PERF-Test-🎯🚨'],
+        'frontend': ['FE-Input-⏳', 'FE-Dashboard-🚨', 'FE-Dashboard-🎯🚨'],
+        'pm-agent-new': ['PM-Input-⏳', 'PM-Coordinate-🚨', 'PM-Coordinate-🎯🚨']
+    }
+    
+    if agent_name in agent_window_mapping:
+        # Add all possible window names for this agent
+        for window_name in agent_window_mapping[agent_name]:
+            window_names_to_try.insert(0, window_name)
 
     for window_name in window_names_to_try:
         try:
