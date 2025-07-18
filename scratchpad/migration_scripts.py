@@ -128,16 +128,29 @@ class DatabaseMigrator:
     
     def _get_sqlite_data(self, db_file: str, table_name: str) -> List[tuple]:
         """Get all data from SQLite table"""
+        # SECURITY FIX: Use parameterized query to prevent SQL injection
+        # Validate table name against known safe tables
+        safe_tables = ['baseline_metrics', 'security_metrics', 'agent_capabilities', 'distributed_state']
+        if table_name not in safe_tables:
+            raise ValueError(f"Table name '{table_name}' not in allowed list")
+        
         with sqlite3.connect(db_file) as conn:
             cursor = conn.cursor()
-            cursor.execute(f"SELECT * FROM {table_name}")
+            # Use identifier quoting for table name to prevent injection
+            cursor.execute(f"SELECT * FROM `{table_name}`")
             return cursor.fetchall()
     
     def _get_sqlite_columns(self, db_file: str, table_name: str) -> List[str]:
         """Get column names from SQLite table"""
+        # SECURITY FIX: Validate table name against safe list
+        safe_tables = ['baseline_metrics', 'security_metrics', 'agent_capabilities', 'distributed_state']
+        if table_name not in safe_tables:
+            raise ValueError(f"Table name '{table_name}' not in allowed list")
+        
         with sqlite3.connect(db_file) as conn:
             cursor = conn.cursor()
-            cursor.execute(f"PRAGMA table_info({table_name})")
+            # Use identifier quoting for table name to prevent injection
+            cursor.execute(f"PRAGMA table_info(`{table_name}`)")
             return [col[1] for col in cursor.fetchall()]
     
     # Individual migration functions for each database

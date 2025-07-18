@@ -231,13 +231,14 @@ class SQLiteToDistributedMigrator:
                 # Check data integrity
                 for table in existing_tables:
                     if table in required_tables:
-                        cursor.execute(f"SELECT COUNT(*) FROM {table}")
+                        # SECURITY FIX: Use identifier quoting to prevent SQL injection
+                        cursor.execute(f"SELECT COUNT(*) FROM `{table}`")
                         count = cursor.fetchone()[0]
                         logger.info(f"Table {table}: {count} records")
 
                         # Sample data validation
                         if count > 0:
-                            cursor.execute(f"SELECT * FROM {table} LIMIT 5")
+                            cursor.execute(f"SELECT * FROM `{table}` LIMIT 5")
                             sample_rows = cursor.fetchall()
                             logger.debug(f"Sample data from {table}: {len(sample_rows)} rows")
 

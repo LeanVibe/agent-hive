@@ -414,6 +414,14 @@ class AgentHiveDatabaseManager:
 
         params.append(agent_id)
 
+        # SECURITY FIX: Validate updates list to prevent SQL injection
+        # Only allow known safe column names
+        safe_columns = ['last_activity', 'status', 'current_task', 'performance_score', 'capabilities']
+        for update in updates:
+            column_name = update.split('=')[0].strip()
+            if column_name not in safe_columns:
+                raise ValueError(f"Column '{column_name}' not in allowed list for updates")
+        
         self.db.execute(f"""
             UPDATE agents SET {', '.join(updates)} WHERE agent_id = ?
         """, params)

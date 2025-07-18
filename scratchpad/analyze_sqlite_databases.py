@@ -46,27 +46,28 @@ def analyze_database(db_path: str) -> Dict[str, Any]:
             if table_name.startswith('sqlite_'):
                 continue
                 
+            # SECURITY FIX: Use identifier quoting to prevent SQL injection
             # Get table info
-            cursor.execute(f"PRAGMA table_info({table_name})")
+            cursor.execute(f"PRAGMA table_info(`{table_name}`)")
             columns = cursor.fetchall()
             
             # Get row count
-            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+            cursor.execute(f"SELECT COUNT(*) FROM `{table_name}`")
             row_count = cursor.fetchone()[0]
             total_rows += row_count
             
             # Get indexes
-            cursor.execute(f"PRAGMA index_list({table_name})")
+            cursor.execute(f"PRAGMA index_list(`{table_name}`)")
             indexes = cursor.fetchall()
             
             # Get foreign keys
-            cursor.execute(f"PRAGMA foreign_key_list({table_name})")
+            cursor.execute(f"PRAGMA foreign_key_list(`{table_name}`)")
             foreign_keys = cursor.fetchall()
             
             # Sample some data for type analysis
             sample_data = []
             if row_count > 0:
-                cursor.execute(f"SELECT * FROM {table_name} LIMIT 3")
+                cursor.execute(f"SELECT * FROM `{table_name}` LIMIT 3")
                 sample_data = cursor.fetchall()
             
             schema_info[table_name] = {
