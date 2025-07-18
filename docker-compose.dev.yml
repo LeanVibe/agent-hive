@@ -1,0 +1,58 @@
+# Development override for Docker Compose
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  # Development configuration for main application
+  agent-hive:
+    build:
+      target: dev-server
+    environment:
+      - LEANVIBE_ENVIRONMENT=development
+      - LEANVIBE_LOG_LEVEL=DEBUG
+      - LEANVIBE_DEBUG_MODE=true
+    volumes:
+      # Mount source code for hot reloading
+      - .:/app
+      # Exclude node_modules and Python cache
+      - /app/node_modules
+      - /app/.venv
+      - /app/__pycache__
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+      - "8081:8081"
+      - "5678:5678"  # Debug port
+
+  # Development PostgreSQL with exposed port
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=dev_password
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+
+  # Development Redis with exposed port
+  redis:
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 128mb
+
+  # Simplified Prometheus for development
+  prometheus:
+    volumes:
+      - ./infrastructure/prometheus/prometheus.dev.yml:/etc/prometheus/prometheus.yml
+
+  # Development Grafana with admin access
+  grafana:
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=dev
+      - GF_USERS_ALLOW_SIGN_UP=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+
+volumes:
+  postgres-dev-data:
+    driver: local
