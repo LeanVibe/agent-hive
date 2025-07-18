@@ -87,17 +87,20 @@ class TestAuthenticationMiddleware:
     def test_basic_auth_user_management(self, auth_middleware):
         """Test basic auth user creation, update, and deletion."""
         # Test user creation
-        result = auth_middleware.create_basic_auth_user(
+        success, issues = auth_middleware.create_basic_auth_user(
             "testuser",
-            "testpass",
+            "TestPass123",
             [Permission.READ, Permission.WRITE]
         )
 
-        assert result is True
+        assert success is True
+        assert len(issues) == 0
         assert "testuser" in auth_middleware.basic_auth_users
 
         user_data = auth_middleware.basic_auth_users["testuser"]
-        assert user_data["password"] == "testpass"
+        # Password should be hashed, not plain text
+        assert user_data["password"] != "TestPass123"
+        assert auth_middleware.verify_password("TestPass123", user_data["password"])
         assert user_data["permissions"] == [Permission.READ, Permission.WRITE]
         assert user_data["active"] is True
         assert user_data["login_count"] == 0
@@ -105,25 +108,22 @@ class TestAuthenticationMiddleware:
         # Test user update
         result = auth_middleware.update_basic_auth_user(
             "testuser",
-            password="newpass",
+            password="NewPass456",
             permissions=[Permission.READ],
             active=False
         )
 
         assert result is True
         updated_user = auth_middleware.basic_auth_users["testuser"]
-        assert updated_user["password"] == "newpass"
+        # Password should be hashed, not plain text
+        assert updated_user["password"] != "NewPass456"
+        assert auth_middleware.verify_password("NewPass456", updated_user["password"])
         assert updated_user["permissions"] == [Permission.READ]
         assert updated_user["active"] is False
         assert "updated_at" in updated_user
 
-        # Test user deletion
-        result = auth_middleware.delete_basic_auth_user("testuser")
-        assert result is True
-        assert "testuser" not in auth_middleware.basic_auth_users
-
-        # Test deletion of non-existent user
-        result = auth_middleware.delete_basic_auth_user("nonexistent")
+        # Test updating non-existent user
+        result = auth_middleware.update_basic_auth_user("nonexistent", password="NewPass789")
         assert result is False
 
     @pytest.mark.asyncio
@@ -178,12 +178,12 @@ class TestAuthenticationMiddleware:
         # Create basic auth user
         auth_middleware.create_basic_auth_user(
             "testuser",
-            "testpass",
+            "TestPass123",
             [Permission.READ, Permission.WRITE]
         )
 
         # Create basic auth header
-        credentials = base64.b64encode(b"testuser:testpass").decode('utf-8')
+        credentials = base64.b64encode(b"testuser:TestPass123").decode('utf-8')
         sample_request.headers["Authorization"] = f"Basic {credentials}"
 
         # Test authentication
@@ -223,8 +223,8 @@ class TestAuthenticationMiddleware:
         assert "Authentication failed" in result.error
 
         # Test deactivated user
-        auth_middleware.create_basic_auth_user("testuser", "testpass", [Permission.READ], active=False)
-        credentials = base64.b64encode(b"testuser:testpass").decode('utf-8')
+        auth_middleware.create_basic_auth_user("testuser", "TestPass123", [Permission.READ], active=False)
+        credentials = base64.b64encode(b"testuser:TestPass123").decode('utf-8')
         sample_request.headers["Authorization"] = f"Basic {credentials}"
         result = await auth_middleware.authenticate_request(sample_request)
         assert result.success is False

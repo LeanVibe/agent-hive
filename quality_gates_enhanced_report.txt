@@ -14,15 +14,15 @@
    CPU Usage: 6.4%
 
    Code Quality (CRITICAL): ❌ FAILED
-   Threshold: 10.0
-   Check Time: 0.002s
+   Threshold: 10
+   Check Time: 0.003s
    MyPy Errors: 34
    Pylint Issues: 1389
    High Complexity: 0
 
    Security (CRITICAL): ❌ FAILED
-   Threshold: 0.0
+   Threshold: 0
    Check Time: 0.004s
 
-⏱️  Report Generated: 2025-07-18T18:36:20.101723
+⏱️  Report Generated: 2025-07-18T19:08:38.341433
 ============================================================

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-07-18T18:36:20.101723",
+  "timestamp": "2025-07-18T19:08:38.341433",
   "all_passed": false,
   "critical_failed": true,
   "gates": {
@@ -14,12 +14,12 @@
         "python_files": 615,
         "total_lines": 282004
       },
-      "check_time": 7.700920104980469e-05
+      "check_time": 5.316734313964844e-05
     },
     "Code Quality": {
       "passed": false,
       "critical": true,
-      "threshold": 10.0,
+      "threshold": 10,
       "result": {
         "pylint_score": 0,
         "mypy_errors": 34,
@@ -27,16 +27,16 @@
         "complexity_issues": 0,
         "pylint_issues": 1389
       },
-      "check_time": 0.001867055892944336
+      "check_time": 0.0027840137481689453
     },
     "Security": {
       "passed": false,
       "critical": true,
-      "threshold": 0.0,
+      "threshold": 0,
       "result": {
         "error": "Expecting value: line 3 column 1 (char 2)"
       },
-      "check_time": 0.003776073455810547
+      "check_time": 0.004196882247924805
     }
   },
   "summary": {
