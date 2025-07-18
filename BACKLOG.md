@@ -20,6 +20,7 @@
 - [ ] **API Documentation Enhancement** (GitHub #8) - update CLI reference (Est: 3hr)
 - [ ] **Setup Documentation** (GitHub #10) - streamline onboarding (Est: 2hr)
 - [ ] **Agent Workflow Documentation** (GitHub #9) - standardize patterns (Est: 2hr)
+- [ ] **Context Usage Monitor** - restore automatic context monitoring with thresholds (Est: 2hr)
 - [ ] **Database Integration for BACKLOG.md** - optional sync table for reporting (Est: 2hr)
 - [ ] **Slack Notifications for Priority Changes** - real-time updates (Est: 1hr)
 
