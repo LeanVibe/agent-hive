@@ -1,0 +1,60 @@
+#!/bin/bash
+# LeanVibe Post-commit Hook - Success Reporting and Status Updates
+
+set -e
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo ""
+echo -e "${GREEN}✅ LeanVibe Agent Hive - Commit Successful${NC}"
+echo -e "${GREEN}=========================================${NC}"
+
+# Get commit info
+COMMIT_HASH=$(git rev-parse --short HEAD)
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')
+COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+COMMIT_DATE=$(git log -1 --pretty=format:'%ai')
+
+echo -e "${BLUE}📝 Commit: $COMMIT_HASH${NC}"
+echo -e "${BLUE}🌿 Branch: $BRANCH_NAME${NC}"
+echo -e "${BLUE}👤 Author: $COMMIT_AUTHOR${NC}"
+echo -e "${BLUE}📅 Date: $COMMIT_DATE${NC}"
+echo ""
+echo -e "${BLUE}💬 Message:${NC}"
+echo "$COMMIT_MESSAGE"
+echo ""
+
+# Check if CLI is available
+if [ -f "cli.py" ]; then
+    echo -e "${GREEN}🔧 LeanVibe CLI Status: Available${NC}"
+    echo -e "${GREEN}   Run: python cli.py --help for usage${NC}"
+else
+    echo -e "${YELLOW}⚠️  LeanVibe CLI: Not found in current directory${NC}"
+fi
+
+# Show file changes summary
+FILES_CHANGED=$(git diff --name-only HEAD~1 HEAD | wc -l)
+ADDITIONS=$(git diff --numstat HEAD~1 HEAD | awk '{sum += $1} END {print sum+0}')
+DELETIONS=$(git diff --numstat HEAD~1 HEAD | awk '{sum += $2} END {print sum+0}')
+
+echo -e "${BLUE}📊 Files changed: $FILES_CHANGED${NC}"
+echo -e "${BLUE}📈 Changes: +$ADDITIONS -$DELETIONS${NC}"
+echo ""
+
+# Next steps guidance
+echo -e "${GREEN}🎉 Ready for next task!${NC}"
+
+# If this is a feature branch, suggest next steps
+if [[ "$BRANCH_NAME" != "main" && "$BRANCH_NAME" != "master" ]]; then
+    echo -e "${YELLOW}💡 Feature branch detected - consider creating PR when ready${NC}"
+    echo -e "${YELLOW}   git push origin $BRANCH_NAME${NC}"
+    echo -e "${YELLOW}   gh pr create --title \"Your PR Title\" --body \"Description\"${NC}"
+fi
+
+exit 0
