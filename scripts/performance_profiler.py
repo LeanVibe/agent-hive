@@ -14,6 +14,7 @@ import logging
 import os
 import pstats
 import psutil
+import subprocess
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -344,7 +345,7 @@ class PerformanceProfiler:
             return report
 
     def benchmark_cli_operations(self) -> Dict[str, float]:
-        """Benchmark CLI operation performance."""
+        """Benchmark CLI operation performance with proper subprocess handling."""
         logger.info("🏃 Benchmarking CLI operations")
 
         benchmarks = {}
@@ -352,27 +353,48 @@ class PerformanceProfiler:
         # Test CLI help command
         start_time = time.time()
         try:
-            result = os.system("python cli.py --help > /dev/null 2>&1")
+            result = subprocess.run(
+                ["python", "cli.py", "--help"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
             benchmarks['cli_help'] = time.time() - start_time
-        except Exception as e:
+            if result.returncode != 0:
+                logger.warning(f"CLI help returned non-zero exit code: {result.returncode}")
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError) as e:
             benchmarks['cli_help'] = -1
             logger.warning(f"CLI help benchmark failed: {e}")
 
         # Test coordination status
         start_time = time.time()
         try:
-            result = os.system("python cli.py coordinate --action status > /dev/null 2>&1")
+            result = subprocess.run(
+                ["python", "cli.py", "coordinate", "--action", "status"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
             benchmarks['coordination_status'] = time.time() - start_time
-        except Exception as e:
+            if result.returncode != 0:
+                logger.warning(f"Coordination status returned non-zero exit code: {result.returncode}")
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError) as e:
             benchmarks['coordination_status'] = -1
             logger.warning(f"Coordination status benchmark failed: {e}")
 
         # Test monitoring
         start_time = time.time()
         try:
-            result = os.system("python cli.py monitor > /dev/null 2>&1")
+            result = subprocess.run(
+                ["python", "cli.py", "monitor"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
             benchmarks['monitor'] = time.time() - start_time
-        except Exception as e:
+            if result.returncode != 0:
+                logger.warning(f"Monitor returned non-zero exit code: {result.returncode}")
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError) as e:
             benchmarks['monitor'] = -1
             logger.warning(f"Monitor benchmark failed: {e}")
 
