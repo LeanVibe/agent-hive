@@ -1,0 +1,925 @@
+diff --git a/scripts/fix_documentation_issues.py b/scripts/fix_documentation_issues.py
+index 6effe72..80499d2 100755
+--- a/scripts/fix_documentation_issues.py
++++ b/scripts/fix_documentation_issues.py
+@@ -20,7 +20,7 @@ class DocumentationFixer:
+ 
+     def __init__(self, project_root: Path):
+         self.project_root = project_root
+-        self.fixes_applied = []
++        self.fixes_applied: List[str] = []
+ 
+     def fix_async_code_examples(self) -> List[str]:
+         """Fix async code examples by wrapping them in async functions."""
+@@ -88,7 +88,7 @@ class DocumentationFixer:
+ 
+     def fix_yaml_multi_document_issues(self) -> List[str]:
+         """Fix YAML multi-document syntax issues."""
+-        fixes = []
++        fixes: List[str] = []
+ 
+         deployment_file = self.project_root / "DEPLOYMENT.md"
+         if not deployment_file.exists():
+diff --git a/scripts/run_quality_gates.py b/scripts/run_quality_gates.py
+index 3b2e63e..302666d 100644
+--- a/scripts/run_quality_gates.py
++++ b/scripts/run_quality_gates.py
+@@ -1,7 +1,5 @@
+ #!/usr/bin/env python3
+ """
+-CANONICAL: This is the canonical script for running all quality gates for new worktrees and general codebase validation. Use this for all pre-merge and pre-integration quality checks.
+-
+ Quality Gates Runner
+ 
+ Runs strict quality gates for new worktrees to ensure high code quality
+@@ -15,7 +13,6 @@ import os
+ from pathlib import Path
+ from typing import Dict, List, Any
+ 
+-
+ class QualityGatesRunner:
+     """Runs quality gates for new development work"""
+ 
+@@ -36,12 +33,12 @@ class QualityGatesRunner:
+                     "required_tests": True,
+                     "required_docs": True,
+                     "required_security_review": True,
+-                    "max_complexity": 15,
++                    "max_complexity": 15
+                 }
+             }
+ 
+         try:
+-            with open(config_file, "r") as f:
++            with open(config_file, 'r') as f:
+                 return json.load(f)
+         except (json.JSONDecodeError, IOError):
+             print("⚠️ Invalid quality gates configuration, using defaults")
+@@ -49,12 +46,12 @@ class QualityGatesRunner:
+ 
+     def run_all_gates(self) -> Dict[str, Any]:
+         """Run all quality gates"""
+-        results = {
++        results: Dict[str, Any] = {
+             "success": True,
+             "checks": {},
+             "warnings": [],
+             "errors": [],
+-            "summary": {},
++            "summary": {}
+         }
+ 
+         print("🔍 Running Quality Gates...")
+@@ -103,14 +100,12 @@ class QualityGatesRunner:
+             results["errors"].extend(complexity_result["errors"])
+ 
+         # Generate summary
+-        passed_checks = sum(
+-            1 for check in results["checks"].values() if check["passed"]
+-        )
++        passed_checks = sum(1 for check in results["checks"].values() if check["passed"])
+         total_checks = len(results["checks"])
+         results["summary"] = {
+             "passed_checks": passed_checks,
+             "total_checks": total_checks,
+-            "success_rate": f"{(passed_checks/total_checks)*100:.1f}%",
++            "success_rate": f"{(passed_checks/total_checks)*100:.1f}%"
+         }
+ 
+         return results
+@@ -118,24 +113,25 @@ class QualityGatesRunner:
+     def _check_pr_size(self) -> Dict[str, Any]:
+         """Check PR size against limits"""
+         try:
+-            result = subprocess.run(
+-                ["git", "diff", "--stat", "main"],
+-                cwd=self.worktree_path,
+-                capture_output=True,
+-                text=True,
+-            )
++            result = subprocess.run([
++                "git", "diff", "--stat", "main"
++            ], cwd=self.worktree_path, capture_output=True, text=True)
+ 
+             if result.returncode != 0:
+                 return {
+                     "passed": False,
+                     "errors": ["Could not check PR size - git command failed"],
+-                    "details": "Git diff command failed",
++                    "details": "Git diff command failed"
+                 }
+ 
+             if not result.stdout.strip():
+-                return {"passed": True, "errors": [], "details": "No changes detected"}
++                return {
++                    "passed": True,
++                    "errors": [],
++                    "details": "No changes detected"
++                }
+ 
+-            lines = result.stdout.strip().split("\n")
++            lines = result.stdout.strip().split('\n')
+             if lines:
+                 last_line = lines[-1]
+                 if "insertion" in last_line or "deletion" in last_line:
+@@ -151,29 +147,27 @@ class QualityGatesRunner:
+                     if changes > max_size:
+                         return {
+                             "passed": False,
+-                            "errors": [
+-                                f"PR size {changes} lines exceeds limit of {max_size} lines"
+-                            ],
+-                            "details": f"Current: {changes}, Limit: {max_size}",
++                            "errors": [f"PR size {changes} lines exceeds limit of {max_size} lines"],
++                            "details": f"Current: {changes}, Limit: {max_size}"
+                         }
+                     else:
+                         return {
+                             "passed": True,
+                             "errors": [],
+-                            "details": f"PR size: {changes}/{max_size} lines",
++                            "details": f"PR size: {changes}/{max_size} lines"
+                         }
+ 
+             return {
+                 "passed": True,
+                 "errors": [],
+-                "details": "No significant changes detected",
++                "details": "No significant changes detected"
+             }
+ 
+         except Exception as e:
+             return {
+                 "passed": False,
+                 "errors": [f"Error checking PR size: {e}"],
+-                "details": str(e),
++                "details": str(e)
+             }
+ 
+     def _check_linting(self) -> Dict[str, Any]:
+@@ -186,81 +180,66 @@ class QualityGatesRunner:
+                 return {
+                     "passed": True,
+                     "errors": [],
+-                    "details": "No Python files to lint",
++                    "details": "No Python files to lint"
+                 }
+ 
+             # Try to run flake8 or similar linter
+             try:
+-                result = subprocess.run(
+-                    ["python", "-m", "flake8", "--max-line-length=120", "."],
+-                    cwd=self.worktree_path,
+-                    capture_output=True,
+-                    text=True,
+-                )
++                result = subprocess.run([
++                    "python", "-m", "flake8", "--max-line-length=120", "."
++                ], cwd=self.worktree_path, capture_output=True, text=True)
+ 
+                 if result.returncode == 0:
+                     return {
+                         "passed": True,
+                         "errors": [],
+-                        "details": f"Linting passed for {len(python_files)} Python files",
++                        "details": f"Linting passed for {len(python_files)} Python files"
+                     }
+                 else:
+                     return {
+                         "passed": False,
+                         "errors": [f"Linting failed: {result.stdout}"],
+-                        "details": result.stdout,
++                        "details": result.stdout
+                     }
+ 
+             except FileNotFoundError:
+                 return {
+                     "passed": False,
+                     "errors": ["Linter not found - please install flake8"],
+-                    "details": "flake8 not available",
++                    "details": "flake8 not available"
+                 }
+ 
+         except Exception as e:
+             return {
+                 "passed": False,
+                 "errors": [f"Error checking linting: {e}"],
+-                "details": str(e),
++                "details": str(e)
+             }
+ 
+     def _check_tests(self) -> Dict[str, Any]:
+         """Check test coverage"""
+         try:
+             # Look for test files
+-            test_files = (
+-                list(self.worktree_path.glob("**/test_*.py"))
+-                + list(self.worktree_path.glob("**/*_test.py"))
+-                + list(self.worktree_path.glob("**/tests/**/*.py"))
+-            )
++            test_files = list(self.worktree_path.glob("**/test_*.py")) + \
++                        list(self.worktree_path.glob("**/*_test.py")) + \
++                        list(self.worktree_path.glob("**/tests/**/*.py"))
+ 
+             if not test_files:
+                 return {
+                     "passed": False,
+                     "errors": ["No test files found"],
+-                    "details": "Required test files missing",
++                    "details": "Required test files missing"
+                 }
+ 
+             # Try to run pytest with coverage
+             try:
+-                result = subprocess.run(
+-                    [
+-                        "python",
+-                        "-m",
+-                        "pytest",
+-                        "--cov=.",
+-                        "--cov-report=term-missing",
+-                        "-v",
+-                    ],
+-                    cwd=self.worktree_path,
+-                    capture_output=True,
+-                    text=True,
+-                )
++                result = subprocess.run([
++                    "python", "-m", "pytest", "--cov=.", "--cov-report=term-missing", "-v"
++                ], cwd=self.worktree_path, capture_output=True, text=True)
+ 
+                 if result.returncode == 0:
+                     # Try to extract coverage percentage
+-                    output_lines = result.stdout.split("\n")
++                    output_lines = result.stdout.split('\n')
+                     for line in output_lines:
+                         if "TOTAL" in line and "%" in line:
+                             # Extract coverage percentage
+@@ -268,60 +247,53 @@ class QualityGatesRunner:
+                             for part in parts:
+                                 if part.endswith("%"):
+                                     coverage = int(part[:-1])
+-                                    min_coverage = self.quality_config["quality_gates"][
+-                                        "min_coverage"
+-                                    ]
++                                    min_coverage = self.quality_config["quality_gates"]["min_coverage"]
+ 
+                                     if coverage >= min_coverage:
+                                         return {
+                                             "passed": True,
+                                             "errors": [],
+-                                            "details": f"Test coverage: {coverage}% (≥{min_coverage}%)",
++                                            "details": f"Test coverage: {coverage}% (≥{min_coverage}%)"
+                                         }
+                                     else:
+                                         return {
+                                             "passed": False,
+-                                            "errors": [
+-                                                f"Test coverage {coverage}% below minimum {min_coverage}%"
+-                                            ],
+-                                            "details": f"Coverage: {coverage}%, Required: {min_coverage}%",
++                                            "errors": [f"Test coverage {coverage}% below minimum {min_coverage}%"],
++                                            "details": f"Coverage: {coverage}%, Required: {min_coverage}%"
+                                         }
+ 
+                     return {
+                         "passed": True,
+                         "errors": [],
+-                        "details": f"Tests passed for {len(test_files)} test files",
++                        "details": f"Tests passed for {len(test_files)} test files"
+                     }
+                 else:
+                     return {
+                         "passed": False,
+                         "errors": [f"Tests failed: {result.stdout}"],
+-                        "details": result.stdout,
++                        "details": result.stdout
+                     }
+ 
+             except FileNotFoundError:
+                 return {
+                     "passed": False,
+-                    "errors": [
+-                        "pytest not found - please install pytest and pytest-cov"
+-                    ],
+-                    "details": "pytest not available",
++                    "errors": ["pytest not found - please install pytest and pytest-cov"],
++                    "details": "pytest not available"
+                 }
+ 
+         except Exception as e:
+             return {
+                 "passed": False,
+                 "errors": [f"Error checking tests: {e}"],
+-                "details": str(e),
++                "details": str(e)
+             }
+ 
+     def _check_documentation(self) -> Dict[str, Any]:
+         """Check documentation requirements"""
+         try:
+             # Check for README files
+-            readme_files = list(self.worktree_path.glob("README*.md")) + list(
+-                self.worktree_path.glob("readme*.md")
+-            )
++            readme_files = list(self.worktree_path.glob("README*.md")) + \
++                          list(self.worktree_path.glob("readme*.md"))
+ 
+             # Check for docstrings in Python files
+             python_files = list(self.worktree_path.glob("**/*.py"))
+@@ -332,7 +304,7 @@ class QualityGatesRunner:
+                     continue
+ 
+                 try:
+-                    with open(py_file, "r") as f:
++                    with open(py_file, 'r') as f:
+                         content = f.read()
+                         if '"""' in content or "'''" in content:
+                             documented_files += 1
+@@ -343,27 +315,27 @@ class QualityGatesRunner:
+                 return {
+                     "passed": False,
+                     "errors": ["No README file found"],
+-                    "details": "README.md required for documentation",
++                    "details": "README.md required for documentation"
+                 }
+ 
+             if python_files and documented_files < len(python_files) * 0.8:
+                 return {
+                     "passed": False,
+                     "errors": ["Insufficient docstring coverage"],
+-                    "details": f"Only {documented_files}/{len(python_files)} Python files have docstrings",
++                    "details": f"Only {documented_files}/{len(python_files)} Python files have docstrings"
+                 }
+ 
+             return {
+                 "passed": True,
+                 "errors": [],
+-                "details": f"Documentation check passed ({documented_files}/{len(python_files)} files documented)",
++                "details": f"Documentation check passed ({documented_files}/{len(python_files)} files documented)"
+             }
+ 
+         except Exception as e:
+             return {
+                 "passed": False,
+                 "errors": [f"Error checking documentation: {e}"],
+-                "details": str(e),
++                "details": str(e)
+             }
+ 
+     def _check_security(self) -> Dict[str, Any]:
+@@ -375,7 +347,7 @@ class QualityGatesRunner:
+ 
+             for py_file in python_files:
+                 try:
+-                    with open(py_file, "r") as f:
++                    with open(py_file, 'r') as f:
+                         content = f.read()
+ 
+                         # Check for common security issues
+@@ -384,13 +356,9 @@ class QualityGatesRunner:
+                         if "exec(" in content:
+                             security_issues.append(f"exec() usage in {py_file}")
+                         if "shell=True" in content:
+-                            security_issues.append(
+-                                f"shell=True in subprocess call in {py_file}"
+-                            )
++                            security_issues.append(f"shell=True in subprocess call in {py_file}")
+                         if "password" in content.lower() and "=" in content:
+-                            security_issues.append(
+-                                f"Potential hardcoded password in {py_file}"
+-                            )
++                            security_issues.append(f"Potential hardcoded password in {py_file}")
+ 
+                 except:
+                     pass
+@@ -399,20 +367,20 @@ class QualityGatesRunner:
+                 return {
+                     "passed": False,
+                     "errors": security_issues,
+-                    "details": f"Found {len(security_issues)} potential security issues",
++                    "details": f"Found {len(security_issues)} potential security issues"
+                 }
+ 
+             return {
+                 "passed": True,
+                 "errors": [],
+-                "details": f"Security check passed for {len(python_files)} Python files",
++                "details": f"Security check passed for {len(python_files)} Python files"
+             }
+ 
+         except Exception as e:
+             return {
+                 "passed": False,
+                 "errors": [f"Error checking security: {e}"],
+-                "details": str(e),
++                "details": str(e)
+             }
+ 
+     def _check_complexity(self) -> Dict[str, Any]:
+@@ -424,20 +392,16 @@ class QualityGatesRunner:
+ 
+             for py_file in python_files:
+                 try:
+-                    with open(py_file, "r") as f:
++                    with open(py_file, 'r') as f:
+                         lines = f.readlines()
+ 
+                     max_indent = 0
+                     for line in lines:
+                         if line.strip():
+                             indent = len(line) - len(line.lstrip())
+-                            max_indent = max(
+-                                max_indent, indent // 4
+-                            )  # Assuming 4-space indentation
++                            max_indent = max(max_indent, indent // 4)  # Assuming 4-space indentation
+ 
+-                    max_complexity = self.quality_config["quality_gates"][
+-                        "max_complexity"
+-                    ]
++                    max_complexity = self.quality_config["quality_gates"]["max_complexity"]
+                     if max_indent > max_complexity:
+                         complex_files.append(f"{py_file} (complexity: {max_indent})")
+ 
+@@ -448,23 +412,23 @@ class QualityGatesRunner:
+                 return {
+                     "passed": False,
+                     "errors": [f"High complexity files: {', '.join(complex_files)}"],
+-                    "details": f"Found {len(complex_files)} files with high complexity",
++                    "details": f"Found {len(complex_files)} files with high complexity"
+                 }
+ 
+             return {
+                 "passed": True,
+                 "errors": [],
+-                "details": f"Complexity check passed for {len(python_files)} Python files",
++                "details": f"Complexity check passed for {len(python_files)} Python files"
+             }
+ 
+         except Exception as e:
+             return {
+                 "passed": False,
+                 "errors": [f"Error checking complexity: {e}"],
+-                "details": str(e),
++                "details": str(e)
+             }
+ 
+-    def print_results(self, results: Dict[str, Any]):
++    def print_results(self, results: Dict[str, Any]) -> None:
+         """Print quality gates results"""
+         print("\n" + "=" * 50)
+         print("📊 QUALITY GATES RESULTS")
+@@ -480,9 +444,7 @@ class QualityGatesRunner:
+ 
+         print("\n" + "-" * 50)
+         summary = results["summary"]
+-        print(
+-            f"📈 Summary: {summary['passed_checks']}/{summary['total_checks']} checks passed ({summary['success_rate']})"
+-        )
++        print(f"📈 Summary: {summary['passed_checks']}/{summary['total_checks']} checks passed ({summary['success_rate']})")
+ 
+         if results["success"]:
+             print("🎉 ALL QUALITY GATES PASSED!")
+@@ -492,7 +454,6 @@ class QualityGatesRunner:
+             for error in results["errors"]:
+                 print(f"  - {error}")
+ 
+-
+ def main():
+     """Main entry point"""
+     worktree_path = sys.argv[1] if len(sys.argv) > 1 else "."
+@@ -505,6 +466,5 @@ def main():
+     # Exit with appropriate code
+     sys.exit(0 if results["success"] else 1)
+ 
+-
+ if __name__ == "__main__":
+     main()
+diff --git a/scripts/validate_links.py b/scripts/validate_links.py
+index 818af68..1bd67c9 100755
+--- a/scripts/validate_links.py
++++ b/scripts/validate_links.py
+@@ -444,7 +444,7 @@ class LinkValidator:
+             report.append(f"❌ BROKEN LINKS ({len(broken_links)}):")
+ 
+             # Group by file
+-            broken_by_file = {}
++            broken_by_file: Dict[str, List[LinkValidationResult]] = {}
+             for result in broken_links:
+                 if result.source_file not in broken_by_file:
+                     broken_by_file[result.source_file] = []
+diff --git a/test_runner.py b/test_runner.py
+new file mode 100644
+index 0000000..2ccc079
+--- /dev/null
++++ b/test_runner.py
+@@ -0,0 +1,396 @@
++#!/usr/bin/env python3
++"""
++Comprehensive test runner for LeanVibe Quality Agent
++
++This script provides a comprehensive test runner with coverage analysis,
++performance benchmarking, and quality gate validation.
++"""
++
++import argparse
++import subprocess
++import sys
++import os
++import json
++import time
++from pathlib import Path
++from datetime import datetime
++from typing import Dict, List, Any, Optional
++
++class TestRunner:
++    """Comprehensive test runner with quality gates."""
++
++    def __init__(self, verbose: bool = False):
++        self.verbose = verbose
++        self.results: Dict[str, Any] = {
++            "timestamp": datetime.now().isoformat(),
++            "total_tests": 0,
++            "passed": 0,
++            "failed": 0,
++            "errors": 0,
++            "skipped": 0,
++            "coverage": 0.0,
++            "duration": 0.0,
++            "quality_gates": []
++        }
++
++    def run_unit_tests(self, pattern: str = "tests/") -> Dict[str, Any]:
++        """Run unit tests with coverage analysis."""
++        print("🧪 Running unit tests...")
++
++        start_time = time.time()
++
++        cmd = [
++            sys.executable, "-m", "pytest",
++            pattern,
++            "--cov=.claude",
++            "--cov-report=html:htmlcov",
++            "--cov-report=json:coverage.json",
++            "--cov-report=term-missing",
++            "--cov-fail-under=80",
++            "--tb=short",
++            "-v" if self.verbose else "-q"
++        ]
++
++        try:
++            result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
++            duration = time.time() - start_time
++
++            # Parse pytest output
++            output_lines = result.stdout.split('\n')
++            for line in output_lines:
++                if "passed" in line and "failed" in line:
++                    # Parse test results
++                    break
++
++            # Load coverage data
++            coverage_data = self._load_coverage_data()
++
++            test_result = {
++                "type": "unit_tests",
++                "duration": duration,
++                "return_code": result.returncode,
++                "stdout": result.stdout,
++                "stderr": result.stderr,
++                "coverage": coverage_data
++            }
++
++            self.results["duration"] = float(self.results["duration"]) + duration
++            if coverage_data:
++                self.results["coverage"] = coverage_data.get("totals", {}).get("percent_covered", 0)
++
++            return test_result
++
++        except subprocess.TimeoutExpired:
++            return {
++                "type": "unit_tests",
++                "duration": time.time() - start_time,
++                "return_code": -1,
++                "error": "Test execution timed out"
++            }
++
++    def run_integration_tests(self) -> Dict[str, Any]:
++        """Run integration tests."""
++        print("🔗 Running integration tests...")
++
++        start_time = time.time()
++
++        cmd = [
++            sys.executable, "-m", "pytest",
++            "tests/integration/",
++            "-v" if self.verbose else "-q",
++            "--tb=short"
++        ]
++
++        try:
++            result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
++            duration = time.time() - start_time
++
++            return {
++                "type": "integration_tests",
++                "duration": duration,
++                "return_code": result.returncode,
++                "stdout": result.stdout,
++                "stderr": result.stderr
++            }
++
++        except subprocess.TimeoutExpired:
++            return {
++                "type": "integration_tests",
++                "duration": time.time() - start_time,
++                "return_code": -1,
++                "error": "Integration tests timed out"
++            }
++
++    def run_performance_tests(self) -> Dict[str, Any]:
++        """Run performance benchmarks."""
++        print("⚡ Running performance tests...")
++
++        start_time = time.time()
++
++        cmd = [
++            sys.executable, "-m", "pytest",
++            "tests/performance/",
++            "-v" if self.verbose else "-q",
++            "--tb=short",
++            "-m", "performance"
++        ]
++
++        try:
++            result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
++            duration = time.time() - start_time
++
++            return {
++                "type": "performance_tests",
++                "duration": duration,
++                "return_code": result.returncode,
++                "stdout": result.stdout,
++                "stderr": result.stderr
++            }
++
++        except subprocess.TimeoutExpired:
++            return {
++                "type": "performance_tests",
++                "duration": time.time() - start_time,
++                "return_code": -1,
++                "error": "Performance tests timed out"
++            }
++
++    def run_security_tests(self) -> Dict[str, Any]:
++        """Run security tests using bandit."""
++        print("🔒 Running security tests...")
++
++        start_time = time.time()
++
++        cmd = [
++            "bandit", "-r", ".claude/", "-f", "json", "-o", "security_report.json"
++        ]
++
++        try:
++            result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
++            duration = time.time() - start_time
++
++            # Load security report
++            security_data = self._load_security_data()
++
++            return {
++                "type": "security_tests",
++                "duration": duration,
++                "return_code": result.returncode,
++                "stdout": result.stdout,
++                "stderr": result.stderr,
++                "security_report": security_data
++            }
++
++        except subprocess.TimeoutExpired:
++            return {
++                "type": "security_tests",
++                "duration": time.time() - start_time,
++                "return_code": -1,
++                "error": "Security tests timed out"
++            }
++        except FileNotFoundError:
++            return {
++                "type": "security_tests",
++                "duration": time.time() - start_time,
++                "return_code": -1,
++                "error": "bandit not installed"
++            }
++
++    def validate_quality_gates(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
++        """Validate quality gates based on test results."""
++        print("🚪 Validating quality gates...")
++
++        gates = []
++
++        # Coverage gate
++        coverage_gate = {
++            "name": "Code Coverage",
++            "threshold": 80.0,
++            "actual": self.results["coverage"],
++            "passed": float(self.results["coverage"]) >= 80.0,
++            "details": f"Coverage: {self.results['coverage']:.1f}%"
++        }
++        gates.append(coverage_gate)
++
++        # Test success rate gate
++        total_tests = sum(1 for r in results if r["return_code"] == 0)
++        success_rate = (total_tests / len(results)) * 100 if results else 0
++
++        test_gate = {
++            "name": "Test Success Rate",
++            "threshold": 100.0,
++            "actual": success_rate,
++            "passed": success_rate >= 100.0,
++            "details": f"Success rate: {success_rate:.1f}%"
++        }
++        gates.append(test_gate)
++
++        # Performance gate
++        performance_gate = {
++            "name": "Test Performance",
++            "threshold": 300.0,  # 5 minutes max
++            "actual": self.results["duration"],
++            "passed": float(self.results["duration"]) <= 300.0,
++            "details": f"Duration: {self.results['duration']:.1f}s"
++        }
++        gates.append(performance_gate)
++
++        # Security gate
++        security_result = next((r for r in results if r["type"] == "security_tests"), None)
++        security_gate = {
++            "name": "Security",
++            "threshold": 0,  # No high-severity issues
++            "actual": 0,
++            "passed": True,
++            "details": "No security scanner available"
++        }
++
++        if security_result and security_result.get("security_report"):
++            high_severity = len([
++                issue for issue in security_result["security_report"].get("results", [])
++                if issue.get("issue_severity") == "HIGH"
++            ])
++            security_gate.update({
++                "actual": high_severity,
++                "passed": high_severity == 0,
++                "details": f"High severity issues: {high_severity}"
++            })
++
++        gates.append(security_gate)
++
++        self.results["quality_gates"] = gates
++        return gates
++
++    def _load_coverage_data(self) -> Optional[Dict[str, Any]]:
++        """Load coverage data from JSON report."""
++        try:
++            with open("coverage.json", "r") as f:
++                data = json.load(f)
++                return data if isinstance(data, dict) else None
++        except FileNotFoundError:
++            return None
++
++    def _load_security_data(self) -> Optional[Dict[str, Any]]:
++        """Load security data from JSON report."""
++        try:
++            with open("security_report.json", "r") as f:
++                data = json.load(f)
++                return data if isinstance(data, dict) else None
++        except FileNotFoundError:
++            return None
++
++    def generate_report(self, results: List[Dict[str, Any]]) -> None:
++        """Generate comprehensive test report."""
++        print("\n📊 Test Report")
++        print("=" * 50)
++
++        # Summary
++        quality_gates: List[Dict[str, Any]] = self.results["quality_gates"]
++        passed_gates = sum(1 for gate in quality_gates if gate["passed"])
++        total_gates = len(quality_gates)
++
++        print(f"📅 Timestamp: {self.results['timestamp']}")
++        print(f"⏱️  Duration: {self.results['duration']:.1f}s")
++        print(f"📈 Coverage: {self.results['coverage']:.1f}%")
++        print(f"🚪 Quality Gates: {passed_gates}/{total_gates} passed")
++
++        # Test results
++        print("\n🧪 Test Results:")
++        for result in results:
++            status = "✅ PASS" if result["return_code"] == 0 else "❌ FAIL"
++            print(f"  {result['type']}: {status} ({result['duration']:.1f}s)")
++
++            if result["return_code"] != 0 and "error" in result:
++                print(f"    Error: {result['error']}")
++
++        # Quality gates
++        print("\n🚪 Quality Gates:")
++        for gate in quality_gates:
++            status = "✅ PASS" if gate["passed"] else "❌ FAIL"
++            print(f"  {gate['name']}: {status}")
++            print(f"    {gate['details']}")
++
++        # Overall result
++        all_passed = all(r["return_code"] == 0 for r in results)
++        gates_passed = all(gate["passed"] for gate in quality_gates)
++        overall_passed = all_passed and gates_passed
++
++        print(f"\n🎯 Overall Result: {'✅ PASS' if overall_passed else '❌ FAIL'}")
++
++        # Save detailed report
++        with open("test_report.json", "w") as f:
++            json.dump({
++                "results": self.results,
++                "test_results": results
++            }, f, indent=2)
++
++        print("\n📄 Detailed report saved to test_report.json")
++        print("📊 HTML coverage report available at htmlcov/index.html")
++
++    def run_all_tests(self) -> int:
++        """Run all tests and return exit code."""
++        print("🚀 Starting comprehensive test suite...")
++
++        results = []
++
++        # Run unit tests
++        unit_result = self.run_unit_tests()
++        results.append(unit_result)
++
++        # Run integration tests
++        integration_result = self.run_integration_tests()
++        results.append(integration_result)
++
++        # Run performance tests
++        performance_result = self.run_performance_tests()
++        results.append(performance_result)
++
++        # Run security tests
++        security_result = self.run_security_tests()
++        results.append(security_result)
++
++        # Validate quality gates
++        gates = self.validate_quality_gates(results)
++
++        # Generate report
++        self.generate_report(results)
++
++        # Return exit code
++        all_passed = all(r["return_code"] == 0 for r in results)
++        gates_passed = all(gate["passed"] for gate in gates)
++
++        return 0 if all_passed and gates_passed else 1
++
++
++def main() -> int:
++    """Main entry point."""
++    parser = argparse.ArgumentParser(description="Comprehensive test runner for LeanVibe Quality Agent")
++    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
++    parser.add_argument("--unit-only", action="store_true", help="Run only unit tests")
++    parser.add_argument("--integration-only", action="store_true", help="Run only integration tests")
++    parser.add_argument("--performance-only", action="store_true", help="Run only performance tests")
++    parser.add_argument("--security-only", action="store_true", help="Run only security tests")
++    parser.add_argument("--pattern", default="tests/", help="Test pattern to run")
++
++    args = parser.parse_args()
++
++    runner = TestRunner(verbose=args.verbose)
++
++    if args.unit_only:
++        result = runner.run_unit_tests(args.pattern)
++        return int(result["return_code"])
++    elif args.integration_only:
++        result = runner.run_integration_tests()
++        return int(result["return_code"])
++    elif args.performance_only:
++        result = runner.run_performance_tests()
++        return int(result["return_code"])
++    elif args.security_only:
++        result = runner.run_security_tests()
++        return int(result["return_code"])
++    else:
++        return runner.run_all_tests()
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+diff --git a/tutorials/framework/tutorial_manager.py b/tutorials/framework/tutorial_manager.py
+index 0291f81..e928117 100644
+--- a/tutorials/framework/tutorial_manager.py
++++ b/tutorials/framework/tutorial_manager.py
+@@ -225,7 +225,7 @@ class TutorialManager:
+         self.save_progress(user_id)
+         return True
+ 
+-    def save_progress(self, user_id: str):
++    def save_progress(self, user_id: str) -> None:
+         """Save user progress to file."""
+         progress_dir = os.path.join(self.tutorial_path, "progress")
+         os.makedirs(progress_dir, exist_ok=True)
