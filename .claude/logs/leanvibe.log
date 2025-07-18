@@ -10927,3 +10927,5 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-07-18 18:40:57 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>]
 2025-07-18 18:40:57 INFO     external_api.auth_middleware                                AuthenticationMiddleware initialized with methods: [<AuthMethod.API_KEY: 'api_key'>, <AuthMethod.BASIC: 'basic'>]
 2025-07-18 18:40:57 INFO     external_api.auth_middleware                                Created API key for user test_user
+2025-07-18 18:47:26 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-18 18:48:30 INFO     leanvibe.startup                                    Logging initialized with level INFO
