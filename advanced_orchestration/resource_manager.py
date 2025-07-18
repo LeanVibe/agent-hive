@@ -222,16 +222,8 @@ class ResourceManager:
         Returns:
             List[ResourceOptimization]: Optimization recommendations
         """
-<<<<<<< HEAD
-        optimizations = []
-
-||||||| 48e9100
-        optimizations = []
-        
-=======
         optimizations: list[ResourceOptimization] = []
 
->>>>>>> new-work/performance-Jul-17-0823
         try:
             # Analyze usage patterns
             if len(self.usage_history) < 10:

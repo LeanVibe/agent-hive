@@ -304,16 +304,8 @@ class AdaptiveLearning:
         # Update learning state
         session_performance = self.model_performance.get(session_id, [])
         session_performance.append(after_performance)
-<<<<<<< HEAD
-        self.learning_state['model_performance'][session_id] = session_performance
-
-||||||| 48e9100
-        self.learning_state['model_performance'][session_id] = session_performance
-        
-=======
         self.model_performance[session_id] = session_performance
 
->>>>>>> new-work/performance-Jul-17-0823
         # Create learning metrics
         metrics = LearningMetrics(
             learning_session_id=session_id,
@@ -411,19 +403,7 @@ class AdaptiveLearning:
 
     def _calculate_convergence_time(self, session_id: str) -> float:
         """Calculate time to convergence for learning session."""
-<<<<<<< HEAD
-
-        performance_history = self.learning_state['model_performance'].get(session_id, [])
-
-||||||| 48e9100
-        
-        performance_history = self.learning_state['model_performance'].get(session_id, [])
-        
-=======
-
         performance_history = self.model_performance.get(session_id, [])
-
->>>>>>> new-work/performance-Jul-17-0823
         if len(performance_history) < 3:
             return 0.0
 
@@ -522,19 +502,7 @@ class AdaptiveLearning:
 
     def _check_convergence(self, session_id: str, model_type: str) -> bool:
         """Check if model has converged and should stop learning."""
-<<<<<<< HEAD
-
-        performance_history = self.learning_state['model_performance'].get(session_id, [])
-
-||||||| 48e9100
-        
-        performance_history = self.learning_state['model_performance'].get(session_id, [])
-        
-=======
-
         performance_history = self.model_performance.get(session_id, [])
-
->>>>>>> new-work/performance-Jul-17-0823
         if len(performance_history) < 5:
             return False
 
@@ -618,16 +586,8 @@ class AdaptiveLearning:
         final_performance = performance_history[-1] if performance_history else 0.5
 
         # Calculate session metrics
-<<<<<<< HEAD
-        convergence_info = self.learning_state['convergence_tracking'].get(session_id, {})
-
-||||||| 48e9100
-        convergence_info = self.learning_state['convergence_tracking'].get(session_id, {})
-        
-=======
         convergence_info = self.convergence_tracking.get(session_id, {})
 
->>>>>>> new-work/performance-Jul-17-0823
         session_summary = {
             'session_id': session_id,
             'final_performance': final_performance,

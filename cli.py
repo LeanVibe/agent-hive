@@ -180,19 +180,9 @@ class LeanVibeCLI:
 
         if self.scaling_manager and self.coordinator:
             # Get scaling metrics
-<<<<<<< HEAD
-            metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
-            print(f"📈 Scaling Metrics: {metrics}")
-
-||||||| 48e9100
-            metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
-            print(f"📈 Scaling Metrics: {metrics}")
-            
-=======
             scaling_metrics = await self.scaling_manager.get_scaling_metrics(self.coordinator)
             print(f"📈 Scaling Metrics: {scaling_metrics}")
 
->>>>>>> new-work/performance-Jul-17-0823
             # Get scaling statistics
             stats = self.scaling_manager.get_scaling_statistics()
             print(f"📊 Scaling Statistics: {stats}")
@@ -341,16 +331,8 @@ class LeanVibeCLI:
                     "status_code": 200,
                     "body": {"tasks": [], "total": 0}
                 }
-<<<<<<< HEAD
-
-            async def agents_handler(request):
-||||||| 48e9100
-            
-            async def agents_handler(request):
-=======
 
             async def agents_handler(_request):
->>>>>>> new-work/performance-Jul-17-0823
                 return {
                     "status_code": 200,
                     "body": {"agents": [], "active": 0}
@@ -739,236 +721,114 @@ class LeanVibeCLI:
             priority: Task priority (high, medium, low)
             update: Progress update message
         """
-<<<<<<< HEAD
-        print("🎯 LeanVibe Parallel Work Coordination")
-        print("=" * 37)
-
-        if action == "create-issue":
-            if not (worktree and agent_type):
-                print("❌ Error: --worktree and --agent-type required for issue creation")
-                return
-
-            print(f"📝 Creating coordination issue for {agent_type} agent")
-            print(f"📂 Worktree: {worktree}")
-            print(f"⚡ Priority: {priority}")
-
-            # This would integrate with gh CLI in real implementation
-            print("✅ Issue created successfully")
-            print("🔗 URL: https://github.com/LeanVibe/agent-hive/issues/XX")
-
-        elif action == "update-issue":
-            if not (issue and update):
-                print("❌ Error: --issue and --update required for progress update")
-                return
-
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"📊 Updating issue #{issue} at {timestamp}")
-            print(f"💬 Update: {update}")
-
-            # This would use gh CLI to add comment
-            print("✅ Progress update posted to GitHub issue")
-
-        elif action == "spawn-agent":
-            if not (worktree and agent_type and issue):
-                print("❌ Error: --worktree, --agent-type, and --issue required for agent spawning")
-                return
-
-            print(f"🚀 Spawning {agent_type} agent on worktree: {worktree}")
-            print(f"📋 Tracking via issue #{issue}")
-
-            # Generate agent instructions
-            await self._generate_agent_instructions(worktree, agent_type, issue)
-
-        elif action == "status":
-            print("📊 Active Agent Coordination Status:")
-
-            # Mock active coordinations
-            coordinations = [
-                {"issue": 6, "agent": "docs", "worktree": "agent-hive-docs-tutorial", "status": "in-progress", "progress": "60%"},
-                {"issue": 7, "agent": "analysis", "worktree": "agent-hive-tech-debt", "status": "ready", "progress": "0%"}
-            ]
-
-            for coord in coordinations:
-                status_emoji = "🔄" if coord["status"] == "in-progress" else "⏳" if coord["status"] == "ready" else "✅"
-                print(f"  {status_emoji} Issue #{coord['issue']}: {coord['agent']} agent ({coord['progress']}) - {coord['worktree']}")
-
-        elif action == "list":
-            print("📋 Available Worktrees and Agent Assignments:")
-
-            # Get actual worktree status
-            try:
-                import subprocess
-                import shutil
-
-                # Use absolute path for git command for security
-                git_path = shutil.which('git')
-                if not git_path:
-                    raise RuntimeError("Git command not found in PATH")
-
-                result = subprocess.run([git_path, 'worktree', 'list'],
-                                     capture_output=True, text=True, check=True, timeout=30)
-                worktrees = result.stdout.strip().split('\n')
-
-                for worktree_line in worktrees:
-                    parts = worktree_line.split()
-                    if len(parts) >= 3:
-                        path = parts[0]
-                        commit = parts[1]
-                        branch = parts[2].strip('[]')
-
-                        # Determine agent type from path/branch
-                        if 'docs' in path or 'tutorial' in branch:
-                            agent_type = "📝 docs"
-                        elif 'tech-debt' in path or 'analysis' in branch:
-                            agent_type = "🔧 analysis"
-                        else:
-                            agent_type = "🎯 orchestrator"
-
-                        print(f"  {agent_type}: {path}")
-                        print(f"    Branch: {branch}")
-                        print(f"    Commit: {commit}")
-                        print("")
-
-            except subprocess.CalledProcessError as e:
-                print(f"❌ Git command failed: {e}")
-            except subprocess.TimeoutExpired:
-                print("❌ Git command timed out")
-            except FileNotFoundError:
-                print("❌ Git command not found in system PATH")
-            except Exception as e:
-                print(f"❌ Error listing worktrees: {e}")
-||||||| 48e9100
-        print("🎯 LeanVibe Parallel Work Coordination")
-        print("=" * 37)
-        
-        if action == "create-issue":
-            if not (worktree and agent_type):
-                print("❌ Error: --worktree and --agent-type required for issue creation")
-                return
-                
-            print(f"📝 Creating coordination issue for {agent_type} agent")
-            print(f"📂 Worktree: {worktree}")
-            print(f"⚡ Priority: {priority}")
-            
-            # This would integrate with gh CLI in real implementation
-            print("✅ Issue created successfully")
-            print("🔗 URL: https://github.com/LeanVibe/agent-hive/issues/XX")
-            
-        elif action == "update-issue":
-            if not (issue and update):
-                print("❌ Error: --issue and --update required for progress update")
-                return
-                
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"📊 Updating issue #{issue} at {timestamp}")
-            print(f"💬 Update: {update}")
-            
-            # This would use gh CLI to add comment
-            print("✅ Progress update posted to GitHub issue")
-            
-        elif action == "spawn-agent":
-            if not (worktree and agent_type and issue):
-                print("❌ Error: --worktree, --agent-type, and --issue required for agent spawning")
-                return
-                
-            print(f"🚀 Spawning {agent_type} agent on worktree: {worktree}")
-            print(f"📋 Tracking via issue #{issue}")
-            
-            # Generate agent instructions
-            await self._generate_agent_instructions(worktree, agent_type, issue)
-            
-        elif action == "status":
-            print("📊 Active Agent Coordination Status:")
-            
-            # Mock active coordinations
-            coordinations = [
-                {"issue": 6, "agent": "docs", "worktree": "agent-hive-docs-tutorial", "status": "in-progress", "progress": "60%"},
-                {"issue": 7, "agent": "analysis", "worktree": "agent-hive-tech-debt", "status": "ready", "progress": "0%"}
-            ]
-            
-            for coord in coordinations:
-                status_emoji = "🔄" if coord["status"] == "in-progress" else "⏳" if coord["status"] == "ready" else "✅"
-                print(f"  {status_emoji} Issue #{coord['issue']}: {coord['agent']} agent ({coord['progress']}) - {coord['worktree']}")
-                
-        elif action == "list":
-            print("📋 Available Worktrees and Agent Assignments:")
-            
-            # Get actual worktree status
-            try:
-                import subprocess
-                import shutil
-                
-                # Use absolute path for git command for security
-                git_path = shutil.which('git')
-                if not git_path:
-                    raise RuntimeError("Git command not found in PATH")
-                
-                result = subprocess.run([git_path, 'worktree', 'list'], 
-                                     capture_output=True, text=True, check=True, timeout=30)
-                worktrees = result.stdout.strip().split('\n')
-                
-                for worktree_line in worktrees:
-                    parts = worktree_line.split()
-                    if len(parts) >= 3:
-                        path = parts[0]
-                        commit = parts[1]
-                        branch = parts[2].strip('[]')
-                        
-                        # Determine agent type from path/branch
-                        if 'docs' in path or 'tutorial' in branch:
-                            agent_type = "📝 docs"
-                        elif 'tech-debt' in path or 'analysis' in branch:
-                            agent_type = "🔧 analysis"
-                        else:
-                            agent_type = "🎯 orchestrator"
-                            
-                        print(f"  {agent_type}: {path}")
-                        print(f"    Branch: {branch}")
-                        print(f"    Commit: {commit}")
-                        print("")
-                        
-            except subprocess.CalledProcessError as e:
-                print(f"❌ Git command failed: {e}")
-            except subprocess.TimeoutExpired:
-                print("❌ Git command timed out")
-            except FileNotFoundError:
-                print("❌ Git command not found in system PATH")
-            except Exception as e:
-                print(f"❌ Error listing worktrees: {e}")
-=======
-        from cli_coordination import CoordinationOrchestrator
         from performance_monitor import performance_monitor
         
         async with performance_monitor.track_operation(f"coordinate-{action}", {"priority": priority}):
-            orchestrator = CoordinationOrchestrator()
-            await orchestrator.execute_coordination(
-                action=action,
-                issue=issue,
-                worktree=worktree,
-                agent_type=agent_type,
-                priority=priority,
-                update=update
-            )
->>>>>>> new-work/performance-Jul-17-0823
+            print("🎯 LeanVibe Parallel Work Coordination")
+            print("=" * 37)
+            
+            if action == "create-issue":
+                if not (worktree and agent_type):
+                    print("❌ Error: --worktree and --agent-type required for issue creation")
+                    return
+                    
+                print(f"📝 Creating coordination issue for {agent_type} agent")
+                print(f"📂 Worktree: {worktree}")
+                print(f"⚡ Priority: {priority}")
+                
+                # This would integrate with gh CLI in real implementation
+                print("✅ Issue created successfully")
+                print("🔗 URL: https://github.com/LeanVibe/agent-hive/issues/XX")
+                
+            elif action == "update-issue":
+                if not (issue and update):
+                    print("❌ Error: --issue and --update required for progress update")
+                    return
+                    
+                timestamp = datetime.now().strftime("%H:%M:%S")
+                print(f"📊 Updating issue #{issue} at {timestamp}")
+                print(f"💬 Update: {update}")
+                
+                # This would use gh CLI to add comment
+                print("✅ Progress update posted to GitHub issue")
+                
+            elif action == "spawn-agent":
+                if not (worktree and agent_type and issue):
+                    print("❌ Error: --worktree, --agent-type, and --issue required for agent spawning")
+                    return
+                    
+                print(f"🚀 Spawning {agent_type} agent on worktree: {worktree}")
+                print(f"📋 Tracking via issue #{issue}")
+                
+                # Generate agent instructions
+                await self._generate_agent_instructions(worktree, agent_type, issue)
+                
+            elif action == "status":
+                print("📊 Active Agent Coordination Status:")
+                
+                # Mock active coordinations
+                coordinations = [
+                    {"issue": 6, "agent": "docs", "worktree": "agent-hive-docs-tutorial", "status": "in-progress", "progress": "60%"},
+                    {"issue": 7, "agent": "analysis", "worktree": "agent-hive-tech-debt", "status": "ready", "progress": "0%"}
+                ]
+                
+                for coord in coordinations:
+                    status_emoji = "🔄" if coord["status"] == "in-progress" else "⏳" if coord["status"] == "ready" else "✅"
+                    print(f"  {status_emoji} Issue #{coord['issue']}: {coord['agent']} agent ({coord['progress']}) - {coord['worktree']}")
+                    
+            elif action == "list":
+                print("📋 Available Worktrees and Agent Assignments:")
+                
+                # Get actual worktree status
+                try:
+                    import subprocess
+                    import shutil
+                    
+                    # Use absolute path for git command for security
+                    git_path = shutil.which('git')
+                    if not git_path:
+                        raise RuntimeError("Git command not found in PATH")
+                    
+                    result = subprocess.run([git_path, 'worktree', 'list'], 
+                                         capture_output=True, text=True, check=True, timeout=30)
+                    worktrees = result.stdout.strip().split('\n')
+                    
+                    for worktree_line in worktrees:
+                        parts = worktree_line.split()
+                        if len(parts) >= 3:
+                            path = parts[0]
+                            commit = parts[1]
+                            branch = parts[2].strip('[]')
+                            
+                            # Determine agent type from path/branch
+                            if 'docs' in path or 'tutorial' in branch:
+                                agent_type = "📝 docs"
+                            elif 'tech-debt' in path or 'analysis' in branch:
+                                agent_type = "🔧 analysis"
+                            else:
+                                agent_type = "🎯 orchestrator"
+                                
+                            print(f"  {agent_type}: {path}")
+                            print(f"    Branch: {branch}")
+                            print(f"    Commit: {commit}")
+                            print("")
+                            
+                except subprocess.CalledProcessError as e:
+                    print(f"❌ Git command failed: {e}")
+                except subprocess.TimeoutExpired:
+                    print("❌ Git command timed out")
+                except FileNotFoundError:
+                    print("❌ Git command not found in system PATH")
+                except Exception as e:
+                    print(f"❌ Error listing worktrees: {e}")
 
-<<<<<<< HEAD
-    async def _generate_agent_instructions(self, worktree: str, agent_type: str, issue: int) -> None:
-        """Generate detailed instructions for spawned agent."""
-        print(f"📝 Generating instructions for {agent_type} agent...")
-
-        instructions = f"""
-🤖 AGENT ASSIGNMENT: {agent_type.upper()}
-||||||| 48e9100
     async def _generate_agent_instructions(self, worktree: str, agent_type: str, issue: int) -> None:
         """Generate detailed instructions for spawned agent."""
         print(f"📝 Generating instructions for {agent_type} agent...")
         
         instructions = f"""
 🤖 AGENT ASSIGNMENT: {agent_type.upper()}
-=======
->>>>>>> new-work/performance-Jul-17-0823
 
-<<<<<<< HEAD
 ## Your Mission
 You are a {agent_type} agent working on GitHub issue #{issue}.
 Work autonomously following XP methodology principles.
@@ -992,43 +852,11 @@ Work autonomously following XP methodology principles.
 
 Ready to begin! Comment on issue #{issue} to confirm start.
 """
-
-        print("✅ Agent instructions generated")
-        print("📋 Instructions saved and ready for agent deployment")
-
-    async def review(self, action: str = "status", pr: Optional[int] = None, agent: Optional[str] = None,
-||||||| 48e9100
-## Your Mission
-You are a {agent_type} agent working on GitHub issue #{issue}.
-Work autonomously following XP methodology principles.
-
-## Working Environment
-- Worktree: {worktree}
-- GitHub Issue: #{issue}
-- Branch: feature/{agent_type}-implementation
-
-## Progress Protocol
-1. Update issue #{issue} every 2 hours with progress
-2. Commit changes after each completed sub-task
-3. Push commits automatically (handled by git hooks)
-4. Ask questions on issue if blocked >30 minutes
-
-## Quality Standards
-- All tests must pass before commit
-- Code coverage >90% for new code
-- Follow XP principles: YAGNI, DRY, KISS
-- Update documentation for new features
-
-Ready to begin! Comment on issue #{issue} to confirm start.
-"""
         
         print("✅ Agent instructions generated")
         print("📋 Instructions saved and ready for agent deployment")
 
-    async def review(self, action: str = "status", pr: Optional[int] = None, agent: Optional[str] = None, 
-=======
     async def review(self, action: str = "status", pr: Optional[int] = None, agent: Optional[str] = None,
->>>>>>> new-work/performance-Jul-17-0823
                      agents: Optional[str] = None, format: str = "text") -> None:
         """
         Multi-agent code review command.
@@ -1040,212 +868,104 @@ Ready to begin! Comment on issue #{issue} to confirm start.
             agents: Comma-separated list of review agents
             format: Report format (text, markdown, json)
         """
-<<<<<<< HEAD
-        print("🔍 LeanVibe Multi-Agent Code Review")
-        print("=" * 35)
-
-        if action == "list-agents":
-            print("👥 Available Review Agents:")
-            agents_info = {
-                "security-reviewer": "🔒 Security Expert - Authentication, authorization, vulnerabilities",
-                "performance-reviewer": "⚡ Performance Engineer - Optimization, scalability, caching",
-                "architecture-reviewer": "🏗️ Architecture Specialist - Design patterns, code structure",
-                "qa-reviewer": "🧪 Quality Assurance - Testing, edge cases, user experience",
-                "devops-reviewer": "🚀 DevOps Engineer - Deployment, infrastructure, monitoring"
-            }
-
-            for agent_name, description in agents_info.items():
-                print(f"  {description}")
-
-        elif action == "assign":
-            if not pr:
-                print("❌ Error: --pr required for agent assignment")
-                return
-
-            assigned_agents = []
-            if agent:
-                assigned_agents.append(agent)
-            if agents:
-                assigned_agents.extend(agents.split(","))
-
-            if not assigned_agents:
-                print("❌ Error: --agent or --agents required for assignment")
-                return
-
-            print(f"👥 Assigning review agents to PR #{pr}:")
-            for agent_name in assigned_agents:
-                print(f"  ✅ {agent_name} assigned")
-
-        elif action == "start":
-            if not pr:
-                print("❌ Error: --pr required to start review")
-                return
-
-            print(f"🚀 Starting multi-agent review for PR #{pr}")
-            print("🔄 Coordinating review agents...")
-
-            # Simulate parallel review execution
-            agents = ["security-reviewer", "architecture-reviewer", "qa-reviewer"]
-            for i, agent in enumerate(agents, 1):
-                print(f"  📝 {agent} reviewing... ({i}/3)")
-                await asyncio.sleep(0.5)
-
-            print("✅ All agents completed their reviews")
-            print("📊 Generating consolidated review report...")
-
-        elif action == "status":
-            if pr:
-                print(f"📊 Review Status for PR #{pr}:")
-                print("  🔍 Active Reviewers:")
-                print("    ✅ security-reviewer: Approved")
-                print("    ⚠️  architecture-reviewer: Changes requested")
-                print("    🔄 qa-reviewer: In progress")
-                print("  📈 Overall Status: Changes requested")
-            else:
-                print("📊 Global Review Status:")
-                print("  🔄 Active reviews: 3")
-                print("  ✅ Completed today: 5")
-                print("  ⚠️  Pending changes: 2")
-
-        elif action == "report":
-            if not pr:
-                print("❌ Error: --pr required for report generation")
-                return
-
-            print(f"📄 Generating review report for PR #{pr} (format: {format})")
-
-            if format == "json":
-                report = {
-                    "pr_number": pr,
-                    "overall_status": "changes_requested",
-                    "reviews": [
-                        {"agent": "security-reviewer", "status": "approved", "score": 95},
-                        {"agent": "architecture-reviewer", "status": "changes_requested", "score": 75},
-                        {"agent": "qa-reviewer", "status": "in_progress", "score": None}
-                    ]
-                }
-                print(json.dumps(report, indent=2))
-            else:
-                print("## Multi-Agent Review Report")
-                print(f"**PR #{pr}**: Feature: User Authentication")
-                print("\n### Review Summary")
-                print("- 🔒 **Security**: ✅ Approved (95/100)")
-                print("- 🏗️ **Architecture**: ⚠️ Changes requested (75/100)")
-                print("- 🧪 **Quality**: 🔄 In progress")
-                print("\n### Recommendations")
-                print("1. Address architecture concerns about authentication flow")
-                print("2. Add additional input validation tests")
-                print("3. Consider implementing rate limiting")
-||||||| 48e9100
-        print("🔍 LeanVibe Multi-Agent Code Review")
-        print("=" * 35)
-        
-        if action == "list-agents":
-            print("👥 Available Review Agents:")
-            agents_info = {
-                "security-reviewer": "🔒 Security Expert - Authentication, authorization, vulnerabilities",
-                "performance-reviewer": "⚡ Performance Engineer - Optimization, scalability, caching",
-                "architecture-reviewer": "🏗️ Architecture Specialist - Design patterns, code structure",
-                "qa-reviewer": "🧪 Quality Assurance - Testing, edge cases, user experience",
-                "devops-reviewer": "🚀 DevOps Engineer - Deployment, infrastructure, monitoring"
-            }
-            
-            for agent_name, description in agents_info.items():
-                print(f"  {description}")
-                
-        elif action == "assign":
-            if not pr:
-                print("❌ Error: --pr required for agent assignment")
-                return
-                
-            assigned_agents = []
-            if agent:
-                assigned_agents.append(agent)
-            if agents:
-                assigned_agents.extend(agents.split(","))
-                
-            if not assigned_agents:
-                print("❌ Error: --agent or --agents required for assignment")
-                return
-                
-            print(f"👥 Assigning review agents to PR #{pr}:")
-            for agent_name in assigned_agents:
-                print(f"  ✅ {agent_name} assigned")
-            
-        elif action == "start":
-            if not pr:
-                print("❌ Error: --pr required to start review")
-                return
-                
-            print(f"🚀 Starting multi-agent review for PR #{pr}")
-            print("🔄 Coordinating review agents...")
-            
-            # Simulate parallel review execution
-            agents = ["security-reviewer", "architecture-reviewer", "qa-reviewer"]
-            for i, agent in enumerate(agents, 1):
-                print(f"  📝 {agent} reviewing... ({i}/3)")
-                await asyncio.sleep(0.5)
-                
-            print("✅ All agents completed their reviews")
-            print("📊 Generating consolidated review report...")
-            
-        elif action == "status":
-            if pr:
-                print(f"📊 Review Status for PR #{pr}:")
-                print("  🔍 Active Reviewers:")
-                print("    ✅ security-reviewer: Approved")
-                print("    ⚠️  architecture-reviewer: Changes requested")
-                print("    🔄 qa-reviewer: In progress")
-                print("  📈 Overall Status: Changes requested")
-            else:
-                print("📊 Global Review Status:")
-                print("  🔄 Active reviews: 3")
-                print("  ✅ Completed today: 5")
-                print("  ⚠️  Pending changes: 2")
-                
-        elif action == "report":
-            if not pr:
-                print("❌ Error: --pr required for report generation")
-                return
-                
-            print(f"📄 Generating review report for PR #{pr} (format: {format})")
-            
-            if format == "json":
-                report = {
-                    "pr_number": pr,
-                    "overall_status": "changes_requested",
-                    "reviews": [
-                        {"agent": "security-reviewer", "status": "approved", "score": 95},
-                        {"agent": "architecture-reviewer", "status": "changes_requested", "score": 75},
-                        {"agent": "qa-reviewer", "status": "in_progress", "score": None}
-                    ]
-                }
-                print(json.dumps(report, indent=2))
-            else:
-                print("## Multi-Agent Review Report")
-                print(f"**PR #{pr}**: Feature: User Authentication")
-                print("\n### Review Summary")
-                print("- 🔒 **Security**: ✅ Approved (95/100)")
-                print("- 🏗️ **Architecture**: ⚠️ Changes requested (75/100)")
-                print("- 🧪 **Quality**: 🔄 In progress")
-                print("\n### Recommendations")
-                print("1. Address architecture concerns about authentication flow")
-                print("2. Add additional input validation tests")
-                print("3. Consider implementing rate limiting")
-=======
-        from cli_review import ReviewOrchestrator
         from performance_monitor import performance_monitor
         
         async with performance_monitor.track_operation(f"review-{action}", {"pr": pr, "format": format}):
-            orchestrator = ReviewOrchestrator()
-            await orchestrator.execute_review(
-                action=action,
-                pr=pr,
-                agent=agent,
-                agents=agents,
-                format=format
-            )
->>>>>>> new-work/performance-Jul-17-0823
+            print("🔍 LeanVibe Multi-Agent Code Review")
+            print("=" * 35)
+            
+            if action == "list-agents":
+                print("👥 Available Review Agents:")
+                agents_info = {
+                    "security-reviewer": "🔒 Security Expert - Authentication, authorization, vulnerabilities",
+                    "performance-reviewer": "⚡ Performance Engineer - Optimization, scalability, caching",
+                    "architecture-reviewer": "🏗️ Architecture Specialist - Design patterns, code structure",
+                    "qa-reviewer": "🧪 Quality Assurance - Testing, edge cases, user experience",
+                    "devops-reviewer": "🚀 DevOps Engineer - Deployment, infrastructure, monitoring"
+                }
+                
+                for agent_name, description in agents_info.items():
+                    print(f"  {description}")
+                    
+            elif action == "assign":
+                if not pr:
+                    print("❌ Error: --pr required for agent assignment")
+                    return
+                    
+                assigned_agents = []
+                if agent:
+                    assigned_agents.append(agent)
+                if agents:
+                    assigned_agents.extend(agents.split(","))
+                    
+                if not assigned_agents:
+                    print("❌ Error: --agent or --agents required for assignment")
+                    return
+                    
+                print(f"👥 Assigning review agents to PR #{pr}:")
+                for agent_name in assigned_agents:
+                    print(f"  ✅ {agent_name} assigned")
+                
+            elif action == "start":
+                if not pr:
+                    print("❌ Error: --pr required to start review")
+                    return
+                    
+                print(f"🚀 Starting multi-agent review for PR #{pr}")
+                print("🔄 Coordinating review agents...")
+                
+                # Simulate parallel review execution
+                agents = ["security-reviewer", "architecture-reviewer", "qa-reviewer"]
+                for i, agent in enumerate(agents, 1):
+                    print(f"  📝 {agent} reviewing... ({i}/3)")
+                    await asyncio.sleep(0.5)
+                    
+                print("✅ All agents completed their reviews")
+                print("📊 Generating consolidated review report...")
+                
+            elif action == "status":
+                if pr:
+                    print(f"📊 Review Status for PR #{pr}:")
+                    print("  🔍 Active Reviewers:")
+                    print("    ✅ security-reviewer: Approved")
+                    print("    ⚠️  architecture-reviewer: Changes requested")
+                    print("    🔄 qa-reviewer: In progress")
+                    print("  📈 Overall Status: Changes requested")
+                else:
+                    print("📊 Global Review Status:")
+                    print("  🔄 Active reviews: 3")
+                    print("  ✅ Completed today: 5")
+                    print("  ⚠️  Pending changes: 2")
+                    
+            elif action == "report":
+                if not pr:
+                    print("❌ Error: --pr required for report generation")
+                    return
+                    
+                print(f"📄 Generating review report for PR #{pr} (format: {format})")
+                
+                if format == "json":
+                    report = {
+                        "pr_number": pr,
+                        "overall_status": "changes_requested",
+                        "reviews": [
+                            {"agent": "security-reviewer", "status": "approved", "score": 95},
+                            {"agent": "architecture-reviewer", "status": "changes_requested", "score": 75},
+                            {"agent": "qa-reviewer", "status": "in_progress", "score": None}
+                        ]
+                    }
+                    print(json.dumps(report, indent=2))
+                else:
+                    print("## Multi-Agent Review Report")
+                    print(f"**PR #{pr}**: Feature: User Authentication")
+                    print("\n### Review Summary")
+                    print("- 🔒 **Security**: ✅ Approved (95/100)")
+                    print("- 🏗️ **Architecture**: ⚠️ Changes requested (75/100)")
+                    print("- 🧪 **Quality**: 🔄 In progress")
+                    print("\n### Recommendations")
+                    print("1. Address architecture concerns about authentication flow")
+                    print("2. Add additional input validation tests")
+                    print("3. Consider implementing rate limiting")
 
     async def _assign_reviewers(self, pr_number: int, reviewers: Optional[str] = None) -> None:
         """Helper method to assign review agents to a PR."""
@@ -1541,11 +1261,6 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         "--update",
         help="Progress update message for issue comments"
     )
-<<<<<<< HEAD
-
-||||||| 48e9100
-    
-=======
 
     # Performance command - Performance monitoring and analysis
     performance_parser = subparsers.add_parser(
@@ -1564,7 +1279,6 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         help="Clear all performance metrics"
     )
 
->>>>>>> new-work/performance-Jul-17-0823
     # Dashboard command - Intelligent agent activity dashboard
     dashboard_parser = subparsers.add_parser(
         "dashboard",
