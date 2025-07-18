@@ -1,4 +1,0 @@
-TASK INSTRUCTIONS:
-🚀 MISSION: Priority high - Implement JWT authentication system with secure token management, user authentication with bcrypt, and security middleware integration. Read your CLAUDE.md file for detailed instructions. Acknowledge receipt and begin work. Report progress every 2 hours to pm-agent.
-
-Delivered at: 2025-07-17T09:44:58.897901

@@ -1,6 +1,7 @@
 @include ../settings.yaml
 @include personas/{persona}.yaml # Replace {persona} with backend etc.
 @include ../rules/evidence-based.md
+@include ../rules/documentation-sot.md
 
 # LeanVibe Agent
 
