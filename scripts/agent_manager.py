@@ -12,6 +12,7 @@ import os
 import subprocess
 import json
 import time
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -173,17 +174,51 @@ class TmuxAgentManager:
         return None
 
     def _get_starting_prompt(self, agent_name: str) -> Optional[str]:
-        """Get appropriate starting prompt for agent."""
-        prompts = {
-            "documentation-agent": "Hello! I'm the Documentation Agent. I'm ready to work on creating comprehensive documentation for agent-hive. Let me start by reading the existing documentation structure and begin with D.1.1: Documentation Audit & Reorganization as outlined in my CLAUDE.md instructions.",
-            "intelligence-agent": "Hello! I'm the Intelligence Agent. I'm ready to implement advanced AI capabilities for agent-hive. Let me start by analyzing the current system architecture and begin implementing the intelligence framework as outlined in my instructions.",
-            "orchestration-agent": "Hello! I'm the Orchestration Agent. I'm ready to coordinate multi-agent workflows and optimize system orchestration. Let me start by analyzing the current agent coordination patterns and begin implementing enhanced orchestration capabilities.",
-            "pm-agent": "Hello! I'm the PM/XP Methodology Enforcer Agent. I'm ready to enforce XP practices and manage GitHub workflows for agent-hive. Let me start by reading the current XP methodology implementation and GitHub processes, then begin with PM.1.1: Sprint Coordination as outlined in my CLAUDE.md instructions.",
-            "integration-agent": "Hello! I'm the Integration Agent. I'm ready to work on system integration and external API connections for agent-hive. Let me start by reading the current system architecture and external integrations, then begin with I.1.1: API Gateway Implementation as outlined in my CLAUDE.md instructions.",
-            "quality-agent": "Hello! I'm the Quality Agent. I'm ready to implement comprehensive testing and quality assurance for agent-hive. Let me start by reading the current test infrastructure and quality processes, then begin with Q.1.1: Comprehensive Test Suite as outlined in my CLAUDE.md instructions.",
-        }
-
-        return prompts.get(agent_name)
+        """Get starting prompt from agent's CLAUDE.md file."""
+        if agent_name not in self.agents:
+            return None
+            
+        agent = self.agents[agent_name]
+        claude_file = agent.get("claude_file")
+        
+        if not claude_file or not claude_file.exists():
+            return None
+            
+        try:
+            # Read CLAUDE.md and extract mission/objectives
+            with open(claude_file, 'r') as f:
+                content = f.read()
+            
+            # Extract agent type and mission from CLAUDE.md content
+            lines = content.split('\n')
+            agent_type = "Agent"
+            mission = ""
+            
+            for i, line in enumerate(lines):
+                if line.startswith('# ') and any(keyword in line.lower() for keyword in ['specialist', 'agent', 'frontend', 'pm', 'security', 'performance']):
+                    agent_type = line.replace('#', '').strip()
+                if line.startswith('## 🎯 **Mission:') and i + 1 < len(lines):
+                    mission = lines[i].replace('## 🎯 **Mission:', '').strip().rstrip('**')
+                    break
+                elif 'Mission:' in line or 'Objectives' in line:
+                    mission = line.split('Mission:')[-1].split('Objectives')[-1].strip()
+                    break
+            
+            if not mission:
+                # Fallback to first few lines after title
+                for line in lines[2:8]:
+                    if line.strip() and not line.startswith('#') and not line.startswith('You are'):
+                        mission = line.strip()
+                        break
+            
+            # Generate dynamic starting prompt
+            prompt = f"Hello! I'm the {agent_type}. I'm ready to work on: {mission}\n\nLet me start by reading my CLAUDE.md instructions and current project status, then begin executing my assigned mission."
+            
+            return prompt
+            
+        except Exception as e:
+            # Fallback prompt if file reading fails
+            return f"Hello! I'm ready to work as the {agent_name}. Let me start by reading my CLAUDE.md instructions and begin executing my assigned tasks."
 
     def create_session(self) -> bool:
         """Create tmux session if it doesn't exist."""

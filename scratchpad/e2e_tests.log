@@ -1,0 +1,97 @@
+2025-07-18 03:13:12,695 - INFO - 🧪 Starting Agent Hive E2E Test Suite
+2025-07-18 03:13:12,695 - INFO - ============================================================
+2025-07-18 03:13:12,695 - INFO - 
+🔍 Running Database Connectivity Tests
+2025-07-18 03:13:12,695 - INFO - ----------------------------------------
+2025-07-18 03:13:12,718 - INFO - ✅ Database basic connection
+2025-07-18 03:13:12,795 - INFO - ✅ Database connection pool
+2025-07-18 03:13:12,795 - INFO - 
+🔍 Running Schema Validation Tests
+2025-07-18 03:13:12,795 - INFO - ----------------------------------------
+2025-07-18 03:13:12,816 - INFO - ✅ Schema structure (6 tables)
+2025-07-18 03:13:12,816 - INFO - 
+🔍 Running Data Operations Tests
+2025-07-18 03:13:12,816 - INFO - ----------------------------------------
+2025-07-18 03:13:12,833 - INFO - ✅ Data CRUD operations
+2025-07-18 03:13:12,834 - INFO - 
+🔍 Running Message Protocol Tests
+2025-07-18 03:13:12,834 - INFO - ----------------------------------------
+2025-07-18 03:13:12,943 - INFO - ✅ Message protocol functionality
+2025-07-18 03:13:12,943 - INFO - 
+🔍 Running Agent Coordination Tests
+2025-07-18 03:13:12,943 - INFO - ----------------------------------------
+2025-07-18 03:13:12,943 - INFO - ✅ Agent coordination tracking
+2025-07-18 03:13:12,943 - INFO - 
+🔍 Running Performance Benchmarks Tests
+2025-07-18 03:13:12,943 - INFO - ----------------------------------------
+2025-07-18 03:13:12,978 - INFO - ✅ Database write performance
+2025-07-18 03:13:12,979 - INFO - 
+🔍 Running Integration Workflows Tests
+2025-07-18 03:13:12,979 - INFO - ----------------------------------------
+2025-07-18 03:13:12,987 - INFO - ✅ Complete integration workflow
+2025-07-18 03:15:18,310 - INFO - 🧪 Starting Agent Hive E2E Test Suite
+2025-07-18 03:15:18,310 - INFO - ============================================================
+2025-07-18 03:15:18,310 - INFO - 
+🔍 Running Database Connectivity Tests
+2025-07-18 03:15:18,310 - INFO - ----------------------------------------
+2025-07-18 03:15:18,337 - INFO - ✅ Database basic connection
+2025-07-18 03:15:18,412 - INFO - ✅ Database connection pool
+2025-07-18 03:15:18,412 - INFO - 
+🔍 Running Schema Validation Tests
+2025-07-18 03:15:18,412 - INFO - ----------------------------------------
+2025-07-18 03:15:18,427 - INFO - ✅ Schema structure (6 tables)
+2025-07-18 03:15:18,428 - INFO - 
+🔍 Running Data Operations Tests
+2025-07-18 03:15:18,428 - INFO - ----------------------------------------
+2025-07-18 03:15:18,436 - ERROR - ❌ Data CRUD operations: duplicate key value violates unique constraint "capabilities_agent_id_key"
+DETAIL:  Key (agent_id)=(test_agent_001) already exists.
+
+2025-07-18 03:15:18,436 - INFO - 
+🔍 Running Message Protocol Tests
+2025-07-18 03:15:18,436 - INFO - ----------------------------------------
+2025-07-18 03:15:18,556 - INFO - ✅ Message protocol functionality
+2025-07-18 03:15:18,556 - INFO - 
+🔍 Running Agent Coordination Tests
+2025-07-18 03:15:18,556 - INFO - ----------------------------------------
+2025-07-18 03:15:18,556 - INFO - ✅ Agent coordination tracking
+2025-07-18 03:15:18,556 - INFO - 
+🔍 Running Performance Benchmarks Tests
+2025-07-18 03:15:18,556 - INFO - ----------------------------------------
+2025-07-18 03:15:18,605 - INFO - ✅ Database write performance
+2025-07-18 03:15:18,605 - INFO - 
+🔍 Running Integration Workflows Tests
+2025-07-18 03:15:18,605 - INFO - ----------------------------------------
+2025-07-18 03:15:18,610 - ERROR - ❌ Complete integration workflow: duplicate key value violates unique constraint "capabilities_agent_id_key"
+DETAIL:  Key (agent_id)=(workflow_agent_001) already exists.
+
+2025-07-18 03:15:38,564 - INFO - 🧪 Starting Agent Hive E2E Test Suite
+2025-07-18 03:15:38,564 - INFO - ============================================================
+2025-07-18 03:15:38,564 - INFO - 
+🔍 Running Database Connectivity Tests
+2025-07-18 03:15:38,564 - INFO - ----------------------------------------
+2025-07-18 03:15:38,577 - INFO - ✅ Database basic connection
+2025-07-18 03:15:38,649 - INFO - ✅ Database connection pool
+2025-07-18 03:15:38,649 - INFO - 
+🔍 Running Schema Validation Tests
+2025-07-18 03:15:38,649 - INFO - ----------------------------------------
+2025-07-18 03:15:38,665 - INFO - ✅ Schema structure (6 tables)
+2025-07-18 03:15:38,665 - INFO - 
+🔍 Running Data Operations Tests
+2025-07-18 03:15:38,665 - INFO - ----------------------------------------
+2025-07-18 03:15:38,684 - INFO - ✅ Data CRUD operations
+2025-07-18 03:15:38,685 - INFO - 
+🔍 Running Message Protocol Tests
+2025-07-18 03:15:38,685 - INFO - ----------------------------------------
+2025-07-18 03:15:38,774 - INFO - ✅ Message protocol functionality
+2025-07-18 03:15:38,774 - INFO - 
+🔍 Running Agent Coordination Tests
+2025-07-18 03:15:38,774 - INFO - ----------------------------------------
+2025-07-18 03:15:38,774 - INFO - ✅ Agent coordination tracking
+2025-07-18 03:15:38,774 - INFO - 
+🔍 Running Performance Benchmarks Tests
+2025-07-18 03:15:38,774 - INFO - ----------------------------------------
+2025-07-18 03:15:38,810 - INFO - ✅ Database write performance
+2025-07-18 03:15:38,810 - INFO - 
+🔍 Running Integration Workflows Tests
+2025-07-18 03:15:38,810 - INFO - ----------------------------------------
+2025-07-18 03:15:38,820 - INFO - ✅ Complete integration workflow
