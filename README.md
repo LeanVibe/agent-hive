@@ -636,13 +636,22 @@ uv run python -c "from advanced_orchestration.models import CoordinatorConfig; p
 
 ## Getting Help
 
-### Documentation
+### 📚 Documentation Structure
 
-#### 📚 Core Documentation
+#### **Single Source of Truth**
+- **[📐 ARCHITECTURE.md](ARCHITECTURE.md)**: **AUTHORITATIVE REFERENCE** - Complete system architecture, design patterns, and technical specifications
+- **[🤖 Agent Communication](AGENT_COMMUNICATION_PROTOCOL.md)**: Agent coordination patterns and communication protocols
+
+#### **Essential Documentation** (Root Directory)
 - **[Development Guide](DEVELOPMENT.md)**: Comprehensive developer reference
-- **[API Reference](API_REFERENCE.md)**: Complete API documentation
+- **[API Reference](API_REFERENCE.md)**: Complete API documentation  
 - **[Troubleshooting Guide](TROUBLESHOOTING.md)**: Common issues and solutions
 - **[Deployment Guide](DEPLOYMENT.md)**: Production deployment strategies
+
+#### **Navigation Guide**
+- **Current Documentation**: All active docs are in root directory or `docs/` folder
+- **Historical Context**: Archived materials in `docs/archived/` with full categorization
+- **New Contributors**: Start with README → ARCHITECTURE.md → DEVELOPMENT.md
 
 #### 🔍 Project Documentation
 - **[Project Plan](docs/PLAN.md)**: Current project plan and status
@@ -660,10 +669,17 @@ uv run python -c "from advanced_orchestration.models import CoordinatorConfig; p
 - **[Verification Scripts](tutorials/medium-clone/examples/verification-scripts.md)**: Validation scripts
 
 #### 🗂️ Archived Documentation
-- **[Documentation Audit](docs/DOCUMENTATION_AUDIT_JULY_2025.md)**: Complete documentation audit
-- **[Archive Index](docs/archived/ARCHIVE_INDEX.md)**: Historical documentation index
-- **[Analysis Reports](analysis_reports/)**: Technical analysis and reports
-- **[Historical Documents](docs/archived/)**: Archived planning and analysis documents
+**Note**: 29 redundant documents were archived in July 2025 to create a clean, maintainable structure.
+
+- **[📋 Archive Index](docs/archived/ARCHIVE_INDEX.md)**: Complete listing of all 29 archived files with categorization
+- **[📊 Documentation Audit](docs/DOCUMENTATION_AUDIT_JULY_2025.md)**: Full audit report and archival strategy
+- **[🔍 Analysis Reports](analysis_reports/)**: Technical analysis and quality reports
+- **Archive Categories**:
+  - `docs/archived/redundant-api-references/` - Legacy API documentation
+  - `docs/archived/coordination-system-legacy/` - Superseded coordination systems  
+  - `docs/archived/outdated-planning/` - Historical planning documents
+  - `docs/archived/completion-reports/` - Historical status reports
+  - `docs/archived/agent-instructions-legacy/` - Legacy agent templates
 
 ### Community
 - **GitHub Issues**: Bug reports and feature requests

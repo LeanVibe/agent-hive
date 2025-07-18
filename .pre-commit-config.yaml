@@ -38,7 +38,7 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
-        args: ["-r", ".", "-f", "json", "-o", "analysis_reports/bandit_security_report.json"]
+        args: ["-r", ".", "-f", "json", "-o", "test_reports/security/bandit_security_report.json"]
         exclude: ^tests/
 
   # Dependency vulnerability scanning
@@ -46,7 +46,7 @@ repos:
     rev: v1.3.2
     hooks:
       - id: python-safety-dependencies-check
-        args: ["--json", "--output", "analysis_reports/safety_report.json"]
+        args: ["--json", "--output", "test_reports/security/safety_report.json"]
 
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -68,6 +68,14 @@ repos:
       - id: pydocstyle
         args: ["--convention=google", "--add-ignore=D100,D104"]
         exclude: ^(tests/|tutorials/)
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: ["--fix", "--config", ".markdownlint.yaml"]
+        exclude: ^(docs/archived/|test_reports/)
 
 # Global configuration
 default_stages: [commit, push]
