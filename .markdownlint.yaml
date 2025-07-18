@@ -1,0 +1,44 @@
+# Markdownlint configuration for LeanVibe Agent Hive
+# Documentation: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Default state for all rules
+default: true
+
+# Rule overrides
+MD013:
+  # Line length - Allow longer lines for code blocks and links
+  line_length: 120
+  code_blocks: false
+  tables: false
+  headings: false
+
+MD033:
+  # Allow inline HTML for mermaid diagrams and formatting
+  allowed_elements: ['details', 'summary', 'br', 'sub', 'sup']
+
+MD041:
+  # First line in file should not be a top level heading
+  # Allow for files that don't start with h1
+  front_matter_title: ""
+
+MD024:
+  # Multiple headings with the same content
+  # Allow in different sections
+  siblings_only: true
+
+MD007:
+  # Unordered list indentation
+  indent: 2
+
+MD029:
+  # Ordered list item prefix
+  style: "ordered"
+
+MD046:
+  # Code block style
+  style: "fenced"
+
+# Disable problematic rules
+MD026: false  # Trailing punctuation in heading
+MD034: false  # Bare URL used - we have many technical URLs
+MD036: false  # Emphasis used instead of a heading

@@ -25,7 +25,7 @@ send_pm_status_request() {
     
     # Use fixed agent communication system
     local response=$(python3 "$SCRIPT_DIR/fixed_agent_communication.py" \
-        --agent pm-agent \
+        --agent pm \
         --message "AUTOMATED STATUS UPDATE: Please provide current coordination status, active agents, PR status, and any urgent issues. Time: $timestamp" \
         2>&1)
     

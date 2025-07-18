@@ -496,6 +496,60 @@ tags: [tag1, tag2]
 - [ ] Implement user feedback system
 - [ ] Create advanced tooling
 
+## Documentation Maintenance Guidelines
+
+### Preventing Documentation Redundancy
+
+**Rule**: One topic, one authoritative document. Before creating new documentation:
+
+1. **Search First**: Check existing documentation in root directory and `docs/` folder
+2. **Check Archive**: Review `docs/archived/ARCHIVE_INDEX.md` for historical context
+3. **Update vs Create**: Prefer updating existing documents over creating new ones
+4. **Consolidate**: If multiple documents exist on the same topic, consolidate into one
+
+### New Documentation Workflow
+
+1. **Proposal**: Discuss new documentation needs in GitHub issues
+2. **Location**: Determine appropriate location:
+   - **Root Directory**: Essential user documentation (README, API_REFERENCE, etc.)
+   - **`docs/`**: Project-specific documentation and guides
+   - **`tutorials/`**: Learning resources and examples
+3. **Template**: Use appropriate template from this standards document
+4. **Review**: All new documentation requires review before merge
+5. **Index**: Update relevant index files and navigation
+
+### Archive Guidelines
+
+When documentation becomes outdated:
+
+1. **Don't Delete**: Move to appropriate archive category in `docs/archived/`
+2. **Categorize**: Use existing categories or create new logical groupings
+3. **Index**: Update `docs/archived/ARCHIVE_INDEX.md` with new archived files
+4. **Link**: Replace outdated content with link to current documentation
+5. **Context**: Add brief explanation of why content was archived
+
+### Archive Categories
+
+- **`redundant-api-references/`**: Duplicate API documentation
+- **`coordination-system-legacy/`**: Superseded coordination implementations  
+- **`outdated-planning/`**: Historical planning documents
+- **`completion-reports/`**: Historical status and completion reports
+- **`agent-instructions-legacy/`**: Legacy agent templates and instructions
+
+### Quality Maintenance
+
+- **Monthly Review**: Review documentation for accuracy and relevance
+- **Link Validation**: Regularly check internal and external links
+- **User Feedback**: Monitor issues and discussions for documentation problems
+- **Version Alignment**: Ensure documentation matches current implementation
+
+### Documentation Debt Prevention
+
+- **Feature Documentation**: New features must include documentation updates
+- **Breaking Changes**: Updates to APIs require immediate documentation updates  
+- **Deprecation**: Mark deprecated features clearly with migration paths
+- **Testing**: Include documentation in definition of done for all features
+
 ## Conclusion
 
 These standards provide the foundation for a world-class documentation system that serves users effectively while maintaining high quality and consistency. Regular review and updates of these standards ensure they remain relevant and effective.

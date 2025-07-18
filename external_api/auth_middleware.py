@@ -81,6 +81,7 @@ class AuthenticationMiddleware:
         self.jwt_algorithm = config.get("jwt_algorithm", "HS256")
         self.token_expiry = config.get("token_expiry_hours", 24)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 ||||||| 64640d5
         
@@ -96,12 +97,18 @@ class AuthenticationMiddleware:
         )
         
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         # Storage for authentication data
         self.api_keys: Dict[str, Dict[str, Any]] = {}
         self.jwt_tokens: Dict[str, Dict[str, Any]] = {}
         self.oauth_tokens: Dict[str, Dict[str, Any]] = {}
         self.signing_secrets: Dict[str, str] = {}
         self.basic_auth_users: Dict[str, Dict[str, Any]] = {}
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 ||||||| 64640d5
@@ -111,10 +118,16 @@ class AuthenticationMiddleware:
         self.password_history: Dict[str, List[str]] = {}  # Track password history
         
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         # Rate limiting for auth attempts
         self.auth_attempts: Dict[str, List[float]] = {}
         self.max_auth_attempts = config.get("max_auth_attempts", 5)
         self.auth_window = config.get("auth_window_minutes", 15) * 60
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 ||||||| 64640d5
@@ -128,6 +141,11 @@ class AuthenticationMiddleware:
         self.password_history_count = self.password_config.get("password_history_count", 5)
         
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         # Role-based access control
         self.roles: Dict[str, List[Permission]] = {
             "admin": [Permission.READ, Permission.WRITE, Permission.ADMIN, Permission.EXECUTE],
@@ -139,6 +157,7 @@ class AuthenticationMiddleware:
         self.path_permissions: Dict[str, List[Permission]] = {}
 
         logger.info(f"AuthenticationMiddleware initialized with methods: {self.enabled_methods}")
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 ||||||| 64640d5
@@ -171,6 +190,11 @@ class AuthenticationMiddleware:
         return pwd_context.verify(plain_password, hashed_password)
     
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     async def authenticate_request(self, request: ApiRequest) -> AuthResult:
         """
         Authenticate an API request using configured methods.
@@ -271,6 +295,7 @@ class AuthenticationMiddleware:
             # Decode JWT token (PyJWT handles expiration automatically)
             payload = await self._decode_jwt(token)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
             # Check expiration
             if payload.get("exp") and payload["exp"] < time.time():
@@ -278,13 +303,24 @@ class AuthenticationMiddleware:
 
 ||||||| 64640d5
             
+||||||| 48e9100
+            
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
             # Check expiration
             if payload.get("exp") and payload["exp"] < time.time():
                 return AuthResult(success=False, error="JWT token has expired")
+<<<<<<< HEAD
             
 =======
             
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+            
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
             # Check if token is blacklisted
             if token in self.jwt_tokens and self.jwt_tokens[token].get("blacklisted"):
                 return AuthResult(success=False, error="JWT token is blacklisted")
@@ -349,13 +385,20 @@ class AuthenticationMiddleware:
 
             user_data = self.basic_auth_users[username]
 <<<<<<< HEAD
+<<<<<<< HEAD
 
             # Verify password (in production, use proper password hashing)
             if user_data.get("password") != password:
 ||||||| 64640d5
             
+||||||| 48e9100
+            
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
             # Verify password (in production, use proper password hashing)
             if user_data.get("password") != password:
+<<<<<<< HEAD
 =======
             
             # Check if account is locked
@@ -368,14 +411,27 @@ class AuthenticationMiddleware:
 >>>>>>> new-work/security-Jul-17-0944
                 return AuthResult(success=False, error="Invalid username or password")
 
+||||||| 48e9100
+                return AuthResult(success=False, error="Invalid username or password")
+            
+=======
+                return AuthResult(success=False, error="Invalid username or password")
+
+>>>>>>> new-work/frontend-Jul-17-0824
             # Check if account is active
             if not user_data.get("active", True):
                 return AuthResult(success=False, error="Account is deactivated")
+<<<<<<< HEAD
 <<<<<<< HEAD
 
             # Update login statistics
 ||||||| 64640d5
             
+||||||| 48e9100
+            
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
             # Update login statistics
 =======
             
@@ -385,6 +441,7 @@ class AuthenticationMiddleware:
             user_data["last_login"] = datetime.now().isoformat()
             user_data["login_count"] = user_data.get("login_count", 0) + 1
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 ||||||| 64640d5
             
@@ -392,6 +449,11 @@ class AuthenticationMiddleware:
             user_data["failed_login_attempts"] = 0
             
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+            
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
             return AuthResult(
                 success=True,
                 user_id=username,
@@ -460,11 +522,11 @@ class AuthenticationMiddleware:
             # Simple base64 decode for demo purposes
             import base64
             header, payload, signature = token.split('.')
-            
+
             # Add padding if needed
             payload += '=' * (4 - len(payload) % 4)
             decoded_payload = base64.b64decode(payload)
-            
+
             return json.loads(decoded_payload)
         except Exception as e:
 =======
@@ -547,6 +609,7 @@ class AuthenticationMiddleware:
             return True
         return False
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 ||||||| 64640d5
     
@@ -620,6 +683,11 @@ class AuthenticationMiddleware:
             history.pop(0)
     
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     def create_basic_auth_user(self, username: str, password: str, permissions: List[Permission],
                               active: bool = True) -> Tuple[bool, List[str]]:
         """Create a basic auth user with bcrypt password hashing and policy validation."""
@@ -653,18 +721,30 @@ class AuthenticationMiddleware:
         
         logger.info(f"Created basic auth user: {username}")
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         return True
 
 ||||||| 64640d5
         
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         return True
+<<<<<<< HEAD
     
 =======
         
         return True, []
     
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     def update_basic_auth_user(self, username: str, password: Optional[str] = None,
                               permissions: Optional[List[Permission]] = None,
                               active: Optional[bool] = None) -> bool:
@@ -680,11 +760,17 @@ class AuthenticationMiddleware:
 
 ||||||| 64640d5
             user_data["password"] = password  # In production: hash this!
+<<<<<<< HEAD
         
 =======
             user_data["password"] = self.hash_password(password)  # Securely hash password
         
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         if permissions is not None:
             user_data["permissions"] = permissions
 
@@ -735,19 +821,20 @@ class AuthenticationMiddleware:
 
 ||||||| 64640d5
             payload["exp"] = time.time() + (expires_in_hours * 3600)
-        
+
         # In production, use proper JWT library
         import base64
         import json
-        
+
         header = {"alg": self.jwt_algorithm, "typ": "JWT"}
         header_b64 = base64.b64encode(json.dumps(header).encode()).decode().rstrip('=')
         payload_b64 = base64.b64encode(json.dumps(payload).encode()).decode().rstrip('=')
-        
+
         # Simple signature (use proper JWT library in production)
         signature = hashlib.sha256(f"{header_b64}.{payload_b64}.{self.jwt_secret}".encode()).hexdigest()
-        
+
         token = f"{header_b64}.{payload_b64}.{signature}"
+<<<<<<< HEAD
         
 =======
             payload["exp"] = current_time + timedelta(hours=expires_in_hours)
@@ -759,21 +846,33 @@ class AuthenticationMiddleware:
         
         # Store token metadata for blacklisting
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         self.jwt_tokens[token] = {
             "user_id": user_id,
             "created_at": current_time.isoformat(),
             "blacklisted": False
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         logger.info(f"Created JWT token for user {user_id}")
 ||||||| 64640d5
         
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         logger.info(f"Created JWT token for user {user_id}")
 =======
         
         logger.info(f"Created JWT token for user {user_id} (expires: {payload['exp']})")
         return token
+<<<<<<< HEAD
     
     def create_rbac_jwt_token(self, user_id: str, roles: List[str], permissions: List[Permission], 
                              user_metadata: Optional[Dict[str, Any]] = None,
@@ -831,6 +930,11 @@ class AuthenticationMiddleware:
 >>>>>>> new-work/security-Jul-17-0944
         return token
 
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     def blacklist_jwt_token(self, token: str) -> bool:
         """Blacklist a JWT token."""
         if token in self.jwt_tokens:
@@ -838,6 +942,7 @@ class AuthenticationMiddleware:
             logger.info(f"Blacklisted JWT token")
             return True
         return False
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 ||||||| 64640d5
@@ -967,6 +1072,11 @@ class AuthenticationMiddleware:
         return False
     
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     def set_path_permissions(self, path: str, permissions: List[Permission]) -> None:
         """Set required permissions for a path."""
         self.path_permissions[path] = permissions
@@ -976,6 +1086,7 @@ class AuthenticationMiddleware:
         """Add signing secret for a client."""
         self.signing_secrets[client_id] = secret
         logger.info(f"Added signing secret for client {client_id}")
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 ||||||| 64640d5
@@ -1068,6 +1179,11 @@ class AuthenticationMiddleware:
         return True, "API key validation passed"
     
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     def get_auth_stats(self) -> Dict[str, Any]:
         """Get authentication statistics."""
         current_time = datetime.now()
@@ -1094,6 +1210,7 @@ class AuthenticationMiddleware:
             "protected_paths": len(self.path_permissions),
 <<<<<<< HEAD
             "enabled_methods": [m.value for m in self.enabled_methods]
+<<<<<<< HEAD
         }
 ||||||| 64640d5
             "enabled_methods": [m.value for m in self.enabled_methods]
@@ -1110,3 +1227,8 @@ class AuthenticationMiddleware:
             "stats_generated_at": current_time.isoformat()
         }
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+        }
+=======
+        }
+>>>>>>> new-work/frontend-Jul-17-0824

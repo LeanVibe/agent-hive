@@ -34,10 +34,16 @@ class ApiGateway:
     and response formatting for the orchestration system.
     """
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
 ||||||| 64640d5
     
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     def __init__(self, config: ApiGatewayConfig, service_discovery: Optional[ServiceDiscovery] = None):
 =======
     
@@ -63,6 +69,7 @@ class ApiGateway:
         self.server_started = False
         self._request_count = 0
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 ||||||| 64640d5
         
@@ -85,9 +92,15 @@ class ApiGateway:
         }
         
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+        
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
         logger.info(f"ApiGateway initialized on {config.host}:{config.port}")
         if service_discovery:
             logger.info("Service discovery integration enabled")
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 ||||||| 64640d5
@@ -97,6 +110,11 @@ class ApiGateway:
             logger.info("Authentication middleware integrated")
     
 >>>>>>> new-work/security-Jul-17-0944
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     async def start_server(self) -> None:
         """Start the API gateway server."""
         if self.server_started:
@@ -590,10 +608,16 @@ class ApiGateway:
 
         return headers
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
 ||||||| 64640d5
     
+||||||| 48e9100
+    
+=======
+
+>>>>>>> new-work/frontend-Jul-17-0824
     def _create_error_response(self, request_id: str, status_code: int, message: str, start_time: float) -> ApiResponse:
 =======
     
