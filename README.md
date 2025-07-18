@@ -42,11 +42,11 @@ All major intelligence components implemented and production-ready:
 - **60+ comprehensive tests** covering all external API functionality
 
 #### **📋 Complete Documentation & Navigation**
-- **[ARCHITECTURE.md](ARCHITECTURE.md)**: 📐 **SINGLE SOURCE OF TRUTH** - Complete system architecture and design
-- **[Agent Communication Protocols](AGENT_COMMUNICATION_PROTOCOL.md)**: 🤖 Agent coordination and communication patterns
-- **[Medium Clone Tutorial](tutorials/MEDIUM_CLONE_TUTORIAL.md)**: 📚 Step-by-step real-world project guide
+- **[ARCHITECTURE.md](ARCHITECTURE.md)**: 📐 **SINGLE SOURCE OF TRUTH** - Complete system architecture, design patterns, and coordination protocols
+- **[Agent Communication Protocols](AGENT_COMMUNICATION_PROTOCOL.md)**: 🤖 Agent coordination, messaging, escalation procedures, and templates
+- **[Medium Clone Tutorial](tutorials/MEDIUM_CLONE_TUTORIAL.md)**: 📚 Step-by-step real-world project guide with multi-agent coordination
 - **[CLI Commands Reference](docs/CLI_COMMANDS_AND_HOOKS_REFERENCE.md)**: ⚡ Complete command and hooks documentation
-- **[Documentation Archive](docs/archived/ARCHIVE_INDEX.md)**: 📦 Historical documentation and archive index
+- **[Documentation Archive](docs/archived/ARCHIVE_INDEX_JUL_18_2025.md)**: 📦 Consolidated documentation archive (8 legacy docs archived July 18, 2025)
 
 ## Key Features
 
@@ -650,13 +650,13 @@ uv run python -c "from advanced_orchestration.models import CoordinatorConfig; p
 
 #### **Navigation Guide**
 - **Current Documentation**: All active docs are in root directory or `docs/` folder
-- **Historical Context**: Archived materials in `docs/archived/` with full categorization
+- **Historical Context**: Archived materials in `docs/archived/` with full categorization (8 docs archived July 18, 2025)
 - **New Contributors**: Start with README → ARCHITECTURE.md → DEVELOPMENT.md
 
-#### 🔍 Project Documentation
-- **[Project Plan](docs/PLAN.md)**: Current project plan and status
+#### 🔍 Project Documentation  
 - **[TODO List](docs/TODO.md)**: Current task list and priorities
 - **[Workflow Guide](docs/WORKFLOW.md)**: Development workflow documentation
+- **[Documentation Archive](docs/archived/ARCHIVE_INDEX_JUL_18_2025.md)**: Legacy planning documents and historical context
 - **[CLI Reference](docs/CLI_COMMANDS_AND_HOOKS_REFERENCE.md)**: CLI commands and hooks
 
 #### 📖 Learning Resources
