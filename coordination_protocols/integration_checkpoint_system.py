@@ -7,13 +7,11 @@ and integration milestones are achieved.
 """
 
 import asyncio
-import json
 import logging
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 from ..feedback_loops import (
     FeedbackPriority,
@@ -23,9 +21,8 @@ from ..feedback_loops import (
 )
 from .automated_coordination_orchestrator import (
     CoordinationPhase,
-    CoordinationStatus,
 )
-from .component_workflow import ComponentStatus, ComponentWorkflowManager
+from .component_workflow import ComponentWorkflowManager
 
 
 class CheckpointType(Enum):

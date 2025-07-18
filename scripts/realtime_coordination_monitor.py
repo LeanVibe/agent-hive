@@ -259,7 +259,7 @@ class RealTimeCoordinationMonitor:
         # Emergency protocols require immediate PM agent notification
         await self._notify_pm_agent(
             f"EMERGENCY: Protocol {protocol} activated. Details: {
-    json.dumps(details)}"
+                json.dumps(details)}"
         )
 
     async def _notify_pm_agent(self, message: str):

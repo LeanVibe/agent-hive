@@ -53,7 +53,7 @@ class DashboardIntegrationMicro:
         """Push XP compliance metric to dashboard - core functionality."""
         metric = DashboardMetric(
             metric_id=f"xp-compliance-{
-    datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                datetime.now().strftime('%Y%m%d_%H%M%S')}",
             metric_type="xp_compliance",
             value=compliance_score,
             status=self._get_compliance_status(compliance_score),
@@ -70,7 +70,7 @@ class DashboardIntegrationMicro:
         """Push PR size metric to dashboard - core functionality."""
         metric = DashboardMetric(
             metric_id=f"pr-size-{pr_number}-{
-    datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                datetime.now().strftime('%Y%m%d_%H%M%S')}",
             metric_type="pr_size",
             value=float(line_count),
             status=self._get_pr_size_status(line_count),

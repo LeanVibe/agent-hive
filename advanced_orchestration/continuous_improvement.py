@@ -657,7 +657,7 @@ class ContinuousImprovementEngine:
                     priority=ImprovementPriority.MEDIUM,
                     title="Improve agent combination efficiency",
                     description=f"Agent combination {combo} has low efficiency ({
-    efficiency:.2f})",
+                        efficiency:.2f})",
                     current_state={"efficiency": efficiency},
                     target_state={"efficiency": 0.8},
                     expected_impact=0.7,

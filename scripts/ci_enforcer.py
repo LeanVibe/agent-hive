@@ -490,8 +490,8 @@ class CIEnforcer:
 
         return CIMetrics(
             period_id=f"ci-metrics-{
-    start_date.strftime('%Y%m%d')}-{
-        end_date.strftime('%Y%m%d')}",
+                start_date.strftime('%Y%m%d')}-{
+                end_date.strftime('%Y%m%d')}",
             start_date=start_date.strftime('%Y-%m-%d'),
             end_date=end_date.strftime('%Y-%m-%d'),
             total_builds=total_builds,

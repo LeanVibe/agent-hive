@@ -112,7 +112,7 @@ jobs:
           exit 1
 
   quality-gates:
-    name: 🔍 Quality Gates
+    name: 🔍 Advanced Quality Gates
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -123,9 +123,10 @@ jobs:
         with:
           python-version: '3.9'
       
-      - name: 📦 Install dependencies
+      - name: 📦 Install quality tools
         run: |
           python -m pip install --upgrade pip
+          pip install flake8 autopep8 autoflake pytest coverage
           pip install -r requirements.txt || echo "No requirements.txt found"
       
       - name: 🔍 Python syntax check
@@ -133,11 +134,88 @@ jobs:
           echo "🔍 Checking Python syntax..."
           python -m py_compile **/*.py || echo "Some files have syntax errors"
       
-      - name: 🧪 Run basic tests
+      - name: 🚫 CRITICAL: Prevent Code Quality Regression
+        id: quality_regression
         run: |
-          echo "🧪 Running basic tests..."
+          echo "🚫 CRITICAL QUALITY GATE: Preventing code quality regression..."
+          
+          # Check for critical errors that were fixed in Phase 1
+          UNUSED_IMPORTS=$(python -m flake8 --select=F401 . 2>/dev/null | wc -l)
+          FORMAT_ERRORS=$(python -m flake8 --select=E1,E2,E3,W2,W3 . 2>/dev/null | wc -l)
+          FSTRING_ERRORS=$(python -m flake8 --select=F541 . 2>/dev/null | wc -l)
+          UNUSED_VARS=$(python -m flake8 --select=F841 . 2>/dev/null | wc -l)
+          
+          echo "unused_imports=$UNUSED_IMPORTS" >> $GITHUB_OUTPUT
+          echo "format_errors=$FORMAT_ERRORS" >> $GITHUB_OUTPUT
+          echo "fstring_errors=$FSTRING_ERRORS" >> $GITHUB_OUTPUT
+          echo "unused_vars=$UNUSED_VARS" >> $GITHUB_OUTPUT
+          
+          # Set critical thresholds (Phase 1 achieved these targets)
+          CRITICAL_UNUSED_IMPORTS=10    # Was 7,651 → 0
+          CRITICAL_FORMAT_ERRORS=50     # Was 1,100+ → 0
+          CRITICAL_FSTRING_ERRORS=5     # Was 101 → 0
+          CRITICAL_UNUSED_VARS=5        # Was 83 → 0
+          
+          REGRESSION_DETECTED=0
+          
+          if [ $UNUSED_IMPORTS -gt $CRITICAL_UNUSED_IMPORTS ]; then
+            echo "::error::🚨 REGRESSION: Unused imports increased to $UNUSED_IMPORTS (threshold: $CRITICAL_UNUSED_IMPORTS)"
+            REGRESSION_DETECTED=1
+          fi
+          
+          if [ $FORMAT_ERRORS -gt $CRITICAL_FORMAT_ERRORS ]; then
+            echo "::error::🚨 REGRESSION: Format errors increased to $FORMAT_ERRORS (threshold: $CRITICAL_FORMAT_ERRORS)"
+            REGRESSION_DETECTED=1
+          fi
+          
+          if [ $FSTRING_ERRORS -gt $CRITICAL_FSTRING_ERRORS ]; then
+            echo "::error::🚨 REGRESSION: F-string errors increased to $FSTRING_ERRORS (threshold: $CRITICAL_FSTRING_ERRORS)"
+            REGRESSION_DETECTED=1
+          fi
+          
+          if [ $UNUSED_VARS -gt $CRITICAL_UNUSED_VARS ]; then
+            echo "::error::🚨 REGRESSION: Unused variables increased to $UNUSED_VARS (threshold: $CRITICAL_UNUSED_VARS)"
+            REGRESSION_DETECTED=1
+          fi
+          
+          echo "regression_detected=$REGRESSION_DETECTED" >> $GITHUB_OUTPUT
+          
+          if [ $REGRESSION_DETECTED -eq 1 ]; then
+            echo "status=regression" >> $GITHUB_OUTPUT
+            echo "::error::🚨 CODE QUALITY REGRESSION DETECTED - PR BLOCKED"
+          else
+            echo "status=pass" >> $GITHUB_OUTPUT
+            echo "✅ No code quality regression detected"
+          fi
+      
+      - name: 📊 Enhanced Code Quality Metrics
+        run: |
+          echo "📊 Comprehensive quality analysis..."
+          
+          # Total error count (for tracking)
+          TOTAL_ERRORS=$(python -m flake8 . 2>/dev/null | wc -l)
+          echo "📊 Total linting errors: $TOTAL_ERRORS"
+          
+          # Line length analysis
+          LINE_LENGTH_ERRORS=$(python -m flake8 --select=E501 . 2>/dev/null | wc -l)
+          echo "📏 Line length violations: $LINE_LENGTH_ERRORS"
+          
+          # Quality score calculation (approximate)
+          if [ $TOTAL_ERRORS -lt 3000 ]; then
+            echo "🏆 Quality Score: EXCELLENT (9+ /10)"
+          elif [ $TOTAL_ERRORS -lt 5000 ]; then
+            echo "🟢 Quality Score: GOOD (7-8 /10)"
+          elif [ $TOTAL_ERRORS -lt 8000 ]; then
+            echo "🟡 Quality Score: FAIR (5-6 /10)"
+          else
+            echo "🔴 Quality Score: POOR (<5 /10)"
+          fi
+      
+      - name: 🧪 Run comprehensive tests
+        run: |
+          echo "🧪 Running comprehensive test suite..."
           if [ -d "tests" ]; then
-            python -m pytest tests/ -v || echo "Tests failed or not available"
+            python -m pytest tests/ -v --tb=short || echo "Tests failed or not available"
           else
             echo "No tests directory found"
           fi
@@ -151,22 +229,33 @@ jobs:
             echo "No CLI found"
           fi
       
-      - name: 🔍 Code Quality Check
+      - name: 🔍 Advanced Code Quality Check
         run: |
-          echo "🔍 Checking code quality..."
-          # Check for debug prints
-          DEBUG_PRINTS=$(grep -r "print(" **/*.py || true)
-          if [ -n "$DEBUG_PRINTS" ]; then
-            echo "⚠️ Debug prints found:"
-            echo "$DEBUG_PRINTS" | head -5
+          echo "🔍 Advanced code quality analysis..."
+          
+          # Check for debug prints (warning only)
+          DEBUG_PRINTS=$(grep -r "print(" **/*.py | grep -v "# debug-ok" | wc -l || echo "0")
+          if [ $DEBUG_PRINTS -gt 50 ]; then
+            echo "⚠️ Many debug prints found: $DEBUG_PRINTS"
           fi
           
-          # Check for TODO comments
-          TODO_COMMENTS=$(grep -r "TODO\|FIXME\|XXX" **/*.py || true)
-          if [ -n "$TODO_COMMENTS" ]; then
-            echo "📝 TODO comments found:"
-            echo "$TODO_COMMENTS" | head -5
-          fi
+          # Check for TODO comments (informational)
+          TODO_COMMENTS=$(grep -r "TODO\|FIXME\|XXX" **/*.py | wc -l || echo "0")
+          echo "📝 TODO comments found: $TODO_COMMENTS"
+          
+          # Check for complex functions (warning threshold)
+          COMPLEX_FUNCTIONS=$(grep -r "def " **/*.py | wc -l || echo "0")
+          echo "📊 Total functions: $COMPLEX_FUNCTIONS"
+      
+      - name: ❌ Block PR if regression detected
+        if: steps.quality_regression.outputs.regression_detected == '1'
+        run: |
+          echo "::error::🚨 CODE QUALITY REGRESSION DETECTED"
+          echo "::error::This PR introduces code quality issues that were resolved in Phase 1"
+          echo "::error::Please run automated fixes before merging:"
+          echo "::error::  python -m autoflake --remove-all-unused-imports --in-place --recursive ."
+          echo "::error::  python -m autopep8 --in-place --recursive ."
+          exit 1
 
   security-scan:
     name: 🔒 Security Scan

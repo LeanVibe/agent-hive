@@ -1001,7 +1001,7 @@ class QualityMetricsMonitor:
         # Save dashboard
         dashboard_file = self.reports_dir / \
             f"quality_dashboard_{
-    datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+                datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
         with open(dashboard_file, 'w') as f:
             f.write(dashboard_html)
 

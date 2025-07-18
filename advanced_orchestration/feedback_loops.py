@@ -599,8 +599,8 @@ class RealTimeFeedbackEngine:
                 if trend < -0.2:  # Significant negative trend
                     signal = FeedbackSignal(
                         id=f"perf_degradation_{metric_name}_{
-    int(
-        time.time())}",
+                            int(
+                                time.time())}",
                         type=FeedbackType.PERFORMANCE_FEEDBACK,
                         priority=FeedbackPriority.HIGH,
                         source="metrics_collector",
@@ -619,8 +619,8 @@ class RealTimeFeedbackEngine:
                 if current_value > 0.85:
                     signal = FeedbackSignal(
                         id=f"resource_saturation_{metric_name}_{
-    int(
-        time.time())}",
+                            int(
+                                time.time())}",
                         type=FeedbackType.RESOURCE_FEEDBACK,
                         priority=FeedbackPriority.CRITICAL,
                         source="metrics_collector",
@@ -726,8 +726,8 @@ class RealTimeFeedbackEngine:
                 if correlation > 0.8 and (trend1 < -0.1 or trend2 < -0.1):
                     signal = FeedbackSignal(
                         id=f"predictive_correlation_{metric1}_{metric2}_{
-    int(
-        time.time())}",
+                            int(
+                                time.time())}",
                         type=FeedbackType.PREDICTIVE_FEEDBACK,
                         priority=FeedbackPriority.MEDIUM,
                         source="correlation_analyzer",

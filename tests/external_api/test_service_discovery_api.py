@@ -157,7 +157,7 @@ class TestServiceDiscoveryAPI:
         # Discover only healthy services
         response = test_client.get(
             f"/services/discover/{
-    sample_service_data['service_name']}?healthy_only=true"
+                sample_service_data['service_name']}?healthy_only=true"
         )
         assert response.status_code == 200
 

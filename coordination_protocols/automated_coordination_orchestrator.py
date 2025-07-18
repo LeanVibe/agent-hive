@@ -7,13 +7,12 @@ throughout the component development process.
 """
 
 import asyncio
-import json
 import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from ..feedback_loops import (
     FeedbackPriority,
@@ -22,8 +21,6 @@ from ..feedback_loops import (
     RealTimeFeedbackEngine,
 )
 from .component_workflow import (
-    ComponentPriority,
-    ComponentStatus,
     ComponentWorkflowManager,
 )
 from .cross_agent_protocols import (
@@ -711,9 +708,9 @@ class AutomatedCoordinationOrchestrator:
         if self.feedback_engine:
             feedback_signal = FeedbackSignal(
                 id=f"coordination_failure_{
-    activity.id}_{
-        int(
-            datetime.now().timestamp())}",
+                    activity.id}_{
+                    int(
+                        datetime.now().timestamp())}",
                 type=FeedbackType.COORDINATION_FEEDBACK,
                 priority=FeedbackPriority.HIGH,
                 source="coordination_orchestrator",

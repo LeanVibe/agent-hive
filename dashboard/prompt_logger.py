@@ -6,7 +6,6 @@ Simple SQLite-based logging system to track agent prompts and provide
 PM review functionality for prompt optimization.
 """
 
-import json
 import logging
 import sqlite3
 from dataclasses import dataclass

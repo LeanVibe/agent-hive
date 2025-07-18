@@ -276,7 +276,7 @@ class TmuxAgentManager:
                 time.sleep(0.2)
                 self._tmux_command([
                     "send-keys", "-t", f"{
-    self.session_name}:{window_name}", "Enter"
+                        self.session_name}:{window_name}", "Enter"
                 ])
 
         print(f"✅ Spawned agent '{agent_name}' in window '{window_name}'")

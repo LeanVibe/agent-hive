@@ -21,15 +21,14 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 
 try:
-    from .prompt_logger import PromptLog, prompt_logger
+    from .prompt_logger import prompt_logger
 except ImportError:
     # Fallback for direct execution
     import sys
     sys.path.append('.')
-    from prompt_logger import PromptLog, prompt_logger
+    from prompt_logger import prompt_logger
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

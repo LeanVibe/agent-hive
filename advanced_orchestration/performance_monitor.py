@@ -543,10 +543,10 @@ class PerformanceMonitor:
             elif avg_value <= threshold.optimization_threshold:
                 recommendations.append(
                     f"OPPORTUNITY: {
-    metric_type.value} averaging {
-        avg_value:.2f}, "
+                        metric_type.value} averaging {
+                        avg_value:.2f}, "
                     f"below optimization threshold of {
-    threshold.optimization_threshold}. "
+                        threshold.optimization_threshold}. "
                     f"Performance is excellent but could be leveraged for higher workloads."
                 )
 

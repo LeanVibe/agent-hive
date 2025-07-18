@@ -366,7 +366,7 @@ class EmergencyCompletion:
 
             # Commit
             subprocess.run(['git', 'commit', '-m', commit_message],
-                                    capture_output=True, text=True, check=True)
+                           capture_output=True, text=True, check=True)
 
             # Get commit hash
             hash_result = subprocess.run(['git', 'rev-parse', 'HEAD'],

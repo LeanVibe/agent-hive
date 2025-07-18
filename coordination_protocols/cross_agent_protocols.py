@@ -6,7 +6,6 @@ agents to ensure synchronized development workflows and quality maintenance.
 """
 
 import asyncio
-import json
 import logging
 import uuid
 from dataclasses import dataclass, field

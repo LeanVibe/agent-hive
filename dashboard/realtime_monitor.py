@@ -11,11 +11,9 @@ Provides real-time monitoring of agent activities including:
 """
 
 import asyncio
-import json
 import logging
 import subprocess
 import time
-from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path

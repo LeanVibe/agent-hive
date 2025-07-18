@@ -277,7 +277,7 @@ class SprintPlanningSystem:
                 status="planned",
                 assignee=assignee,
                 github_issue_url=f"https://github.com/LeanVibe/agent-hive/issues/{
-    issue['number']}",
+                    issue['number']}",
                 created_at=datetime.now().isoformat(),
                 updated_at=datetime.now().isoformat()
             )

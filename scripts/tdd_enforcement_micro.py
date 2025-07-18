@@ -289,8 +289,8 @@ class TDDEnforcementMicro:
 
         return TDDViolation(
             violation_id=f"no-test-{
-    Path(file_path).stem}-{
-        datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                Path(file_path).stem}-{
+                datetime.now().strftime('%Y%m%d_%H%M%S')}",
             file_path=file_path,
             violation_type="no_test",
             severity="critical" if line_count > 100 else "warning",

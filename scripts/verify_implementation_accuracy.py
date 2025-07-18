@@ -156,11 +156,11 @@ class ImplementationVerifier:
                             status=accuracy,
                             documented_value=str(documented_count),
                             actual_value=f"{
-    len(
-        self.test_files)} test files, {test_methods} test methods",
+                                len(
+                                    self.test_files)} test files, {test_methods} test methods",
                             message=f"Documented: {documented_count}, Actual: {
-    len(
-        self.test_files)} files",
+                                len(
+                                    self.test_files)} files",
                             confidence=confidence
                         ))
 

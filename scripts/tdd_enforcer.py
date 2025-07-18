@@ -387,8 +387,8 @@ class TDDEnforcer:
 
         return TDDMetrics(
             period_id=f"tdd-{
-    start_date.strftime('%Y%m%d')}-{
-        end_date.strftime('%Y%m%d')}",
+                start_date.strftime('%Y%m%d')}-{
+                end_date.strftime('%Y%m%d')}",
             start_date=start_date.strftime('%Y-%m-%d'),
             end_date=end_date.strftime('%Y-%m-%d'),
             total_cycles=total_cycles,

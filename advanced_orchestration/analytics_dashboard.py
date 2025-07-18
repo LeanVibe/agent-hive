@@ -296,8 +296,8 @@ class AnalyticsDashboard:
                 status=self._get_status_for_metric(
                     metric_name, metric_data.get("current", 0.0)),
                 description=f"Current {
-    metric_name.replace(
-        '_', ' ')} measurement",
+                    metric_name.replace(
+                        '_', ' ')} measurement",
                 chart_type="line",
                 color=self._get_color_for_metric(
                     metric_name, metric_data.get("current", 0.0)),

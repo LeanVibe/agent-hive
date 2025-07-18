@@ -9,17 +9,16 @@ testing, and deployment validation for all components.
 import asyncio
 import json
 import logging
-import subprocess
 import sys
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from progress_monitoring import ProgressMonitor
-from quality_gate_validation import QualityGateValidator, ValidationStatus
+from quality_gate_validation import QualityGateValidator
 
 logger = logging.getLogger(__name__)
 

@@ -307,7 +307,7 @@ class ContextMemoryManager:
             updated_content = re.sub(
                 r'\*Last Updated: [^*]+\*',
                 f'*Last Updated: {
-    datetime.now().strftime("%Y-%m-%d")} - Auto-updated by context manager*',
+                    datetime.now().strftime("%Y-%m-%d")} - Auto-updated by context manager*',
                 content
             )
 

@@ -111,9 +111,9 @@ Please create your PRs so we can review and merge them!"""
         else:
             pr_summary = "\n".join([
                 f"- PR #{
-    pr['number']}: {
-        pr['title']} ({
-            pr['additions']} lines)"
+                    pr['number']}: {
+                    pr['title']} ({
+                    pr['additions']} lines)"
                 for pr in prs
             ])
 

@@ -10,13 +10,11 @@ import asyncio
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from advanced_orchestration.models import (
-    AgentInfo,
     CoordinatorConfig,
     ResourceLimits,
-    TaskAssignment,
 )
 from advanced_orchestration.multi_agent_coordinator import (
     MultiAgentCoordinator,

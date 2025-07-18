@@ -5,14 +5,11 @@ Provides comprehensive state management with SQLite backend, including agent sta
 task states, checkpoints, and ML integration.
 """
 
-import asyncio
 import json
 import logging
 import sqlite3
-from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)

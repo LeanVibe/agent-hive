@@ -1,0 +1,8 @@
+2025-07-18 14:03:51,494 - PerformanceProfiler - INFO - PerformanceProfiler initialized
+2025-07-18 14:03:51,494 - PerformanceProfiler - INFO - 🏃 Benchmarking CLI operations
+2025-07-18 14:03:51,979 - PerformanceProfiler - INFO - 📊 CLI benchmarks: {'cli_help': 0.0964198112487793, 'coordination_status': 0.08702611923217773, 'monitor': 0.30136799812316895}
+2025-07-18 14:03:56,580 - PerformanceProfiler - INFO - PerformanceProfiler initialized
+2025-07-18 14:03:56,580 - PerformanceProfiler - INFO - 📋 Generating optimization report
+2025-07-18 14:03:56,580 - PerformanceProfiler - INFO - 🏃 Benchmarking CLI operations
+2025-07-18 14:03:57,075 - PerformanceProfiler - INFO - 📊 CLI benchmarks: {'cli_help': 0.08658909797668457, 'coordination_status': 0.08653807640075684, 'monitor': 0.32140541076660156}
+2025-07-18 14:03:57,076 - PerformanceProfiler - INFO - 📋 Optimization report saved: performance_reports/optimization_report_20250718_140357.md

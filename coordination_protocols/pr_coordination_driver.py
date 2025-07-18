@@ -19,7 +19,7 @@ from .automated_coordination_orchestrator import (
     CoordinationPhase,
 )
 from .component_workflow import ComponentWorkflowManager
-from .cross_agent_protocols import AgentRole, CrossAgentCoordinator
+from .cross_agent_protocols import CrossAgentCoordinator
 from .integration_checkpoint_system import IntegrationCheckpointSystem
 
 
@@ -576,7 +576,6 @@ class PRCoordinationDriver:
         """Handle agent response event."""
         # Forward to coordination orchestrator
         # This would typically involve processing the response message
-        pass
 
     async def _handle_checkpoint_completion(
             self, event_data: Dict[str, Any]) -> None:
@@ -586,7 +585,6 @@ class PRCoordinationDriver:
 
         # Check if this triggers any milestones
         # This would typically trigger next phase activities
-        pass
 
     async def _handle_phase_transition(
             self, event_data: Dict[str, Any]) -> None:
@@ -595,7 +593,6 @@ class PRCoordinationDriver:
         self.logger.info(f"Phase transition to: {new_phase}")
 
         # Update coordination status and trigger next phase activities
-        pass
 
     async def _handle_coordination_failure(
             self, event_data: Dict[str, Any]) -> None:
@@ -604,7 +601,6 @@ class PRCoordinationDriver:
         self.logger.error(f"Coordination failure: {failure_reason}")
 
         # Implement failure recovery logic
-        pass
 
     async def get_coordination_status(self) -> Dict[str, Any]:
         """Get current coordination status."""
