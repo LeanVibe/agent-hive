@@ -217,7 +217,7 @@ class PatternOptimizer:
                 normalized_features[key] = value
         
         feature_str = json.dumps(normalized_features, sort_keys=True)
-        return hashlib.md5(feature_str.encode()).hexdigest()[:16]
+        return hashlib.md5(feature_str.encode(), usedforsecurity=False).hexdigest()[:16]
     
     def _calculate_performance_score(self, metrics: Dict[str, float]) -> float:
         """Calculate overall performance score from metrics."""

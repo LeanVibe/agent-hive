@@ -18,7 +18,7 @@ def test_import_state_manager():
     try:
         import sys
         sys.path.append('.claude')
-        from state_manager import StateManager
+        from state.state_manager import StateManager
         assert StateManager is not None
     except ImportError:
         # This should work as it's already implemented

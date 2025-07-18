@@ -273,7 +273,7 @@ class ConfidenceTracker:
         }
 
         feature_str = json.dumps(features, sort_keys=True)
-        return hashlib.md5(feature_str.encode()).hexdigest()[:16]
+        return hashlib.md5(feature_str.encode(), usedforsecurity=False).hexdigest()[:16]
 
     def _calculate_risk(self, context: Dict) -> float:
         """Calculate risk score for decision context.
@@ -316,8 +316,8 @@ class ConfidenceTracker:
             cursor.execute(
                 """
                 DELETE FROM decisions 
-                WHERE timestamp < datetime('now', '-{} days')
-                """.format(days_to_keep)
+                WHERE timestamp < datetime('now', ? || ' days')
+                """, (f'-{days_to_keep}',)
             )
             deleted_decisions = cursor.rowcount
             

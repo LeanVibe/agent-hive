@@ -1,4 +1,4 @@
-ldef ultra_compress(text):
+def ultra_compress(text):
     replacements = {
         " and ": " & ",
         " to ": " → ",
