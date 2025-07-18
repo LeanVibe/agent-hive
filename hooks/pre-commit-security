@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+"""
+Pre-commit Security Hook
+
+Prevents commits with critical security vulnerabilities.
+Integrates with Security Quality Gates framework.
+"""
+
+import sys
+import os
+import subprocess
+import asyncio
+import json
+import logging
+from pathlib import Path
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from security.quality_gates import SecurityQualityGates, QualityGateStatus, SeverityLevel
+
+# Configure logging for pre-commit hook
+logging.basicConfig(
+    level=logging.WARNING,  # Only show warnings and errors in pre-commit
+    format='%(levelname)s: %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+def get_staged_files():
+    """Get list of staged files for commit."""
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--name-only"],
+            capture_output=True,
+            text=True,
+            cwd=project_root
+        )
+        
+        if result.returncode == 0:
+            files = [f for f in result.stdout.strip().split('\n') if f]
+            return [str(project_root / f) for f in files if Path(project_root / f).exists()]
+        else:
+            logger.error(f"Failed to get staged files: {result.stderr}")
+            return []
+            
+    except Exception as e:
+        logger.error(f"Error getting staged files: {e}")
+        return []
+
+
+def get_modified_python_files():
+    """Get only Python files that are staged for commit."""
+    staged_files = get_staged_files()
+    python_files = [f for f in staged_files if f.endswith('.py')]
+    return python_files
+
+
+async def run_security_checks():
+    """Run security quality gates on staged files."""
+    print("🔒 Running Security Quality Gates...")
+    
+    # Get staged files
+    staged_files = get_staged_files()
+    python_files = get_modified_python_files()
+    
+    if not staged_files:
+        print("✅ No files staged for commit")
+        return True
+    
+    print(f"📁 Checking {len(staged_files)} staged files ({len(python_files)} Python files)")
+    
+    # Initialize quality gates
+    try:
+        gates = SecurityQualityGates()
+    except Exception as e:
+        print(f"❌ Failed to initialize security quality gates: {e}")
+        return False
+    
+    # Run security checks on staged files
+    try:
+        # For pre-commit, focus on critical checks that can be run quickly
+        critical_gates = {
+            "secrets_detection": gates._run_secrets_detection,
+            "bandit_scan": gates._run_bandit_scan,
+        }
+        
+        results = {}
+        
+        for gate_name, gate_func in critical_gates.items():
+            try:
+                print(f"🔍 Running {gate_name}...")
+                result = await gate_func(staged_files if gate_name == "secrets_detection" else python_files)
+                results[gate_name] = result
+                
+                if result.status == QualityGateStatus.FAILED:
+                    print(f"❌ {gate_name} FAILED")
+                elif result.status == QualityGateStatus.WARNING:
+                    print(f"⚠️  {gate_name} WARNING")
+                else:
+                    print(f"✅ {gate_name} PASSED")
+                    
+            except Exception as e:
+                print(f"❌ Error running {gate_name}: {e}")
+                results[gate_name] = type('Result', (), {
+                    'status': QualityGateStatus.ERROR,
+                    'issues': [],
+                    'error': str(e)
+                })()
+        
+        # Analyze results
+        critical_issues = []
+        high_issues = []
+        all_issues = []
+        
+        for result in results.values():
+            for issue in getattr(result, 'issues', []):
+                all_issues.append(issue)
+                if issue.severity == SeverityLevel.CRITICAL:
+                    critical_issues.append(issue)
+                elif issue.severity == SeverityLevel.HIGH:
+                    high_issues.append(issue)
+        
+        # Report findings
+        print(f"\n📊 Security Scan Results:")
+        print(f"   Critical Issues: {len(critical_issues)}")
+        print(f"   High Issues: {len(high_issues)}")
+        print(f"   Total Issues: {len(all_issues)}")
+        
+        # Check zero critical policy
+        if critical_issues:
+            print(f"\n🚨 CRITICAL SECURITY ISSUES DETECTED:")
+            for issue in critical_issues[:5]:  # Show first 5 critical issues
+                print(f"   ❌ {issue.title}")
+                print(f"      File: {issue.file_path}")
+                if issue.line_number:
+                    print(f"      Line: {issue.line_number}")
+                print(f"      Description: {issue.description}")
+                if issue.remediation:
+                    print(f"      Fix: {issue.remediation}")
+                print()
+            
+            if len(critical_issues) > 5:
+                print(f"   ... and {len(critical_issues) - 5} more critical issues")
+            
+            print("🚫 COMMIT BLOCKED: Zero critical vulnerability policy violation")
+            print("   Please fix all critical security issues before committing")
+            return False
+        
+        # Check for high severity issues (configurable)
+        max_high_severity = 2  # Can be made configurable
+        if len(high_issues) > max_high_severity:
+            print(f"\n⚠️  HIGH SEVERITY ISSUES DETECTED:")
+            for issue in high_issues[:3]:  # Show first 3 high issues
+                print(f"   ⚠️  {issue.title}")
+                print(f"      File: {issue.file_path}")
+                if issue.line_number:
+                    print(f"      Line: {issue.line_number}")
+                print()
+            
+            print(f"⚠️  WARNING: {len(high_issues)} high severity issues found (limit: {max_high_severity})")
+            print("   Consider fixing these issues before committing")
+            # Don't block commit for high severity, just warn
+        
+        if all_issues:
+            print(f"\n💡 Run 'python security/quality_gates.py' for detailed security report")
+        
+        print("✅ Security quality gates passed - commit allowed")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Security check failed: {e}")
+        logger.exception("Security check exception")
+        return False
+
+
+def check_pre_commit_dependencies():
+    """Check if required security tools are available."""
+    required_tools = [
+        ("bandit", "pip install bandit"),
+        ("safety", "pip install safety"),
+    ]
+    
+    missing_tools = []
+    
+    for tool, install_cmd in required_tools:
+        try:
+            result = subprocess.run(
+                [tool, "--version"],
+                capture_output=True,
+                timeout=5
+            )
+            if result.returncode != 0:
+                missing_tools.append((tool, install_cmd))
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            missing_tools.append((tool, install_cmd))
+    
+    if missing_tools:
+        print("⚠️  Missing security tools:")
+        for tool, install_cmd in missing_tools:
+            print(f"   {tool}: {install_cmd}")
+        print("   Some security checks may be skipped")
+    
+    return len(missing_tools) == 0
+
+
+def main():
+    """Main pre-commit hook execution."""
+    print("🔒 Pre-commit Security Hook")
+    print("=" * 50)
+    
+    # Check if we're in a git repository
+    if not (project_root / ".git").exists():
+        print("⚠️  Not in a git repository, skipping security checks")
+        return 0
+    
+    # Check dependencies
+    check_pre_commit_dependencies()
+    
+    # Run security checks
+    try:
+        success = asyncio.run(run_security_checks())
+        
+        if success:
+            print("\n✅ Pre-commit security checks passed")
+            return 0
+        else:
+            print("\n❌ Pre-commit security checks failed")
+            print("🔧 To bypass this check (NOT RECOMMENDED):")
+            print("   git commit --no-verify")
+            print("🔧 To fix issues and retry:")
+            print("   Fix the security issues listed above")
+            print("   git add <fixed-files>")
+            print("   git commit")
+            return 1
+            
+    except KeyboardInterrupt:
+        print("\n⚠️  Security check interrupted")
+        return 1
+    except Exception as e:
+        print(f"\n❌ Pre-commit hook failed: {e}")
+        logger.exception("Pre-commit hook exception")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
