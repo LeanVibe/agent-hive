@@ -20,6 +20,9 @@ from .models import (
     ApiResponse
 )
 from .service_discovery import ServiceDiscovery, ServiceInstance
+from .service_registry import PersistentServiceRegistry, ServiceRegistryConfig
+from .load_balancer import ServiceLoadBalancer, LoadBalancingAlgorithm
+from .circuit_breaker import CircuitBreakerManager, CircuitBreakerConfig, with_circuit_breaker
 from .auth_middleware import AuthenticationMiddleware, AuthResult
 from .rate_limit_middleware import RateLimitMiddleware
 
@@ -48,6 +51,21 @@ class ApiGateway:
         
         # Initialize core components
         self.service_discovery = ServiceDiscovery(self.config.get("service_discovery", {}))
+        
+        # Initialize enhanced service registry
+        registry_config = ServiceRegistryConfig(**self.config.get("service_registry", {}))
+        self.service_registry = PersistentServiceRegistry(registry_config)
+        
+        # Initialize load balancer
+        self.load_balancer = ServiceLoadBalancer(
+            self.service_discovery, 
+            self.config.get("load_balancer", {})
+        )
+        
+        # Initialize circuit breaker manager
+        cb_config = CircuitBreakerConfig(**self.config.get("circuit_breaker", {}))
+        self.circuit_breaker_manager = CircuitBreakerManager(cb_config)
+        
         self.auth_middleware = AuthenticationMiddleware(self.config.get("auth", {}))
         self.rate_limit_middleware = RateLimitMiddleware(self.config.get("rate_limiting", {}))
         
@@ -73,7 +91,11 @@ class ApiGateway:
         self.blocked_ips: Set[str] = set()
         self.security_events: List[Dict[str, Any]] = []
         
-        logger.info(f"API Gateway initialized on {self.gateway_config.host}:{self.gateway_config.port}")
+        # Service routing configuration
+        self.service_routes: Dict[str, str] = self.config.get("service_routes", {})
+        self.enable_service_discovery_routing = self.config.get("enable_service_discovery_routing", True)
+        
+        logger.info(f"API Gateway initialized on {self.gateway_config.host}:{self.gateway_config.port} with enhanced service discovery")
     
     def _get_default_config(self) -> Dict[str, Any]:
         """Get default API Gateway configuration."""
@@ -118,6 +140,146 @@ class ApiGateway:
                 "performance_target_ms": 5.0
             }
         }
+    
+    async def start(self) -> None:
+        """Start the API Gateway and all components."""
+        try:
+            # Start service discovery
+            await self.service_discovery.start()
+            
+            # Start service registry
+            await self.service_registry.start()
+            
+            # Start load balancer
+            await self.load_balancer.start()
+            
+            logger.info("API Gateway started successfully")
+            
+        except Exception as e:
+            logger.error(f"Failed to start API Gateway: {e}")
+            raise
+    
+    async def stop(self) -> None:
+        """Stop the API Gateway and all components."""
+        try:
+            # Stop components in reverse order
+            await self.load_balancer.stop()
+            await self.service_registry.stop()
+            await self.service_discovery.stop()
+            
+            logger.info("API Gateway stopped successfully")
+            
+        except Exception as e:
+            logger.error(f"Error stopping API Gateway: {e}")
+    
+    async def register_service(self, service_instance: ServiceInstance, 
+                             dependencies: Optional[List[str]] = None) -> bool:
+        """Register a service with the gateway."""
+        try:
+            # Register with service discovery
+            discovery_success = await self.service_discovery.register_service(service_instance)
+            
+            # Register with service registry
+            registry_success = await self.service_registry.register_service(
+                service_instance, dependencies
+            )
+            
+            # Add to load balancer
+            lb_success = await self.load_balancer.add_instance(service_instance)
+            
+            if discovery_success and registry_success and lb_success:
+                logger.info(f"Successfully registered service {service_instance.service_id}")
+                return True
+            else:
+                logger.error(f"Partial failure registering service {service_instance.service_id}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Failed to register service {service_instance.service_id}: {e}")
+            return False
+    
+    async def deregister_service(self, service_id: str) -> bool:
+        """Deregister a service from the gateway."""
+        try:
+            # Deregister from all components
+            discovery_success = await self.service_discovery.deregister_service(service_id)
+            registry_success = await self.service_registry.deregister_service(service_id)
+            lb_success = await self.load_balancer.remove_instance(service_id)
+            
+            logger.info(f"Deregistered service {service_id}")
+            return discovery_success or registry_success or lb_success
+            
+        except Exception as e:
+            logger.error(f"Failed to deregister service {service_id}: {e}")
+            return False
+    
+    async def route_to_service(self, service_name: str, request: ApiRequest) -> Optional[ServiceInstance]:
+        """Route request to best available service instance."""
+        try:
+            # Use load balancer to select instance
+            selected_instance = await self.load_balancer.select_instance(
+                service_name=service_name,
+                session_id=request.headers.get("X-Session-ID"),
+                request_metadata={
+                    "client_ip": request.client_ip,
+                    "user_agent": request.headers.get("User-Agent"),
+                    "path": request.path
+                }
+            )
+            
+            if selected_instance:
+                logger.debug(f"Routed request to service {selected_instance.service_id}")
+            else:
+                logger.warning(f"No available instances for service {service_name}")
+            
+            return selected_instance
+            
+        except Exception as e:
+            logger.error(f"Error routing to service {service_name}: {e}")
+            return None
+    
+    async def execute_service_request(self, service_instance: ServiceInstance, 
+                                    request: ApiRequest) -> ApiResponse:
+        """Execute request to service instance with circuit breaker protection."""
+        try:
+            # Create circuit breaker name
+            cb_name = f"service_{service_instance.service_name}_{service_instance.host}_{service_instance.port}"
+            
+            # Execute with circuit breaker
+            start_time = time.time()
+            
+            async def service_call():
+                # This would be replaced with actual HTTP client call
+                # For now, simulate a service call
+                await asyncio.sleep(0.01)  # Simulate network latency
+                return ApiResponse(
+                    status_code=200,
+                    headers={"Content-Type": "application/json"},
+                    body={"message": f"Response from {service_instance.service_id}"},
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+            
+            response = await with_circuit_breaker(cb_name, service_call)
+            
+            # Record successful request
+            response_time = (time.time() - start_time) * 1000
+            await self.load_balancer.record_request_result(
+                service_instance.service_id, True, response_time
+            )
+            
+            return response
+            
+        except Exception as e:
+            # Record failed request
+            response_time = (time.time() - start_time) * 1000
+            await self.load_balancer.record_request_result(
+                service_instance.service_id, False, response_time, str(e)
+            )
+            
+            logger.error(f"Service call failed to {service_instance.service_id}: {e}")
+            return self._create_error_response(503, "Service unavailable", request.request_id)
     
     async def process_request(self, request: ApiRequest) -> ApiResponse:
         """
@@ -338,6 +500,12 @@ class ApiGateway:
             auth_stats = await self.jwt_service.get_authentication_stats()
             rate_limit_stats = await self.rate_limit_middleware.get_middleware_stats()
             
+            # Get service discovery metrics
+            discovery_info = await self.service_discovery.get_system_info()
+            load_balancer_stats = await self.load_balancer.get_load_balancing_stats()
+            circuit_breaker_stats = await self.circuit_breaker_manager.get_summary_stats()
+            registry_stats = await self.service_registry.get_registry_stats()
+            
             metrics = {
                 "timestamp": datetime.utcnow().isoformat(),
                 "requests": {
@@ -357,6 +525,12 @@ class ApiGateway:
                     "security_events": len(self.security_events),
                     "authentication": auth_stats.get("jwt_integration", {}),
                     "rate_limiting": rate_limit_stats
+                },
+                "service_discovery": {
+                    "discovery": discovery_info,
+                    "load_balancer": load_balancer_stats,
+                    "circuit_breakers": circuit_breaker_stats,
+                    "registry": registry_stats
                 },
                 "configuration": asdict(self.gateway_config)
             }
@@ -395,8 +569,16 @@ class ApiGateway:
             return await self.get_health_status()
         elif request.path == "/metrics":
             return await self.get_metrics()
+        elif request.path == "/api/v1/services":
+            return await self._handle_service_endpoints(request)
         elif request.path.startswith("/api/v1/auth"):
             return await self._handle_auth_endpoints(request)
+        
+        # Service discovery routing
+        if self.enable_service_discovery_routing:
+            service_response = await self._try_service_discovery_routing(request)
+            if service_response:
+                return service_response
         
         # No handler found
         return self._create_error_response(404, "Endpoint not found", request.request_id)
@@ -436,6 +618,151 @@ class ApiGateway:
         
         else:
             return self._create_error_response(404, "Auth endpoint not found", request.request_id)
+    
+    async def _handle_service_endpoints(self, request: ApiRequest) -> ApiResponse:
+        """Handle service discovery management endpoints."""
+        try:
+            if request.path == "/api/v1/services" and request.method == "GET":
+                # List all services
+                services = await self.service_registry.get_registry_stats()
+                return ApiResponse(
+                    status_code=200,
+                    headers={"Content-Type": "application/json"},
+                    body=services,
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+            
+            elif request.path == "/api/v1/services" and request.method == "POST":
+                # Register new service
+                if not request.body:
+                    return self._create_error_response(400, "Request body required", request.request_id)
+                
+                service_data = request.body
+                try:
+                    service_instance = ServiceInstance(
+                        service_id=service_data["service_id"],
+                        service_name=service_data["service_name"],
+                        host=service_data["host"],
+                        port=service_data["port"],
+                        metadata=service_data.get("metadata", {}),
+                        health_check_url=service_data.get("health_check_url"),
+                        tags=service_data.get("tags", []),
+                        version=service_data.get("version", "1.0.0")
+                    )
+                    
+                    dependencies = service_data.get("dependencies", [])
+                    success = await self.register_service(service_instance, dependencies)
+                    
+                    if success:
+                        return ApiResponse(
+                            status_code=201,
+                            headers={"Content-Type": "application/json"},
+                            body={"message": "Service registered successfully", "service_id": service_instance.service_id},
+                            timestamp=datetime.utcnow(),
+                            processing_time=0.0,
+                            request_id=request.request_id
+                        )
+                    else:
+                        return self._create_error_response(500, "Service registration failed", request.request_id)
+                
+                except KeyError as e:
+                    return self._create_error_response(400, f"Missing required field: {e}", request.request_id)
+            
+            elif request.path.startswith("/api/v1/services/") and request.method == "DELETE":
+                # Deregister service
+                service_id = request.path.split("/")[-1]
+                success = await self.deregister_service(service_id)
+                
+                if success:
+                    return ApiResponse(
+                        status_code=200,
+                        headers={"Content-Type": "application/json"},
+                        body={"message": "Service deregistered successfully"},
+                        timestamp=datetime.utcnow(),
+                        processing_time=0.0,
+                        request_id=request.request_id
+                    )
+                else:
+                    return self._create_error_response(404, "Service not found", request.request_id)
+            
+            elif request.path.startswith("/api/v1/services/") and "/health" in request.path:
+                # Get service health
+                service_id = request.path.split("/")[-2]  # /api/v1/services/{id}/health
+                health_info = await self.service_registry.get_service_health(service_id)
+                
+                if health_info:
+                    return ApiResponse(
+                        status_code=200,
+                        headers={"Content-Type": "application/json"},
+                        body=health_info,
+                        timestamp=datetime.utcnow(),
+                        processing_time=0.0,
+                        request_id=request.request_id
+                    )
+                else:
+                    return self._create_error_response(404, "Service not found", request.request_id)
+            
+            elif request.path == "/api/v1/services/discovery/stats":
+                # Get service discovery statistics
+                discovery_info = await self.service_discovery.get_system_info()
+                load_balancer_stats = await self.load_balancer.get_load_balancing_stats()
+                circuit_breaker_stats = await self.circuit_breaker_manager.get_summary_stats()
+                
+                stats = {
+                    "service_discovery": discovery_info,
+                    "load_balancer": load_balancer_stats,
+                    "circuit_breakers": circuit_breaker_stats,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+                
+                return ApiResponse(
+                    status_code=200,
+                    headers={"Content-Type": "application/json"},
+                    body=stats,
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+            
+            else:
+                return self._create_error_response(404, "Service endpoint not found", request.request_id)
+        
+        except Exception as e:
+            logger.error(f"Error handling service endpoint: {e}")
+            return self._create_error_response(500, "Internal server error", request.request_id)
+    
+    async def _try_service_discovery_routing(self, request: ApiRequest) -> Optional[ApiResponse]:
+        """Try to route request using service discovery."""
+        try:
+            # Extract service name from path
+            # Expected format: /api/v1/{service_name}/...
+            path_parts = request.path.strip("/").split("/")
+            if len(path_parts) < 3 or path_parts[0] != "api" or path_parts[1] != "v1":
+                return None
+            
+            service_name = path_parts[2]
+            
+            # Check if this is a known service
+            instances = await self.service_discovery.discover_services(service_name)
+            if not instances:
+                # Try service registry as fallback
+                registry_instances = await self.service_registry.discover_services(service_name)
+                if not registry_instances:
+                    return None
+            
+            # Route to service instance
+            selected_instance = await self.route_to_service(service_name, request)
+            if not selected_instance:
+                return self._create_error_response(503, f"No healthy instances available for service {service_name}", request.request_id)
+            
+            # Execute request to service
+            return await self.execute_service_request(selected_instance, request)
+            
+        except Exception as e:
+            logger.error(f"Error in service discovery routing: {e}")
+            return None
     
     def _get_required_permissions(self, path: str) -> Optional[List]:
         """Get required permissions for endpoint."""
