@@ -1,0 +1,52 @@
+{
+  "_description": "Slack Integration Configuration for LeanVibe Agent Hive",
+  "_note": "Replace webhook_url with your actual Slack webhook URL",
+  
+  "webhook_url": "",
+  "channel": "#agent-hive-notifications",
+  "username": "LeanVibe Agent Hive",
+  "icon_emoji": ":robot_face:",
+  
+  "notifications": {
+    "priority_changes": {
+      "enabled": true,
+      "min_priority": "P2",
+      "_comment": "Only notify for P0, P1, P2 priority changes"
+    },
+    "completions": {
+      "enabled": true,
+      "min_priority": "P1",
+      "_comment": "Only notify for P0 and P1 completions"
+    },
+    "sprint_updates": {
+      "enabled": true,
+      "milestone_threshold": 25.0,
+      "_comment": "Notify when sprint progress reaches milestones (25%, 50%, 75%, 100%)"
+    }
+  },
+  
+  "delivery_settings": {
+    "max_retries": 3,
+    "timeout_seconds": 10,
+    "enable_threading": true,
+    "rate_limit_per_minute": 30
+  },
+  
+  "filters": {
+    "exclude_bots": true,
+    "exclude_automated": false,
+    "quiet_hours": {
+      "enabled": false,
+      "start_time": "22:00",
+      "end_time": "08:00",
+      "timezone": "UTC"
+    }
+  },
+  
+  "formatting": {
+    "include_context": true,
+    "include_links": true,
+    "max_message_length": 4000,
+    "truncate_long_titles": true
+  }
+}
