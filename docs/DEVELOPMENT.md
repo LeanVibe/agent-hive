@@ -293,11 +293,70 @@ scaling:
   scale_down_threshold: 0.3
 ```
 
+## 🚀 Quick Start Guide (< 15 minutes)
+
+### Prerequisites
+- **macOS**: 12.0+ (Monterey) or **Linux**: Ubuntu 20.04+
+- **Python**: 3.12+ (managed automatically by UV)
+- **Git**: Latest version
+- **Memory**: 4GB+ available RAM
+- **Disk**: 2GB+ free space
+
+### One-Command Setup
+
+```bash
+# macOS/Linux - Complete setup in one command
+curl -fsSL https://raw.githubusercontent.com/leanvibe/agent-hive/main/scripts/quick-setup.sh | bash
+```
+
+**What this does:**
+1. Installs UV package manager automatically
+2. Clones the repository
+3. Sets up Python environment
+4. Installs all dependencies
+5. Runs verification tests
+6. Creates development configuration
+
+### Manual Setup (Alternative)
+
+#### Step 1: Install UV Package Manager
+```bash
+# macOS (optimized)
+brew install uv  # If you have Homebrew
+# OR
+curl -LsSf https://astral.sh/uv/install.sh | sh && source ~/.bashrc
+
+# Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh && source ~/.bashrc
+```
+
+#### Step 2: Clone and Setup Project
+```bash
+# Clone repository
+git clone https://github.com/leanvibe/agent-hive.git
+cd agent-hive
+
+# Auto-setup with UV (handles Python version, dependencies, everything)
+uv sync --dev
+
+# Verify installation (should complete in < 30 seconds)
+uv run pytest --tb=short
+```
+
+#### Step 3: Verify Installation
+```bash
+# Quick health check
+uv run python -c "from claude.orchestrator import Orchestrator; print('✅ Installation successful!')"
+
+# Run core functionality test
+uv run pytest tests/test_orchestrator.py -v
+```
+
 ## Modern Development Workflow
 
 ### Development Environment Setup
 
-#### Option 1: UV Setup (Recommended)
+#### Option 1: UV Setup (Recommended - < 5 minutes)
 ```bash
 # Install UV (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -314,20 +373,92 @@ uv sync
 uv run pytest
 ```
 
-#### Option 2: Traditional Python Setup
+#### Option 2: Traditional Python Setup (Fallback)
 ```bash
 git clone https://github.com/leanvibe/agent-hive.git
 cd agent-hive
 
+# Ensure Python 3.12+
+python3 --version  # Should show 3.12 or higher
+
 # Create virtual environment
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 
-# Install dependencies
+# Upgrade pip and install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
 # Verify installation
 pytest
+```
+
+### macOS-Specific Optimizations
+
+#### Performance Optimizations
+```bash
+# Enable faster file watching (for development)
+export PYTHONDONTWRITEBYTECODE=1
+
+# Optimize for Apple Silicon (M1/M2/M3)
+if [[ $(uname -m) == "arm64" ]]; then
+    export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+    export PYTORCH_ENABLE_MPS_FALLBACK=1
+fi
+
+# Add to your ~/.zshrc or ~/.bashrc for persistence
+echo 'export PYTHONDONTWRITEBYTECODE=1' >> ~/.zshrc
+```
+
+#### Dependency Management (macOS)
+```bash
+# Install system dependencies with Homebrew
+brew install sqlite git curl
+
+# For performance monitoring (optional)
+brew install htop
+
+# For development tools
+brew install jq  # JSON processing
+brew install httpie  # API testing
+```
+
+### 🛠️ Development Tools Setup
+
+#### IDE Configuration
+
+**VS Code (Recommended)**
+```bash
+# Install recommended extensions
+code --install-extension ms-python.python
+code --install-extension ms-python.black-formatter
+code --install-extension ms-python.mypy-type-checker
+code --install-extension charliermarsh.ruff
+
+# Open project with optimal settings
+code . --goto .vscode/settings.json
+```
+
+**PyCharm**
+```bash
+# Configure interpreter to use UV environment
+# File → Project Settings → Python Interpreter → Add → Existing Environment
+# Path: .venv/bin/python
+```
+
+#### Shell Configuration
+```bash
+# Add project aliases to ~/.zshrc (macOS) or ~/.bashrc (Linux)
+cat >> ~/.zshrc << 'EOF'
+# Agent Hive Development Aliases
+alias aht='uv run pytest'  # Run tests
+alias ahr='uv run python .claude/orchestrator.py'  # Run orchestrator
+alias ahc='uv run python cli.py'  # Run CLI
+alias ahs='uv run python -m http.server 8000'  # Serve docs
+EOF
+
+# Reload shell
+source ~/.zshrc
 ```
 
 #### Modern JavaScript Development with Bun (Optional)
@@ -346,9 +477,43 @@ bun run build
 bun test
 ```
 
-### CLI-Driven Development Workflow
+### 🔄 Development Workflow
 
-#### LeanVibe CLI Commands (8 Commands Available)
+#### Daily Development Commands
+
+**Morning Setup (< 1 minute)**
+```bash
+# Navigate to project and activate
+cd agent-hive
+
+# Update dependencies (if needed)
+uv sync --upgrade
+
+# Quick health check
+uv run pytest tests/test_health.py -v
+
+# Start development server
+uv run python .claude/orchestrator.py --dev
+```
+
+#### CLI-Driven Development Workflow
+
+**Core Development Commands**
+```bash
+# Test-driven development
+uv run pytest --watch  # Auto-run tests on file changes
+uv run pytest --cov --cov-report=html  # Coverage report
+
+# Code quality
+uv run black .  # Format code
+uv run mypy .claude/  # Type checking
+uv run ruff check .  # Linting
+
+# Development server
+uv run python .claude/orchestrator.py --dev --hot-reload
+```
+
+**LeanVibe CLI Commands (8 Commands Available)**
 ```bash
 # Orchestration and coordination
 uv run python cli.py orchestrate --workflow feature-dev --validate
@@ -363,6 +528,31 @@ uv run python cli.py webhook --action start --port 8080
 uv run python cli.py gateway --action start --port 8081
 uv run python cli.py streaming --action start --publish-test
 uv run python cli.py external-api --api-command status
+```
+
+#### Smart Development Shortcuts
+
+**Quick Testing**
+```bash
+# Test specific component
+aht tests/test_orchestrator.py  # Using alias
+
+# Test with specific markers
+uv run pytest -m "not slow"  # Skip slow tests
+uv run pytest -m "unit"  # Only unit tests
+
+# Debug failing test
+uv run pytest --pdb tests/test_failing.py  # Drop into debugger
+```
+
+**Quick Development Server**
+```bash
+# Start with hot reload
+ahr --dev --reload  # Using alias
+
+# Start specific component
+uv run python -m external_api.webhook_server --dev
+uv run python -m external_api.api_gateway --dev
 ```
 
 #### Development Workflow with UV
@@ -907,7 +1097,183 @@ uv run pytest tests/integration/ -v
 - Scalability considerations
 - Error handling in distributed scenarios
 
-## Troubleshooting
+## 🚨 Troubleshooting Quick Reference
+
+### Common Setup Issues
+
+#### Python Version Issues
+```bash
+# Check Python version
+python3 --version
+
+# If < 3.12, install via UV
+uv python install 3.12
+uv python pin 3.12
+
+# Or use pyenv (alternative)
+pyenv install 3.12
+pyenv local 3.12
+```
+
+#### UV Installation Issues
+```bash
+# If UV install fails
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Add to PATH manually
+export PATH="$HOME/.cargo/bin:$PATH"
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.zshrc
+
+# Verify installation
+uv --version
+```
+
+#### Dependency Issues
+```bash
+# Clear cache and reinstall
+uv cache clean
+rm -rf .venv uv.lock
+uv sync --refresh
+
+# If specific package fails
+uv add package-name --force-reinstall
+```
+
+#### Test Failures
+```bash
+# Run tests with verbose output
+uv run pytest -v --tb=long
+
+# Skip problematic tests temporarily
+uv run pytest -k "not test_problematic"
+
+# Run only fast tests
+uv run pytest -m "not slow"
+```
+
+#### Memory Issues (macOS)
+```bash
+# Check memory usage
+top -o MEM
+
+# Increase Docker memory (if using Docker)
+# Docker Desktop → Settings → Resources → Memory → 8GB+
+
+# Reduce test parallelism
+uv run pytest -n 2  # Instead of default auto
+```
+
+#### Port Conflicts
+```bash
+# Check what's using port 8080
+lsof -i :8080
+
+# Kill process using port
+kill -9 $(lsof -t -i:8080)
+
+# Use alternative port
+uv run python .claude/orchestrator.py --port 8081
+```
+
+### Development Environment Issues
+
+#### IDE Integration Problems
+
+**VS Code Issues**
+```bash
+# Reset Python interpreter
+Cmd+Shift+P → "Python: Select Interpreter" → Choose .venv/bin/python
+
+# Reload window
+Cmd+Shift+P → "Developer: Reload Window"
+
+# Clear cache
+rm -rf .vscode/settings.json && code .
+```
+
+**Import Resolution Issues**
+```bash
+# Verify PYTHONPATH
+echo $PYTHONPATH
+
+# Add project root to PYTHONPATH
+export PYTHONPATH="$(pwd):$PYTHONPATH"
+
+# Or create .env file
+echo "PYTHONPATH=$(pwd)" > .env
+```
+
+### macOS-Specific Issues
+
+#### Permissions Issues
+```bash
+# Fix file permissions
+chmod +x scripts/*.sh
+
+# Fix .venv permissions
+chmod -R 755 .venv/
+
+# If encountering SIP issues
+csrutil status  # Check System Integrity Protection
+```
+
+#### M1/M2 Architecture Issues
+```bash
+# Force x86 compatibility if needed
+arch -x86_64 uv sync
+
+# Check architecture
+uname -m  # Should show arm64 for Apple Silicon
+```
+
+### Performance Issues
+
+#### Slow Tests
+```bash
+# Run tests in parallel
+uv run pytest -n auto
+
+# Profile slow tests
+uv run pytest --durations=10
+
+# Skip integration tests during development
+uv run pytest -m "not integration"
+```
+
+#### Memory Leaks
+```bash
+# Monitor memory usage
+uv run python -m memory_profiler your_script.py
+
+# Profile memory usage
+uv run pytest --memray tests/
+```
+
+### Getting Help
+
+#### Debug Information Collection
+```bash
+# Collect system information
+./scripts/debug-info.sh > debug-info.txt
+
+# Or manually:
+echo "Python: $(python3 --version)"
+echo "UV: $(uv --version)"
+echo "OS: $(uname -a)"
+echo "Memory: $(free -h | head -2)"
+echo "Disk: $(df -h . | tail -1)"
+```
+
+#### Quick Health Check
+```bash
+# Run comprehensive health check
+uv run python scripts/health_check.py
+
+# Or step by step:
+uv run pytest tests/test_health.py -v
+uv run python -c "import claude; print('Import successful')"
+uv run python .claude/orchestrator.py --test
+```
 
 ### Phase 2 Specific Issues
 
@@ -1000,39 +1366,101 @@ uv run python .claude/tools/agent_profiler.py --agent-id backend-agent-1
 uv run pytest tests/integration/test_agent_communication.py -v --trace
 ```
 
-### Getting Help (Phase 2)
+### 📚 Documentation Quick Reference
 
-#### 1. Documentation Resources
-- **README.md**: Overview and quick start
-- **DEVELOPMENT.md**: This comprehensive guide
-- **API_REFERENCE.md**: Complete API documentation with Phase 2 components
-- **TROUBLESHOOTING.md**: Comprehensive troubleshooting guide with Phase 2 scenarios
-- **DEPLOYMENT.md**: Production deployment guide with external API configurations
-- **Phase 2 Progress**: `docs/PHASE2_PROGRESS_SUMMARY.md`
+#### Essential Documents
+- **README.md**: Project overview and quick start
+- **DEVELOPMENT.md**: This complete development guide
+- **DEPLOYMENT.md**: Production deployment strategies
+- **API_REFERENCE.md**: Complete API documentation
+- **TROUBLESHOOTING.md**: Comprehensive troubleshooting
 
-#### 2. Debugging Tools (Enhanced)
+#### Getting Started Guides
+- **docs/getting-started/installation.md**: Detailed installation guide
+- **docs/getting-started/quick-start.md**: 5-minute quick start
+- **docs/getting-started/first-project.md**: Your first project walkthrough
+
+#### Platform-Specific Guides
+- **docs/setup/macos-setup.md**: macOS optimization guide
+- **docs/setup/linux-setup.md**: Linux-specific instructions
+- **docs/setup/windows-setup.md**: Windows WSL setup
+
+#### Development Guides
+- **docs/guides/docker-deployment.md**: Docker development setup
+- **docs/guides/cicd-operations.md**: CI/CD pipeline setup
+- **docs/guides/security-configuration.md**: Security best practices
+
+#### 🛠️ Debugging Tools and Commands
+
+**System Health Checks**
 ```bash
-# Comprehensive system health check via CLI
+# Complete system health check
+uv run python scripts/health_check.py --verbose
+
+# Component-specific health checks
 uv run python cli.py monitor --metrics --real-time
-
-# Intelligence framework diagnostics
-uv run python -c "from intelligence_framework import IntelligenceFramework; framework = IntelligenceFramework(); print(framework.health_check())"
-
-# External API status check
 uv run python cli.py external-api --api-command status
 
-# Performance analysis
-uv run pytest tests/performance/ -v --detailed
-
-# ML enhancements monitoring
-uv run python -c "from ml_enhancements import PatternOptimizer; optimizer = PatternOptimizer(); print(optimizer.get_status())"
+# Performance diagnostics
+uv run pytest tests/performance/ -v --benchmark
+uv run python scripts/performance_check.py
 ```
 
-#### 3. Community Support
-- **GitHub Issues**: Bug reports and feature requests
-- **GitHub Discussions**: Phase 2 development questions
-- **Pull Request Reviews**: Code feedback and collaboration
-- **Phase 2 Roadmap**: Track development progress
+**Development Debugging**
+```bash
+# Debug with rich output
+uv run python -c "from rich.console import Console; Console().print('[green]Debug mode active[/green]')"
+
+# Interactive debugging
+uv run python -i scripts/debug_shell.py
+
+# Component testing
+uv run python -c "from claude.orchestrator import Orchestrator; o = Orchestrator(); print(o.status())"
+```
+
+**Log Analysis**
+```bash
+# View recent logs
+tail -f logs/orchestrator.log
+
+# Search logs for errors
+grep -i error logs/*.log
+
+# Structured log analysis
+uv run python scripts/log_analyzer.py --last-hour
+```
+
+#### 🤝 Community and Support
+
+**GitHub Resources**
+- **Issues**: [Bug reports and feature requests](https://github.com/leanvibe/agent-hive/issues)
+- **Discussions**: [Development questions and community](https://github.com/leanvibe/agent-hive/discussions)
+- **Wiki**: [Community documentation](https://github.com/leanvibe/agent-hive/wiki)
+- **Releases**: [Latest updates and changelog](https://github.com/leanvibe/agent-hive/releases)
+
+**Development Resources**
+- **Pull Requests**: Code review and collaboration
+- **Actions**: CI/CD pipeline status
+- **Projects**: Development roadmap and milestones
+- **Security**: Security advisories and policies
+
+**Quick Support**
+```bash
+# Create support bundle
+uv run python scripts/create_support_bundle.py
+
+# Report issue template
+gh issue create --template bug_report.md
+
+# Check known issues
+gh issue list --label "known-issue"
+```
+
+**Development Community**
+- **Daily standups**: Join GitHub Discussions
+- **Code reviews**: Contribute to pull requests
+- **Feature discussions**: Propose new features
+- **Documentation**: Help improve guides and tutorials
 
 ---
 
