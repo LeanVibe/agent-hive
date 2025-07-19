@@ -844,8 +844,13 @@ class AuthenticationService:
                     logger.error(f"Session cleanup error: {e}")
                     await asyncio.sleep(300)  # Wait 5 minutes on error
         
-        # Start cleanup task
-        asyncio.create_task(cleanup_expired_sessions())
+        # Start cleanup task only if event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(cleanup_expired_sessions())
+        except RuntimeError:
+            # No event loop running, cleanup will be handled manually
+            logger.info("No event loop running, session cleanup will be handled manually")
     
     async def get_authentication_stats(self) -> Dict[str, Any]:
         """Get authentication service statistics."""

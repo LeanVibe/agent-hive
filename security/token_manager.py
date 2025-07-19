@@ -345,6 +345,229 @@ class SecureTokenManager:
             logger.error(f"Token rotation failed: {e}")
             return None
     
+    async def refresh_access_token(self, refresh_token: str, client_ip: Optional[str] = None) -> Optional[Tuple[str, str, datetime]]:
+        """
+        Refresh access token using refresh token.
+        
+        Returns:
+            Tuple of (new_access_token, new_token_id, expires_at) or None if refresh failed
+        """
+        try:
+            # Validate refresh token
+            payload = jwt.decode(
+                refresh_token, 
+                self.config["jwt_secret"], 
+                algorithms=[self.config.get("jwt_algorithm", "HS256")]
+            )
+            
+            refresh_token_id = payload.get("token_id")
+            if not refresh_token_id or refresh_token_id not in self.token_metadata:
+                return None
+            
+            refresh_metadata = self.token_metadata[refresh_token_id]
+            
+            # Check if refresh token is active and not expired
+            if refresh_metadata.status != TokenStatus.ACTIVE:
+                return None
+            
+            if refresh_metadata.expires_at and datetime.utcnow() > refresh_metadata.expires_at:
+                refresh_metadata.status = TokenStatus.EXPIRED
+                return None
+            
+            # Verify token type
+            if refresh_metadata.token_type != TokenType.REFRESH:
+                return None
+            
+            # Update refresh token usage
+            refresh_metadata.last_used = datetime.utcnow()
+            refresh_metadata.usage_count += 1
+            if client_ip:
+                refresh_metadata.ip_addresses.add(client_ip)
+            
+            # Create new access token
+            permissions = [Permission(p) for p in payload.get("permissions", [])]
+            user_id = payload.get("user_id")
+            
+            new_access_token, new_token_id = await self.create_secure_token(
+                user_id=user_id,
+                token_type=TokenType.ACCESS,
+                permissions=permissions,
+                expires_in_hours=self.config.get("token_expiry_minutes", 15) / 60,
+                scopes=payload.get("scopes", [])
+            )
+            
+            # Get new token metadata for expiration
+            new_metadata = self.token_metadata[new_token_id]
+            
+            # Log refresh event
+            await self._log_security_event({
+                "event_type": "access_token_refreshed",
+                "user_id": user_id,
+                "refresh_token_id": refresh_token_id,
+                "new_access_token_id": new_token_id,
+                "client_ip": client_ip,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+            
+            return new_access_token, new_token_id, new_metadata.expires_at
+            
+        except ExpiredSignatureError:
+            logger.warning("Attempted to use expired refresh token")
+            return None
+        except Exception as e:
+            logger.error(f"Access token refresh failed: {e}")
+            return None
+    
+    async def create_token_pair(self, user_id: str, permissions: List[Permission],
+                               scopes: Optional[List[str]] = None,
+                               client_metadata: Optional[Dict[str, Any]] = None) -> Tuple[str, str, str, str]:
+        """
+        Create access and refresh token pair.
+        
+        Returns:
+            Tuple of (access_token, access_token_id, refresh_token, refresh_token_id)
+        """
+        # Create access token
+        access_token, access_token_id = await self.create_secure_token(
+            user_id=user_id,
+            token_type=TokenType.ACCESS,
+            permissions=permissions,
+            expires_in_hours=self.config.get("token_expiry_minutes", 15) / 60,
+            scopes=scopes,
+            client_metadata=client_metadata
+        )
+        
+        # Create refresh token (longer lived)
+        refresh_token, refresh_token_id = await self.create_secure_token(
+            user_id=user_id,
+            token_type=TokenType.REFRESH,
+            permissions=permissions,
+            expires_in_hours=24 * 30,  # 30 days
+            scopes=scopes,
+            client_metadata=client_metadata
+        )
+        
+        # Link tokens in family
+        family_id = f"{user_id}:token_pair"
+        if family_id not in self.token_families:
+            self.token_families[family_id] = []
+        self.token_families[family_id].extend([access_token_id, refresh_token_id])
+        
+        return access_token, access_token_id, refresh_token, refresh_token_id
+    
+    async def invalidate_token_family(self, user_id: str, token_type: Optional[TokenType] = None) -> int:
+        """
+        Invalidate all tokens in a user's token family.
+        
+        Returns:
+            Number of tokens invalidated
+        """
+        invalidated_count = 0
+        
+        for token_id, metadata in self.token_metadata.items():
+            if (metadata.user_id == user_id and 
+                metadata.status == TokenStatus.ACTIVE and
+                (token_type is None or metadata.token_type == token_type)):
+                
+                await self.revoke_token(token_id, reason="family_invalidation")
+                invalidated_count += 1
+        
+        return invalidated_count
+    
+    async def check_token_health(self, token: str) -> Dict[str, Any]:
+        """
+        Check token health and provide recommendations.
+        
+        Returns:
+            Dictionary with health information and recommendations
+        """
+        try:
+            # Decode token
+            payload = jwt.decode(
+                token, 
+                self.config["jwt_secret"], 
+                algorithms=[self.config.get("jwt_algorithm", "HS256")]
+            )
+            
+            token_id = payload.get("token_id")
+            if not token_id or token_id not in self.token_metadata:
+                return {
+                    "healthy": False,
+                    "error": "Token metadata not found",
+                    "recommendations": ["Token may be invalid or revoked"]
+                }
+            
+            metadata = self.token_metadata[token_id]
+            current_time = datetime.utcnow()
+            
+            # Calculate token age
+            age_hours = (current_time - metadata.created_at).total_seconds() / 3600
+            
+            # Calculate time until expiration
+            time_to_expiry_hours = 0
+            if metadata.expires_at:
+                time_to_expiry_hours = (metadata.expires_at - current_time).total_seconds() / 3600
+            
+            # Determine health status
+            healthy = True
+            warnings = []
+            recommendations = []
+            
+            # Check token status
+            if metadata.status != TokenStatus.ACTIVE:
+                healthy = False
+                warnings.append(f"Token status is {metadata.status.value}")
+            
+            # Check expiration
+            if metadata.expires_at and current_time > metadata.expires_at:
+                healthy = False
+                warnings.append("Token has expired")
+                recommendations.append("Refresh token immediately")
+            elif time_to_expiry_hours < 1:
+                warnings.append("Token expires within 1 hour")
+                recommendations.append("Consider refreshing token soon")
+            
+            # Check usage patterns
+            if metadata.usage_count > 1000:
+                warnings.append("High usage count detected")
+                recommendations.append("Consider token rotation for security")
+            
+            # Check IP diversity
+            if len(metadata.ip_addresses) > 5:
+                warnings.append("Token used from many different IP addresses")
+                recommendations.append("Review access patterns for suspicious activity")
+            
+            # Check age
+            if age_hours > 24:
+                warnings.append("Token is over 24 hours old")
+                recommendations.append("Consider rotating token for enhanced security")
+            
+            return {
+                "healthy": healthy,
+                "token_id": token_id,
+                "age_hours": round(age_hours, 2),
+                "time_to_expiry_hours": round(time_to_expiry_hours, 2),
+                "usage_count": metadata.usage_count,
+                "unique_ips": len(metadata.ip_addresses),
+                "status": metadata.status.value,
+                "token_type": metadata.token_type.value,
+                "warnings": warnings,
+                "recommendations": recommendations
+            }
+            
+        except ExpiredSignatureError:
+            return {
+                "healthy": False,
+                "error": "Token has expired",
+                "recommendations": ["Refresh token immediately"]
+            }
+        except Exception as e:
+            return {
+                "healthy": False,
+                "error": f"Token validation error: {str(e)}",
+                "recommendations": ["Check token format and signature"]
+            }
+    
     async def revoke_token(self, token_id: str, reason: str = "revoked") -> bool:
         """Revoke a token and log the action."""
         if token_id not in self.token_metadata:
@@ -531,8 +754,13 @@ class SecureTokenManager:
                     logger.error(f"Token cleanup error: {e}")
                     await asyncio.sleep(300)  # Wait 5 minutes on error
         
-        # Start cleanup task
-        asyncio.create_task(cleanup_expired_tokens())
+        # Start cleanup task only if event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(cleanup_expired_tokens())
+        except RuntimeError:
+            # No event loop running, cleanup will be handled manually
+            logger.info("No event loop running, token cleanup will be handled manually")
     
     async def export_security_report(self) -> Dict[str, Any]:
         """Export comprehensive security report."""
