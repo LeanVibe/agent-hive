@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+"""
+/context command - Context usage monitoring and threshold management
+Provides real-time context usage information and configuration options
+"""
+
+import asyncio
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.append(str(project_root))
+
+sys.path.append(str(project_root / ".claude" / "scripts"))
+from enhanced_context_monitor import EnhancedContextMonitor
+
+async def main():
+    # Parse command arguments
+    action = "status"  # Default action
+    value = None
+    
+    if len(sys.argv) > 1:
+        action = sys.argv[1].lower()
+        if len(sys.argv) > 2:
+            value = sys.argv[2]
+    
+    monitor = EnhancedContextMonitor()
+    
+    if action == "status" or action == "show":
+        # Show current context status
+        print(monitor.display_context_status())
+        
+        # Also check for any immediate notifications
+        notifications = monitor.check_and_notify_thresholds()
+        if notifications:
+            print("\n🚨 Active Alerts:")
+            for notification in notifications:
+                print(f"  {notification}")
+    
+    elif action == "history":
+        # Show usage history
+        hours = 6  # Default
+        if value:
+            try:
+                hours = int(value)
+            except ValueError:
+                print("❌ Invalid hours value, using default (6)")
+        
+        history = monitor.get_usage_history_summary(hours)
+        if "error" not in history:
+            print(f"\n📈 Context Usage History (Last {hours} hours):")
+            print(f"  📊 Data Points: {history['data_points']}")
+            print(f"  📉 Min Usage: {history['min_usage']:.1f}%")
+            print(f"  📈 Max Usage: {history['max_usage']:.1f}%")
+            print(f"  📊 Avg Usage: {history['avg_usage']:.1f}%")
+            print(f"  🎯 Current: {history['current_usage']:.1f}%")
+            print(f"  📈 Trend: {history['trend']}")
+        else:
+            print(f"❌ {history['error']}")
+    
+    elif action == "config":
+        # Show configuration
+        if value == "reset":
+            monitor.config = monitor._get_default_config()
+            if monitor.save_config():
+                print("✅ Configuration reset to defaults")
+            else:
+                print("❌ Failed to reset configuration")
+        else:
+            print("📋 Current Context Monitor Configuration:")
+            print("=" * 50)
+            
+            thresholds = monitor.config.get("thresholds", {})
+            print("🎯 Thresholds:")
+            print(f"  Light Consolidation: {thresholds.get('consolidation_light', 75)}%")
+            print(f"  Critical Consolidation: {thresholds.get('consolidation_critical', 85)}%")
+            print(f"  Emergency Sleep: {thresholds.get('sleep_emergency', 95)}%")
+            
+            monitoring = monitor.config.get("monitoring", {})
+            print("\n⚙️ Monitoring Settings:")
+            print(f"  Check Interval: {monitoring.get('check_interval_seconds', 300)}s")
+            print(f"  Automatic Actions: {monitoring.get('enable_automatic_actions', True)}")
+            print(f"  Background Monitoring: {monitoring.get('enable_background_monitoring', False)}")
+            
+            display = monitor.config.get("display", {})
+            print("\n🎨 Display Settings:")
+            print(f"  Progress Bar: {display.get('show_progress_bar', True)}")
+            print(f"  Progress Bar Width: {display.get('progress_bar_width', 40)}")
+            print(f"  Color Coding: {display.get('color_coding', True)}")
+    
+    elif action == "threshold":
+        # Update threshold
+        if not value:
+            print("❌ Usage: /context threshold <threshold_name> <value>")
+            print("   Valid thresholds: consolidation_light, consolidation_critical, sleep_emergency")
+            return
+        
+        if len(sys.argv) < 4:
+            print("❌ Usage: /context threshold <threshold_name> <value>")
+            return
+        
+        threshold_name = value
+        threshold_value = sys.argv[3]
+        
+        try:
+            value_float = float(threshold_value)
+            if 0 <= value_float <= 100:
+                success = monitor.update_threshold(threshold_name, value_float)
+                if success:
+                    print(f"✅ Updated {threshold_name} to {value_float}%")
+                    print(f"💾 Configuration saved")
+                else:
+                    print(f"❌ Failed to update {threshold_name}")
+            else:
+                print("❌ Threshold value must be between 0 and 100")
+        except ValueError:
+            print("❌ Threshold value must be a number")
+    
+    elif action == "monitor":
+        # Start monitoring session
+        duration = 60  # Default 60 minutes
+        if value:
+            try:
+                duration = int(value)
+            except ValueError:
+                print("❌ Invalid duration value, using default (60 minutes)")
+        
+        print(f"🔍 Starting enhanced context monitoring for {duration} minutes...")
+        print("   Will display alerts when thresholds are reached")
+        print("   Press Ctrl+C to stop monitoring")
+        
+        try:
+            await monitor.monitor_with_notifications(duration)
+        except KeyboardInterrupt:
+            print("\n⏹️ Monitoring stopped by user")
+    
+    elif action == "check":
+        # Quick check with just the essentials
+        usage_data = monitor.get_enhanced_context_usage()
+        usage_pct = usage_data['percentage']
+        status = usage_data['threshold_status']
+        
+        # Simple status line
+        status_emoji = {
+            "normal": "🟢",
+            "warning": "🟡", 
+            "critical": "🟠",
+            "emergency": "🔴"
+        }
+        
+        emoji = status_emoji.get(status, "⚪")
+        progress_bar = monitor.get_progress_bar(usage_pct, 20)  # Shorter bar for quick check
+        
+        print(f"{emoji} Context: {progress_bar} ({status})")
+        
+        # Show trend if available
+        if usage_data['usage_trend'] != "stable":
+            trend_emoji = "📈" if usage_data['usage_trend'] == "increasing" else "📉"
+            print(f"{trend_emoji} Trend: {usage_data['usage_trend']}")
+        
+        # Show time estimates for increasing usage
+        if usage_data.get('estimated_time_to_critical'):
+            minutes = int(usage_data['estimated_time_to_critical'] / 60)
+            print(f"⏰ Est. time to critical: {minutes} minutes")
+    
+    elif action == "help":
+        print("🔍 Context Usage Monitor - Available Commands:")
+        print("=" * 50)
+        print("/context [status]     - Show detailed context status (default)")
+        print("/context check        - Quick context check with progress bar")
+        print("/context history [N]  - Show usage history for N hours (default: 6)")
+        print("/context config       - Show current configuration")
+        print("/context config reset - Reset configuration to defaults")
+        print("/context threshold <name> <value> - Update threshold")
+        print("                        (consolidation_light|consolidation_critical|sleep_emergency)")
+        print("/context monitor [N]  - Monitor for N minutes with alerts (default: 60)")
+        print("/context help         - Show this help message")
+        print("")
+        print("Examples:")
+        print("  /context check")
+        print("  /context threshold consolidation_light 70")
+        print("  /context monitor 30")
+        print("  /context history 12")
+    
+    else:
+        print(f"❌ Unknown action: {action}")
+        print("💡 Use '/context help' for available commands")
+
+if __name__ == "__main__":
+    asyncio.run(main())
