@@ -8,7 +8,8 @@ and Infrastructure Agent's RBAC framework.
 import logging
 from datetime import datetime, timedelta
 
-from .auth_middleware import AuthenticationMiddleware, Permission
+from .auth_middleware import AuthenticationMiddleware
+from config.auth_models import Permission
 from .redis_cache_integration import RedisCacheManager
 
 # Configure logging

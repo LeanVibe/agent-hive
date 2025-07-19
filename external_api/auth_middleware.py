@@ -39,25 +39,7 @@ class AuthMethod(Enum):
     SIGNATURE = "signature"
 
 
-class Permission(Enum):
-    """System permissions."""
-    READ = "read"
-    WRITE = "write"
-    ADMIN = "admin"
-    EXECUTE = "execute"
-
-
-class AuthResult:
-    """Authentication result."""
-
-    def __init__(self, success: bool, user_id: Optional[str] = None,
-                 permissions: Optional[List[Permission]] = None,
-                 error: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None):
-        self.success = success
-        self.user_id = user_id
-        self.permissions = permissions or []
-        self.error = error
-        self.metadata = metadata or {}
+from config.auth_models import Permission, AuthResult
 
 
 class AuthenticationMiddleware:

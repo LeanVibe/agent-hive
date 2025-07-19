@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from passlib.context import CryptContext
 import jwt
 
-from external_api.auth_middleware import Permission, AuthResult
+from config.auth_models import Permission, AuthResult
 from security.token_manager import SecureTokenManager, TokenType
 from config.security_config import get_security_config, SecurityConfigManager
 
