@@ -1,0 +1,41 @@
+{
+  "thresholds": {
+    "consolidation_light": 75,
+    "consolidation_critical": 85,
+    "sleep_emergency": 95
+  },
+  "monitoring": {
+    "check_interval_seconds": 300,
+    "warning_advance_notice": 5,
+    "enable_automatic_actions": true,
+    "enable_background_monitoring": false
+  },
+  "actions": {
+    "75_percent": {
+      "action": "consolidate_light",
+      "notify": true,
+      "message": "\ud83d\udfe1 Context usage at 75% - Light consolidation recommended"
+    },
+    "85_percent": {
+      "action": "consolidate_critical",
+      "notify": true,
+      "message": "\ud83d\udfe0 Context usage at 85% - Critical consolidation required"
+    },
+    "95_percent": {
+      "action": "sleep_emergency",
+      "notify": true,
+      "message": "\ud83d\udd34 Context usage at 95% - Emergency sleep/wake cycle required"
+    }
+  },
+  "display": {
+    "show_percentage": true,
+    "show_progress_bar": true,
+    "progress_bar_width": 40,
+    "color_coding": true
+  },
+  "meta": {
+    "version": "1.0.0",
+    "last_updated": "2025-07-19T08:50:32.379030",
+    "created_by": "Enhanced Context Monitor"
+  }
+}
