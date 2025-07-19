@@ -1,0 +1,438 @@
+# Rate Limiting Configuration for LeanVibe Agent Hive
+# Comprehensive rate limiting rules and policies for API protection
+
+# Global Rate Limiting Configuration
+global:
+  enabled: true
+  enforcement_mode: "strict"  # strict, permissive, monitoring_only
+  default_strategy: "sliding_window"
+  performance_target_ms: 5.0
+  cleanup_interval_seconds: 300
+  max_violations_stored: 10000
+
+# System-wide Protection Limits
+system_limits:
+  global_protection:
+    strategy: "token_bucket"
+    requests_per_second: 1000
+    burst_capacity: 1500
+    refill_rate: 1000.0
+    priority: 10
+    enabled: true
+    description: "Global system protection against DDoS attacks"
+
+  emergency_throttle:
+    strategy: "fixed_window"
+    requests_per_second: 100
+    window_seconds: 1
+    priority: 5
+    enabled: false
+    description: "Emergency throttling when system is under extreme load"
+
+# User-based Rate Limits
+user_limits:
+  authenticated_user:
+    strategy: "sliding_window"
+    requests_per_minute: 100
+    window_seconds: 60
+    priority: 20
+    enabled: true
+    description: "Standard rate limit for authenticated users"
+
+  premium_user:
+    strategy: "token_bucket"
+    requests_per_minute: 500
+    burst_capacity: 750
+    refill_rate: 8.33  # 500 requests per 60 seconds
+    priority: 15
+    enabled: true
+    description: "Higher limits for premium users"
+
+  anonymous_user:
+    strategy: "sliding_window"
+    requests_per_minute: 20
+    window_seconds: 60
+    priority: 25
+    enabled: true
+    description: "Conservative limits for anonymous users"
+
+# Role-based Rate Limits
+role_limits:
+  SuperAdmin:
+    strategy: "token_bucket"
+    requests_per_minute: 2000
+    burst_capacity: 3000
+    refill_rate: 33.33
+    priority: 10
+    enabled: true
+    description: "Highest limits for super administrators"
+
+  Admin:
+    strategy: "token_bucket"
+    requests_per_minute: 1000
+    burst_capacity: 1500
+    refill_rate: 16.67
+    priority: 12
+    enabled: true
+    description: "High limits for administrators"
+
+  Developer:
+    strategy: "sliding_window"
+    requests_per_minute: 500
+    window_seconds: 60
+    priority: 15
+    enabled: true
+    description: "Moderate limits for developers"
+
+  User:
+    strategy: "sliding_window"
+    requests_per_minute: 100
+    window_seconds: 60
+    priority: 20
+    enabled: true
+    description: "Standard limits for regular users"
+
+  Guest:
+    strategy: "sliding_window"
+    requests_per_minute: 10
+    window_seconds: 60
+    priority: 30
+    enabled: true
+    description: "Restrictive limits for guest users"
+
+  Agent:
+    strategy: "token_bucket"
+    requests_per_minute: 300
+    burst_capacity: 450
+    refill_rate: 5.0
+    priority: 18
+    enabled: true
+    description: "Limits for automated agent access"
+
+# Endpoint-specific Rate Limits
+endpoint_limits:
+  # Authentication endpoints - strict limits to prevent brute force
+  auth_login:
+    pattern: "/api/v1/auth/login"
+    strategy: "sliding_window_log"
+    requests_per_window: 5
+    window_seconds: 300  # 5 attempts per 5 minutes
+    priority: 5
+    enabled: true
+    description: "Strict login attempt limiting"
+
+  auth_password_reset:
+    pattern: "/api/v1/auth/password-reset"
+    strategy: "sliding_window"
+    requests_per_window: 3
+    window_seconds: 3600  # 3 attempts per hour
+    priority: 5
+    enabled: true
+    description: "Password reset attempt limiting"
+
+  # Administrative endpoints - very strict
+  admin_endpoints:
+    pattern: "/api/v1/admin/*"
+    strategy: "token_bucket"
+    requests_per_minute: 20
+    burst_capacity: 30
+    refill_rate: 0.33
+    priority: 8
+    enabled: true
+    description: "Strict limits for admin operations"
+
+  # Agent management endpoints
+  agent_creation:
+    pattern: "/api/v1/agents/create"
+    strategy: "sliding_window"
+    requests_per_minute: 10
+    window_seconds: 60
+    priority: 15
+    enabled: true
+    description: "Limit agent creation frequency"
+
+  agent_management:
+    pattern: "/api/v1/agents/*"
+    strategy: "sliding_window"
+    requests_per_minute: 200
+    window_seconds: 60
+    priority: 20
+    enabled: true
+    description: "General agent management limits"
+
+  # Task and workflow endpoints
+  task_creation:
+    pattern: "/api/v1/tasks/create"
+    strategy: "token_bucket"
+    requests_per_minute: 50
+    burst_capacity: 75
+    refill_rate: 0.83
+    priority: 18
+    enabled: true
+    description: "Task creation rate limiting"
+
+  task_management:
+    pattern: "/api/v1/tasks/*"
+    strategy: "sliding_window"
+    requests_per_minute: 300
+    window_seconds: 60
+    priority: 22
+    enabled: true
+    description: "General task management limits"
+
+  # File upload endpoints
+  file_upload:
+    pattern: "/api/v1/upload/*"
+    strategy: "token_bucket"
+    requests_per_minute: 20
+    burst_capacity: 30
+    refill_rate: 0.33
+    priority: 15
+    enabled: true
+    description: "File upload rate limiting"
+
+  # Search and query endpoints
+  search_endpoints:
+    pattern: "/api/v1/search/*"
+    strategy: "sliding_window"
+    requests_per_minute: 100
+    window_seconds: 60
+    priority: 25
+    enabled: true
+    description: "Search operation rate limiting"
+
+  # Monitoring and metrics endpoints
+  metrics_endpoints:
+    pattern: "/api/v1/metrics/*"
+    strategy: "fixed_window"
+    requests_per_minute: 60
+    window_seconds: 60
+    priority: 30
+    enabled: true
+    description: "Metrics access rate limiting"
+
+# IP-based Rate Limits for DoS Protection
+ip_limits:
+  general_ip_protection:
+    strategy: "sliding_window"
+    requests_per_minute: 300
+    window_seconds: 60
+    priority: 40
+    enabled: true
+    description: "General IP-based DoS protection"
+
+  suspicious_ip_protection:
+    strategy: "token_bucket"
+    requests_per_minute: 50
+    burst_capacity: 75
+    refill_rate: 0.83
+    priority: 35
+    enabled: true
+    description: "Stricter limits for suspicious IPs"
+
+# Geographic Rate Limits (if geographic detection is available)
+geographic_limits:
+  high_risk_regions:
+    strategy: "sliding_window"
+    requests_per_minute: 100
+    window_seconds: 60
+    priority: 45
+    enabled: false  # Disabled by default
+    description: "Limits for high-risk geographic regions"
+
+# Custom Rate Limit Rules
+custom_rules:
+  api_key_specific:
+    # Example: specific limits for API keys
+    strategy: "token_bucket"
+    requests_per_minute: 1000
+    burst_capacity: 1500
+    refill_rate: 16.67
+    priority: 12
+    enabled: false
+    description: "Custom limits for specific API keys"
+
+  webhook_endpoints:
+    pattern: "/api/v1/webhooks/*"
+    strategy: "sliding_window"
+    requests_per_minute: 500
+    window_seconds: 60
+    priority: 20
+    enabled: true
+    description: "Webhook delivery rate limiting"
+
+# Rate Limit Violation Handling
+violation_handling:
+  # Progressive penalties
+  progressive_penalties:
+    enabled: true
+    levels:
+      - violations: 3
+        penalty_multiplier: 2.0
+        duration_minutes: 15
+      - violations: 5
+        penalty_multiplier: 5.0
+        duration_minutes: 60
+      - violations: 10
+        penalty_multiplier: 10.0
+        duration_minutes: 360
+
+  # Automatic blocking
+  auto_blocking:
+    enabled: true
+    violation_threshold: 15
+    block_duration_minutes: 1440  # 24 hours
+    whitelist_patterns:
+      - "127.0.0.1"
+      - "localhost"
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"
+
+# Monitoring and Alerting Configuration
+monitoring:
+  enabled: true
+  
+  # Performance monitoring
+  performance_alerts:
+    max_check_time_ms: 10.0
+    alert_threshold_violations: 100
+    alert_window_minutes: 5
+
+  # Security monitoring
+  security_alerts:
+    rapid_violations_threshold: 10
+    rapid_violations_window_minutes: 1
+    suspicious_pattern_detection: true
+
+  # Metrics collection
+  metrics:
+    collect_detailed_stats: true
+    retention_hours: 168  # 7 days
+    aggregation_intervals:
+      - 1m
+      - 5m
+      - 1h
+      - 1d
+
+# Integration Configuration
+integration:
+  # JWT/RBAC Integration
+  auth_integration:
+    enabled: true
+    extract_user_from_jwt: true
+    extract_roles_from_jwt: true
+    fallback_to_anonymous: true
+
+  # API Gateway Integration
+  api_gateway:
+    add_headers: true
+    custom_error_responses: true
+    include_retry_after: true
+    log_violations: true
+
+  # External Systems Integration
+  external_systems:
+    # Prometheus metrics
+    prometheus:
+      enabled: false
+      metrics_endpoint: "/metrics/rate-limits"
+    
+    # Alerting systems
+    alerting:
+      slack_webhook: ""
+      email_alerts: false
+      pagerduty_integration: false
+
+# Environment-specific Overrides
+environments:
+  development:
+    global:
+      enforcement_mode: "permissive"
+    system_limits:
+      global_protection:
+        requests_per_second: 10000  # Higher limits for dev
+    user_limits:
+      authenticated_user:
+        requests_per_minute: 1000
+
+  staging:
+    global:
+      enforcement_mode: "strict"
+    monitoring:
+      performance_alerts:
+        max_check_time_ms: 15.0  # More lenient in staging
+
+  production:
+    global:
+      enforcement_mode: "strict"
+    monitoring:
+      security_alerts:
+        rapid_violations_threshold: 5  # More sensitive in prod
+    violation_handling:
+      auto_blocking:
+        violation_threshold: 10  # Stricter blocking
+
+# Bypass Configuration
+bypass:
+  # Patterns that bypass rate limiting entirely
+  patterns:
+    - "/health"
+    - "/metrics"
+    - "/favicon.ico"
+    - "*.css"
+    - "*.js"
+    - "*.png"
+    - "*.jpg"
+    - "*.gif"
+    - "*.ico"
+    - "/api/v1/system/status"
+
+  # IP addresses that bypass rate limiting
+  ip_whitelist:
+    - "127.0.0.1"
+    - "::1"
+    # Add trusted internal IPs here
+
+  # User agents that bypass rate limiting
+  user_agent_whitelist:
+    - "HealthChecker/1.0"
+    - "MonitoringService/2.0"
+    # Add trusted monitoring services here
+
+# Error Messages and Response Configuration
+error_responses:
+  default_message: "Rate limit exceeded. Please try again later."
+  
+  custom_messages:
+    global_protection: "System is under high load. Please try again later."
+    auth_login: "Too many login attempts. Please try again in 5 minutes."
+    admin_endpoints: "Administrative endpoint rate limit exceeded."
+    agent_creation: "Agent creation rate limit exceeded. Please wait before creating more agents."
+    file_upload: "File upload rate limit exceeded. Please wait before uploading more files."
+
+  include_details:
+    retry_after: true
+    remaining_requests: true
+    reset_time: true
+    violation_id: false  # For debugging, set to true in development
+
+# Advanced Configuration
+advanced:
+  # Distributed rate limiting (for multi-instance deployments)
+  distributed:
+    enabled: false
+    backend: "redis"  # redis, consul, etcd
+    sync_interval_ms: 1000
+    
+  # Cache configuration
+  cache:
+    ttl_seconds: 3600
+    max_entries: 100000
+    eviction_policy: "lru"
+    
+  # Performance optimization
+  performance:
+    async_processing: true
+    batch_size: 100
+    worker_threads: 4

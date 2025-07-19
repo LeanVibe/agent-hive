@@ -21,6 +21,7 @@ from .models import (
 )
 from .service_discovery import ServiceDiscovery, ServiceInstance
 from .auth_middleware import AuthenticationMiddleware, AuthResult
+from .rate_limit_middleware import RateLimitMiddleware
 
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ class ApiGateway:
         # Initialize core components
         self.service_discovery = ServiceDiscovery(self.config.get("service_discovery", {}))
         self.auth_middleware = AuthenticationMiddleware(self.config.get("auth", {}))
+        self.rate_limit_middleware = RateLimitMiddleware(self.config.get("rate_limiting", {}))
         
         # Initialize JWT integration
         from .jwt_integration import JwtIntegrationService
@@ -67,6 +69,7 @@ class ApiGateway:
         self.middleware_stack: List[Callable] = []
         
         # Security tracking
+        from typing import Set
         self.blocked_ips: Set[str] = set()
         self.security_events: List[Dict[str, Any]] = []
         
@@ -106,6 +109,13 @@ class ApiGateway:
                 "registry_host": "localhost",
                 "registry_port": 8500,
                 "health_check_interval": 30
+            },
+            "rate_limiting": {
+                "enabled": True,
+                "include_headers": True,
+                "log_violations": True,
+                "bypass_patterns": ["/health", "/metrics", "/favicon.ico"],
+                "performance_target_ms": 5.0
             }
         }
     
@@ -145,8 +155,11 @@ class ApiGateway:
             request.headers["X-User-ID"] = auth_metadata.user_id or ""
             request.headers["X-User-Roles"] = ",".join(auth_metadata.roles)
             
-            # Route request to appropriate handler
-            response = await self._route_request(request)
+            # Rate Limiting - process request through rate limit middleware
+            async def route_handler(req):
+                return await self._route_request(req)
+            
+            response = await self.rate_limit_middleware.process_request(request, route_handler)
             
             # Add CORS headers if enabled
             if self.gateway_config.enable_cors:
@@ -280,6 +293,7 @@ class ApiGateway:
         try:
             # Get component health
             auth_stats = await self.jwt_service.get_authentication_stats()
+            rate_limit_stats = await self.rate_limit_middleware.get_middleware_stats()
             
             # Calculate service health
             avg_response_time = sum(self.response_times) / len(self.response_times) if self.response_times else 0
@@ -297,6 +311,7 @@ class ApiGateway:
                     "blocked_ips": len(self.blocked_ips)
                 },
                 "authentication": auth_stats,
+                "rate_limiting": rate_limit_stats,
                 "configuration": {
                     "auth_required": self.gateway_config.auth_required,
                     "cors_enabled": self.gateway_config.enable_cors,
@@ -321,6 +336,7 @@ class ApiGateway:
         """Get detailed API Gateway metrics."""
         try:
             auth_stats = await self.jwt_service.get_authentication_stats()
+            rate_limit_stats = await self.rate_limit_middleware.get_middleware_stats()
             
             metrics = {
                 "timestamp": datetime.utcnow().isoformat(),
@@ -339,7 +355,8 @@ class ApiGateway:
                 "security": {
                     "blocked_ips": len(self.blocked_ips),
                     "security_events": len(self.security_events),
-                    "authentication": auth_stats.get("jwt_integration", {})
+                    "authentication": auth_stats.get("jwt_integration", {}),
+                    "rate_limiting": rate_limit_stats
                 },
                 "configuration": asdict(self.gateway_config)
             }
