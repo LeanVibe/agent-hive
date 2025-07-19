@@ -1,0 +1,44 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: leanvibe-agent-hive-development
+
+namespace: leanvibe-agent-hive-dev
+
+namePrefix: dev-
+
+bases:
+  - ../../base
+
+commonLabels:
+  environment: development
+  tier: dev
+
+patchesStrategicMerge:
+  - agent-hive-deployment-patch.yaml
+  - configmap-patch.yaml
+  - hpa-patch.yaml
+
+images:
+  - name: leanvibe-agent-hive
+    newTag: "dev-latest"
+
+configMapGenerator:
+  - name: deployment-info
+    behavior: merge
+    literals:
+      - deployment.environment=development
+      - deployment.tier=dev
+      - debug.enabled=true
+
+replicas:
+  - name: agent-hive
+    count: 1
+  - name: postgres
+    count: 1
+  - name: redis
+    count: 1
+
+resources:
+  - service-nodeport.yaml

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-hive
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: agent-hive
+        env:
+        - name: LEANVIBE_ENVIRONMENT
+          value: "production"
+        - name: LEANVIBE_LOG_LEVEL
+          value: "INFO"
+        - name: LEANVIBE_DEBUG_MODE
+          value: "false"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 10

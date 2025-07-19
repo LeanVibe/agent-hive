@@ -1,0 +1,278 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-monitoring-config
+  namespace: leanvibe-agent-hive
+  labels:
+    app.kubernetes.io/name: security-monitoring
+    app.kubernetes.io/component: monitoring
+data:
+  falco-rules.yaml: |
+    # Falco security monitoring rules for LeanVibe Agent Hive
+    
+    - rule: Unexpected network traffic
+      desc: Detect unexpected network connections from application pods
+      condition: >
+        (fd.type=ipv4 or fd.type=ipv6) and
+        k8s.ns.name=leanvibe-agent-hive and
+        not (fd.rip in (postgresql_ips, redis_ips, prometheus_ips, allowed_external_ips))
+      output: >
+        Unexpected network connection from Agent Hive pod
+        (connection=%fd.name src_ip=%fd.lip dest_ip=%fd.rip dest_port=%fd.rport
+        pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: WARNING
+    
+    - rule: Sensitive file access
+      desc: Detect access to sensitive files in Agent Hive pods
+      condition: >
+        open_read and
+        k8s.ns.name=leanvibe-agent-hive and
+        (fd.name contains "/etc/passwd" or
+         fd.name contains "/etc/shadow" or
+         fd.name contains "/etc/ssh" or
+         fd.name contains "id_rsa" or
+         fd.name contains ".pem" or
+         fd.name contains ".key")
+      output: >
+        Sensitive file accessed in Agent Hive pod
+        (file=%fd.name pod=%k8s.pod.name ns=%k8s.ns.name proc=%proc.name)
+      priority: WARNING
+    
+    - rule: Privilege escalation attempt
+      desc: Detect privilege escalation attempts
+      condition: >
+        spawned_process and
+        k8s.ns.name=leanvibe-agent-hive and
+        (proc.name in (su, sudo, passwd, chsh, chfn, chage, setuid, setgid))
+      output: >
+        Privilege escalation attempt in Agent Hive pod
+        (proc=%proc.name pod=%k8s.pod.name ns=%k8s.ns.name user=%user.name)
+      priority: HIGH
+    
+    - rule: Suspicious shell activity
+      desc: Detect suspicious shell activity in containers
+      condition: >
+        spawned_process and
+        k8s.ns.name=leanvibe-agent-hive and
+        proc.name in (sh, bash, zsh, fish, csh, tcsh) and
+        not proc.pname in (python, node, uvicorn, gunicorn)
+      output: >
+        Suspicious shell spawned in Agent Hive pod
+        (shell=%proc.name parent=%proc.pname pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: WARNING
+  
+  prometheus-security-rules.yaml: |
+    groups:
+    - name: security.rules
+      rules:
+      # Failed authentication attempts
+      - alert: HighFailedAuthenticationRate
+        expr: rate(http_requests_total{status=~"401|403",job="agent-hive"}[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High rate of failed authentication attempts"
+          description: "More than 5 failed authentication attempts per second over the last 5 minutes"
+      
+      # Suspicious network activity
+      - alert: UnusualNetworkTraffic
+        expr: rate(container_network_transmit_bytes_total{namespace="leanvibe-agent-hive"}[5m]) > 10485760  # 10MB/s
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Unusual network traffic detected"
+          description: "High network transmission rate detected from Agent Hive pods"
+      
+      # Certificate expiry
+      - alert: SSLCertificateExpiring
+        expr: probe_ssl_earliest_cert_expiry - time() < 604800  # 7 days
+        for: 1h
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate for {{ $labels.instance }} expires in less than 7 days"
+      
+      # Pod security violations
+      - alert: PodSecurityViolation
+        expr: increase(security_violations_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Pod security policy violation detected"
+          description: "Security violation detected in pod {{ $labels.pod }}"
+      
+      # Privilege escalation
+      - alert: PrivilegeEscalationAttempt
+        expr: increase(privilege_escalation_attempts_total[1m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Privilege escalation attempt detected"
+          description: "Privilege escalation attempt in pod {{ $labels.pod }}"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: security-monitoring-agent
+  namespace: leanvibe-agent-hive
+  labels:
+    app.kubernetes.io/name: security-monitoring
+    app.kubernetes.io/component: agent
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: security-monitoring
+      app.kubernetes.io/component: agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: security-monitoring
+        app.kubernetes.io/component: agent
+    spec:
+      serviceAccountName: security-monitoring-sa
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 65534
+      containers:
+      - name: security-agent
+        image: falcosecurity/falco:latest
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: falco-config
+          mountPath: /etc/falco
+          readOnly: true
+        - name: var-log
+          mountPath: /var/log
+          readOnly: true
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
+        env:
+        - name: FALCO_GRPC_ENABLED
+          value: "true"
+        - name: FALCO_GRPC_BIND_ADDRESS
+          value: "0.0.0.0:5060"
+        - name: FALCO_OUTPUT_FILE_ENABLED
+          value: "true"
+        - name: FALCO_OUTPUT_FILE_PATH
+          value: "/var/log/falco/events.log"
+      volumes:
+      - name: falco-config
+        configMap:
+          name: security-monitoring-config
+      - name: var-log
+        hostPath:
+          path: /var/log
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: security-monitoring-sa
+  namespace: leanvibe-agent-hive
+  labels:
+    app.kubernetes.io/name: security-monitoring
+    app.kubernetes.io/component: rbac
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-monitoring-role
+  labels:
+    app.kubernetes.io/name: security-monitoring
+    app.kubernetes.io/component: rbac
+rules:
+- apiGroups: [""]
+  resources: ["pods", "namespaces", "services", "events"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "daemonsets", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: security-monitoring-binding
+  labels:
+    app.kubernetes.io/name: security-monitoring
+    app.kubernetes.io/component: rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-monitoring-role
+subjects:
+- kind: ServiceAccount
+  name: security-monitoring-sa
+  namespace: leanvibe-agent-hive
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-monitoring-service
+  namespace: leanvibe-agent-hive
+  labels:
+    app.kubernetes.io/name: security-monitoring
+    app.kubernetes.io/component: service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8765"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+  - name: grpc
+    port: 5060
+    targetPort: 5060
+    protocol: TCP
+  - name: metrics
+    port: 8765
+    targetPort: 8765
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: security-monitoring
+    app.kubernetes.io/component: agent

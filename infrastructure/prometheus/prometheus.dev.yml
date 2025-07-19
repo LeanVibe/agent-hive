@@ -1,0 +1,37 @@
+# Prometheus configuration for development environment
+# Simplified setup for local development
+
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  external_labels:
+    cluster: 'leanvibe-agent-hive-dev'
+    environment: 'development'
+
+# Scrape configurations for development
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # LeanVibe Agent Hive main application
+  - job_name: 'agent-hive'
+    static_configs:
+      - targets: ['agent-hive:8000']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # LeanVibe services
+  - job_name: 'agent-hive-services'
+    static_configs:
+      - targets: 
+        - 'agent-hive:8080'  # Webhook server
+        - 'agent-hive:8081'  # API Gateway
+    scrape_interval: 60s
+
+# Shorter retention for development
+storage:
+  tsdb:
+    retention.time: 7d
+    retention.size: 1GB

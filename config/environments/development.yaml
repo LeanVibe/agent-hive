@@ -1,0 +1,101 @@
+# Development Environment Configuration
+# Overrides for local development and testing
+
+# Environment Information
+environment:
+  name: "development"
+  debug: true
+  testing: true
+
+# Server Configuration
+server:
+  workers: 2
+  max_connections: 50
+  reload: true
+  access_log: true
+
+# Database Configuration
+database:
+  host: "localhost"
+  name: "agent_hive_dev"
+  pool_size: 5
+  max_overflow: 10
+  echo: true  # Enable SQL logging
+
+# Cache Configuration
+cache:
+  host: "localhost"
+  db: 1  # Use different Redis database
+
+# Security Configuration
+security:
+  jwt:
+    expire_minutes: 60  # Shorter expiration for development
+  cors:
+    allow_origins: ["*"]  # Allow all origins for development
+  rate_limiting:
+    requests_per_minute: 1000  # More lenient rate limiting
+    burst_size: 2000
+
+# Logging Configuration
+logging:
+  level: "DEBUG"
+  format: "detailed"
+  handlers:
+    - type: "console"
+      level: "DEBUG"
+      colorize: true
+    - type: "file"
+      level: "DEBUG"
+      filename: "/tmp/agent-hive-dev.log"
+
+# Monitoring Configuration
+monitoring:
+  metrics:
+    enabled: true
+    expose_internal_metrics: true
+  health_check:
+    enabled: true
+    detailed: true
+  tracing:
+    enabled: true
+    sample_rate: 1.0  # Trace everything in development
+
+# Agent Coordination Configuration
+agent_coordination:
+  max_agents: 3
+  heartbeat_interval: 60  # Longer interval for development
+  auto_scaling:
+    enabled: false  # Disable auto-scaling in development
+
+# Task Queue Configuration
+task_queue:
+  max_queue_size: 100
+  retry_attempts: 1  # Fewer retries in development
+
+# File Storage Configuration
+storage:
+  base_path: "/tmp/agent-hive-data"
+  max_file_size: 10485760  # 10MB for development
+
+# API Configuration
+api:
+  docs_url: "/docs"
+  redoc_url: "/redoc"
+  include_in_schema: true
+
+# Development-specific Features
+features:
+  hot_reload: true
+  debug_toolbar: true
+  mock_external_services: true
+  test_endpoints: true
+  detailed_error_pages: true
+
+# Development Tools
+development:
+  enable_profiling: true
+  enable_debugging: true
+  mock_authentication: true
+  bypass_rate_limiting: true
+  enable_test_routes: true

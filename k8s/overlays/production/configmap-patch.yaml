@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-hive-config
+data:
+  LEANVIBE_ENVIRONMENT: "production"
+  LEANVIBE_LOG_LEVEL: "INFO"
+  LEANVIBE_DEBUG_MODE: "false"
+  
+  # Production database settings
+  LEANVIBE_POSTGRES_URL: "postgresql://agent_hive_app:${POSTGRES_APP_PASSWORD}@prod-postgres-service:5432/agent_hive"
+  LEANVIBE_REDIS_URL: "redis://prod-redis-service:6379/0"
+  
+  # High performance settings for production
+  WORKERS: "8"
+  MAX_CONNECTIONS: "200"
+  TIMEOUT: "120"
+  
+  # Strict security for production
+  CORS_ORIGINS: "https://agent-hive.yourdomain.com,https://api.agent-hive.yourdomain.com"
+  RATE_LIMIT_REQUESTS: "100"
+  RATE_LIMIT_WINDOW: "60"
+  
+  # Additional production settings
+  ENABLE_METRICS: "true"
+  ENABLE_TRACING: "true"
+  ENABLE_HEALTH_CHECKS: "true"
+  LOG_FORMAT: "json"
+  LOG_LEVEL: "INFO"

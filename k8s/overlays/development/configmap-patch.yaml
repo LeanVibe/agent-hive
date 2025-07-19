@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-hive-config
+data:
+  LEANVIBE_ENVIRONMENT: "development"
+  LEANVIBE_LOG_LEVEL: "DEBUG"
+  LEANVIBE_DEBUG_MODE: "true"
+  
+  # Development database settings
+  LEANVIBE_POSTGRES_URL: "postgresql://postgres:dev_password@dev-postgres-service:5432/agent_hive_dev"
+  LEANVIBE_REDIS_URL: "redis://dev-redis-service:6379/0"
+  
+  # Reduced performance settings for development
+  WORKERS: "2"
+  MAX_CONNECTIONS: "50"
+  TIMEOUT: "30"
+  
+  # Relaxed security for development
+  CORS_ORIGINS: "*"
+  RATE_LIMIT_REQUESTS: "1000"
+  RATE_LIMIT_WINDOW: "60"
