@@ -893,3 +893,355 @@ class AuthenticationService:
                 "password_expiry_days": self.password_expiry_days
             }
         }
+    
+    # RBAC Integration Methods
+    
+    async def create_user_with_rbac(self, username: str, email: str, password: str,
+                                   role_ids: List[str], rbac_manager=None, created_by: str = "system",
+                                   active: bool = True, metadata: Optional[Dict[str, Any]] = None) -> Tuple[bool, str, Optional[User]]:
+        """
+        Create user and assign RBAC roles in a single operation.
+        
+        Args:
+            username: User's username
+            email: User's email address
+            password: User's password
+            role_ids: List of role IDs to assign to user
+            rbac_manager: RBAC manager instance for role assignment
+            created_by: User who created this account
+            active: Whether user account is active
+            metadata: Additional user metadata
+            
+        Returns:
+            Tuple of (success, message, user_object)
+        """
+        try:
+            # Create user with basic roles first
+            from security.auth_service import UserRole  # Import here to avoid circular imports
+            success, message, user = await self.create_user(
+                username=username,
+                email=email,
+                password=password,
+                roles=[],  # Empty roles initially
+                active=active,
+                metadata=metadata
+            )
+            
+            if not success:
+                return False, message, None
+            
+            # Assign RBAC roles if manager provided
+            if rbac_manager and role_ids:
+                for role_id in role_ids:
+                    assign_success, assign_message = await rbac_manager.assign_role_to_user(
+                        user_id=user.user_id,
+                        role_id=role_id,
+                        assigned_by=created_by
+                    )
+                    
+                    if not assign_success:
+                        logger.warning(f"Failed to assign role {role_id} to user {user.user_id}: {assign_message}")
+                        # Continue with other roles even if one fails
+            
+            # Log security event
+            await self._log_security_event({
+                "event_type": "user_created_with_rbac",
+                "user_id": user.user_id,
+                "username": username,
+                "role_ids": role_ids,
+                "created_by": created_by,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+            
+            logger.info(f"Created user with RBAC roles: {username} ({user.user_id})")
+            return True, "User created with RBAC roles successfully", user
+            
+        except Exception as e:
+            logger.error(f"Failed to create user with RBAC {username}: {e}")
+            return False, f"Failed to create user with RBAC: {e}", None
+    
+    async def authenticate_with_rbac(self, username: str, password: str, client_ip: str, 
+                                   user_agent: str, rbac_manager=None,
+                                   two_factor_code: Optional[str] = None) -> Tuple[bool, str, Optional[UserSession], Optional[List[str]]]:
+        """
+        Authenticate user and return session with RBAC role information.
+        
+        Returns:
+            Tuple of (success, message, session_object, user_role_ids)
+        """
+        try:
+            # Standard authentication
+            success, message, session = await self.authenticate_user(
+                username=username,
+                password=password,
+                client_ip=client_ip,
+                user_agent=user_agent,
+                two_factor_code=two_factor_code
+            )
+            
+            if not success:
+                return False, message, None, None
+            
+            # Get user's RBAC roles if manager provided
+            user_role_ids = []
+            if rbac_manager:
+                user_roles = await rbac_manager.get_user_roles(session.user_id)
+                user_role_ids = [role.role_id for role in user_roles]
+                
+                # Add role information to session metadata
+                if hasattr(session, 'metadata'):
+                    session.metadata = session.metadata or {}
+                else:
+                    session.metadata = {}
+                
+                session.metadata['rbac_roles'] = user_role_ids
+                session.metadata['rbac_role_names'] = [role.name for role in user_roles]
+            
+            return True, message, session, user_role_ids
+            
+        except Exception as e:
+            logger.error(f"RBAC authentication error for user {username}: {e}")
+            return False, "Authentication with RBAC failed", None, None
+    
+    async def validate_session_with_rbac(self, access_token: str, client_ip: str, rbac_manager=None,
+                                       required_permissions: Optional[List] = None) -> AuthResult:
+        """
+        Validate session and check RBAC permissions if required.
+        
+        Args:
+            access_token: User's access token
+            client_ip: Client IP address
+            rbac_manager: RBAC manager for permission checking
+            required_permissions: List of permissions to validate
+            
+        Returns:
+            Enhanced AuthResult with RBAC information
+        """
+        try:
+            # Standard session validation
+            auth_result = await self.validate_session(
+                access_token=access_token,
+                client_ip=client_ip,
+                required_permissions=required_permissions
+            )
+            
+            if not auth_result.success:
+                return auth_result
+            
+            # Enhanced validation with RBAC if manager provided
+            if rbac_manager:
+                # Get user's current roles
+                user_roles = await rbac_manager.get_user_roles(auth_result.user_id)
+                role_names = [role.name for role in user_roles]
+                
+                # Get user's effective permissions
+                user_permissions = await rbac_manager.get_user_permissions(auth_result.user_id)
+                permission_values = [perm.value for perm in user_permissions]
+                
+                # Check required permissions if specified
+                permission_checks = {}
+                if required_permissions:
+                    for permission in required_permissions:
+                        check_result = await rbac_manager.check_permission(
+                            auth_result.user_id, 
+                            permission
+                        )
+                        permission_checks[permission.value] = {
+                            "granted": check_result.granted,
+                            "reason": check_result.reason
+                        }
+                
+                # Enhance auth result with RBAC data
+                enhanced_metadata = {
+                    **auth_result.metadata,
+                    "rbac": {
+                        "roles": role_names,
+                        "role_count": len(user_roles),
+                        "permissions": permission_values,
+                        "permission_count": len(user_permissions),
+                        "permission_checks": permission_checks
+                    }
+                }
+                
+                return AuthResult(
+                    success=auth_result.success,
+                    user_id=auth_result.user_id,
+                    permissions=auth_result.permissions,
+                    error=auth_result.error,
+                    metadata=enhanced_metadata
+                )
+            
+            return auth_result
+            
+        except Exception as e:
+            logger.error(f"RBAC session validation failed: {e}")
+            return AuthResult(success=False, error=f"RBAC session validation failed: {e}")
+    
+    async def get_user_rbac_summary(self, user_id: str, rbac_manager=None) -> Dict[str, Any]:
+        """
+        Get comprehensive RBAC summary for a user.
+        
+        Args:
+            user_id: User identifier
+            rbac_manager: RBAC manager instance
+            
+        Returns:
+            Dictionary with user's RBAC information
+        """
+        try:
+            user = self.users.get(user_id)
+            if not user:
+                return {"error": "User not found"}
+            
+            summary = {
+                "user_id": user_id,
+                "username": user.username,
+                "email": user.email,
+                "active": user.active,
+                "created_at": user.created_at.isoformat(),
+                "last_login": user.last_login.isoformat() if user.last_login else None,
+                "login_count": user.login_count
+            }
+            
+            if rbac_manager:
+                # Get roles
+                user_roles = await rbac_manager.get_user_roles(user_id)
+                summary["roles"] = [
+                    {
+                        "role_id": role.role_id,
+                        "name": role.name,
+                        "type": role.role_type.value,
+                        "description": role.description
+                    }
+                    for role in user_roles
+                ]
+                
+                # Get permissions
+                user_permissions = await rbac_manager.get_user_permissions(user_id)
+                summary["permissions"] = [perm.value for perm in user_permissions]
+                
+                # Get role assignments
+                assignments = rbac_manager.user_assignments.get(user_id, [])
+                active_assignments = [
+                    {
+                        "assignment_id": assign.assignment_id,
+                        "role_id": assign.role_id,
+                        "assigned_by": assign.assigned_by,
+                        "assigned_at": assign.assigned_at.isoformat(),
+                        "expires_at": assign.expires_at.isoformat() if assign.expires_at else None,
+                        "active": assign.active
+                    }
+                    for assign in assignments if assign.active
+                ]
+                summary["role_assignments"] = active_assignments
+                
+                summary["rbac_summary"] = {
+                    "total_roles": len(user_roles),
+                    "total_permissions": len(user_permissions),
+                    "active_assignments": len(active_assignments)
+                }
+            else:
+                summary["rbac_available"] = False
+            
+            return summary
+            
+        except Exception as e:
+            logger.error(f"Failed to get RBAC summary for user {user_id}: {e}")
+            return {"error": f"Failed to get RBAC summary: {e}"}
+    
+    async def bulk_assign_roles(self, user_role_mapping: Dict[str, List[str]], 
+                               rbac_manager=None, assigned_by: str = "system") -> Dict[str, Any]:
+        """
+        Assign roles to multiple users in bulk operation.
+        
+        Args:
+            user_role_mapping: Dictionary mapping user_id to list of role_ids
+            rbac_manager: RBAC manager instance
+            assigned_by: User performing the bulk assignment
+            
+        Returns:
+            Summary of bulk assignment results
+        """
+        try:
+            if not rbac_manager:
+                return {"error": "RBAC manager not available"}
+            
+            results = {
+                "successful_assignments": 0,
+                "failed_assignments": 0,
+                "assignment_details": [],
+                "errors": []
+            }
+            
+            for user_id, role_ids in user_role_mapping.items():
+                user_results = {
+                    "user_id": user_id,
+                    "roles_assigned": [],
+                    "roles_failed": []
+                }
+                
+                for role_id in role_ids:
+                    success, message = await rbac_manager.assign_role_to_user(
+                        user_id=user_id,
+                        role_id=role_id,
+                        assigned_by=assigned_by
+                    )
+                    
+                    if success:
+                        user_results["roles_assigned"].append(role_id)
+                        results["successful_assignments"] += 1
+                    else:
+                        user_results["roles_failed"].append({"role_id": role_id, "error": message})
+                        results["failed_assignments"] += 1
+                
+                results["assignment_details"].append(user_results)
+            
+            # Log bulk assignment event
+            await self._log_security_event({
+                "event_type": "bulk_role_assignment",
+                "total_users": len(user_role_mapping),
+                "successful_assignments": results["successful_assignments"],
+                "failed_assignments": results["failed_assignments"],
+                "assigned_by": assigned_by,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"Bulk role assignment failed: {e}")
+            return {"error": f"Bulk role assignment failed: {e}"}
+    
+    async def sync_user_permissions_cache(self, user_id: str, rbac_manager=None) -> bool:
+        """
+        Synchronize user's permission cache with current RBAC state.
+        
+        Args:
+            user_id: User identifier
+            rbac_manager: RBAC manager instance
+            
+        Returns:
+            Success status
+        """
+        try:
+            if not rbac_manager:
+                return False
+            
+            # Clear user's permission cache in RBAC manager
+            await rbac_manager._clear_user_permission_cache(user_id)
+            
+            # Pre-warm cache with common permissions
+            common_permissions = [
+                # Add commonly checked permissions here
+                # This would be configured based on your application needs
+            ]
+            
+            for permission in common_permissions:
+                await rbac_manager.check_permission(user_id, permission)
+            
+            logger.debug(f"Synchronized permission cache for user {user_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to sync permission cache for user {user_id}: {e}")
+            return False

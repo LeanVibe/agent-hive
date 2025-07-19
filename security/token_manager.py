@@ -23,7 +23,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from external_api.auth_middleware import AuthenticationMiddleware, Permission, AuthResult
+from config.auth_models import Permission, AuthResult
 
 
 logger = logging.getLogger(__name__)
@@ -86,7 +86,6 @@ class SecureTokenManager:
     def __init__(self, config: Dict[str, Any]):
         """Initialize secure token manager."""
         self.config = config
-        self.auth_middleware = AuthenticationMiddleware(config)
         
         # Initialize encryption for sensitive data
         self.encryption_key = self._derive_encryption_key()
