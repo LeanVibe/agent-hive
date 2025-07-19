@@ -51,6 +51,13 @@ except ImportError:
     
     performance_monitor = MockPerformanceMonitor()
 
+# Slack Integration
+try:
+    from integrations.slack.cli_commands import SlackCLI
+except ImportError:
+    # Slack integration not available
+    SlackCLI = None
+
 
 class LeanVibeCLI:
     """Main CLI interface for LeanVibe Agent Hive."""
@@ -1040,6 +1047,80 @@ Ready to begin! Comment on issue #{issue} to confirm start.
         else:
             print(f"❌ Unknown performance action: {action}")
 
+    async def slack(self, action: str = "status", 
+                   title: Optional[str] = None, message: Optional[str] = None,
+                   priority: str = "medium", webhook_url: Optional[str] = None,
+                   channel: Optional[str] = None, notification_type: str = "custom",
+                   item_id: Optional[str] = None, old_priority: Optional[str] = None,
+                   new_priority: Optional[str] = None) -> None:
+        """
+        Slack notifications management command.
+
+        Args:
+            action: Slack action (status, test, send, setup, check-events)
+            title: Notification title for custom messages
+            message: Notification message for custom messages
+            priority: Notification priority (urgent, high, medium, low)
+            webhook_url: Slack webhook URL for setup
+            channel: Slack channel for setup
+            notification_type: Type for test notifications (priority, completion, sprint)
+            item_id: Item ID for manual notifications
+            old_priority: Old priority for priority change notifications
+            new_priority: New priority for priority change notifications
+        """
+        if not SlackCLI:
+            print("❌ Slack integration not available")
+            print("💡 Make sure the integrations.slack module is properly installed")
+            return
+
+        print("📱 LeanVibe Slack Notifications")
+        print("=" * 30)
+
+        slack_cli = SlackCLI()
+
+        try:
+            if action == "status":
+                slack_cli.show_config()
+                
+            elif action == "test":
+                await slack_cli.test_connection()
+                
+            elif action == "test-notification":
+                await slack_cli.send_test_notification(notification_type)
+                
+            elif action == "send":
+                if not title or not message:
+                    print("❌ Error: --title and --message required for custom notifications")
+                    return
+                await slack_cli.send_custom_message(title, message, priority)
+                
+            elif action == "setup":
+                slack_cli.setup_config(webhook_url, channel)
+                
+            elif action == "check-events":
+                await slack_cli.check_events()
+                
+            elif action == "notify-priority":
+                if not all([item_id, title, old_priority, new_priority]):
+                    print("❌ Error: --item-id, --title, --old-priority, and --new-priority required")
+                    return
+                await slack_cli.manually_notify_priority_change(item_id, title, old_priority, new_priority)
+                
+            elif action == "notify-completion":
+                if not all([item_id, title, priority]):
+                    print("❌ Error: --item-id, --title, and --priority required")
+                    return
+                await slack_cli.manually_notify_completion(item_id, title, priority)
+                
+            else:
+                print(f"❌ Unknown Slack action: {action}")
+                print("💡 Available actions: status, test, test-notification, send, setup, check-events, notify-priority, notify-completion")
+
+        except Exception as e:
+            print(f"❌ Error executing Slack command: {e}")
+            import traceback
+            print(f"Debug info: {traceback.format_exc()}")
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser."""
@@ -1335,6 +1416,58 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         help="Display format (default: compact)"
     )
 
+    # Slack command - Slack notifications management  
+    slack_parser = subparsers.add_parser(
+        "slack",
+        help="Manage Slack notifications for priority changes and completions"
+    )
+    slack_parser.add_argument(
+        "--action",
+        choices=["status", "test", "test-notification", "send", "setup", "check-events", "notify-priority", "notify-completion"],
+        default="status",
+        help="Slack action to perform (default: status)"
+    )
+    slack_parser.add_argument(
+        "--title",
+        help="Notification title for custom messages"
+    )
+    slack_parser.add_argument(
+        "--message", 
+        help="Notification message for custom messages"
+    )
+    slack_parser.add_argument(
+        "--priority",
+        choices=["urgent", "high", "medium", "low"],
+        default="medium",
+        help="Notification priority (default: medium)"
+    )
+    slack_parser.add_argument(
+        "--webhook-url",
+        help="Slack webhook URL for setup"
+    )
+    slack_parser.add_argument(
+        "--channel",
+        help="Slack channel for setup"
+    )
+    slack_parser.add_argument(
+        "--notification-type",
+        choices=["priority", "completion", "sprint"],
+        default="priority",
+        help="Type for test notifications (default: priority)"
+    )
+    slack_parser.add_argument(
+        "--item-id",
+        help="Item ID for manual notifications"
+    )
+    slack_parser.add_argument(
+        "--old-priority",
+        help="Old priority for priority change notifications (P0-P3)"
+    )
+    slack_parser.add_argument(
+        "--new-priority", 
+        help="New priority for priority change notifications (P0-P3)"
+    )
+
     return parser
 
 
@@ -1412,6 +1545,18 @@ async def main() -> None:
         "dashboard": lambda: cli.dashboard(
             live=args.live,
             format=args.format
+        ),
+        "slack": lambda: cli.slack(
+            action=args.action,
+            title=args.title,
+            message=args.message,
+            priority=args.priority,
+            webhook_url=args.webhook_url,
+            channel=args.channel,
+            notification_type=args.notification_type,
+            item_id=args.item_id,
+            old_priority=args.old_priority,
+            new_priority=args.new_priority
         )
     }
 
