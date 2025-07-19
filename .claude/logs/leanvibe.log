@@ -15,3 +15,16 @@
 2025-07-19 12:38:43 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-19 12:48:44 INFO     leanvibe.startup                                    Logging initialized with level INFO
 2025-07-19 13:02:33 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-19 13:21:36 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-19 13:27:20 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-19 13:27:52 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-19 13:27:52 INFO     security.audit_logger                                No event loop running, using synchronous processing
+2025-07-19 13:27:52 INFO     security.audit_logger                                SecurityAuditLogger initialized with comprehensive monitoring
+2025-07-19 13:27:52 INFO     security.security_monitor                                Initialized 6 anomaly detection engines
+2025-07-19 13:27:52 INFO     security.security_monitor                                Loaded 21 threat indicators
+2025-07-19 13:27:52 INFO     security.security_monitor                                No event loop running, monitoring will be handled synchronously
+2025-07-19 13:27:52 INFO     security.security_monitor                                SecurityMonitor initialized with advanced threat detection
+2025-07-19 13:27:52 INFO     security.alert_system                                Loaded 6 default alert rules
+2025-07-19 13:27:52 INFO     security.alert_system                                Configured 2 notification channels
+2025-07-19 13:27:52 INFO     security.alert_system                                No event loop running, notifications will be processed synchronously
+2025-07-19 13:27:52 INFO     security.alert_system                                SecurityAlertSystem initialized with automated notifications
