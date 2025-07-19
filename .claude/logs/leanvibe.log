@@ -28,3 +28,5 @@
 2025-07-19 13:27:52 INFO     security.alert_system                                Configured 2 notification channels
 2025-07-19 13:27:52 INFO     security.alert_system                                No event loop running, notifications will be processed synchronously
 2025-07-19 13:27:52 INFO     security.alert_system                                SecurityAlertSystem initialized with automated notifications
+2025-07-19 13:43:28 INFO     leanvibe.startup                                    Logging initialized with level INFO
+2025-07-19 13:44:41 INFO     leanvibe.startup                                    Logging initialized with level INFO
