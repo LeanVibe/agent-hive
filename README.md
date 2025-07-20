@@ -774,20 +774,17 @@ uv run python -c "from advanced_orchestration.models import CoordinatorConfig; p
 
 ### 📚 Documentation Structure
 
-#### **Single Source of Truth**
-- **[📐 ARCHITECTURE.md](ARCHITECTURE.md)**: **AUTHORITATIVE REFERENCE** - Complete system architecture, design patterns, and technical specifications
-- **[🤖 Agent Communication](AGENT_COMMUNICATION_PROTOCOL.md)**: Agent coordination patterns and communication protocols
-
-#### **Essential Documentation** (Root Directory)
-- **[Development Guide](DEVELOPMENT.md)**: Comprehensive developer reference
-- **[API Reference](API_REFERENCE.md)**: Complete API documentation  
-- **[Troubleshooting Guide](TROUBLESHOOTING.md)**: Common issues and solutions
-- **[Deployment Guide](DEPLOYMENT.md)**: Production deployment strategies
+#### **Essential Documentation**
+- **[📚 Development Guide](DEVELOPMENT.md)**: Complete developer reference with security standards and contribution guidelines
+- **[🚀 Product Roadmap](ROADMAP.md)**: Feature roadmap and upcoming releases  
+- **[📊 Performance Benchmarks](BENCHMARKS.md)**: Detailed performance metrics and validation methodology
+- **[🎯 Project Context](CLAUDE.md)**: Basic project overview and development guidelines
 
 #### **Navigation Guide**
-- **Current Documentation**: All active docs are in root directory or `docs/` folder
-- **Historical Context**: Archived materials in `docs/archived/` with full categorization (8 docs archived July 18, 2025)
-- **New Contributors**: Start with README → ARCHITECTURE.md → DEVELOPMENT.md
+- **For Users**: README.md → Quick Start → ROADMAP.md for future features
+- **For Developers**: README.md → DEVELOPMENT.md → BENCHMARKS.md for validation
+- **For Contributors**: DEVELOPMENT.md contains complete contribution guidelines
+- **Complete Documentation**: See `docs/` folder for detailed technical references
 
 #### 🔍 Project Documentation  
 - **[TODO List](docs/TODO.md)**: Current task list and priorities
