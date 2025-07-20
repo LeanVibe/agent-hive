@@ -80,65 +80,111 @@ LeanVibe Agent Hive is a **production-ready** multi-agent orchestration system t
 **PRODUCTION READY**: This system delivers immediate business value through automated development workflows and intelligent coordination.
 
 ### **Key Business Benefits**
-- **Development Velocity**: 5-10x faster feature delivery through AI coordination
-- **Quality Assurance**: 95%+ test coverage with automated validation
-- **Resource Efficiency**: 95%+ utilization through intelligent load balancing
-- **Reliability**: <5 minute MTTR with automatic fault recovery
-- **Scalability**: Support for 10+ concurrent agents with linear scaling
+- **Development Velocity**: Accelerate feature delivery (internal benchmarks show up to 5-10x improvements)
+- **Quality Assurance**: Comprehensive test coverage with automated validation
+- **Resource Efficiency**: Intelligent load balancing and resource optimization
+- **Reliability**: Automatic fault recovery with minimal downtime
+- **Scalability**: Support for multiple concurrent agents with demand-responsive scaling
 
-### **Production-Ready Components**
-- ✅ **Multi-Agent Coordinator**: `advanced_orchestration/` - Complete orchestration system
-- ✅ **API Gateway**: `external_api/api_gateway.py` - Production API management
-- ✅ **Service Discovery**: `external_api/service_discovery.py` - Microservices coordination
-- ✅ **Security Framework**: `security/` - JWT auth, RBAC, monitoring
-- ✅ **Performance Monitor**: Real-time optimization and analytics
-- ✅ **Quality Gates**: Automated testing and validation pipeline
+### **Core Components**
+- ✅ **Multi-Agent Coordinator**: `advanced_orchestration/` - Agent orchestration and task distribution
+- ✅ **API Gateway**: `external_api/api_gateway.py` - API management and routing
+- ✅ **Service Discovery**: `external_api/service_discovery.py` - Service registration and discovery
+- ✅ **Security Framework**: `security/` - Authentication and authorization
+- ✅ **Performance Monitor**: Real-time system monitoring and optimization
+- ✅ **Quality Gates**: Automated testing and code validation
 
-### **Immediate Installation & Usage**
-1. **Clone and install dependencies** - Ready in 2 minutes
-2. **Run test suite** - Validate all systems operational
-3. **Start coordination** - Begin autonomous development
-4. **Monitor progress** - Real-time dashboard and metrics
+### **Quick Setup Process**
+1. **Install dependencies** - `pip install -r requirements.txt`
+2. **Configure environment** - Set up `.env` file with required variables
+3. **Verify installation** - Run system health checks
+4. **Start first task** - Use guided examples to begin coordination
+5. **Monitor progress** - Access real-time dashboard and metrics
+
+## Installation
+
+### **Prerequisites**
+- Python 3.8+
+- Git
+- Basic familiarity with command-line tools
+
+### **Install Dependencies**
+```bash
+# Clone the repository
+git clone https://github.com/LeanVibe/agent-hive.git
+cd agent-hive
+
+# Install dependencies (choose one method)
+# Method 1: Using pip
+pip install -r requirements.txt
+
+# Method 2: Using UV (recommended for faster installs)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.bashrc  # or restart terminal
+uv sync
+```
+
+### **Configuration** 
+```bash
+# Set up environment configuration
+cp .env.example .env
+
+# Edit .env file with your settings:
+# CLAUDE_API_KEY=your_claude_api_key_here
+# SYSTEM_LOG_LEVEL=INFO
+# Optional: Add any additional configuration
+```
 
 ## Quick Start Guide
 
-### **Immediate Value in 5 Minutes**
+### **Verify Installation**
 
-#### **1. Verify System Health**
 ```bash
 # Test core components
 python -c "from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator; print('✅ Multi-Agent Coordinator ready')"
 python -c "from external_api.service_discovery import ServiceDiscovery; print('✅ Service Discovery ready')"
 
-# Run comprehensive test suite
+# Run test suite to validate installation
 pytest tests/ -v
-# Expected: 95%+ test coverage, all critical systems validated
+# Expected: Majority of tests passing, core systems validated
+
+# Generate coverage report (optional)
+pytest --cov=advanced_orchestration --cov=external_api --cov-report=html
+# Open htmlcov/index.html to view detailed coverage
 ```
 
-#### **2. Start Production Services**
+### **Your First Autonomous Task**
 ```bash
-# Start API Gateway
-python external_api/api_gateway.py
-# Provides: RESTful API management, authentication, monitoring
+# Start the system dashboard (runs in background)
+python dashboard/enhanced_server.py &
+# Access dashboard at: http://localhost:8000 
+# You should see: System status, metrics, and real-time monitoring
 
-# Start Service Discovery
-python external_api/service_discovery.py
-# Provides: Microservice registration, health checks, load balancing
+# Run a simple coordination test
+python -c "
+from advanced_orchestration.multi_agent_coordinator import MultiAgentCoordinator
+from advanced_orchestration.models import CoordinatorConfig
 
-# Start Dashboard
-python dashboard/enhanced_server.py
-# Access: http://localhost:8000 for real-time monitoring
+config = CoordinatorConfig()
+coordinator = MultiAgentCoordinator(config)
+print('✅ Multi-agent system initialized successfully')
+print(f'Available agents: {coordinator.get_available_agents()}')
+"
 ```
 
-#### **3. Begin Autonomous Development**
+### **Advanced Usage**
 ```bash
-# Initialize multi-agent coordinator
+# Initialize development workflow coordination
+# --workflow: Type of development workflow (feature-dev, bug-fix, refactor)
+# --validate: Run validation checks before proceeding
 python cli.py orchestrate --workflow feature-dev --validate
 
-# Spawn specialized agents
-python cli.py spawn --task "implement API endpoint" --depth ultrathink
+# Spawn task-specific agents  
+# --task: Description of the work to be done
+# --depth: Analysis depth (quick, standard, ultrathink)
+python cli.py spawn --task "create hello world API endpoint" --depth standard
 
-# Monitor real-time progress
+# Monitor system performance and agent activity
 python cli.py monitor --metrics --real-time
 ```
 
