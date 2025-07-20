@@ -70,6 +70,15 @@ After reading this file:
 - **BACKLOG.md first**: Always check priorities here before planning
 - **Quality gates**: Never skip validation before completion
 - **Documentation rules**: Embedded in sleep/wake/spawn cycles
+- **NEVER DELETE PROTECTED FILES**: Check .agent-config.json before any destructive actions
+- **Operational vs Documentation**: NEVER transform operational files (BACKLOG.md) into user docs (ROADMAP.md)
+
+## 🛡️ SAFETY PROTOCOLS (Added July 20, 2025)
+### Critical File Protection
+- **BACKLOG.md**: SYSTEM CRITICAL - Never delete, has protection headers
+- **Check .agent-config.json**: Before any file deletions or "cleanup" tasks
+- **CODEOWNERS protection**: Critical files require team approval (.github/CODEOWNERS)
+- **Test automation**: Always verify backlog sync after any changes
 
 ---
 **🎯 MEMORY COMMITMENT**: This knowledge persists across context boundaries. 

@@ -1,0 +1,28 @@
+# CODEOWNERS - Protect Critical Files
+# Documentation: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Critical operational files - require system automation team approval
+BACKLOG.md @system-automation
+.claude/memory/ @system-automation
+scripts/backlog_sync.py @system-automation
+scripts/agent_manager.py @system-automation
+
+# Configuration files - require admin approval  
+.github/ @admin-team
+docker-compose*.yml @admin-team
+.quality-gates.json @admin-team
+
+# Security-related files - require security team approval
+security/ @security-team
+.bandit @security-team
+.pre-commit-config.yaml @security-team
+
+# Core system files - require core team approval
+agent_hive_cli.py @core-team
+agent_coordination_protocols.py @core-team
+agent_registry.db @core-team
+
+# Documentation that affects user experience - require documentation team approval
+README.md @documentation-team
+docs/ @documentation-team
+ROADMAP.md @documentation-team

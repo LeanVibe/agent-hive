@@ -1,0 +1,66 @@
+{
+  "agent_safety_config": {
+    "version": "1.0",
+    "last_updated": "2025-07-20",
+    "description": "Configuration file to prevent critical file deletion and system failures",
+    "protected_files": [
+      {
+        "path": "BACKLOG.md",
+        "reason": "Single source of truth for project management and GitHub sync automation",
+        "action": "NEVER_DELETE",
+        "owner": "@system-automation",
+        "criticality": "SYSTEM_CRITICAL"
+      },
+      {
+        "path": ".claude/memory/",
+        "reason": "Essential workflow knowledge and session state",
+        "action": "NEVER_DELETE",
+        "owner": "@system-automation", 
+        "criticality": "SYSTEM_CRITICAL"
+      },
+      {
+        "path": "scripts/backlog_sync.py",
+        "reason": "Automation script for BACKLOG.md to GitHub sync",
+        "action": "REQUIRE_APPROVAL",
+        "owner": "@system-automation",
+        "criticality": "HIGH"
+      },
+      {
+        "path": "scripts/agent_manager.py",
+        "reason": "Core agent coordination and communication",
+        "action": "REQUIRE_APPROVAL", 
+        "owner": "@system-automation",
+        "criticality": "HIGH"
+      },
+      {
+        "path": ".github/CODEOWNERS",
+        "reason": "File protection configuration",
+        "action": "REQUIRE_APPROVAL",
+        "owner": "@admin-team",
+        "criticality": "HIGH"
+      }
+    ],
+    "operational_vs_documentation": {
+      "operational_files": [
+        "BACKLOG.md",
+        "scripts/",
+        ".claude/",
+        "agent_*.py",
+        ".quality-gates.json"
+      ],
+      "user_documentation": [
+        "README.md", 
+        "ROADMAP.md",
+        "docs/",
+        "DEVELOPMENT.md"
+      ],
+      "rule": "NEVER transform operational files into documentation files without explicit approval"
+    },
+    "mandatory_checks": [
+      "Before deleting any file, check if it exists in protected_files list",
+      "Before cleanup tasks, distinguish between operational and documentation files",
+      "Always create a plan and get approval for destructive actions",
+      "Test automation after any file changes that could affect it"
+    ]
+  }
+}
