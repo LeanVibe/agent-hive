@@ -1040,6 +1040,210 @@ Ready to begin! Comment on issue #{issue} to confirm start.
         else:
             print(f"❌ Unknown performance action: {action}")
 
+    async def backlog(self, action: str = "status", dry_run: bool = False, 
+                     format: str = "json", days: int = 30, output: Optional[str] = None,
+                     table: Optional[str] = None, repo_path: str = ".", 
+                     db_path: Optional[str] = None) -> None:
+        """
+        BACKLOG.md database integration and analytics command.
+
+        Args:
+            action: Analytics action to perform
+            dry_run: Show what would be done without executing (sync only)
+            format: Output format (json, markdown, csv)
+            days: Number of days for trend analysis
+            output: Output file path for reports and exports
+            table: Database table to export
+            repo_path: Path to repository root
+            db_path: Custom database path
+        """
+        try:
+            if action == "sync":
+                # Import and use the sync system
+                from scripts.backlog_database_sync import BacklogDatabaseSync
+                
+                sync_manager = BacklogDatabaseSync(repo_path, db_path)
+                
+                if dry_run:
+                    print("🔄 BACKLOG.md Database Sync (Dry Run)")
+                    print("=" * 40)
+                    stats = sync_manager.sync_to_database(dry_run=True)
+                    print(f"📋 Would process {stats['items_processed']} items")
+                else:
+                    print("🔄 BACKLOG.md Database Sync")
+                    print("=" * 28)
+                    stats = sync_manager.sync_to_database(dry_run=False)
+                    sync_manager.update_sprint_metrics()
+                    
+                    print(f"✅ Sync complete:")
+                    print(f"  📝 Items processed: {stats['items_processed']}")
+                    print(f"  ➕ Items created: {stats['items_created']}")
+                    print(f"  🔄 Items updated: {stats['items_updated']}")
+                    print(f"  ✅ Items completed: {stats['items_completed']}")
+                    
+                    if stats['errors']:
+                        print(f"  ❌ Errors: {len(stats['errors'])}")
+                        for error in stats['errors']:
+                            print(f"    - {error}")
+
+            else:
+                # Import and use the analytics system
+                from scripts.backlog_analytics import BacklogAnalytics
+                
+                analytics = BacklogAnalytics(repo_path, db_path)
+                
+                print("📊 BACKLOG.md Analytics")
+                print("=" * 24)
+                
+                if action == "status":
+                    result = analytics.get_current_sprint_status()
+                    if format == "json":
+                        output_data = json.dumps(result, indent=2)
+                    else:
+                        output_data = str(result)
+                
+                elif action == "velocity":
+                    result = analytics.get_velocity_trend(days)
+                    if format == "json":
+                        output_data = json.dumps(result, indent=2)
+                    else:
+                        output_data = str(result)
+                
+                elif action == "priority-changes":
+                    result = analytics.get_priority_change_analysis()
+                    if format == "json":
+                        output_data = json.dumps(result, indent=2)
+                    else:
+                        output_data = str(result)
+                
+                elif action == "completion-times":
+                    result = analytics.get_completion_time_analysis()
+                    if format == "json":
+                        output_data = json.dumps(result, indent=2)
+                    else:
+                        output_data = str(result)
+                
+                elif action == "workload":
+                    result = analytics.get_workload_distribution()
+                    if format == "json":
+                        output_data = json.dumps(result, indent=2)
+                    else:
+                        output_data = str(result)
+                
+                elif action == "activity":
+                    result = analytics.get_recent_activity(days)
+                    if format == "json":
+                        output_data = json.dumps(result, indent=2)
+                    else:
+                        output_data = str(result)
+                
+                elif action == "report":
+                    output_data = analytics.generate_comprehensive_report(format)
+                
+                elif action == "export":
+                    if not table or not output:
+                        print("❌ Export requires --table and --output arguments")
+                        return
+                    analytics.export_data(table, output, format)
+                    print(f"✅ Exported {table} to {output} ({format})")
+                    return
+                
+                else:
+                    print(f"❌ Unknown backlog action: {action}")
+                    return
+                
+                # Output results
+                if output:
+                    with open(output, 'w') as f:
+                        f.write(output_data)
+                    print(f"✅ Results saved to {output}")
+                else:
+                    print(output_data)
+        
+        except ImportError as e:
+            print(f"❌ Import Error: {e}")
+            print("💡 Make sure the backlog analytics scripts are available in scripts/ directory")
+        except FileNotFoundError as e:
+            print(f"❌ File Not Found: {e}")
+            print("💡 Run 'backlog sync' first to initialize the database")
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            print("💡 Check that BACKLOG.md exists and database is accessible")
+
+    async def slack(self, action: str = "status", 
+                   title: Optional[str] = None, message: Optional[str] = None,
+                   priority: str = "medium", webhook_url: Optional[str] = None,
+                   channel: Optional[str] = None, notification_type: str = "custom",
+                   item_id: Optional[str] = None, old_priority: Optional[str] = None,
+                   new_priority: Optional[str] = None) -> None:
+        """
+        Slack notifications management command.
+
+        Args:
+            action: Slack action (status, test, send, setup, check-events)
+            title: Notification title for custom messages
+            message: Notification message for custom messages
+            priority: Notification priority (urgent, high, medium, low)
+            webhook_url: Slack webhook URL for setup
+            channel: Slack channel for setup
+            notification_type: Type for test notifications (priority, completion, sprint)
+            item_id: Item ID for manual notifications
+            old_priority: Old priority for priority change notifications
+            new_priority: New priority for priority change notifications
+        """
+        if not SlackCLI:
+            print("❌ Slack integration not available")
+            print("💡 Make sure the integrations.slack module is properly installed")
+            return
+
+        print("📱 LeanVibe Slack Notifications")
+        print("=" * 30)
+
+        slack_cli = SlackCLI()
+
+        try:
+            if action == "status":
+                slack_cli.show_config()
+                
+            elif action == "test":
+                await slack_cli.test_connection()
+                
+            elif action == "test-notification":
+                await slack_cli.send_test_notification(notification_type)
+                
+            elif action == "send":
+                if not title or not message:
+                    print("❌ Error: --title and --message required for custom notifications")
+                    return
+                await slack_cli.send_custom_message(title, message, priority)
+                
+            elif action == "setup":
+                slack_cli.setup_config(webhook_url, channel)
+                
+            elif action == "check-events":
+                await slack_cli.check_events()
+                
+            elif action == "notify-priority":
+                if not all([item_id, title, old_priority, new_priority]):
+                    print("❌ Error: --item-id, --title, --old-priority, and --new-priority required")
+                    return
+                await slack_cli.manually_notify_priority_change(item_id, title, old_priority, new_priority)
+                
+            elif action == "notify-completion":
+                if not all([item_id, title, priority]):
+                    print("❌ Error: --item-id, --title, and --priority required")
+                    return
+                await slack_cli.manually_notify_completion(item_id, title, priority)
+                
+            else:
+                print(f"❌ Unknown Slack action: {action}")
+                print("💡 Available actions: status, test, test-notification, send, setup, check-events, notify-priority, notify-completion")
+
+        except Exception as e:
+            print(f"❌ Error executing Slack command: {e}")
+            import traceback
+            print(f"Debug info: {traceback.format_exc()}")
+
 
 def create_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser."""
@@ -1335,6 +1539,105 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         help="Display format (default: compact)"
     )
 
+    # Backlog Analytics command - BACKLOG.md database integration and analytics
+    backlog_parser = subparsers.add_parser(
+        "backlog",
+        help="BACKLOG.md database integration and analytics system"
+    )
+    backlog_parser.add_argument(
+        "--action",
+        choices=["sync", "status", "velocity", "priority-changes", "completion-times", 
+                "workload", "activity", "report", "export"],
+        default="status",
+        help="Analytics action to perform (default: status)"
+    )
+    backlog_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without executing (sync only)"
+    )
+    backlog_parser.add_argument(
+        "--format",
+        choices=["json", "markdown", "csv"],
+        default="json",
+        help="Output format (default: json)"
+    )
+    backlog_parser.add_argument(
+        "--days",
+        type=int,
+        default=30,
+        help="Number of days for trend analysis (default: 30)"
+    )
+    backlog_parser.add_argument(
+        "--output",
+        help="Output file path for reports and exports"
+    )
+    backlog_parser.add_argument(
+        "--table",
+        help="Database table to export"
+    )
+    backlog_parser.add_argument(
+        "--repo-path",
+        default=".",
+        help="Path to repository root (default: current directory)"
+    )
+    backlog_parser.add_argument(
+        "--db-path",
+        help="Custom database path (default: {repo}/database/backlog_analytics.db)"
+    )
+
+    # Slack command - Slack notifications management  
+    slack_parser = subparsers.add_parser(
+        "slack",
+        help="Manage Slack notifications for priority changes and completions"
+    )
+    slack_parser.add_argument(
+        "--action",
+        choices=["status", "test", "test-notification", "send", "setup", "check-events", "notify-priority", "notify-completion"],
+        default="status",
+        help="Slack action to perform (default: status)"
+    )
+    slack_parser.add_argument(
+        "--title",
+        help="Notification title for custom messages"
+    )
+    slack_parser.add_argument(
+        "--message", 
+        help="Notification message for custom messages"
+    )
+    slack_parser.add_argument(
+        "--priority",
+        choices=["urgent", "high", "medium", "low"],
+        default="medium",
+        help="Notification priority (default: medium)"
+    )
+    slack_parser.add_argument(
+        "--webhook-url",
+        help="Slack webhook URL for setup"
+    )
+    slack_parser.add_argument(
+        "--channel",
+        help="Slack channel for setup"
+    )
+    slack_parser.add_argument(
+        "--notification-type",
+        choices=["priority", "completion", "sprint"],
+        default="priority",
+        help="Type for test notifications (default: priority)"
+    )
+    slack_parser.add_argument(
+        "--item-id",
+        help="Item ID for manual notifications"
+    )
+    slack_parser.add_argument(
+        "--old-priority",
+        help="Old priority for priority change notifications (P0-P3)"
+    )
+    slack_parser.add_argument(
+        "--new-priority", 
+        help="New priority for priority change notifications (P0-P3)"
+    )
+
     return parser
 
 
@@ -1412,6 +1715,28 @@ async def main() -> None:
         "dashboard": lambda: cli.dashboard(
             live=args.live,
             format=args.format
+        ),
+        "backlog": lambda: cli.backlog(
+            action=args.action,
+            dry_run=args.dry_run,
+            format=args.format,
+            days=args.days,
+            output=args.output,
+            table=args.table,
+            repo_path=args.repo_path,
+            db_path=args.db_path
+        ),
+        "slack": lambda: cli.slack(
+            action=args.action,
+            title=args.title,
+            message=args.message,
+            priority=args.priority,
+            webhook_url=args.webhook_url,
+            channel=args.channel,
+            notification_type=args.notification_type,
+            item_id=args.item_id,
+            old_priority=args.old_priority,
+            new_priority=args.new_priority
         )
     }
 

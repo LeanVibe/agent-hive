@@ -9,10 +9,16 @@ quality gates, and vulnerability scanning components.
 import pytest
 import tempfile
 import os
+import sys
 import json
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
+
+# Add project root to Python path for imports
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 # Import new security components
 from security.auth_service import AuthenticationService, UserRole
@@ -20,7 +26,7 @@ from security.token_manager import SecureTokenManager, TokenType
 from security.quality_gates import SecurityQualityGates, SeverityLevel
 from security.vulnerability_scanner import VulnerabilityScanner
 from security.enhanced_middleware import EnhancedSecurityMiddleware
-from external_api.auth_middleware import Permission, AuthResult
+from config.auth_models import Permission, AuthResult
 from external_api.models import ApiRequest
 
 

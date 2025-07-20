@@ -1,0 +1,101 @@
+# Staging Environment Configuration
+# Production-like environment for testing and validation
+
+# Environment Information
+environment:
+  name: "staging"
+  debug: false
+  testing: true
+
+# Server Configuration
+server:
+  workers: 4
+  max_connections: 100
+  reload: false
+  access_log: true
+
+# Database Configuration
+database:
+  host: "staging-postgres-service"
+  name: "agent_hive_staging"
+  pool_size: 20
+  max_overflow: 40
+  echo: false
+  pool_pre_ping: true
+
+# Cache Configuration
+cache:
+  host: "staging-redis-service"
+  max_connections: 50
+
+# Security Configuration
+security:
+  jwt:
+    expire_minutes: 480  # 8 hours for staging
+  cors:
+    allow_origins: 
+      - "https://staging.agent-hive.yourdomain.com"
+      - "https://staging-api.agent-hive.yourdomain.com"
+  rate_limiting:
+    requests_per_minute: 200  # More lenient than production
+    burst_size: 300
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  handlers:
+    - type: "console"
+      level: "INFO"
+    - type: "file"
+      level: "INFO"
+      filename: "/app/logs/staging.log"
+
+# Monitoring Configuration
+monitoring:
+  metrics:
+    enabled: true
+    include_system_metrics: true
+  health_check:
+    enabled: true
+    detailed: true
+  tracing:
+    enabled: true
+    sample_rate: 0.5  # Sample 50% of requests
+
+# Agent Coordination Configuration
+agent_coordination:
+  max_agents: 10
+  auto_scaling:
+    enabled: true
+    min_agents: 2
+    max_agents: 10
+
+# Task Queue Configuration
+task_queue:
+  max_queue_size: 5000
+  retry_attempts: 3
+
+# File Storage Configuration
+storage:
+  base_path: "/app/staging-data"
+  max_file_size: 104857600  # 100MB
+
+# API Configuration
+api:
+  docs_url: "/docs"  # Enable docs in staging
+  redoc_url: "/redoc"
+  include_in_schema: true
+
+# Staging-specific Features
+features:
+  performance_monitoring: true
+  error_tracking: true
+  load_testing: true
+  integration_testing: true
+
+# Testing Configuration
+testing:
+  enable_test_data: true
+  enable_load_testing: true
+  synthetic_monitoring: true

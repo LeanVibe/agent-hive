@@ -1,0 +1,14 @@
+# Grafana dashboard configuration
+apiVersion: 1
+
+providers:
+  - name: 'LeanVibe Agent Hive'
+    orgId: 1
+    folder: 'Agent Hive'
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

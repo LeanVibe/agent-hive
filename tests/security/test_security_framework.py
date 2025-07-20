@@ -19,10 +19,16 @@ import re
 from pathlib import Path
 from typing import Dict, List, Any
 
-# Add the .claude directory to Python path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / '.claude'))
+# Add project root to Python path for imports
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
+# Import from the main state manager, not .claude
 from state.state_manager import StateManager, AgentState
+
+# Add the .claude directory to Python path for task_queue
+sys.path.insert(0, str(project_root / '.claude'))
 from task_queue_module.task_queue import TaskQueue, Task
 
 

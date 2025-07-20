@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-hive-config-{{ENVIRONMENT}}
+  namespace: leanvibe-agent-hive{{#if ENVIRONMENT_SUFFIX}}-{{ENVIRONMENT_SUFFIX}}{{/if}}
+  labels:
+    app.kubernetes.io/name: leanvibe-agent-hive
+    app.kubernetes.io/component: config
+    environment: {{ENVIRONMENT}}
+data:
+  # Application configuration
+  LEANVIBE_ENVIRONMENT: "{{ENVIRONMENT}}"
+  LEANVIBE_LOG_LEVEL: "{{LOG_LEVEL}}"
+  LEANVIBE_DEBUG_MODE: "{{DEBUG_MODE}}"
+  
+  # Service URLs
+  LEANVIBE_REDIS_URL: "redis://{{REDIS_HOST}}:{{REDIS_PORT}}/{{REDIS_DB}}"
+  LEANVIBE_POSTGRES_URL: "postgresql://{{DB_USER}}:{{DB_PASSWORD}}@{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}"
+  LEANVIBE_PROMETHEUS_ENDPOINT: "http://{{PROMETHEUS_HOST}}:{{PROMETHEUS_PORT}}"
+  LEANVIBE_JAEGER_ENDPOINT: "http://{{JAEGER_HOST}}:{{JAEGER_PORT}}/api/traces"
+  
+  # Server configuration
+  WORKERS: "{{SERVER_WORKERS}}"
+  MAX_CONNECTIONS: "{{SERVER_MAX_CONNECTIONS}}"
+  TIMEOUT: "{{SERVER_TIMEOUT}}"
+  
+  # Security settings
+  CORS_ORIGINS: "{{CORS_ORIGINS}}"
+  RATE_LIMIT_REQUESTS: "{{RATE_LIMIT_REQUESTS}}"
+  RATE_LIMIT_WINDOW: "{{RATE_LIMIT_WINDOW}}"
+  
+  # Feature flags
+  ENABLE_METRICS: "{{ENABLE_METRICS}}"
+  ENABLE_TRACING: "{{ENABLE_TRACING}}"
+  ENABLE_HEALTH_CHECKS: "{{ENABLE_HEALTH_CHECKS}}"
+  
+  # Logging
+  LOG_FORMAT: "{{LOG_FORMAT}}"
+  
+  # Agent coordination
+  MAX_AGENTS: "{{MAX_AGENTS}}"
+  TASK_TIMEOUT: "{{TASK_TIMEOUT}}"
+  HEARTBEAT_INTERVAL: "{{HEARTBEAT_INTERVAL}}"
+  
+  # Auto-scaling
+  AUTO_SCALING_ENABLED: "{{AUTO_SCALING_ENABLED}}"
+  MIN_AGENTS: "{{MIN_AGENTS}}"
+  MAX_AGENTS_SCALE: "{{MAX_AGENTS_SCALE}}"
+  SCALE_UP_THRESHOLD: "{{SCALE_UP_THRESHOLD}}"
+  SCALE_DOWN_THRESHOLD: "{{SCALE_DOWN_THRESHOLD}}"

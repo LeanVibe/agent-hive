@@ -1,0 +1,172 @@
+# Production Environment Configuration
+# Optimized for performance, security, and reliability
+
+# Environment Information
+environment:
+  name: "production"
+  debug: false
+  testing: false
+
+# Server Configuration
+server:
+  workers: 8
+  max_connections: 200
+  reload: false
+  access_log: false  # Disable for performance
+  worker_class: "uvicorn.workers.UvicornWorker"
+  worker_connections: 1000
+  max_requests: 10000
+  max_requests_jitter: 1000
+  preload_app: true
+
+# Database Configuration
+database:
+  pool_size: 50
+  max_overflow: 100
+  pool_timeout: 60
+  pool_recycle: 1800  # 30 minutes
+  echo: false
+  pool_pre_ping: true
+  connect_args:
+    connect_timeout: 10
+    command_timeout: 60
+    server_settings:
+      application_name: "leanvibe-agent-hive"
+      search_path: "public"
+
+# Cache Configuration
+cache:
+  max_connections: 100
+  retry_on_timeout: true
+  socket_keepalive: true
+  socket_keepalive_options:
+    TCP_KEEPIDLE: 1
+    TCP_KEEPINTVL: 3
+    TCP_KEEPCNT: 5
+
+# Security Configuration
+security:
+  jwt:
+    expire_minutes: 720  # 12 hours for production
+  cors:
+    allow_origins: 
+      - "https://agent-hive.yourdomain.com"
+      - "https://api.agent-hive.yourdomain.com"
+      - "https://monitoring.agent-hive.yourdomain.com"
+  rate_limiting:
+    requests_per_minute: 100
+    burst_size: 150
+    enable_slowdown: true
+  headers:
+    x_frame_options: "DENY"
+    x_content_type_options: "nosniff"
+    x_xss_protection: "1; mode=block"
+    referrer_policy: "strict-origin-when-cross-origin"
+    content_security_policy: "default-src 'self'"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  handlers:
+    - type: "structured"
+      level: "INFO"
+      include_timestamp: true
+      include_level: true
+      include_logger_name: true
+      include_thread_id: true
+  loggers:
+    uvicorn.access:
+      level: "WARNING"
+    sqlalchemy.engine:
+      level: "WARNING"
+
+# Monitoring Configuration
+monitoring:
+  metrics:
+    enabled: true
+    include_system_metrics: true
+    include_business_metrics: true
+  health_check:
+    enabled: true
+    check_dependencies: true
+    timeout: 30
+  tracing:
+    enabled: true
+    sample_rate: 0.1  # Sample 10% of requests
+    exclude_paths: ["/health", "/metrics"]
+  alerting:
+    enabled: true
+    prometheus_url: "http://prometheus-service:9090"
+
+# Agent Coordination Configuration
+agent_coordination:
+  max_agents: 20
+  task_timeout: 7200  # 2 hours
+  heartbeat_interval: 15
+  auto_scaling:
+    enabled: true
+    min_agents: 3
+    max_agents: 20
+    scale_up_threshold: 0.7
+    scale_down_threshold: 0.2
+    cooldown_period: 180
+
+# Task Queue Configuration
+task_queue:
+  max_queue_size: 10000
+  retry_attempts: 5
+  retry_delay: 30
+  exponential_backoff: true
+  dead_letter_queue_enabled: true
+
+# File Storage Configuration
+storage:
+  type: "s3"  # Use cloud storage in production
+  base_path: "/app/data"
+  max_file_size: 1073741824  # 1GB
+  encryption_enabled: true
+
+# API Configuration
+api:
+  docs_url: null  # Disable docs in production
+  redoc_url: null
+  include_in_schema: false
+
+# Production-specific Features
+features:
+  hot_reload: false
+  debug_toolbar: false
+  mock_external_services: false
+  test_endpoints: false
+  detailed_error_pages: false
+  performance_monitoring: true
+  error_tracking: true
+  audit_logging: true
+
+# Performance Optimization
+performance:
+  enable_compression: true
+  compression_level: 6
+  enable_caching: true
+  cache_ttl: 300
+  enable_connection_pooling: true
+  optimize_database_queries: true
+
+# Backup Configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  destinations:
+    - type: "s3"
+      bucket: "leanvibe-backups"
+    - type: "local"
+      path: "/app/backups"
+
+# Disaster Recovery
+disaster_recovery:
+  enabled: true
+  replication_enabled: true
+  backup_verification: true
+  recovery_testing_schedule: "weekly"

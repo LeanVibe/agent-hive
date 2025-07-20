@@ -20,7 +20,7 @@ import re
 from collections import defaultdict, deque
 
 from security.auth_service import AuthenticationService
-from external_api.auth_middleware import Permission, AuthResult
+from config.auth_models import Permission, AuthResult
 from external_api.models import ApiRequest, ApiResponse
 
 
