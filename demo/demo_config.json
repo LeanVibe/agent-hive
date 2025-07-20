@@ -1,0 +1,44 @@
+{
+  "demo_environment": {
+    "name": "E-Commerce Platform Demo",
+    "version": "1.0.0",
+    "services": [
+      {
+        "name": "api-gateway",
+        "description": "Main traffic router",
+        "critical": true,
+        "startup_time": 10
+      },
+      {
+        "name": "user-service",
+        "description": "User authentication and management",
+        "critical": true,
+        "startup_time": 15
+      },
+      {
+        "name": "product-service",
+        "description": "Product inventory and catalog",
+        "critical": true,
+        "startup_time": 12
+      },
+      {
+        "name": "order-service",
+        "description": "Order processing and management",
+        "critical": true,
+        "startup_time": 18
+      },
+      {
+        "name": "payment-service",
+        "description": "Payment processing",
+        "critical": true,
+        "startup_time": 14
+      }
+    ]
+  },
+  "deployment_simulation": {
+    "manual_process_time": 240,
+    "agent_hive_time": 75,
+    "failure_rate_manual": 20,
+    "failure_rate_agent": 5
+  }
+}
