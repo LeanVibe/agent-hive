@@ -11,7 +11,7 @@ import logging
 import time
 import uuid
 from datetime import datetime
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, List, Callable, Union
 from dataclasses import asdict
 
 from .models import (
@@ -81,6 +81,7 @@ class ApiGateway:
         self.response_times = []
         self.error_count = 0
         self.active_requests: Dict[str, datetime] = {}
+        self.server_running: bool = False
         
         # Route handlers
         self.route_handlers: Dict[str, Callable] = {}
@@ -158,6 +159,19 @@ class ApiGateway:
         except Exception as e:
             logger.error(f"Failed to start API Gateway: {e}")
             raise
+
+    # ---- Runtime server control for CLI compatibility ----
+    async def start_server(self) -> Dict[str, Any]:
+        """Start the gateway runtime service (compatibility method for CLI)."""
+        await self.start()
+        self.server_running = True
+        return {"status": "started", "port": self.gateway_config.port}
+
+    async def stop_server(self) -> Dict[str, Any]:
+        """Stop the gateway runtime service (compatibility method for CLI)."""
+        await self.stop()
+        self.server_running = False
+        return {"status": "stopped"}
     
     async def stop(self) -> None:
         """Stop the API Gateway and all components."""
@@ -435,14 +449,37 @@ class ApiGateway:
             logger.error(f"Logout error: {e}")
             return self._create_error_response(500, "Logout failed", str(uuid.uuid4()))
     
-    def register_route(self, path: str, handler: Callable, methods: List[str] = None) -> None:
-        """Register route handler for specific path."""
-        if methods is None:
-            methods = ["GET"]
-        
-        for method in methods:
+    def register_route(
+        self,
+        path: str,
+        method_or_handler: Union[str, Callable],
+        handler: Optional[Callable] = None,
+        methods: Optional[List[str]] = None,
+    ) -> None:
+        """Register route handler for specific path.
+
+        Supports both call styles:
+        - register_route(path, handler, methods=["GET"])  # original
+        - register_route(path, "GET", handler)            # CLI style
+        """
+        resolved_handler: Callable
+        resolved_methods: List[str]
+
+        # Detect signature variant
+        if callable(method_or_handler) and handler is None:
+            # Original style: (path, handler, methods)
+            resolved_handler = method_or_handler  # type: ignore[arg-type]
+            resolved_methods = methods or ["GET"]
+        else:
+            # CLI style: (path, method, handler)
+            if not isinstance(method_or_handler, str) or handler is None:
+                raise ValueError("Invalid register_route signature. Expected (path, handler, methods) or (path, method, handler)")
+            resolved_handler = handler
+            resolved_methods = [method_or_handler]
+
+        for method in resolved_methods:
             route_key = f"{method}:{path}"
-            self.route_handlers[route_key] = handler
+            self.route_handlers[route_key] = resolved_handler
             logger.info(f"Registered route: {route_key}")
     
     def add_middleware(self, middleware: Callable) -> None:
@@ -470,7 +507,9 @@ class ApiGateway:
                     "error_rate_percent": round(error_rate, 2),
                     "avg_response_time_ms": round(avg_response_time, 2),
                     "active_requests": len(self.active_requests),
-                    "blocked_ips": len(self.blocked_ips)
+                    "blocked_ips": len(self.blocked_ips),
+                    "server_running": self.server_running,
+                    "registered_routes": len(self.route_handlers)
                 },
                 "authentication": auth_stats,
                 "rate_limiting": rate_limit_stats,
@@ -493,6 +532,29 @@ class ApiGateway:
         except Exception as e:
             logger.error(f"Health check error: {e}")
             return self._create_error_response(500, "Health check failed", str(uuid.uuid4()))
+
+    # ---- Lightweight helpers for CLI status ----
+    async def health_check(self) -> Dict[str, Any]:
+        """Lightweight health check used by CLI.status()."""
+        try:
+            response = await self.get_health_status()
+            return {
+                "status": "healthy" if response.status_code == 200 else "unhealthy",
+                "server_running": self.server_running,
+                "registered_routes": len(self.route_handlers),
+                "active_requests": len(self.active_requests),
+            }
+        except Exception:
+            return {"status": "unhealthy", "server_running": self.server_running}
+
+    def get_gateway_info(self) -> Dict[str, Any]:
+        """Return summary info for CLI display."""
+        return {
+            "total_requests": self.request_count,
+            "error_count": self.error_count,
+            "registered_routes": len(self.route_handlers),
+            "server_running": self.server_running,
+        }
     
     async def get_metrics(self) -> ApiResponse:
         """Get detailed API Gateway metrics."""
