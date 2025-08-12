@@ -63,8 +63,12 @@ Create and assign specific tasks to agents.
 # Basic task spawning
 python cli.py spawn --task "implement user authentication"
 
-# Agent-specific task assignment
-python cli.py spawn --task "create API endpoints" --agent backend
+# Persona-guided spawning (auto-select persona from capabilities)
+python cli.py spawn --task "optimize caching layer" \
+  --capabilities performance,scalability,architecture
+
+# Explicit persona
+python cli.py spawn --task "harden login flow" --persona security
 
 # Deep thinking mode for complex tasks
 python cli.py spawn --task "design database schema" --depth ultrathink
@@ -264,6 +268,23 @@ python cli.py streaming --action subscribe --filter "*.important"
 
 # Get streaming status
 python cli.py streaming --action status
+```
+
+#### `observability` - Real-time Observability (hooks)
+Control hook manager and real-time event streaming (WS/SSE).
+
+```bash
+# Start observability
+python cli.py observability --action start
+
+# Emit a demo event after starting
+python cli.py observability --action start --demo
+
+# Check observability status
+python cli.py observability --action status
+
+# Stop observability
+python cli.py observability --action stop
 ```
 
 **Streaming Operations**:
