@@ -12,44 +12,37 @@ Welcome to the comprehensive documentation for the LeanVibe Agent Hive - a produ
 ### 🏗️ Architecture
 - [System Overview](architecture/overview.md) - High-level architecture and concepts
 - [Core Components](architecture/components.md) - Detailed component documentation
-- [Data Flow](architecture/data-flow.md) - How data moves through the system
-- [Multi-Agent Coordination](MULTIAGENT_COORDINATOR_ARCHITECTURE.md) - Agent coordination architecture
+- [Multi-Agent Coordination](architecture/MULTIAGENT_COORDINATOR_ARCHITECTURE.md) - Agent coordination architecture
 
 ### 📖 User Guides
-- [Configuration Guide](guides/configuration.md) - Complete configuration reference
-- [Deployment Guide](../DEPLOYMENT.md) - Production deployment strategies
-- [Troubleshooting Guide](../TROUBLESHOOTING.md) - Common issues and solutions
-- [Workflow Guide](WORKFLOW.md) - Autonomous XP workflow methodology
+- [Configuration Management](guides/security-configuration.md) - Security and configuration
+- [Docker Deployment](guides/docker-deployment.md) - Containerized deployment
+- [Troubleshooting Guide](reference/TROUBLESHOOTING.md) - Common issues and solutions
+- [Workflow Guide](workflows/WORKFLOW.md) - Autonomous XP workflow methodology
 
 ### 🔧 API Reference
-- [API Reference](../API_REFERENCE.md) - Complete API documentation
-- [CLI Commands](CLI_COMMANDS_AND_HOOKS_REFERENCE.md) - Command-line interface reference
-- [Authentication](api/authentication.md) - API authentication and security
-- [Examples](api/examples.md) - Practical API usage examples
+- [API Reference](reference/API_REFERENCE.md) - Complete API documentation
+- [CLI Commands](CLI_COMMANDS.md) - Command-line interface reference
 
 ### 🎓 Tutorials
 - [Medium Clone Tutorial](../tutorials/MEDIUM_CLONE_TUTORIAL.md) - Complete real-world project
-- [Agent Creation Tutorial](tutorials/agent-creation.md) - Create custom agents
-- [Workflow Customization](tutorials/workflow-customization.md) - Customize workflows
-- [Integration Examples](tutorials/integration-examples.md) - Third-party integrations
+- [Agent Creation Tutorial](../tutorials/agent-creation.md) - Create custom agents
+- [Workflow Customization](../tutorials/workflow-customization.md) - Customize workflows
 
 ### 📋 Reference
-- [Configuration Reference](reference/configuration.md) - All configuration options
-- [Error Codes](reference/error-codes.md) - Error codes and solutions
-- [Performance Tuning](reference/performance-tuning.md) - Optimization guide
-- [Migration Guide](reference/migration-guide.md) - Version migration instructions
+- [Troubleshooting Guide](reference/TROUBLESHOOTING.md) - Common issues and solutions
 
 ## Documentation Standards
 
 ### For Contributors
-- [Documentation Standards](DOCUMENTATION_STANDARDS.md) - Writing and formatting guidelines
-- [Documentation Governance](DOCUMENTATION_GOVERNANCE.md) - Governance framework
-- [Templates](templates/) - Standardized documentation templates
+- [Documentation Standards](standards/DOCUMENTATION_STANDARDS.md) - Writing and formatting guidelines
+- [Documentation Governance](governance/DOCUMENTATION_GOVERNANCE.md) - Governance framework
+- [Templates](templates/quick-start-template.md) - Standardized documentation templates
 
 ### Quality Assurance
-- [Documentation Audit Report](../DOCUMENTATION_AUDIT_REPORT.md) - Current state assessment
-- [Feedback Implementation](FEEDBACK_IMPLEMENTATION_WORKFLOW.md) - Feedback processes
-- [Review Workflow](PR_REVIEW_WORKFLOW.md) - Documentation review process
+- [Documentation Audit Report](archived/system-reports-2025/DOCUMENTATION_AUDIT_JULY_2025.md) - Current state assessment
+- [Feedback Implementation](workflows/FEEDBACK_IMPLEMENTATION_WORKFLOW.md) - Feedback processes
+- [Review Workflow](workflows/PR_REVIEW_WORKFLOW.md) - Documentation review process
 
 ## Current Status
 
@@ -80,14 +73,14 @@ Welcome to the comprehensive documentation for the LeanVibe Agent Hive - a produ
 
 ### Quick Help
 - **Installation Issues**: See [Installation Guide](getting-started/installation.md)
-- **Configuration Problems**: Check [Configuration Guide](guides/configuration.md)
-- **API Questions**: Review [API Reference](../API_REFERENCE.md)
-- **Deployment Issues**: Consult [Deployment Guide](../DEPLOYMENT.md)
+- **Configuration Problems**: Check [Configuration Management](guides/security-configuration.md)
+- **API Questions**: Review [API Reference](reference/API_REFERENCE.md)
+- **Deployment Issues**: Consult [Docker Deployment](guides/docker-deployment.md)
 
 ### Contributing
-- **Documentation**: Follow [Documentation Standards](DOCUMENTATION_STANDARDS.md)
-- **Code**: See [Development Guide](../DEVELOPMENT.md)
-- **Issues**: Use [Issue Templates](../github_issue_templates.py)
+- **Documentation**: Follow [Documentation Standards](standards/DOCUMENTATION_STANDARDS.md)
+- **Code**: See [Development Guide](guides/DEVELOPMENT.md)
+- **Issues**: Use [Issue Templates](../scripts/github_issue_templates.py)
 
 ## Version Information
 
@@ -101,8 +94,8 @@ Welcome to the comprehensive documentation for the LeanVibe Agent Hive - a produ
 ### Find What You Need
 - **New Users**: Start with [Quick Start Guide](getting-started/quick-start.md)
 - **Developers**: Begin with [Architecture Overview](architecture/overview.md)
-- **Operators**: Review [Deployment Guide](../DEPLOYMENT.md)
-- **Troubleshooters**: Check [Troubleshooting Guide](../TROUBLESHOOTING.md)
+- **Operators**: Review [Docker Deployment](guides/docker-deployment.md)
+- **Troubleshooters**: Check [Troubleshooting Guide](reference/TROUBLESHOOTING.md)
 
 ### Document Structure
 - **Overview**: High-level concepts and purpose

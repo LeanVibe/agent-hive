@@ -602,14 +602,14 @@ leanvibe queue status --detailed
 ### Learning Path
 1. **Setup**: [Installation Guide](../getting-started/installation.md)
 2. **Basic Usage**: [Quick Start Guide](../getting-started/quick-start.md)
-3. **Configuration**: [Configuration Guide](../guides/configuration.md)
-4. **Deployment**: [Deployment Guide](../guides/deployment.md)
+3. **Configuration**: [Configuration Management](../guides/security-configuration.md)
+4. **Deployment**: [Docker Deployment](../guides/docker-deployment.md) (see `k8s/README.md` for Kubernetes)
 
 ### Advanced Topics
-- [Multi-Agent Coordination Patterns](../MULTIAGENT_COORDINATOR_ARCHITECTURE.md)
-- [Workflow Optimization](../WORKFLOW_OPTIMIZATION_ANALYSIS.md)
-- [Security Configuration](../guides/security.md)
-- [Performance Tuning](../reference/performance-tuning.md)
+- [Multi-Agent Coordination Patterns](../architecture/MULTIAGENT_COORDINATOR_ARCHITECTURE.md)
+- [Workflow Optimization](../workflows/WORKFLOW_OPTIMIZATION_SUMMARY.md)
+- [Security Configuration](../guides/security-configuration.md)
+- [Performance Benchmarks](../guides/BENCHMARKS.md)
 
 ---
 

@@ -104,7 +104,7 @@ LeanVibe Agent Hive is a **production-ready** multi-agent orchestration system t
 ## Installation
 
 ### **Prerequisites**
-- Python 3.8+
+- Python 3.12+
 - Git
 - Basic familiarity with command-line tools
 
