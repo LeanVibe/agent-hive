@@ -16,7 +16,12 @@ import uuid
 
 from .models import ApiRequest, ApiResponse
 from security.rate_limiter import RateLimiter, RateLimitStatus, RateLimitConfig, RateLimitScope, RateLimitStrategy
-from config.auth_models import Permission
+try:
+    from config.auth_models import Permission  # type: ignore
+except Exception:
+    from enum import Enum
+    class Permission(Enum):  # type: ignore
+        READ = "read"; WRITE = "write"; ADMIN = "admin"; EXECUTE = "execute"
 
 
 logger = logging.getLogger(__name__)

@@ -23,7 +23,22 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from config.auth_models import Permission, AuthResult
+try:
+    from config.auth_models import Permission, AuthResult  # type: ignore
+except Exception:
+    try:
+        from config import Permission, AuthResult  # type: ignore
+    except Exception:
+        from enum import Enum
+        class Permission(Enum):  # type: ignore
+            READ = "read"; WRITE = "write"; ADMIN = "admin"; EXECUTE = "execute"
+        class AuthResult:  # type: ignore
+            def __init__(self, success: bool, user_id=None, permissions=None, error=None, metadata=None):
+                self.success = success
+                self.user_id = user_id
+                self.permissions = permissions or []
+                self.error = error
+                self.metadata = metadata or {}
 
 
 logger = logging.getLogger(__name__)

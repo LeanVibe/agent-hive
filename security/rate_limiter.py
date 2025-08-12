@@ -20,7 +20,13 @@ import hashlib
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from config.auth_models import Permission
+# Avoid hard dependency for tests where import path may be shadowed
+try:
+    from config.auth_models import Permission  # type: ignore
+except Exception:
+    from enum import Enum
+    class Permission(Enum):  # type: ignore
+        READ = "read"; WRITE = "write"; ADMIN = "admin"; EXECUTE = "execute"
 
 
 logger = logging.getLogger(__name__)

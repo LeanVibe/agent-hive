@@ -13,11 +13,20 @@ Last updated: 2025-08-12 | Owner: Core Maintainers | Confidence: High
   - Flexible route registration API for CLI compatibility. [Implemented]
   - Circuit breaker, load balancer, registry stats endpoints.
   - Service discovery routing smoke tests and docs.
-- Tasks:
-  - Add gateway health/metrics JSON to CLI status output.
-  - Expand tests: gateway lifecycle, route registration, health/metrics shape.
-  - Docs: guides/api-gateway-guide.md verify code parity.
-  - Add example service registration in `docs/guides/deployment.md`.
+- Tasks (Week 1-2):
+  - Gateway lifecycle + routing
+    - Ensure `start_server`, `stop_server`, `health_check`, `get_gateway_info` return consistent structures
+    - Make `register_route` accept `(path, handler, methods)` and `(path, method, handler)` (done)
+    - Add `_find_handler` and simple `handle_request` with timeout, CORS, and basic API-key support (done)
+  - Discovery/registry/circuit breaker/load balancer
+    - Add integration tests for discovery, registry stats, and circuit-breaker trips
+    - Simulate two service instances and assert load balancer selection
+  - API surface consistency and examples
+    - Provide sample `/api/v1/services` and `/api/v1/auth/*` flows with smoke
+  - Docs parity
+    - Verify guides/api-gateway-guide.md and DEPLOYMENT.md reflect reality
+  - Acceptance
+    - CLI `gateway --action start|status|stop` shows `server_running`, `registered_routes`, <200ms p95
 - Success metrics:
   - <200ms gateway health endpoint p95, <1% error rate during smoke tests.
 
@@ -27,11 +36,20 @@ Last updated: 2025-08-12 | Owner: Core Maintainers | Confidence: High
   - JWT/RBAC flow validations through gateway endpoints.
   - Audit logging roll-up, summarized dashboards.
   - Pre-commit/CI checks ensure critical docs present and current.
-- Tasks:
-  - Add integration tests through `external_api` auth endpoints using `tests/external_api` fixtures.
-  - Wire `security/security_manager.py` summaries into dashboard surface.
-  - Ensure README/test counts reflect reality; align with hooks expectations.
-  - Pen-test checklist doc; add quick OWASP ZAP how-to.
+- Tasks (Week 2-3):
+  - JWT/RBAC coherency
+    - Validate protected/public paths; add tests for valid/expired/invalid/revoked tokens
+    - Verify permission gating on `agents` and `tasks` endpoints
+  - Rate limiting
+    - Ensure 429 includes retry headers; surface rate-limit stats in metrics
+  - Audit + dashboard
+    - Use `audit_logger` roll-ups; render to `security_dashboard`
+  - Import shadowing
+    - Resolve `.claude/config` name collision with `config/` (namespace or rename)
+  - Pen-test checklist & script
+    - Add OWASP ZAP quick-run and verify zero critical findings in smoke
+  - Acceptance
+    - 100% auth path test coverage; audit roll-up visible; 0 critical findings
 - Success metrics:
   - 100% auth paths covered by tests; 0 critical findings in quick scan.
 
@@ -41,10 +59,18 @@ Last updated: 2025-08-12 | Owner: Core Maintainers | Confidence: High
   - `observability/hook_manager.py` already implements core. Verify start/stop from CLI/dash.
   - SSE/WS live stream with lightweight client sample.
   - Docs and a 2-minute verification script.
-- Tasks:
-  - Add CLI glue: simple test that generates events and prints received counts.
-  - Write docs/README_MONITORING.md cross-link and quick start.
-  - Tests for event serialization and broadcast.
+- Tasks (Week 3-4):
+  - CLI glue
+    - Add `observability` command to start/stop/status (done)
+    - Add optional demo emitter to generate events
+  - Client view
+    - Minimal CLI tail or simple dashboard client
+  - Persistence and metrics
+    - Keep small rolling event history; expose counters in `/metrics`
+  - Docs
+    - Quick start and verification script
+  - Acceptance
+    - <100ms fan-out to WS/SSE; stable under 500 events/min locally
 - Success metrics:
   - <100ms event fan-out to local WS, stable under 500 events/min.
 
@@ -54,19 +80,28 @@ Last updated: 2025-08-12 | Owner: Core Maintainers | Confidence: High
   - Leverage `personas/persona_manager.py` to pick personas based on capabilities.
   - CLI flags for persona and capability hints in `spawn`/`review` flows.
   - Minimal docs and example.
-- Tasks:
-  - Add `--persona` and `--capabilities` flags; print resolved persona.
-  - Unit test persona selection + context compression stats.
-  - Doc section in CLI reference.
+- Tasks (Week 4-5):
+  - CLI flags (spawn/review)
+    - Add `--persona` and `--capabilities` (done)
+    - Resolve persona with `persona_manager` and print selection and compression stats
+  - Coordinator metadata (minimal)
+    - Plumb persona metadata into task context (no behavior change)
+  - Docs
+    - Update CLI reference with examples
+  - Acceptance
+    - Deterministic persona chosen for provided capabilities; smoke test output validated
 - Success metrics:
   - Persona chosen deterministically for given capabilities; smoke test passing.
 
 ## Cross-cutting
 - Docs parity: ensure `README.md`, `docs/CLI_COMMANDS*.md`, gateway and security guides align.
 - Tests: green run locally; CI readiness.
+- Performance SLOs: Gateway p95 <200ms; Observability fan-out <100ms; <1% error-rate smoke
+- CI: slim matrix for external_api/security/observability; no long-lived processes
 
 ## Immediate Next Work (this branch)
-- Implement Epic 1 minimal code: gateway lifecycle + route registration compatibility. [Done]
+- Implement gateway lifecycle + route registration compatibility. [Done]
+- Add persona flags in CLI and `observability` command. [Done]
 - Add targeted tests next commit.
 - Update docs with plan and next steps. [Done]
 

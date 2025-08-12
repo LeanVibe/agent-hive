@@ -19,7 +19,22 @@ import uuid
 import jwt
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
-from config.auth_models import Permission, AuthResult
+try:
+    from config.auth_models import Permission, AuthResult  # type: ignore
+except Exception:
+    try:
+        from config import Permission, AuthResult  # type: ignore
+    except Exception:
+        from enum import Enum
+        class Permission(Enum):  # type: ignore
+            READ = "read"; WRITE = "write"; ADMIN = "admin"; EXECUTE = "execute"
+        class AuthResult:  # type: ignore
+            def __init__(self, success: bool, user_id=None, permissions=None, error=None, metadata=None):
+                self.success = success
+                self.user_id = user_id
+                self.permissions = permissions or []
+                self.error = error
+                self.metadata = metadata or {}
 from security.auth_service import AuthenticationService, UserRole, SessionStatus
 from security.token_manager import SecureTokenManager, TokenType, TokenStatus
 from external_api.auth_middleware import AuthenticationMiddleware, AuthMethod

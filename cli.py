@@ -171,6 +171,31 @@ class LeanVibeCLI:
         print(f"✅ Task '{task}' spawned successfully")
         print(f"📝 Task ID: task-{int(time.time())}")
 
+    async def spawn_with_persona(self, task: str, depth: str = "standard", parallel: bool = False,
+                                 persona: str = None, capabilities: str = None) -> None:
+        """Spawn with optional persona selection."""
+        await self.initialize_systems()
+
+        resolved_persona = persona
+        capability_list = [c.strip() for c in (capabilities or '').split(',') if c.strip()]
+        if not resolved_persona and capability_list:
+            try:
+                from personas.persona_manager import find_optimal_persona
+                resolved_persona = find_optimal_persona(capability_list)
+            except Exception:
+                resolved_persona = None
+
+        print(f"🎯 Spawning task: {task}")
+        print(f"🧠 Thinking depth: {depth}")
+        if resolved_persona:
+            print(f"👤 Persona: {resolved_persona}")
+        if capability_list:
+            print(f"🧩 Required capabilities: {', '.join(capability_list)}")
+        print(f"⚡ Parallel execution: {'enabled' if parallel else 'disabled'}")
+
+        # Proceed with original spawn routine
+        await self.spawn(task=task, depth=depth, parallel=parallel)
+
     async def monitor(self, metrics: bool = False, real_time: bool = False) -> None:
         """
         System monitoring command.
@@ -617,6 +642,40 @@ class LeanVibeCLI:
             await asyncio.sleep(30)  # Refresh every 30 seconds
             await self.dashboard(live=True, format=format)
 
+    async def observability(self, action: str = "status", demo: bool = False) -> None:
+        """Control real-time observability system (hook manager)."""
+        print("📡 LeanVibe Observability")
+        print("=" * 26)
+        try:
+            from observability.hook_manager import start_observability_system, stop_observability_system, hook_manager, HookType
+            import asyncio as _asyncio
+        except Exception as e:
+            print(f"❌ Observability system unavailable: {e}")
+            return
+
+        if action == "start":
+            await start_observability_system()
+            print("✅ Observability started")
+            if demo:
+                # Emit a small demo sequence
+                await hook_manager.create_and_process_event(
+                    hook_type=HookType.NOTIFICATION,
+                    agent_id="demo-agent",
+                    session_id="demo-session",
+                    context={"message": "observability demo started"}
+                )
+                print("🧪 Demo event emitted")
+        elif action == "stop":
+            await stop_observability_system()
+            print("🛑 Observability stopped")
+        elif action == "status":
+            metrics = hook_manager.get_system_metrics()
+            print(f"📊 Running: {metrics['hook_manager']['running']}")
+            print(f"🪝 Registered hooks: {sum(metrics['hook_manager']['registered_hooks'].values())}")
+            print(f"🔌 WS clients: {metrics['event_stream']['websocket_clients']}")
+        else:
+            print(f"❌ Unknown observability action: {action}")
+
     async def _get_agents_status(self) -> list:
         """Get current status of all active agents."""
         # In a real implementation, this would query actual agent status
@@ -963,6 +1022,19 @@ Ready to begin! Comment on issue #{issue} to confirm start.
 
                     print("✅ All agents completed their reviews")
                     print("📊 Generating consolidated review report...")
+                elif action == "start-with-persona":
+                    if not pr:
+                        print("❌ Error: --pr required to start review")
+                        return
+                    print(f"🚀 Starting persona-guided review for PR #{pr}")
+                    print("🔄 Selecting reviewer persona...")
+                    # Minimal persona selection demo
+                    try:
+                        from personas.persona_manager import find_optimal_persona
+                        reviewer = find_optimal_persona(["review", "quality", "architecture"])
+                        print(f"👤 Selected reviewer persona: {reviewer}")
+                    except Exception:
+                        print("⚠️ Persona system unavailable; continuing with defaults")
 
                 elif action == "status":
                     if pr:
@@ -1310,6 +1382,14 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         action="store_true",
         help="Enable parallel execution"
     )
+    spawn_parser.add_argument(
+        "--persona",
+        help="Preferred persona to use for the task (optional)"
+    )
+    spawn_parser.add_argument(
+        "--capabilities",
+        help="Comma-separated capability hints to select persona (optional)"
+    )
 
     # Monitor command
     monitor_parser = subparsers.add_parser(
@@ -1444,7 +1524,7 @@ For more information, visit: https://github.com/leanvibe/agent-hive
     )
     review_parser.add_argument(
         "--action",
-        choices=["start", "status", "report", "assign", "list-agents"],
+        choices=["start", "status", "report", "assign", "list-agents", "start-with-persona"],
         default="status",
         help="Review action to perform (default: status)"
     )
@@ -1591,6 +1671,22 @@ For more information, visit: https://github.com/leanvibe/agent-hive
         "slack",
         help="Manage Slack notifications for priority changes and completions"
     )
+    # Observability command - Real-time hooks/stream control
+    observability_parser = subparsers.add_parser(
+        "observability",
+        help="Control real-time observability system (start|stop|status)"
+    )
+    observability_parser.add_argument(
+        "--action",
+        choices=["start", "stop", "status"],
+        default="status",
+        help="Observability action to perform (default: status)"
+    )
+    observability_parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Emit a demo event after starting"
+    )
     slack_parser.add_argument(
         "--action",
         choices=["status", "test", "test-notification", "send", "setup", "check-events", "notify-priority", "notify-completion"],
@@ -1658,11 +1754,20 @@ async def main() -> None:
             workflow=args.workflow,
             validate=args.validate
         ),
-        "spawn": lambda: cli.spawn(
-            task=args.task,
-            depth=args.depth,
-            parallel=args.parallel
+        "spawn": lambda: (
+            cli.spawn_with_persona(
+                task=args.task,
+                depth=args.depth,
+                parallel=args.parallel,
+                persona=getattr(args, "persona", None),
+                capabilities=getattr(args, "capabilities", None),
+            ) if (getattr(args, "persona", None) or getattr(args, "capabilities", None)) else cli.spawn(
+                task=args.task,
+                depth=args.depth,
+                parallel=args.parallel
+            )
         ),
+        # Back-compat: if persona flags provided, route to spawn_with_persona
         "monitor": lambda: cli.monitor(
             metrics=args.metrics,
             real_time=args.real_time
@@ -1725,6 +1830,10 @@ async def main() -> None:
             table=args.table,
             repo_path=args.repo_path,
             db_path=args.db_path
+        ),
+        "observability": lambda: cli.observability(
+            action=args.action,
+            demo=getattr(args, "demo", False)
         ),
         "slack": lambda: cli.slack(
             action=args.action,

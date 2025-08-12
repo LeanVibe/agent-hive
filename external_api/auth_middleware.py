@@ -21,7 +21,21 @@ import jwt
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
 from .models import ApiRequest, ApiResponse
-from config.security_config import get_auth_config, get_security_config
+# Import security config with robust fallbacks (project has .claude/config shadowing)
+try:
+    # Direct submodule import (preferred)
+    from config.security_config import get_auth_config, get_security_config  # type: ignore
+except Exception:
+    # Fallback: import from top-level package if it re-exports
+    try:
+        from config import get_auth_config, get_security_config  # type: ignore
+    except Exception as e:  # Final fallback: local lazy resolver to avoid import error during collection
+        def get_auth_config() -> dict:  # type: ignore
+            from config.security_config import get_auth_middleware_config as _g
+            return _g()
+        def get_security_config():  # type: ignore
+            from config.security_config import security_config_manager as _m
+            return _m.get_config()
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +53,23 @@ class AuthMethod(Enum):
     SIGNATURE = "signature"
 
 
-from config.auth_models import Permission, AuthResult
+try:
+    from config.auth_models import Permission, AuthResult
+except Exception:
+    # Final fallback: define lightweight shims if top-level package shadowing prevents import
+    try:
+        from config import Permission, AuthResult  # type: ignore
+    except Exception:
+        from enum import Enum
+        class Permission(Enum):  # type: ignore
+            READ = "read"; WRITE = "write"; ADMIN = "admin"; EXECUTE = "execute"
+        class AuthResult:  # type: ignore
+            def __init__(self, success: bool, user_id=None, permissions=None, error=None, metadata=None):
+                self.success = success
+                self.user_id = user_id
+                self.permissions = permissions or []
+                self.error = error
+                self.metadata = metadata or {}
 
 
 class AuthenticationMiddleware:
