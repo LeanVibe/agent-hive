@@ -1017,6 +1017,58 @@ class UnifiedPerformanceMonitor:
 # Global unified performance monitor instance
 performance_monitor = UnifiedPerformanceMonitor()
 
+# Convenience decorators expected by tests
+def _make_tracker(operation_name: str, component: ComponentType):
+    def decorator(extra_metadata: Optional[Dict[str, Any]] = None):
+        def wrapper(func: Callable):
+            async def async_inner(*args, **kwargs):
+                async with performance_monitor.track_operation(operation_name, component, extra_metadata):
+                    return await func(*args, **kwargs)
+
+            def sync_inner(*args, **kwargs):
+                start = time.time()
+                try:
+                    result = func(*args, **kwargs)
+                    duration = (time.time() - start) * 1000
+                    metric = PerformanceMetrics(
+                        operation_name=operation_name,
+                        component_type=component,
+                        start_time=start,
+                        end_time=time.time(),
+                        duration=duration,
+                        success=True,
+                        metadata=extra_metadata or {},
+                    )
+                    performance_monitor.metrics.append(metric)
+                    return result
+                except Exception as e:
+                    duration = (time.time() - start) * 1000
+                    metric = PerformanceMetrics(
+                        operation_name=operation_name,
+                        component_type=component,
+                        start_time=start,
+                        end_time=time.time(),
+                        duration=duration,
+                        success=False,
+                        error_message=str(e),
+                        metadata=extra_metadata or {},
+                    )
+                    performance_monitor.metrics.append(metric)
+                    raise
+
+            return async_inner if asyncio.iscoroutinefunction(func) else sync_inner
+        return wrapper
+    return decorator
+
+# Expose specific trackers
+track_jwt_authentication = _make_tracker("jwt_authentication", ComponentType.AUTHENTICATION)
+track_rbac_authorization = _make_tracker("rbac_authorization", ComponentType.AUTHORIZATION)
+track_rate_limiting = _make_tracker("rate_limiting", ComponentType.RATE_LIMITING)
+track_service_discovery = _make_tracker("service_discovery", ComponentType.SERVICE_DISCOVERY)
+track_load_balancing = _make_tracker("load_balancing", ComponentType.LOAD_BALANCER)
+track_api_gateway_request = _make_tracker("api_gateway_request", ComponentType.API_GATEWAY)
+track_end_to_end_request = _make_tracker("end_to_end_request", ComponentType.SYSTEM)
+
 # Compatibility alias for existing code
 PerformanceMonitor = UnifiedPerformanceMonitor
 

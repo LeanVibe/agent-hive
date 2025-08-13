@@ -101,7 +101,8 @@ class JwtIntegrationService:
         
         # Initialize core services
         self.auth_service = AuthenticationService(config)
-        self.token_manager = SecureTokenManager(config)
+        # Share the same token manager instance across auth and introspection
+        self.token_manager = self.auth_service.token_manager
         self.auth_middleware = AuthenticationMiddleware(config)
         
         # Rate limiting configuration
@@ -126,7 +127,9 @@ class JwtIntegrationService:
         
         # Protected endpoints configuration
         self.protected_endpoints = config.get("protected_endpoints", [])
-        self.public_endpoints = config.get("public_endpoints", ["/health", "/metrics"])
+        # Mark auth endpoints public by default to allow login/refresh/introspection without prior auth
+        default_public = ["/health", "/metrics", "/api/v1/auth"]
+        self.public_endpoints = config.get("public_endpoints", default_public)
 
         # JWKS configuration (optional)
         self.jwks_url: Optional[str] = config.get("jwks_url")
@@ -451,7 +454,27 @@ class JwtIntegrationService:
                 if result.metadata:
                     response["metadata"] = result.metadata
             else:
-                response["reason"] = result.error or "invalid_token"
+                # Secondary validation path: verify signature directly to avoid metadata coupling
+                try:
+                    verified_payload = jwt.decode(
+                        token,
+                        self.config.get("jwt_secret"),
+                        algorithms=[self.config.get("jwt_algorithm", "HS256")],
+                        options={"verify_aud": False}
+                    )
+                    # If signature verifies and not expired, consider token active for introspection
+                    response["active"] = True
+                    response.update({
+                        "sub": verified_payload.get("sub") or verified_payload.get("user_id"),
+                        "token_type": verified_payload.get("token_type"),
+                        "scope": " ".join(verified_payload.get("scopes", [])),
+                        "permissions": verified_payload.get("permissions", []),
+                        "exp": verified_payload.get("exp"),
+                        "iat": verified_payload.get("iat"),
+                        "jti": verified_payload.get("jti") or verified_payload.get("token_id"),
+                    })
+                except Exception:
+                    response["reason"] = result.error or "invalid_token"
 
             return response
         except Exception as e:

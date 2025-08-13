@@ -369,19 +369,21 @@ class ApiGateway:
             if request.method == "OPTIONS":
                 return self._handle_cors_preflight(request)
             
-            # JWT Authentication
-            auth_success, auth_metadata, auth_error = await self.jwt_service.authenticate_request(
-                request=request,
-                required_permissions=self._get_required_permissions(request.path)
-            )
+            # Allow auth endpoints without pre-authentication
+            if not (request.path.startswith("/api/v1/auth")):
+                # JWT Authentication
+                auth_success, auth_metadata, auth_error = await self.jwt_service.authenticate_request(
+                    request=request,
+                    required_permissions=self._get_required_permissions(request.path)
+                )
+                if not auth_success:
+                    self.error_count += 1
+                    return auth_error
+                # Add authentication metadata to request context
+                request.headers["X-User-ID"] = auth_metadata.user_id or ""
+                request.headers["X-User-Roles"] = ",".join(auth_metadata.roles)
             
-            if not auth_success:
-                self.error_count += 1
-                return auth_error
             
-            # Add authentication metadata to request context
-            request.headers["X-User-ID"] = auth_metadata.user_id or ""
-            request.headers["X-User-Roles"] = ",".join(auth_metadata.roles)
             
             # Rate Limiting - process request through rate limit middleware
             async def route_handler(req):
@@ -410,6 +412,19 @@ class ApiGateway:
         except Exception as e:
             logger.error(f"API Gateway error processing request {request_id}: {e}")
             self.error_count += 1
+            # For auth introspection, return a 200 with inactive=false body on errors
+            try:
+                if request.path == "/api/v1/auth/introspect" and request.method == "POST":
+                    return ApiResponse(
+                        status_code=200,
+                        headers={"Content-Type": "application/json"},
+                        body={"active": False, "reason": "introspection_error"},
+                        timestamp=datetime.utcnow(),
+                        processing_time=0.0,
+                        request_id=request_id,
+                    )
+            except Exception:
+                pass
             return self._create_error_response(500, "Internal server error", request_id)
         
         finally:

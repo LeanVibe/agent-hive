@@ -347,7 +347,8 @@ class CircuitBreaker:
                 recent_failures = [r for r in recent_requests if not r.success]
                 failure_rate = (len(recent_failures) / len(recent_requests)) * 100
                 
-                if failure_rate >= self.config.failure_rate_threshold:
+                # Open only when failure rate strictly exceeds threshold
+                if failure_rate > self.config.failure_rate_threshold:
                     should_open = True
             
             if should_open:
@@ -397,6 +398,10 @@ class CircuitBreakerManager:
                 cb_config = config or self.default_config
                 self.circuit_breakers[name] = CircuitBreaker(name, cb_config)
                 logger.info(f"Created new circuit breaker: {name}")
+            else:
+                # If a custom config is provided for an existing breaker, update it
+                if config is not None:
+                    self.circuit_breakers[name].config = config
             
             return self.circuit_breakers[name]
     

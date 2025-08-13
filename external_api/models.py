@@ -119,9 +119,9 @@ class ApiRequest:
     headers: Dict[str, str]
     query_params: Dict[str, Any]
     body: Optional[Dict[str, Any]]
-    timestamp: datetime
     request_id: str
     client_ip: str
+    timestamp: datetime = field(default_factory=datetime.utcnow)
 
     def __post_init__(self):
         """Validate request data."""

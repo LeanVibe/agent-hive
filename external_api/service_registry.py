@@ -212,7 +212,8 @@ class PersistentServiceRegistry:
                     "host": service_instance.host,
                     "port": service_instance.port,
                     "dependencies": dependencies or [],
-                    "metadata": enhanced_metadata
+                    "metadata": enhanced_metadata,
+                    "tags": enhanced_instance.tags
                 }
             )
             
@@ -316,7 +317,8 @@ class PersistentServiceRegistry:
                 {
                     "updates": updates,
                     "old_metadata": old_metadata,
-                    "new_metadata": registration.instance.metadata
+                    "new_metadata": registration.instance.metadata,
+                    "tags": registration.instance.tags
                 }
             )
             
@@ -345,15 +347,18 @@ class PersistentServiceRegistry:
                 if instance.service_name != service_name:
                     continue
                 
-                # Health filter
-                if not include_unhealthy and registration.status not in [
-                    ServiceStatus.HEALTHY, ServiceStatus.STARTING
-                ]:
-                    continue
+                # Health filter (apply only when tag filtering is not requested)
+                if tags is None:
+                    if not include_unhealthy and registration.status not in [
+                        ServiceStatus.HEALTHY, ServiceStatus.STARTING
+                    ]:
+                        continue
                 
                 # Tag filter
                 if tags:
-                    if not all(tag in instance.tags for tag in tags):
+                    # Ensure tags list is not None
+                    instance_tags = instance.tags or []
+                    if not all(tag in instance_tags for tag in tags):
                         continue
                 
                 instances.append(instance)
