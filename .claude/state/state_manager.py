@@ -1,67 +1,28 @@
-import json
-import sqlite3
-import time
+"""Compatibility shim for tests that import state from `.claude`.
+
+This module dynamically loads the real project `state/state_manager.py` and
+re-exports its public API so tests that add `.claude` to `sys.path` can still
+import `StateManager`, `AgentState`, `TaskState`, and `SystemState` as expected.
+"""
+
+from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
+import sys
 
-import git
+_project_root = Path(__file__).resolve().parents[3]
+_real_state_path = _project_root / "state" / "state_manager.py"
 
+_spec = spec_from_file_location("_real_state_manager", str(_real_state_path))
+if _spec and _spec.loader:  # Load the real module from the project source
+    _mod = module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+else:
+    raise ImportError(f"Unable to load real state_manager from {_real_state_path}")
 
-class StateManager:
-    def __init__(self, base_path: Path):
-        try:
-            self.db = sqlite3.connect(base_path / ".claude/state.db")
-            self.repo = git.Repo(base_path)
-            self._init_db()
-        except Exception as e:
-            print(f"State init error: {e}")
-            raise
+# Re-export the expected symbols
+StateManager = _mod.StateManager
+AgentState = _mod.AgentState
+TaskState = _mod.TaskState
+SystemState = _mod.SystemState
 
-    def _init_db(self):
-        self.db.executescript("""
-            CREATE TABLE IF NOT EXISTS checkpoints (
-                id TEXT PRIMARY KEY,
-                git_tag TEXT,
-                metrics JSON,
-                timestamp DATETIME
-            );
-            CREATE TABLE IF NOT EXISTS tasks (
-                id TEXT PRIMARY KEY,
-                agent TEXT,
-                status TEXT,
-                confidence REAL
-            );
-            CREATE TABLE IF NOT EXISTS performance (
-                agent TEXT,
-                task_id TEXT,
-                duration REAL,
-                success BOOL
-            );
-        """)
-
-    def checkpoint(self, name: str):
-        try:
-            tag = self.repo.create_tag(name)
-            metrics = self._collect_metrics()  # e.g., avg confidence from DB
-            self.db.execute(
-                "INSERT INTO checkpoints VALUES (?, ?, ?, ?)",
-                (name, tag.name, json.dumps(metrics), time.time()),
-            )
-            self.db.commit()
-        except Exception as e:
-            print(f"Checkpoint error: {e}")
-            # Auto-rollback to last if critical
-            self.rollback("last-good")
-
-    def rollback(self, checkpoint_id: str):
-        try:
-            self.repo.git.checkout(checkpoint_id)
-            # Restore DB state if needed (e.g., truncate recent entries)
-        except Exception as e:
-            print(f"Rollback error: {e}")
-            raise
-
-    def _collect_metrics(self):
-        # Query DB for avg confidence, task success rate
-        cursor = self.db.cursor()
-        cursor.execute("SELECT AVG(confidence) FROM tasks")
-        return {"avg_confidence": cursor.fetchone()[0] or 0.8}
+__all__ = ["StateManager", "AgentState", "TaskState", "SystemState"]

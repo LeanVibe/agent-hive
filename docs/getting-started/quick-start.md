@@ -122,9 +122,9 @@ ls -la tests/
 - [Workflow Customization](../../tutorials/workflow-customization.md) - Customize workflows
 
 ### Advanced Configuration
-- [Configuration Guide](../guides/configuration.md) - Complete configuration reference
-- [Deployment Guide](../../DEPLOYMENT.md) - Production deployment strategies
-- [API Reference](../../API_REFERENCE.md) - Complete API documentation
+- [Configuration Guide](../guides/README.md) - Complete configuration reference
+- [Deployment Guide](../guides/docker-deployment.md) - Production deployment strategies (see `k8s/README.md` for Kubernetes)
+- [API Reference](../reference/API_REFERENCE.md) - Complete API documentation
 
 ## Troubleshooting
 
@@ -140,7 +140,7 @@ ls -la tests/
 **Solution**: Verify installation: `uv sync` and check virtual environment
 
 ### Get Help
-- Check [Troubleshooting Guide](../../TROUBLESHOOTING.md)
+- Check [Troubleshooting Guide](../reference/TROUBLESHOOTING.md)
 - Review [Installation Guide](installation.md)
 - Ask questions in [GitHub Discussions](https://github.com/leanvibe/agent-hive/discussions)
 

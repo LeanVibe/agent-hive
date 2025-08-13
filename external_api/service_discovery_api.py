@@ -104,6 +104,18 @@ class ServiceDiscoveryAPI:
             """API health check endpoint."""
             return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
+        @self.app.get("/ready", response_model=Dict[str, str])
+        async def readiness_probe():
+            """Readiness endpoint indicating API is ready to serve traffic."""
+            # Consider discovery running state as readiness signal
+            status_txt = "ready" if self.service_discovery._running else "initializing"
+            return {"status": status_txt, "timestamp": datetime.now().isoformat()}
+
+        @self.app.get("/live", response_model=Dict[str, str])
+        async def liveness_probe():
+            """Liveness endpoint indicating process is alive."""
+            return {"status": "alive", "timestamp": datetime.now().isoformat()}
+
         @self.app.post("/services/register", response_model=Dict[str, Any])
         async def register_service(request: ServiceInstanceRequest):
             """Register a new service instance."""
@@ -175,7 +187,6 @@ class ServiceDiscoveryAPI:
 
                 service_responses = []
                 for instance in instances:
-                    # Get registration info for status and timestamps
                     registration = self.service_discovery.services.get(instance.service_id)
                     if registration:
                         service_responses.append(ServiceInstanceResponse(
@@ -191,6 +202,25 @@ class ServiceDiscoveryAPI:
                             registered_at=registration.registered_at.isoformat(),
                             last_heartbeat=registration.last_heartbeat.isoformat()
                         ))
+
+                # Fallback: if none found and healthy_only requested, include STARTING instances
+                if healthy_only and len(service_responses) == 0:
+                    for reg in self.service_discovery.services.values():
+                        if reg.instance.service_name == service_name and reg.status.value == "starting":
+                            inst = reg.instance
+                            service_responses.append(ServiceInstanceResponse(
+                                service_id=inst.service_id,
+                                service_name=inst.service_name,
+                                host=inst.host,
+                                port=inst.port,
+                                metadata=inst.metadata,
+                                health_check_url=inst.health_check_url,
+                                tags=inst.tags,
+                                version=inst.version,
+                                status=reg.status.value,
+                                registered_at=reg.registered_at.isoformat(),
+                                last_heartbeat=reg.last_heartbeat.isoformat()
+                            ))
 
                 return ServiceDiscoveryResponse(
                     services=service_responses,

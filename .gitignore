@@ -73,3 +73,5 @@ dmypy.json
 worktrees/
 sample_tasks.json
 temp/
+terraform/.terraform/
+infrastructure/nginx/ssl/*.pem

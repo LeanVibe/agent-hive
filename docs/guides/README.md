@@ -42,7 +42,7 @@ This directory contains comprehensive operational guides for deploying, managing
 - Performance monitoring and alerting
 - Team collaboration and notifications
 
-### 📊 [Production Deployment](deployment.md)
+### 📊 [Production Deployment](../operations/DEPLOYMENT.md)
 **High-level deployment strategies and architecture**
 
 - **Kubernetes deployment** configurations
@@ -63,9 +63,9 @@ This directory contains comprehensive operational guides for deploying, managing
 |----------|---------------|-------------------|------------|
 | Local Development | [Docker Deployment](docker-deployment.md) | [CI/CD Operations](cicd-operations.md) | Low |
 | Staging Environment | [Docker Deployment](docker-deployment.md) | [CI/CD Operations](cicd-operations.md) | Medium |
-| Small Production | [Docker Deployment](docker-deployment.md) | [CI/CD Operations](cicd-operations.md), [Deployment](deployment.md) | Medium |
-| Enterprise Production | [Deployment](deployment.md) | [Docker Deployment](docker-deployment.md), [CI/CD Operations](cicd-operations.md) | High |
-| Multi-Cloud | [Deployment](deployment.md) | All guides | High |
+| Small Production | [Docker Deployment](docker-deployment.md) | [CI/CD Operations](cicd-operations.md), [Deployment](../operations/DEPLOYMENT.md) | Medium |
+| Enterprise Production | [Deployment](../operations/DEPLOYMENT.md) | [Docker Deployment](docker-deployment.md), [CI/CD Operations](cicd-operations.md) | High |
+| Multi-Cloud | [Deployment](../operations/DEPLOYMENT.md) | All guides | High |
 
 ## Architecture Decision Matrix
 
@@ -75,7 +75,7 @@ This directory contains comprehensive operational guides for deploying, managing
 |----------|----------|-------|------------|
 | Docker Compose | Development, Small Production | [Docker Deployment](docker-deployment.md) | Low |
 | Docker Swarm | Medium Production | [Docker Deployment](docker-deployment.md) | Medium |
-| Kubernetes | Large Production, Enterprise | [Deployment](deployment.md) | High |
+| Kubernetes | Large Production, Enterprise | [Deployment](../operations/DEPLOYMENT.md) | High |
 
 ### CI/CD Pipeline
 
@@ -92,7 +92,7 @@ This directory contains comprehensive operational guides for deploying, managing
 | Prometheus | Metrics collection | Auto-discovery, scraping | [Docker Deployment](docker-deployment.md) |
 | Grafana | Visualization | Dashboards, alerting | [Docker Deployment](docker-deployment.md) |
 | ELK Stack | Log aggregation | Centralized logging | [Docker Deployment](docker-deployment.md) |
-| Jaeger | Distributed tracing | Performance monitoring | [Deployment](deployment.md) |
+| Jaeger | Distributed tracing | Performance monitoring | [Deployment](../operations/DEPLOYMENT.md) |
 
 ## Implementation Roadmap
 
@@ -260,7 +260,7 @@ act -j test  # Run GitHub Actions locally
 - **Training Programs**: Custom training for development and operations teams
 
 ### Emergency Procedures
-- **Critical Issues**: Follow incident response procedures in [Deployment Guide](deployment.md)
+- **Critical Issues**: Follow incident response procedures in [Deployment Guide](../operations/DEPLOYMENT.md)
 - **Security Incidents**: Contact security team immediately
 - **Data Recovery**: Follow backup and recovery procedures
 - **Escalation**: Contact on-call engineer or team lead

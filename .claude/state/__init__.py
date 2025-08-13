@@ -1,5 +1,17 @@
-"""State management module for LeanVibe orchestrator."""
+"""State management module for LeanVibe orchestrator.
 
-from .state_manager import StateManager
+Provides compatibility re-exports for tests importing from `.claude.state`.
+"""
 
-__all__ = ['StateManager']
+from .state_manager import StateManager, AgentState, TaskState, SystemState  # type: ignore
+from .git_milestone_manager import GitMilestoneManager, GitMilestone, CommitRecommendation  # type: ignore
+
+__all__ = [
+    'StateManager',
+    'AgentState',
+    'TaskState',
+    'SystemState',
+    'GitMilestoneManager',
+    'GitMilestone',
+    'CommitRecommendation',
+]

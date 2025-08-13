@@ -1,8 +1,8 @@
 # Agent Hive Architecture Overview
 
-**Version**: 2.0  
-**Last Updated**: July 15, 2025  
-**Status**: Production Ready (Phase 2)  
+**Version**: 4.0  
+**Last Updated**: July 26, 2025  
+**Status**: Production Ready (Phase 4)  
 
 ## Introduction
 
@@ -295,8 +295,8 @@ sequenceDiagram
 ### Monitoring Stack
 - **Prometheus**: Metrics collection and alerting
 - **Grafana**: Visualization and dashboards
-- **Jaeger**: Distributed tracing (planned)
-- **ELK Stack**: Log aggregation and analysis (planned)
+- **Jaeger**: Distributed tracing (integrated)
+- **ELK Stack**: Log aggregation and analysis (optional)
 
 ## Deployment Architecture
 
@@ -349,9 +349,9 @@ The modular design allows for easy extension and customization while the compreh
 
 - [Core Components](components.md) - Detailed component documentation
 - [Data Flow](data-flow.md) - System data flow patterns
-- [Multi-Agent Coordination](../MULTIAGENT_COORDINATOR_ARCHITECTURE.md) - Coordination details
-- [Deployment Guide](../../DEPLOYMENT.md) - Production deployment
-- [API Reference](../../API_REFERENCE.md) - Complete API documentation
+- [Multi-Agent Coordination](MULTIAGENT_COORDINATOR_ARCHITECTURE.md) - Coordination details
+- [Deployment Guide](../guides/docker-deployment.md) - Containerized deployment (see `k8s/README.md` for Kubernetes)
+- [API Reference](../reference/API_REFERENCE.md) - Complete API documentation
 
 ---
 
