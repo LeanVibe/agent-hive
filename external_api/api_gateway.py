@@ -1371,6 +1371,64 @@ class ApiGateway:
                 logger.exception("Introspection error")
                 return self._create_error_response(500, "Introspection failed", request.request_id)
         
+        # OAuth2: client credentials (MVP)
+        elif request.path == "/api/v1/auth/token" and request.method == "POST":
+            if not request.body:
+                return self._create_error_response(400, "Request body required", request.request_id)
+            grant_type = request.body.get("grant_type")
+            if grant_type != "client_credentials":
+                return self._create_error_response(400, "unsupported_grant_type", request.request_id)
+            client_id = request.body.get("client_id")
+            client_secret = request.body.get("client_secret")
+            scope = (request.body.get("scope") or "").strip()
+            if not client_id or not client_secret:
+                return self._create_error_response(400, "invalid_request", request.request_id)
+            # Minimal in-config client registry
+            client_cfg = (self.config or {}).get("oauth_clients", {}).get(client_id)
+            if not client_cfg or client_cfg.get("secret") != client_secret:
+                return self._create_error_response(401, "invalid_client", request.request_id)
+            # Map to permissions/scopes
+            scopes = client_cfg.get("scopes", [])
+            if scope and scope not in scopes:
+                return self._create_error_response(400, "invalid_scope", request.request_id)
+            permissions = client_cfg.get("permissions", ["read"])  # default minimal
+            perms_enum = []
+            try:
+                from config.auth_models import Permission  # type: ignore
+                perms_enum = [Permission(p) for p in permissions]
+            except Exception:
+                from enum import Enum
+                class Permission(Enum):
+                    READ = "read"; WRITE = "write"; ADMIN = "admin"; EXECUTE = "execute"
+                perms_enum = [Permission(p) if isinstance(p, str) else p for p in permissions]
+            # Issue a short-lived access token without refresh
+            try:
+                from security.token_manager import TokenType
+                token_type = TokenType.ACCESS
+            except Exception:
+                token_type = None
+            access_token, token_id = await self.jwt_service.token_manager.create_secure_token(
+                user_id=client_id,
+                token_type=token_type,
+                permissions=perms_enum,
+                scopes=scopes,
+                expires_in_hours=1
+            )
+            body = {
+                "access_token": access_token,
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "scope": scope or " ".join(scopes)
+            }
+            return ApiResponse(
+                status_code=200,
+                headers={"Content-Type": "application/json"},
+                body=body,
+                timestamp=datetime.utcnow(),
+                processing_time=0.0,
+                request_id=request.request_id
+            )
+        
         else:
             return self._create_error_response(404, "Auth endpoint not found", request.request_id)
     
