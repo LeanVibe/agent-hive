@@ -7,6 +7,7 @@ when OpenTelemetry is not installed.
 """
 from typing import Optional, Dict, Any
 import uuid
+import re
 
 class _NoopSpanCtx:
     def __init__(self) -> None:
@@ -87,3 +88,45 @@ class Tracer:
 
 def get_tracer(service_name: str = "app", enabled: bool = False) -> Tracer:
     return Tracer(enabled=enabled, service_name=service_name)
+
+# ---- W3C traceparent helpers (minimal) ----
+
+_TP_REGEX = re.compile(r"^(?P<ver>[0-9a-f]{2})-(?P<trace>[0-9a-f]{32})-(?P<span>[0-9a-f]{16})-(?P<flags>[0-9a-f]{2})$")
+
+def parse_traceparent(value: str) -> Optional[Dict[str, str]]:
+    """Parse a W3C traceparent header into its components.
+
+    Returns None if invalid.
+    """
+    if not isinstance(value, str):
+        return None
+    m = _TP_REGEX.match(value.strip())
+    if not m:
+        return None
+    return {
+        "version": m.group("ver"),
+        "trace_id": m.group("trace"),
+        "span_id": m.group("span"),
+        "flags": m.group("flags"),
+    }
+
+def build_traceparent(trace_id: str, span_id: Optional[str] = None, flags: str = "01", version: str = "00") -> str:
+    """Build a W3C traceparent header string.
+
+    Generates a random 16-hex span_id if not provided.
+    """
+    trace_id_l = str(trace_id).lower()
+    if not re.fullmatch(r"[0-9a-f]{32}", trace_id_l):
+        # Normalize using uuid if invalid
+        trace_id_l = uuid.uuid4().hex
+    if not span_id or not re.fullmatch(r"[0-9a-f]{16}", str(span_id).lower()):
+        span_id_l = uuid.uuid4().hex[:16]
+    else:
+        span_id_l = str(span_id).lower()
+    flags_l = (flags or "01").lower()
+    if not re.fullmatch(r"[0-9a-f]{2}", flags_l):
+        flags_l = "01"
+    ver_l = (version or "00").lower()
+    if not re.fullmatch(r"[0-9a-f]{2}", ver_l):
+        ver_l = "00"
+    return f"{ver_l}-{trace_id_l}-{span_id_l}-{flags_l}"

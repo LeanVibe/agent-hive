@@ -686,8 +686,19 @@ class ApiGateway:
             "net.peer.ip": request.client_ip,
             "request.id": request.request_id,
         }
+        # normalize/propagate incoming W3C traceparent -> X-Trace-Id
+        try:
+            from .trace_utils import parse_traceparent, build_traceparent  # lazy import
+            tp_in = request.headers.get("traceparent")
+            if tp_in:
+                parsed = parse_traceparent(tp_in)
+                if parsed and parsed.get("trace_id"):
+                    request.headers["X-Trace-Id"] = parsed["trace_id"]
+        except Exception:
+            pass
+
         with self._trace("api_gateway.handle_request", trace_attrs) as span_ctx:
-            # ensure trace id propagation
+            # ensure trace id propagation (prefer incoming)
             request.headers.setdefault("X-Trace-Id", span_ctx.trace_id)
             try:
                 async def call_handler():
@@ -719,11 +730,15 @@ class ApiGateway:
         if self.gateway_config.enable_cors:
             response = self._add_cors_headers(response)
         response = self._add_security_headers(response)
-        # attach trace id if present
+        # attach trace id and traceparent if present
         try:
+            from .trace_utils import build_traceparent  # lazy import
             trace_id = request.headers.get("X-Trace-Id")
             if trace_id:
                 response.headers["X-Trace-Id"] = trace_id
+                # ensure a traceparent header is present for downstream consumers
+                # generate a lightweight span id and flags if not provided
+                response.headers.setdefault("traceparent", build_traceparent(trace_id))
         except Exception:
             pass
         return response
