@@ -16,9 +16,27 @@ from datetime import datetime
 
 # Add project root and .claude to path for imports
 import sys
+# Ensure sitecustomize runs to enforce local imports
+try:
+    import sitecustomize  # noqa: F401
+except Exception as _e:
+    print(f"Warning: sitecustomize not loaded: {_e}")
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / ".claude"))
+
+# Force the local `config` package to take precedence over any installed package named `config`
+try:
+    import importlib, sys as _sys
+    local_config_path = str(project_root / "config" / "__init__.py")
+    existing = _sys.modules.get("config")
+    if existing is not None:
+        if not getattr(existing, "__file__", "").endswith("config/__init__.py"):
+            del _sys.modules["config"]
+    importlib.invalidate_caches()
+    import config  # noqa: F401 - ensure local package is loaded
+except Exception as _e:
+    print(f"Warning: failed to enforce local config package: {_e}")
 
 # Import components for testing
 try:

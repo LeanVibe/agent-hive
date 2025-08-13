@@ -12,24 +12,23 @@ from pathlib import Path
 from typing import Dict, Any
 from unittest.mock import Mock
 
-# Ensure we can import from project root
+# Ensure we can import from project root and prefer local `config` package
 project_root = Path(__file__).parent.parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-# Change working directory to project root to help with imports
-original_cwd = os.getcwd()
-os.chdir(project_root)
-
+# Force local config package precedence in this test package as well
 try:
-    # Try to import existing modules, skip if not available
-    pass
-    # from config.security_config import SecurityConfigManager, SecurityLevel
-    # from config.auth_models import Permission
-    # from security.auth_service import AuthenticationService, UserRole
-finally:
-    # Restore original working directory
-    os.chdir(original_cwd)
+    import importlib, sys as _sys
+    existing = _sys.modules.get("config")
+    if existing is not None and (getattr(existing, "__file__", "") or "").find("/config/__init__.py") == -1:
+        del _sys.modules["config"]
+    importlib.invalidate_caches()
+    import config  # noqa: F401
+except Exception as _e:
+    print(f"Warning (security conftest): failed to enforce local config: {_e}")
+
+# Avoid changing working directory during collection; rely on sys.path insertion above
 
 
 @pytest.fixture

@@ -75,3 +75,5 @@ sample_tasks.json
 temp/
 terraform/.terraform/
 infrastructure/nginx/ssl/*.pem
+.claude/logs/
+!/.claude/logs/.gitkeep

@@ -7,6 +7,8 @@ Last updated: 2025-08-13 • Owner: Foundation Epic Phase 2 • Scope: external_
 - GitHub Actions shows failures driven by global workflows (XP gate) executing full repo tests. Root causes identified and planned for remediation.
 - Recent security work: JWT introspection/blacklisting tests added and passing; auth endpoints exempted from pre-auth; shared SecureTokenManager instance across services.
 - Orchestrator and state shims under `.claude/*` caused import errors in full-suite runs; compatibility shims introduced, additional adapters planned below.
+  - Full repo test collection now succeeds after adding `sitecustomize.py`, enforcing local `config` package, and adding `config/config_loader.py` shim.
+  - `.claude/logs/` added to `.gitignore` with `.gitkeep`; tracked logs removed.
   - ApiGateway accepts injected `service_discovery` and exposes service route helpers
   - Load balancer metrics include successful/failed counters; circuit-breaker recovery semantics improved
   - Event streaming batch now always exposes `event_count` and `events` even when compressed
@@ -94,7 +96,7 @@ Last updated: 2025-08-13 • Owner: Foundation Epic Phase 2 • Scope: external_
    - Align signatures expected by tests (e.g., `should_create_checkpoint(agent_id)` vs optional arg) [review]
 3) Performance module decorators
    - Added `track_jwt_authentication`, `track_rbac_authorization`, `track_rate_limiting`, `track_service_discovery`, `track_load_balancing`, `track_api_gateway_request`, `track_end_to_end_request` [done]
-   - Implement missing `metrics_collector` lifecycle helpers `start_metrics_collection`, `stop_metrics_collection`, `print_live_dashboard` exports [todo]
+   - Implement missing `metrics_collector` lifecycle helpers `start_metrics_collection`, `stop_metrics_collection`, `print_live_dashboard` exports [done]
 4) Security imports
    - Tests import `config.auth_models`, `config.security_config`; both exist under `config/` [verified]
    - Ensure package import works in CI PYTHONPATH; tests already insert project root [verified]

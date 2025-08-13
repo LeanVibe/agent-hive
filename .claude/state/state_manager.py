@@ -9,7 +9,7 @@ from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
 import sys
 
-_project_root = Path(__file__).resolve().parents[3]
+_project_root = Path(__file__).resolve().parents[2]
 _real_state_path = _project_root / "state" / "state_manager.py"
 
 _spec = spec_from_file_location("_real_state_manager", str(_real_state_path))
