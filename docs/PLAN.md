@@ -125,3 +125,133 @@ Last updated: 2025-08-13 • Owner: Foundation Epic Phase 2 • Scope: external_
 - Terraform infra definitions (stubs acceptable)
 - Global coverage target across out-of-sprint directories
 - Full JWT/RBAC production flows beyond test harness usage
+
+---
+
+# Next 4 Epics – Pragmatic Roadmap (80/20 focus)
+
+All epics follow the same rules: prioritize must-haves, add tests first, ship vertical slices, keep repo test collection clean.
+
+## Epic 2 – Security & Identity Hardening (Phase 2 core)
+
+Objectives
+- Production-grade token and key lifecycle; RBAC consistency; tenant isolation hooks
+
+Must-haves
+- JWT refresh rotation with jti tracking and invalidation
+- Blacklist provider interface with in-memory default; optional Redis provider (behind feature flag)
+- Introspection endpoint hardening (issuer/audience/expiry/permissions validation); error shaping parity
+- API key lifecycle: issue/rotate/revoke; hash at rest; per-key rate limits; minimal analytics (usage count, last used)
+- Scope→RBAC mapping utilities; permission checks centralized
+- Tenant propagation via `X-Tenant-ID`; per-tenant rate-limit quotas (config-driven)
+
+Tests
+- Extend `tests/security/test_jwt_auth.py` and `test_auth_security_integration.py` for refresh rotation, introspection, and revocation
+- Add focused tests for API key rotation/revocation and per-key limits
+- Add tenant header propagation and quota checks in gateway middleware tests
+
+Deliverables
+- `security/token_manager.py`: jti store and rotation semantics
+- `external_api/auth_middleware.py`: tenant header handling; introspection checks
+- `security/api_key_manager.py`: rotate/revoke APIs; hashed storage
+- Config toggles in `config/security_config.py`
+
+Acceptance
+- All security tests pass; new tests added for rotation/introspection/keys/tenant quotas
+
+Non-goals
+- Full OAuth2 auth code + PKCE (moved to next epic)
+
+Milestone slices
+1) jti + refresh rotation + tests
+2) blacklist provider interface + in-memory implementation + tests
+3) introspection hardening + tests
+4) API key rotation/revocation + per-key limits + tests
+5) tenant header propagation + quota checks + tests
+
+## Epic 3 – Mesh & Observability (Envoy exporter + tracing)
+
+Objectives
+- Strengthen Envoy/xDS export; consistent tracing and metrics across gateway/discovery/lb
+
+Must-haves
+- Envoy exporter enhancements: per-method route duplication; weighted clusters for multiple backends; retries/timeouts mapping; headers match parity
+- Golden tests for exporter based on sample routing DSL
+- End-to-end tracing: ensure traceparent propagation already implemented is covered; add spans in service discovery and load balancer critical paths
+- Minimal metrics: expose Prometheus-style endpoint for gateway (if already present, extend with key counters)
+
+Tests
+- Add/extend `tests/external_api/test_envoy_exporter.py` with golden cases (methods, weights, retries)
+- Extend tracing tests (`tests/external_api/test_traceparent_propagation.py`, `test_tracing_basic.py`) to include discovery/lb spans assertions (mocked)
+
+Deliverables
+- `external_api/envoy_exporter.py` upgrades
+- Tracing hooks in `external_api/service_discovery.py`, `external_api/load_balancer.py`
+- Optional lightweight `/metrics` JSON/Prometheus mapping in `external_api/monitoring_system.py`
+
+Acceptance
+- Exporter tests green; tracing tests extended and passing
+
+Non-goals
+- Full dynamic xDS control plane; stick to static export for now
+
+Milestone slices
+1) Per-method route split + tests
+2) Weighted clusters + tests
+3) Retry/timeout/header mapping + tests
+4) Tracing spans in discovery/lb + tests
+
+## Epic 4 – Developer Experience & SDKs
+
+Objectives
+- Faster integration for users: OpenAPI→routes and SDKs that are practically useful
+
+Must-haves
+- Minimal operation parsing from OpenAPI to generate per-verb client methods (Python/JS)
+- CLI or function to write generated clients to disk under `clients/{lang}/{service}`
+- Improve docs and examples to wire gateway+discovery and export SDKs
+- CI for SDK generation smoke tests
+
+Tests
+- Add unit tests for SDK factory that assert method names and basic request composition per path/verb
+
+Deliverables
+- `external_api/client_generators.py`: extend `generate_*_from_openapi`
+- Small CLI entry or helper in `cli.py`
+- Docs samples under `docs/`
+
+Acceptance
+- SDK unit tests pass; example generation outputs expected files
+
+Non-goals
+- Full schema-driven models; keep payloads typed loosely for now
+
+Milestone slices
+1) Parse operations → in-memory client methods + tests
+2) Emit to disk + simple importable package structure + tests
+3) Docs/examples + CI smoke
+
+## Epic 5 – Production Readiness & Reliability
+
+Objectives
+- Harden gateway and services for production basics: limits, headers, graceful lifecycle, and packaging
+
+Must-haves
+- Request size/time limits, HSTS and security headers (verify in middleware)
+- Backpressure and graceful shutdown hooks exposed in gateway
+- Health/readiness endpoints consistency across gateway/discovery
+- Build pipeline: reproducible Docker image, GH Actions build workflow, release artifact
+
+Tests
+- Extend existing webhook/gateway tests for payload limits/timeouts
+- Add health/readiness endpoint tests
+
+Deliverables
+- `external_api/api_gateway.py` and middleware: limits/headers/shutdown
+- Dockerfile tweaks if needed; GH Actions build workflow(s)
+
+Acceptance
+- New tests pass; image builds in CI
+
+Non-goals
+- Full Terraform/Helm stack (documented stubs only if required)
