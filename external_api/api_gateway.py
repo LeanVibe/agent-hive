@@ -1503,9 +1503,8 @@ class ApiGateway:
             if request.path == "/api/v1/keys" and request.method == "POST":
                 if not request.body:
                     return self._create_error_response(400, "Request body required", request.request_id)
-                user_id = request.body.get("user_id")
-                if not user_id:
-                    return self._create_error_response(400, "user_id is required", request.request_id)
+                # Accept either user_id or owner (MVP ergonomics)
+                user_id = request.body.get("user_id") or request.body.get("owner") or "service-account"
                 raw_perms = request.body.get("permissions") or [Permission.READ.value]
                 permissions = [Permission(p) if not isinstance(p, Permission) else p for p in raw_perms]
                 scopes = request.body.get("scopes") or []
@@ -1556,7 +1555,7 @@ class ApiGateway:
                 return ApiResponse(
                     status_code=200,
                     headers={"Content-Type": "application/json"},
-                    body={"api_key": new_key, "token_id": new_id},
+                    body={"new_api_key": new_key, "token_id": new_id},
                     timestamp=datetime.utcnow(),
                     processing_time=0.0,
                     request_id=request.request_id

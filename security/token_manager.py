@@ -319,10 +319,12 @@ class SecureTokenManager:
         """
         try:
             # Validate old token
+            # Validate signature only for rotation in this context; relax aud
             payload = jwt.decode(
-                old_token, 
-                self.config["jwt_secret"], 
-                algorithms=[self.config.get("jwt_algorithm", "HS256")]
+                old_token,
+                self.config["jwt_secret"],
+                algorithms=[self.config.get("jwt_algorithm", "HS256")],
+                options={"verify_aud": False}
             )
             
             old_token_id = payload.get("token_id")

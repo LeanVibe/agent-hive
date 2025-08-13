@@ -263,24 +263,30 @@ class JwtIntegrationService:
             payload = jwt.decode(token, options={"verify_signature": False})
             token_id = payload.get("token_id")
             
+            # Add to Redis blacklist if available (use token exp for TTL)
+            blacklisted = False
+            try:
+                if self.redis_cache_manager is not None:
+                    exp_val = payload.get("exp")
+                    from datetime import datetime, timezone
+                    if isinstance(exp_val, (int, float)):
+                        expires_at = datetime.fromtimestamp(exp_val, tz=timezone.utc).replace(tzinfo=None)
+                    else:
+                        # best-effort: blacklist for 24h if exp not present or unparsable
+                        expires_at = datetime.utcnow() + timedelta(hours=24)
+                    self.redis_cache_manager.blacklist_jwt_token(token, expires_at)
+                    blacklisted = True
+            except Exception:
+                # Non-fatal if Redis unavailable
+                pass
+
             if token_id:
-                # Add to Redis blacklist if available (use token exp for TTL)
-                try:
-                    if self.redis_cache_manager is not None:
-                        exp_val = payload.get("exp")
-                        from datetime import datetime, timezone
-                        if isinstance(exp_val, (int, float)):
-                            expires_at = datetime.fromtimestamp(exp_val, tz=timezone.utc).replace(tzinfo=None)
-                        else:
-                            # best-effort: blacklist for 24h if exp not present or unparsable
-                            expires_at = datetime.utcnow() + timedelta(hours=24)
-                        self.redis_cache_manager.blacklist_jwt_token(token, expires_at)
-                except Exception:
-                    # Do not fail revocation on blacklist error
-                    pass
-                return await self.token_manager.revoke_token(token_id, reason)
-            
-            return False
+                # Revoke in token manager if known; consider blacklist success sufficient
+                tm_revoked = await self.token_manager.revoke_token(token_id, reason)
+                return bool(tm_revoked or blacklisted)
+
+            # If no token_id, at least indicate success if blacklisted
+            return bool(blacklisted)
             
         except Exception as e:
             logger.error(f"Token revocation error: {e}")
