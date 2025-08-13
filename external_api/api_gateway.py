@@ -661,9 +661,22 @@ class ApiGateway:
                     request_id=request.request_id,
                 )
 
-        # Resolve handler
+        # Built-in endpoints should be handled before route resolution
+        if request.path == "/health":
+            return await self.get_health_status()
+        if request.path == "/metrics":
+            return await self.get_metrics()
+        if request.path.startswith("/api/v1/auth"):
+            return await self._handle_auth_endpoints(request)
+        if request.path.startswith("/api/v1/keys"):
+            return await self._handle_api_key_endpoints(request)
+        if request.path == "/api/v1/services":
+            return await self._handle_service_endpoints(request)
+
+        # Resolve handler (custom/user routes)
         handler = self._find_handler(request.path, request.method)
         if not handler:
+            # Maintain legacy error string for tests expecting "Route not found"
             return self._create_error_response(404, "Route not found", request.request_id)
 
         # Execute with timeout, with optional tracing span
