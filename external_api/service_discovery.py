@@ -80,6 +80,13 @@ class ServiceDiscovery:
         self._running = False
 
         logger.info("ServiceDiscovery initialized")
+        # Optional tracing
+        try:
+            from .trace_utils import get_tracer
+            obs = (self.config or {}).get("observability", {})
+            self._tracer = get_tracer("service-discovery", bool(obs.get("tracing_enabled", False)))
+        except Exception:
+            self._tracer = None
 
     async def start(self) -> None:
         """Start the service discovery system."""
@@ -124,6 +131,12 @@ class ServiceDiscovery:
             True if registration successful
         """
         try:
+            span_cm = (self._tracer.trace("service_discovery.register_service", {
+                "service.id": instance.service_id,
+                "service.name": instance.service_name,
+            }) if getattr(self, "_tracer", None) else None)
+            if span_cm:
+                span_cm.__enter__()
             registration = ServiceRegistration(
                 instance=instance,
                 registered_at=datetime.now(),
@@ -155,6 +168,12 @@ class ServiceDiscovery:
         except Exception as e:
             logger.error(f"Failed to register service {instance.service_id}: {e}")
             return False
+        finally:
+            try:
+                if span_cm:
+                    span_cm.__exit__(None, None, None)
+            except Exception:
+                pass
 
     async def deregister_service(self, service_id: str) -> bool:
         """
@@ -208,6 +227,12 @@ class ServiceDiscovery:
         Returns:
             List of matching service instances
         """
+        span_cm = (self._tracer.trace("service_discovery.discover_services", {
+            "service.name": service_name,
+            "healthy_only": healthy_only,
+        }) if getattr(self, "_tracer", None) else None)
+        if span_cm:
+            span_cm.__enter__()
         instances = []
 
         for registration in self.services.values():
@@ -225,7 +250,14 @@ class ServiceDiscovery:
                 instances.append(registration.instance)
 
         logger.debug(f"Discovered {len(instances)} instances of {service_name}")
-        return instances
+        try:
+            return instances
+        finally:
+            try:
+                if span_cm:
+                    span_cm.__exit__(None, None, None)
+            except Exception:
+                pass
 
     async def get_service_by_id(self, service_id: str) -> Optional[ServiceInstance]:
         """

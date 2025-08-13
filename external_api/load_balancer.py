@@ -22,7 +22,10 @@ logger = logging.getLogger(__name__)
 
 
 class LoadBalancingAlgorithm(Enum):
-    """Load balancing algorithms."""
+    """Load balancing algorithms.
+
+    Public API enum used by tests; do not change values.
+    """
     ROUND_ROBIN = "round_robin"
     LEAST_CONNECTIONS = "least_connections"
     WEIGHTED_ROUND_ROBIN = "weighted_round_robin"
@@ -41,8 +44,15 @@ class HealthStatus(Enum):
 
 @dataclass
 class LoadBalancingMetrics:
-    """Metrics for load balancing decisions."""
+    """Metrics for load balancing decisions.
+
+    Tracks success/failure counts, latency, and connection load. Exposes
+    lightweight counters `successful_requests` and `failed_requests` required
+    by tests.
+    """
     total_requests: int = 0
+    successful_requests: int = 0
+    failed_requests: int = 0
     active_connections: int = 0
     avg_response_time_ms: float = 0.0
     success_rate: float = 100.0
@@ -86,12 +96,16 @@ class LoadBalancerInstance:
         """Check if instance is available for requests."""
         if self.circuit_breaker_open:
             if self.circuit_breaker_open_until and datetime.utcnow() > self.circuit_breaker_open_until:
+                # Auto-recover once the open window expires
                 self.circuit_breaker_open = False
                 self.circuit_breaker_open_until = None
+                # Upon recovery, mark as degraded until health monitor upgrades
+                if self.health_status == HealthStatus.UNKNOWN:
+                    self.health_status = HealthStatus.DEGRADED
             else:
                 return False
         
-        return self.health_status in [HealthStatus.HEALTHY, HealthStatus.DEGRADED]
+        return self.health_status in [HealthStatus.HEALTHY, HealthStatus.DEGRADED, HealthStatus.UNKNOWN]
     
     @property
     def effective_weight(self) -> float:
@@ -111,7 +125,7 @@ class LoadBalancerInstance:
 class ServiceLoadBalancer:
     """
     Advanced load balancer for service discovery with health-aware distribution.
-    
+
     Features:
     - Multiple load balancing algorithms
     - Health-aware request routing
@@ -148,6 +162,13 @@ class ServiceLoadBalancer:
         self.request_history: Dict[str, List[Dict[str, Any]]] = {}
         
         logger.info(f"ServiceLoadBalancer initialized with algorithm: {self.algorithm.value}")
+        # Optional tracing
+        try:
+            from .trace_utils import get_tracer
+            obs = (self.config or {}).get("observability", {})
+            self._tracer = get_tracer("service-load-balancer", bool(obs.get("tracing_enabled", False)))
+        except Exception:
+            self._tracer = None
     
     async def start(self) -> None:
         """Start the load balancer."""
@@ -247,6 +268,11 @@ class ServiceLoadBalancer:
         """
         try:
             # Get available instances for service
+            span_cm = (self._tracer.trace("load_balancer.select_instance", {
+                "service.name": service_name,
+            }) if getattr(self, "_tracer", None) else None)
+            if span_cm:
+                span_cm.__enter__()
             available_instances = await self._get_available_instances(service_name)
             
             if not available_instances:
@@ -277,6 +303,12 @@ class ServiceLoadBalancer:
         except Exception as e:
             logger.error(f"Error selecting instance for {service_name}: {e}")
             return None
+        finally:
+            try:
+                if span_cm:
+                    span_cm.__exit__(None, None, None)
+            except Exception:
+                pass
     
     async def record_request_result(self, instance_id: str, success: bool,
                                   response_time_ms: float, error: Optional[str] = None) -> None:
@@ -320,6 +352,11 @@ class ServiceLoadBalancer:
             if recent_requests:
                 successes = sum(1 for r in recent_requests if r["success"])
                 metrics.success_rate = (successes / len(recent_requests)) * 100
+            # Update success/failure counters for tests
+            if success:
+                metrics.successful_requests += 1
+            else:
+                metrics.failed_requests += 1
             
             # Update health score
             metrics.calculate_health_score()
