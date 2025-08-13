@@ -136,6 +136,13 @@ class ApiGateway:
             self.enable_service_discovery_routing = effective_config.get("enable_service_discovery_routing", True)
         # Declarative routing DSL storage
         self.routing_config: Dict[str, Any] = {"routes": []}
+
+        # Observability / Tracing (optional, no-op if not enabled or missing deps)
+        self.observability_config: Dict[str, Any] = effective_config.get("observability", {})
+        self.tracing_enabled: bool = bool(self.observability_config.get("tracing_enabled", False))
+        self.tracing_service_name: str = str(self.observability_config.get("service_name", "api-gateway"))
+        self._otel_tracer = None
+        self._init_tracing()
         
         logger.info(f"API Gateway initialized on {self.gateway_config.host}:{self.gateway_config.port} with enhanced service discovery")
     
@@ -644,19 +651,31 @@ class ApiGateway:
         if not handler:
             return self._create_error_response(404, "Route not found", request.request_id)
 
-        # Execute with timeout
-        try:
-            async def call_handler():
-                return await handler(request)
+        # Execute with timeout, with optional tracing span
+        trace_attrs = {
+            "http.method": request.method,
+            "http.target": request.path,
+            "net.peer.ip": request.client_ip,
+            "request.id": request.request_id,
+        }
+        with self._trace("api_gateway.handle_request", trace_attrs) as span_ctx:
+            # ensure trace id propagation
+            request.headers.setdefault("X-Trace-Id", span_ctx.trace_id)
+            try:
+                async def call_handler():
+                    return await handler(request)
 
-            handler_result = await asyncio.wait_for(
-                call_handler(), timeout=self.gateway_config.request_timeout
-            )
-        except asyncio.TimeoutError:
-            return self._create_error_response(504, "Request timeout", request.request_id)
-        except Exception:
-            logger.exception("Handler error")
-            return self._create_error_response(500, "Internal server error", request.request_id)
+                handler_result = await asyncio.wait_for(
+                    call_handler(), timeout=self.gateway_config.request_timeout
+                )
+            except asyncio.TimeoutError as _:
+                span_ctx.set_attribute("error", True)
+                return self._create_error_response(504, "Request timeout", request.request_id)
+            except Exception as e:
+                logger.exception("Handler error")
+                span_ctx.record_exception(e)
+                span_ctx.set_attribute("error", True)
+                return self._create_error_response(500, "Internal server error", request.request_id)
 
         # Build response
         response = ApiResponse(
@@ -672,6 +691,13 @@ class ApiGateway:
         if self.gateway_config.enable_cors:
             response = self._add_cors_headers(response)
         response = self._add_security_headers(response)
+        # attach trace id if present
+        try:
+            trace_id = request.headers.get("X-Trace-Id")
+            if trace_id:
+                response.headers["X-Trace-Id"] = trace_id
+        except Exception:
+            pass
         return response
     
     async def get_health_status(self) -> ApiResponse:
@@ -1111,16 +1137,26 @@ class ApiGateway:
                 import aiohttp
                 total_timeout = timeout_override if timeout_override is not None else self.gateway_config.request_timeout
                 timeout = aiohttp.ClientTimeout(total=total_timeout)
-                async with aiohttp.ClientSession(timeout=timeout) as session:
-                    # Ensure request has required timestamp for compatibility
-                    if not getattr(request, "timestamp", None):
-                        try:
-                            request.timestamp = datetime.utcnow()
-                        except Exception:
-                            pass
+                # tracing context for outbound call
+                url_for_attrs = None
+                with self._trace("api_gateway.proxy_to_service", {
+                    "service.name": service_name,
+                    "proxy.attempt": attempt,
+                }) as span_ctx:
+                    async with aiohttp.ClientSession(timeout=timeout) as session:
+                        # Ensure request has required timestamp for compatibility
+                        if not getattr(request, "timestamp", None):
+                            try:
+                                request.timestamp = datetime.utcnow()
+                            except Exception:
+                                pass
 
-                    # Support both awaited and async-context-managed response objects (for AsyncMock patterns)
-                    pending = session.request(method=request.method, url=url, headers=request.headers, json=request.body)
+                        # Support both awaited and async-context-managed response objects (for AsyncMock patterns)
+                        # propagate trace id header if available
+                        outbound_headers = dict(request.headers)
+                        outbound_headers.setdefault("X-Trace-Id", outbound_headers.get("X-Trace-Id", span_ctx.trace_id))
+                        url_for_attrs = url
+                        pending = session.request(method=request.method, url=url, headers=outbound_headers, json=request.body)
                     resp_ctx = getattr(pending, "__aenter__", None)
                     if callable(resp_ctx):
                         async with pending as resp:
@@ -1130,6 +1166,11 @@ class ApiGateway:
                             except Exception:
                                 body = {"raw": text}
                             result = {"status_code": resp.status, "headers": dict(resp.headers), "body": body}
+                            try:
+                                span_ctx.set_attribute("http.status_code", resp.status)
+                                span_ctx.set_attribute("http.url", url_for_attrs or url)
+                            except Exception:
+                                pass
                             if resp.status >= 500 and attempt <= retries:
                                 last_error = f"upstream {resp.status}"
                                 if backoff_ms > 0:
@@ -1145,6 +1186,11 @@ class ApiGateway:
                         except Exception:
                             body = {"raw": text}
                         result = {"status_code": resp.status, "headers": dict(resp.headers), "body": body}
+                        try:
+                            span_ctx.set_attribute("http.status_code", resp.status)
+                            span_ctx.set_attribute("http.url", url_for_attrs or url)
+                        except Exception:
+                            pass
                         if resp.status >= 500 and attempt <= retries:
                             last_error = f"upstream {resp.status}"
                             if backoff_ms > 0:
@@ -1165,6 +1211,87 @@ class ApiGateway:
                     "headers": {},
                     "body": {"error": "Bad gateway", "details": last_error or "proxy_failure"}
                 }
+
+    # ---- Tracing helpers (optional) ----
+    def _init_tracing(self) -> None:
+        if not self.tracing_enabled:
+            return
+        try:
+            from opentelemetry import trace as _otel_trace  # type: ignore
+            self._otel_tracer = _otel_trace.get_tracer(self.tracing_service_name)
+        except Exception:
+            # Missing dependencies or init failure; operate in no-op mode
+            self._otel_tracer = None
+
+    class _NoopSpanCtx:
+        def __init__(self):
+            import uuid as _uuid
+            self._trace_id = _uuid.uuid4().hex
+        @property
+        def trace_id(self) -> str:
+            return self._trace_id
+        def __enter__(self):
+            return self
+        def __exit__(self, exc_type, exc, tb):
+            return False
+        def set_attribute(self, key: str, value: Any) -> None:
+            pass
+        def record_exception(self, exc: Exception) -> None:
+            pass
+
+    class _OtelSpanCtx:
+        def __init__(self, tracer, name: str, attributes: Optional[Dict[str, Any]] = None):
+            self._tracer = tracer
+            self._name = name
+            self._attributes = attributes or {}
+            self._span = None
+            self._cm = None
+            import uuid as _uuid
+            self._fallback_id = _uuid.uuid4().hex
+        def __enter__(self):
+            self._cm = self._tracer.start_as_current_span(self._name)
+            self._span = self._cm.__enter__()
+            try:
+                for k, v in self._attributes.items():
+                    self._span.set_attribute(k, v)
+            except Exception:
+                pass
+            return self
+        def __exit__(self, exc_type, exc, tb):
+            try:
+                if exc is not None:
+                    self.record_exception(exc)
+            finally:
+                try:
+                    self._cm.__exit__(exc_type, exc, tb)
+                except Exception:
+                    pass
+            return False
+        @property
+        def trace_id(self) -> str:
+            try:
+                # Return hex trace id if available
+                ctx = self._span.get_span_context()
+                if ctx and getattr(ctx, "trace_id", 0):
+                    return f"{ctx.trace_id:032x}"
+            except Exception:
+                pass
+            return self._fallback_id
+        def set_attribute(self, key: str, value: Any) -> None:
+            try:
+                self._span.set_attribute(key, value)
+            except Exception:
+                pass
+        def record_exception(self, exc: Exception) -> None:
+            try:
+                self._span.record_exception(exc)
+            except Exception:
+                pass
+
+    def _trace(self, name: str, attributes: Optional[Dict[str, Any]] = None):
+        if self.tracing_enabled and self._otel_tracer is not None:
+            return ApiGateway._OtelSpanCtx(self._otel_tracer, name, attributes)
+        return ApiGateway._NoopSpanCtx()
     
     async def _handle_auth_endpoints(self, request: ApiRequest) -> ApiResponse:
         """Handle authentication endpoints."""
