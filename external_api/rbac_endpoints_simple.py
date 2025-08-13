@@ -9,6 +9,7 @@ This is a simplified version for testing and validation purposes.
 import asyncio
 import logging
 from datetime import datetime
+from .time_utils import iso_now_utc
 from typing import Dict, Any, List, Optional
 
 from security.rbac_manager import RBACManager, PermissionType, RoleType
@@ -186,7 +187,7 @@ class SimpleRBACEndpoints:
                 "user_id": user_id,
                 "permissions": [p.value for p in permissions],
                 "total_permissions": len(permissions),
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -200,7 +201,7 @@ class SimpleRBACEndpoints:
             return {
                 "success": True,
                 "analytics": analytics,
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -214,7 +215,7 @@ class SimpleRBACEndpoints:
             return {
                 "success": True,
                 "analytics": analytics,
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -240,7 +241,7 @@ class SimpleRBACEndpoints:
                     "registered_endpoints": len(self.permission_middleware.endpoint_permissions),
                     "cache_enabled": self.permission_middleware.cache_enabled
                 },
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             }
             
         except Exception as e:
@@ -249,5 +250,5 @@ class SimpleRBACEndpoints:
                 "success": False,
                 "status": "unhealthy",
                 "error": str(e),
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             }

@@ -10,6 +10,7 @@ import json
 import logging
 import sqlite3
 from datetime import datetime, timedelta
+from .time_utils import now_utc, iso_now_utc, ensure_naive
 from typing import Dict, List, Optional, Any, Callable, Set
 from dataclasses import dataclass, asdict
 from enum import Enum
@@ -184,8 +185,8 @@ class PersistentServiceRegistry:
             
             registration = ServiceRegistration(
                 instance=enhanced_instance,
-                registered_at=datetime.utcnow(),
-                last_heartbeat=datetime.utcnow(),
+                registered_at=now_utc(),
+                last_heartbeat=now_utc(),
                 status=ServiceStatus.STARTING,
                 ttl=self.config.service_ttl
             )
@@ -388,7 +389,7 @@ class PersistentServiceRegistry:
                     circuit_breaker_status = await cb.get_status()
             
             # Calculate uptime
-            uptime_seconds = (datetime.utcnow() - registration.registered_at).total_seconds()
+            uptime_seconds = (now_utc() - registration.registered_at).total_seconds()
             
             # Check dependencies
             dependency_health = {}
@@ -503,11 +504,11 @@ class PersistentServiceRegistry:
         """Create manual backup of registry."""
         try:
             if not backup_path:
-                timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+                timestamp = now_utc().strftime("%Y%m%d_%H%M%S")
                 backup_path = f"service_registry_backup_{timestamp}.json"
             
             backup_data = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": iso_now_utc(),
                 "services": {},
                 "dependencies": {},
                 "events": [],
@@ -735,7 +736,7 @@ class PersistentServiceRegistry:
                 event_type=event_type,
                 service_id=service_id,
                 service_name=service_name,
-                timestamp=datetime.utcnow(),
+                timestamp=now_utc(),
                 details=details
             )
             
@@ -811,7 +812,7 @@ class PersistentServiceRegistry:
     async def _cleanup_expired_services(self) -> None:
         """Clean up expired services."""
         try:
-            current_time = datetime.utcnow()
+            current_time = now_utc()
             expired_services = []
             
             for service_id, registration in self.services.items():
@@ -837,12 +838,12 @@ class PersistentServiceRegistry:
     async def _cleanup_old_events(self) -> None:
         """Clean up old events."""
         try:
-            cutoff_time = datetime.utcnow() - timedelta(hours=self.config.event_retention_hours)
+            cutoff_time = ensure_naive(now_utc()) - timedelta(hours=self.config.event_retention_hours)
             
             # Clean memory events
             self.service_events = [
                 event for event in self.service_events
-                if event.timestamp > cutoff_time
+                if ensure_naive(event.timestamp) > cutoff_time
             ]
             
             # Clean database events

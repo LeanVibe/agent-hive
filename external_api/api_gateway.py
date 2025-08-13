@@ -11,6 +11,7 @@ import logging
 import time
 import uuid
 from datetime import datetime
+from .time_utils import now_utc, iso_now_utc
 import re
 import random
 from typing import Dict, Any, Optional, List, Callable, Union
@@ -322,7 +323,7 @@ class ApiGateway:
                     status_code=200,
                     headers={"Content-Type": "application/json"},
                     body={"message": f"Response from {service_instance.service_id}"},
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -356,7 +357,7 @@ class ApiGateway:
         
         try:
             # Track active request
-            self.active_requests[request_id] = datetime.utcnow()
+            self.active_requests[request_id] = now_utc()
             self.request_count += 1
             
             # Check if IP is blocked
@@ -419,7 +420,7 @@ class ApiGateway:
                         status_code=200,
                         headers={"Content-Type": "application/json"},
                         body={"active": False, "reason": "introspection_error"},
-                        timestamp=datetime.utcnow(),
+                        timestamp=now_utc(),
                         processing_time=0.0,
                         request_id=request_id,
                     )
@@ -456,7 +457,7 @@ class ApiGateway:
                         "expires_at": session.expires_at.isoformat(),
                         "user_id": session.user_id
                     },
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=str(uuid.uuid4())
                 )
@@ -484,7 +485,7 @@ class ApiGateway:
                         "refresh_token": new_refresh_token,
                         "token_type": "Bearer"
                     },
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=str(uuid.uuid4())
                 )
@@ -505,7 +506,7 @@ class ApiGateway:
                     status_code=200,
                     headers={"Content-Type": "application/json"},
                     body={"message": "Logout successful"},
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=str(uuid.uuid4())
                 )
@@ -585,7 +586,7 @@ class ApiGateway:
         """Register an API key for simple auth flows in tests."""
         self.api_keys[api_key] = {
             **metadata,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": iso_now_utc(),
             "request_count": 0,
         }
 
@@ -593,7 +594,7 @@ class ApiGateway:
         """Revoke or deactivate an API key in the in-memory store."""
         if api_key in self.api_keys:
             self.api_keys[api_key]["active"] = False
-            self.api_keys[api_key]["revoked_at"] = datetime.utcnow().isoformat()
+            self.api_keys[api_key]["revoked_at"] = iso_now_utc()
             return True
         return False
 
@@ -656,7 +657,7 @@ class ApiGateway:
                     status_code=int(result.get("status_code", 403)),
                     headers={"Content-Type": "application/json"},
                     body=result.get("body", {"error": "Forbidden"}),
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=(time.time() - start_time) * 1000,
                     request_id=request.request_id,
                 )
@@ -721,7 +722,7 @@ class ApiGateway:
             status_code=int(handler_result.get("status_code", 200)),
             headers={"Content-Type": "application/json"},
             body=handler_result.get("body", {}),
-            timestamp=datetime.utcnow(),
+            timestamp=now_utc(),
             processing_time=(time.time() - start_time) * 1000,
             request_id=request.request_id,
         )
@@ -756,7 +757,7 @@ class ApiGateway:
             
             health_status = {
                 "status": "healthy" if error_rate < 5 else "degraded" if error_rate < 20 else "unhealthy",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": iso_now_utc(),
                 "gateway": {
                     "total_requests": self.request_count,
                     "error_count": self.error_count,
@@ -780,7 +781,7 @@ class ApiGateway:
                 status_code=200,
                 headers={"Content-Type": "application/json"},
                 body=health_status,
-                timestamp=datetime.utcnow(),
+                timestamp=now_utc(),
                 processing_time=0.0,
                 request_id=str(uuid.uuid4())
             )
@@ -800,7 +801,7 @@ class ApiGateway:
                     "server_running": False,
                     "registered_routes": len(self.route_handlers),
                     "active_requests": len(self.active_requests),
-                    "timestamp": datetime.utcnow().isoformat(),
+                    "timestamp": iso_now_utc(),
                 }
             response = await self.get_health_status()
             return {
@@ -808,10 +809,10 @@ class ApiGateway:
                 "server_running": self.server_running,
                 "registered_routes": len(self.route_handlers),
                 "active_requests": len(self.active_requests),
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": iso_now_utc(),
             }
         except Exception:
-            return {"status": "unhealthy", "server_running": self.server_running, "timestamp": datetime.utcnow().isoformat()}
+            return {"status": "unhealthy", "server_running": self.server_running, "timestamp": iso_now_utc()}
 
     def get_gateway_info(self) -> Dict[str, Any]:
         """Return summary info for CLI display."""
@@ -839,7 +840,7 @@ class ApiGateway:
             registry_stats = await self.service_registry.get_registry_stats()
             
             metrics = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": iso_now_utc(),
                 "requests": {
                     "total": self.request_count,
                     "errors": self.error_count,
@@ -871,7 +872,7 @@ class ApiGateway:
                 status_code=200,
                 headers={"Content-Type": "application/json"},
                 body=metrics,
-                timestamp=datetime.utcnow(),
+                timestamp=now_utc(),
                 processing_time=0.0,
                 request_id=str(uuid.uuid4())
             )
@@ -1004,7 +1005,7 @@ class ApiGateway:
             status_code=int(proxy_dict.get("status_code", 502)),
             headers=proxy_dict.get("headers", {}),
             body=proxy_dict.get("body"),
-            timestamp=datetime.utcnow(),
+            timestamp=now_utc(),
             processing_time=0.0,
             request_id=request.request_id,
         )
@@ -1190,7 +1191,7 @@ class ApiGateway:
                         # Ensure request has required timestamp for compatibility
                         if not getattr(request, "timestamp", None):
                             try:
-                                request.timestamp = datetime.utcnow()
+                                request.timestamp = now_utc()
                             except Exception:
                                 pass
 
@@ -1378,7 +1379,7 @@ class ApiGateway:
                     status_code=200,
                     headers={"Content-Type": "application/json"},
                     body=result,
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -1439,7 +1440,7 @@ class ApiGateway:
                 status_code=200,
                 headers={"Content-Type": "application/json"},
                 body=body,
-                timestamp=datetime.utcnow(),
+                timestamp=now_utc(),
                 processing_time=0.0,
                 request_id=request.request_id
             )
@@ -1457,7 +1458,7 @@ class ApiGateway:
                     status_code=200,
                     headers={"Content-Type": "application/json"},
                     body=services,
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -1488,7 +1489,7 @@ class ApiGateway:
                             status_code=201,
                             headers={"Content-Type": "application/json"},
                             body={"message": "Service registered successfully", "service_id": service_instance.service_id},
-                            timestamp=datetime.utcnow(),
+                            timestamp=now_utc(),
                             processing_time=0.0,
                             request_id=request.request_id
                         )
@@ -1508,7 +1509,7 @@ class ApiGateway:
                         status_code=200,
                         headers={"Content-Type": "application/json"},
                         body={"message": "Service deregistered successfully"},
-                        timestamp=datetime.utcnow(),
+                        timestamp=now_utc(),
                         processing_time=0.0,
                         request_id=request.request_id
                     )
@@ -1525,7 +1526,7 @@ class ApiGateway:
                         status_code=200,
                         headers={"Content-Type": "application/json"},
                         body=health_info,
-                        timestamp=datetime.utcnow(),
+                        timestamp=now_utc(),
                         processing_time=0.0,
                         request_id=request.request_id
                     )
@@ -1542,14 +1543,14 @@ class ApiGateway:
                     "service_discovery": discovery_info,
                     "load_balancer": load_balancer_stats,
                     "circuit_breakers": circuit_breaker_stats,
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": iso_now_utc()
                 }
                 
                 return ApiResponse(
                     status_code=200,
                     headers={"Content-Type": "application/json"},
                     body=stats,
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -1595,7 +1596,7 @@ class ApiGateway:
                     "permissions": [p.value for p in permissions],
                     "scopes": scopes,
                     "active": True,
-                    "created_at": datetime.utcnow().isoformat(),
+                    "created_at": iso_now_utc(),
                     "request_count": 0,
                 }
                 meta = self.jwt_service.token_manager.token_metadata.get(token_id)
@@ -1604,7 +1605,7 @@ class ApiGateway:
                     status_code=201,
                     headers={"Content-Type": "application/json"},
                     body={"api_key": token, "token_id": token_id, "expires_at": expires_at},
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -1623,13 +1624,13 @@ class ApiGateway:
                     meta_local = self.api_keys.pop(old_key)
                 else:
                     meta_local = {"user_id": None, "permissions": [], "scopes": []}
-                self.api_keys[old_key] = {**meta_local, "active": False, "revoked_at": datetime.utcnow().isoformat()}
-                self.api_keys[new_key] = {**meta_local, "active": True, "created_at": datetime.utcnow().isoformat(), "request_count": 0}
+                self.api_keys[old_key] = {**meta_local, "active": False, "revoked_at": iso_now_utc()}
+                self.api_keys[new_key] = {**meta_local, "active": True, "created_at": iso_now_utc(), "request_count": 0}
                 return ApiResponse(
                     status_code=200,
                     headers={"Content-Type": "application/json"},
                     body={"new_api_key": new_key, "token_id": new_id},
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -1654,7 +1655,7 @@ class ApiGateway:
                     status_code=200,
                     headers={"Content-Type": "application/json"},
                     body={"revoked": True},
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -1673,7 +1674,7 @@ class ApiGateway:
                         "active_keys": active,
                         "total_requests": total_requests,
                     },
-                    timestamp=datetime.utcnow(),
+                    timestamp=now_utc(),
                     processing_time=0.0,
                     request_id=request.request_id
                 )
@@ -1752,7 +1753,7 @@ class ApiGateway:
                 "Access-Control-Max-Age": "86400"
             },
             body=None,
-            timestamp=datetime.utcnow(),
+            timestamp=now_utc(),
             processing_time=0.0,
             request_id=request.request_id
         )
@@ -1790,9 +1791,9 @@ class ApiGateway:
             body={
                 "error": message,
                 "request_id": request_id,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             },
-            timestamp=datetime.utcnow(),
+            timestamp=now_utc(),
             processing_time=0.0,
             request_id=request_id
         )

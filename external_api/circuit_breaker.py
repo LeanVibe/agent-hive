@@ -9,6 +9,7 @@ import asyncio
 import logging
 import time
 from datetime import datetime, timedelta
+from .time_utils import now_utc, ensure_naive
 from typing import Dict, Any, Optional, Callable, TypeVar, Awaitable
 from dataclasses import dataclass, field
 from enum import Enum
@@ -93,7 +94,7 @@ class CircuitBreaker:
         # State management
         self.state = CircuitBreakerState.CLOSED
         self.last_failure_time: Optional[datetime] = None
-        self.state_changed_time = datetime.utcnow()
+        self.state_changed_time = now_utc()
         
         # Metrics and history
         self.metrics = CircuitBreakerMetrics()
@@ -201,14 +202,14 @@ class CircuitBreaker:
             self.metrics = CircuitBreakerMetrics()
             self.request_history.clear()
             self.last_failure_time = None
-            self.state_changed_time = datetime.utcnow()
+            self.state_changed_time = now_utc()
             
             logger.info(f"Circuit breaker '{self.name}' reset to initial state")
     
     async def get_status(self) -> Dict[str, Any]:
         """Get current circuit breaker status."""
         time_since_state_change = (
-            datetime.utcnow() - self.state_changed_time
+            now_utc() - self.state_changed_time
         ).total_seconds()
         
         recent_requests = self.request_history[-self.config.sliding_window_size:]
@@ -261,7 +262,8 @@ class CircuitBreaker:
         if self.state == CircuitBreakerState.OPEN:
             # Check if recovery timeout has passed
             if self.last_failure_time:
-                time_since_failure = datetime.utcnow() - self.last_failure_time
+                # Normalize to naive to avoid aware-naive subtraction in tests
+                time_since_failure = ensure_naive(now_utc()) - ensure_naive(self.last_failure_time)
                 if time_since_failure.total_seconds() >= self.config.recovery_timeout:
                     await self._change_state(CircuitBreakerState.HALF_OPEN)
                     return True
@@ -279,7 +281,7 @@ class CircuitBreaker:
         self.metrics.successful_requests += 1
         self.metrics.current_consecutive_successes += 1
         self.metrics.current_consecutive_failures = 0
-        self.metrics.last_success_time = datetime.utcnow()
+        self.metrics.last_success_time = now_utc()
         
         # Update average response time
         if self.metrics.avg_response_time_ms == 0:
@@ -313,7 +315,7 @@ class CircuitBreaker:
         self.metrics.failed_requests += 1
         self.metrics.current_consecutive_failures += 1
         self.metrics.current_consecutive_successes = 0
-        self.last_failure_time = datetime.utcnow()
+        self.last_failure_time = now_utc()
         
         # Add to history
         self.request_history.append(RequestResult(
@@ -363,7 +365,7 @@ class CircuitBreaker:
         if new_state != self.state:
             old_state = self.state
             self.state = new_state
-            self.state_changed_time = datetime.utcnow()
+            self.state_changed_time = now_utc()
             self.metrics.state_changes += 1
             
             logger.info(f"Circuit breaker '{self.name}' state changed: "

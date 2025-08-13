@@ -12,6 +12,7 @@ import json
 import logging
 import time
 from datetime import datetime, timedelta
+from .time_utils import now_utc
 from typing import Dict, Any, Optional, List, Callable, Tuple
 from enum import Enum
 import uuid
@@ -125,8 +126,8 @@ class AuthenticationMiddleware:
             "permissions": permissions,
             "active": True,
             "usage_count": 0,
-            "created_at": datetime.now().isoformat(),
-            "expires_at": (datetime.now() + timedelta(hours=expires_in_hours)).isoformat(),
+            "created_at": datetime.now().astimezone().isoformat(),
+            "expires_at": (datetime.now().astimezone() + timedelta(hours=expires_in_hours)).isoformat(),
         }
         return key
 
@@ -172,14 +173,14 @@ class AuthenticationMiddleware:
             user["permissions"] = permissions
         if active is not None:
             user["active"] = active
-        user["updated_at"] = datetime.now().isoformat()
+            user["updated_at"] = datetime.now().astimezone().isoformat()
         return True
 
     def create_jwt_token(self, user_id: str, permissions: List[Permission], expires_in_hours: int = 1) -> str:
         payload = {
             "sub": user_id,
             "permissions": [p.value for p in permissions],
-            "exp": datetime.utcnow() + timedelta(hours=expires_in_hours),
+            "exp": now_utc() + timedelta(hours=expires_in_hours),
             "type": "access",
         }
         token = jwt.encode(payload, self.jwt_secret, algorithm=self.jwt_algorithm)
@@ -194,7 +195,7 @@ class AuthenticationMiddleware:
             "rbac": {"roles": roles},
             "user_metadata": user_metadata or {},
             "permissions": [p.value for p in permissions],
-            "exp": datetime.utcnow() + timedelta(hours=expires_in_hours),
+            "exp": now_utc() + timedelta(hours=expires_in_hours),
             "type": "access",
         }
         token = jwt.encode(payload, self.jwt_secret, algorithm=self.jwt_algorithm)
@@ -253,7 +254,7 @@ class AuthenticationMiddleware:
                     user = self.basic_auth_users.get(username)
                     if user and user.get("active") and self.verify_password(password, user["password"]):
                         user["login_count"] = user.get("login_count", 0) + 1
-                        user["last_login"] = datetime.now().isoformat()
+                        user["last_login"] = datetime.now().astimezone().isoformat()
                         return AuthResult(success=True, user_id=username, permissions=user["permissions"], metadata={"basic_auth": True})
                 except Exception:
                     pass
@@ -273,8 +274,8 @@ class AuthenticationMiddleware:
                 token_data = self.oauth_tokens.get(token)
                 if token_data:
                     try:
-                        exp = datetime.fromisoformat(token_data["expires_at"])
-                        if exp > datetime.now():
+                        exp = datetime.fromisoformat(token_data["expires_at"]).astimezone()
+                        if exp > datetime.now().astimezone():
                             return AuthResult(success=True, user_id=token_data["user_id"], permissions=token_data["permissions"], metadata={"oauth2": True})
                     except Exception:
                         pass

@@ -10,6 +10,7 @@ import logging
 import random
 import time
 from datetime import datetime, timedelta
+from .time_utils import now_utc, ensure_naive
 from typing import Dict, List, Optional, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
@@ -95,7 +96,7 @@ class LoadBalancerInstance:
     def is_available(self) -> bool:
         """Check if instance is available for requests."""
         if self.circuit_breaker_open:
-            if self.circuit_breaker_open_until and datetime.utcnow() > self.circuit_breaker_open_until:
+            if self.circuit_breaker_open_until and ensure_naive(now_utc()) > ensure_naive(self.circuit_breaker_open_until):
                 # Auto-recover once the open window expires
                 self.circuit_breaker_open = False
                 self.circuit_breaker_open_until = None
@@ -322,7 +323,7 @@ class ServiceLoadBalancer:
             
             # Update metrics
             metrics.total_requests += 1
-            metrics.last_request_time = datetime.utcnow()
+            metrics.last_request_time = now_utc()
             
             # Update response time (exponential moving average)
             if metrics.avg_response_time_ms == 0:
@@ -335,7 +336,7 @@ class ServiceLoadBalancer:
             
             # Track request in history
             request_record = {
-                "timestamp": datetime.utcnow(),
+                "timestamp": now_utc(),
                 "success": success,
                 "response_time_ms": response_time_ms,
                 "error": error
@@ -577,7 +578,7 @@ class ServiceLoadBalancer:
                 else:
                     instance.health_status = HealthStatus.UNHEALTHY
                 
-                instance.last_health_check = datetime.utcnow()
+                instance.last_health_check = now_utc()
                 
                 # Log status changes
                 if old_status != instance.health_status:
@@ -614,7 +615,7 @@ class ServiceLoadBalancer:
             
             instance.circuit_breaker_open = True
             instance.circuit_breaker_open_until = (
-                datetime.utcnow() + timedelta(seconds=self.circuit_breaker_timeout)
+                now_utc() + timedelta(seconds=self.circuit_breaker_timeout)
             )
             
             logger.warning(f"Circuit breaker opened for {instance_id} due to {len(recent_failures)} failures")

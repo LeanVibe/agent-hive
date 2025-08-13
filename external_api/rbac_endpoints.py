@@ -9,6 +9,7 @@ role creation, assignment, permission management, and analytics.
 import asyncio
 import logging
 from datetime import datetime, timedelta
+from .time_utils import now_utc, iso_now_utc
 from typing import Dict, Any, List, Optional, Tuple
 import json
 import uuid
@@ -428,7 +429,7 @@ class RBACEndpoints:
             
             # Get assignments for detailed response
             assignments = self.rbac_manager.user_assignments.get(user_id, [])
-            current_time = datetime.utcnow()
+            current_time = now_utc()
             
             result = []
             for role in roles:
@@ -509,7 +510,7 @@ class RBACEndpoints:
             return {
                 "user_id": request.user_id,
                 "permissions": results,
-                "checked_at": datetime.utcnow().isoformat()
+                "checked_at": iso_now_utc()
             }
             
         except ValueError as e:
@@ -528,7 +529,7 @@ class RBACEndpoints:
                 "user_id": user_id,
                 "permissions": [p.value for p in permissions],
                 "total_permissions": len(permissions),
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -554,7 +555,7 @@ class RBACEndpoints:
                 "user_id": user_id,
                 "accessible_endpoints": endpoints_data,
                 "total_endpoints": len(endpoints_data),
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -567,7 +568,7 @@ class RBACEndpoints:
             analytics = await self.rbac_manager.get_rbac_analytics()
             return {
                 **analytics,
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -580,7 +581,7 @@ class RBACEndpoints:
             analytics = await self.permission_middleware.get_permission_analytics()
             return {
                 **analytics,
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -614,7 +615,7 @@ class RBACEndpoints:
                     "user_id": user_id,
                     "limit": limit
                 },
-                "retrieved_at": datetime.utcnow().isoformat()
+                "retrieved_at": iso_now_utc()
             }
             
         except Exception as e:
@@ -641,7 +642,7 @@ class RBACEndpoints:
                     "cache_enabled": self.permission_middleware.cache_enabled,
                     "performance_stats": self.permission_middleware.performance_stats
                 },
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             }
             
             return health_status
@@ -651,7 +652,7 @@ class RBACEndpoints:
             return {
                 "status": "unhealthy",
                 "error": str(e),
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             }
     
     # Helper methods

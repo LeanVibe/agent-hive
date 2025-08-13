@@ -11,6 +11,7 @@ import asyncio
 import logging
 import time
 from datetime import datetime, timedelta
+from .time_utils import now_utc, iso_now_utc
 from typing import Dict, Any, Optional, List, Tuple, Set
 from dataclasses import dataclass
 from enum import Enum
@@ -237,7 +238,7 @@ class JwtIntegrationService:
                     "event_type": "token_refreshed",
                     "user_id": session.user_id,
                     "client_ip": client_ip,
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": iso_now_utc()
                 })
                 
                 return True, session.access_token, session.refresh_token
@@ -247,7 +248,7 @@ class JwtIntegrationService:
                     "event_type": "token_refresh_failed",
                     "client_ip": client_ip,
                     "reason": message,
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": iso_now_utc()
                 })
                 
                 return False, None, None
@@ -273,7 +274,7 @@ class JwtIntegrationService:
                         expires_at = datetime.fromtimestamp(exp_val, tz=timezone.utc).replace(tzinfo=None)
                     else:
                         # best-effort: blacklist for 24h if exp not present or unparsable
-                        expires_at = datetime.utcnow() + timedelta(hours=24)
+                        expires_at = now_utc() + timedelta(hours=24)
                     self.redis_cache_manager.blacklist_jwt_token(token, expires_at)
                     blacklisted = True
             except Exception:
@@ -523,7 +524,7 @@ class JwtIntegrationService:
                 "client_ip": request.client_ip,
                 "user_agent": request.headers.get("User-Agent"),
                 "request_path": request.path,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             })
         
         return True, JwtValidationMetadata(
@@ -534,7 +535,7 @@ class JwtIntegrationService:
     async def _check_rate_limits(self, request: ApiRequest) -> Tuple[bool, int]:
         """Check rate limits for client IP."""
         client_key = f"rate_limit:{request.client_ip}"
-        current_time = datetime.utcnow()
+        current_time = now_utc()
         window_start = current_time - timedelta(seconds=self.rate_limit_window)
         
         # Initialize tracking if not exists
@@ -569,7 +570,7 @@ class JwtIntegrationService:
     async def _detect_suspicious_activity(self, request: ApiRequest) -> bool:
         """Detect suspicious activity patterns."""
         # Track requests per minute for burst detection
-        minute_key = datetime.utcnow().replace(second=0, microsecond=0)
+        minute_key = now_utc().replace(second=0, microsecond=0)
         minute_requests = self.request_tracking.get(request.client_ip, [])
         
         # Count requests in current minute
@@ -605,7 +606,7 @@ class JwtIntegrationService:
             created_at = metadata.get("created_at")
             if created_at:
                 created_time = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-                age_delta = datetime.utcnow() - created_time.replace(tzinfo=None)
+                age_delta = now_utc() - created_time.replace(tzinfo=None)
                 return age_delta.total_seconds() / 3600
         except Exception:
             pass
@@ -618,7 +619,7 @@ class JwtIntegrationService:
             "user_id": validation_metadata.user_id,
             "token_age_hours": validation_metadata.token_age_hours,
             "client_ip": request.client_ip,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": iso_now_utc()
         })
     
     def _create_error_response(self, status_code: int, message: str, request_id: str) -> ApiResponse:
@@ -629,9 +630,9 @@ class JwtIntegrationService:
             body={
                 "error": message,
                 "request_id": request_id,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             },
-            timestamp=datetime.utcnow(),
+            timestamp=now_utc(),
             processing_time=0.0,
             request_id=request_id
         )
@@ -662,7 +663,7 @@ class JwtIntegrationService:
         response_body = {
             "error": message,
             "request_id": request_id,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": iso_now_utc()
         }
         
         # Add additional information for specific error types
@@ -677,7 +678,7 @@ class JwtIntegrationService:
             status_code=status_code,
             headers={"Content-Type": "application/json"},
             body=response_body,
-            timestamp=datetime.utcnow(),
+            timestamp=now_utc(),
             processing_time=0.0,
             request_id=request_id
         )
@@ -697,7 +698,7 @@ class JwtIntegrationService:
             "method": request.method,
             "validation_result": validation_metadata.validation_result.value,
             "processing_time_ms": round(processing_time * 1000, 2),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": iso_now_utc()
         }
         
         # Add user information if available

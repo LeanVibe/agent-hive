@@ -10,6 +10,7 @@ import asyncio
 import logging
 import time
 from datetime import datetime
+from .time_utils import now_utc, iso_now_utc
 from typing import Dict, Any, Optional, List, Callable, Tuple
 import json
 import uuid
@@ -231,7 +232,7 @@ class RateLimitMiddleware:
             "method": request.method,
             "client_ip": request.client_ip,
             "user_agent": request.headers.get("User-Agent", "unknown"),
-            "timestamp": datetime.utcnow()
+            "timestamp": now_utc()
         }
         
         # Extract user information if available
@@ -267,7 +268,7 @@ class RateLimitMiddleware:
         """Log rate limit violation for monitoring."""
         violation_data = {
             "violation_id": status.violation.violation_id if status.violation else str(uuid.uuid4()),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": iso_now_utc(),
             "request": {
                 "method": request.method,
                 "path": request.path,
@@ -302,7 +303,7 @@ class RateLimitMiddleware:
                 "retry_after_seconds": status.retry_after
             },
             "request_id": request.request_id,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": iso_now_utc()
         }
         
         headers = {"Content-Type": "application/json"}
@@ -316,7 +317,7 @@ class RateLimitMiddleware:
             status_code=429,  # Too Many Requests
             headers=headers,
             body=error_body,
-            timestamp=datetime.utcnow(),
+            timestamp=now_utc(),
             processing_time=0.0,
             request_id=request.request_id
         )
@@ -455,7 +456,7 @@ class RateLimitMiddleware:
         return {
             "user_id": user_id,
             "reset_count": reset_count,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": iso_now_utc(),
             "success": True
         }
     
@@ -466,7 +467,7 @@ class RateLimitMiddleware:
         return {
             "client_ip": client_ip,
             "reset_count": reset_count,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": iso_now_utc(),
             "success": True
         }
     
@@ -478,7 +479,7 @@ class RateLimitMiddleware:
             "endpoint": "/api/v1/general",
             "client_ip": "127.0.0.1",
             "user_roles": [],
-            "timestamp": datetime.utcnow()
+            "timestamp": now_utc()
         }
         
         # Check current status without consuming limits
@@ -494,7 +495,7 @@ class RateLimitMiddleware:
             "retry_after": status.retry_after,
             "violations_count": len([v for v in self.rate_limiter.get_recent_violations(1) 
                                    if v.client_info.get("user_id") == user_id]),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": iso_now_utc()
         }
     
     def get_rate_limit_config(self) -> Dict[str, Any]:
@@ -521,7 +522,7 @@ class RateLimitMiddleware:
                 "user_id": "health_check_user",
                 "endpoint": "/health",
                 "client_ip": "127.0.0.1",
-                "timestamp": datetime.utcnow()
+            "timestamp": now_utc()
             }
             
             start_time = time.time()
@@ -547,12 +548,12 @@ class RateLimitMiddleware:
                     "active_rules": len(self.rate_limiter.rules),
                     "recent_violations": len(self.rate_limiter.get_recent_violations(1))
                 },
-                "timestamp": datetime.utcnow().isoformat()
+            "timestamp": iso_now_utc()
             }
             
         except Exception as e:
             return {
                 "status": "unhealthy",
                 "error": str(e),
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": iso_now_utc()
             }

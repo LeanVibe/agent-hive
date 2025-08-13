@@ -12,6 +12,7 @@ import json
 import logging
 import time
 from datetime import datetime
+from .time_utils import now_utc
 from typing import Dict, Any, Optional, List
 import hashlib
 import redis
@@ -43,7 +44,7 @@ class RedisCacheManager:
         """Add JWT token to blacklist."""
         try:
             # Calculate TTL based on token expiration
-            ttl = max(int((expires_at - datetime.utcnow()).total_seconds()), 0)
+            ttl = max(int((expires_at - now_utc()).total_seconds()), 0)
             
             # Hash token for privacy
             token_hash = hashlib.sha256(token.encode()).hexdigest()

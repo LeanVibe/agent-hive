@@ -5,6 +5,7 @@ Provides SQLAlchemy models for persistent storage of users, API keys, and JWT to
 """
 
 from datetime import datetime
+from .time_utils import now_utc
 from typing import Optional, Dict, Any
 import uuid
 
@@ -206,13 +207,13 @@ class Role(Base):
             self.parent_role_names = []
         if parent_role_name not in self.parent_role_names:
             self.parent_role_names.append(parent_role_name)
-            self.updated_at = datetime.utcnow()
+            self.updated_at = now_utc()
     
     def remove_parent_role(self, parent_role_name: str) -> None:
         """Remove a parent role."""
         if self.parent_role_names and parent_role_name in self.parent_role_names:
             self.parent_role_names.remove(parent_role_name)
-            self.updated_at = datetime.utcnow()
+            self.updated_at = now_utc()
     
     def add_child_role(self, child_role_name: str) -> None:
         """Add a child role."""
@@ -220,13 +221,13 @@ class Role(Base):
             self.child_role_names = []
         if child_role_name not in self.child_role_names:
             self.child_role_names.append(child_role_name)
-            self.updated_at = datetime.utcnow()
+            self.updated_at = now_utc()
     
     def remove_child_role(self, child_role_name: str) -> None:
         """Remove a child role."""
         if self.child_role_names and child_role_name in self.child_role_names:
             self.child_role_names.remove(child_role_name)
-            self.updated_at = datetime.utcnow()
+            self.updated_at = now_utc()
 
 
 class PermissionModel(Base):
@@ -295,7 +296,7 @@ class PermissionModel(Base):
         """Check if permission is still valid."""
         if not self.is_active:
             return False
-        if self.expires_at and datetime.utcnow() > self.expires_at:
+        if self.expires_at and now_utc() > self.expires_at:
             return False
         return True
     
@@ -373,7 +374,7 @@ class APIKey(Base):
         """Check if the API key is expired."""
         if self.expires_at is None:
             return False
-        return datetime.utcnow() > self.expires_at
+        return now_utc() > self.expires_at
 
 
 class JWTToken(Base):
@@ -428,12 +429,12 @@ class JWTToken(Base):
     
     def is_expired(self) -> bool:
         """Check if the JWT token is expired."""
-        return datetime.utcnow() > self.expires_at
+        return now_utc() > self.expires_at
     
     def blacklist(self, reason: str = None) -> None:
         """Blacklist this token."""
         self.is_blacklisted = True
-        self.blacklisted_at = datetime.utcnow()
+        self.blacklisted_at = now_utc()
         self.blacklist_reason = reason or "Manually blacklisted"
 
 
@@ -474,11 +475,11 @@ class LoginSession(Base):
     
     def is_expired(self) -> bool:
         """Check if the session is expired."""
-        return datetime.utcnow() > self.expires_at
+        return now_utc() > self.expires_at
     
     def update_activity(self) -> None:
         """Update the last activity timestamp."""
-        self.last_activity = datetime.utcnow()
+        self.last_activity = now_utc()
 
 
 # Database utility functions
