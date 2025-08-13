@@ -11,6 +11,8 @@ import logging
 import time
 import uuid
 from datetime import datetime
+import re
+import random
 from typing import Dict, Any, Optional, List, Callable, Union
 from dataclasses import asdict
 
@@ -19,6 +21,7 @@ from .models import (
     ApiRequest,
     ApiResponse
 )
+from datetime import datetime
 from .service_discovery import ServiceDiscovery, ServiceInstance
 from .service_registry import PersistentServiceRegistry, ServiceRegistryConfig
 from .load_balancer import ServiceLoadBalancer, LoadBalancingAlgorithm
@@ -45,7 +48,7 @@ class ApiGateway:
     - Comprehensive logging and metrics
     """
     
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Optional[Dict[str, Any]] = None, service_discovery: Optional[ServiceDiscovery] = None):
         """Initialize API Gateway with JWT authentication.
 
         Compatibility: accepts either a raw dict configuration or an
@@ -62,7 +65,8 @@ class ApiGateway:
             effective_config = self.config  # type: ignore[assignment]
         
         # Initialize core components
-        self.service_discovery = ServiceDiscovery(effective_config.get("service_discovery", {}))
+        # Allow service discovery injection for integration tests
+        self.service_discovery = service_discovery or ServiceDiscovery(effective_config.get("service_discovery", {}))
         
         # Initialize enhanced service registry
         registry_config = ServiceRegistryConfig(**effective_config.get("service_registry", {}))
@@ -104,6 +108,10 @@ class ApiGateway:
         self.route_handlers: Dict[str, Callable] = {}
         self.routes: Dict[str, Dict[str, Callable]] = {}
 
+        # Service route table for discovery-based proxying
+        # Maps route prefixes (e.g., "/api/v1/users") -> service_name (e.g., "user-service")
+        self._service_routes: Dict[str, str] = {}
+
         # Middleware stacks (internal and test-expected)
         self.middleware_stack: List[Callable] = []
         self.middleware: List[Callable] = []
@@ -126,6 +134,8 @@ class ApiGateway:
         else:
             self.service_routes: Dict[str, str] = effective_config.get("service_routes", {})
             self.enable_service_discovery_routing = effective_config.get("enable_service_discovery_routing", True)
+        # Declarative routing DSL storage
+        self.routing_config: Dict[str, Any] = {"routes": []}
         
         logger.info(f"API Gateway initialized on {self.gateway_config.host}:{self.gateway_config.port} with enhanced service discovery")
     
@@ -557,6 +567,14 @@ class ApiGateway:
             "request_count": 0,
         }
 
+    def revoke_api_key(self, api_key: str) -> bool:
+        """Revoke or deactivate an API key in the in-memory store."""
+        if api_key in self.api_keys:
+            self.api_keys[api_key]["active"] = False
+            self.api_keys[api_key]["revoked_at"] = datetime.utcnow().isoformat()
+            return True
+        return False
+
     def _find_handler(self, path: str, method: str) -> Optional[Callable]:
         """Find a handler by matching path with optional api_prefix stripping."""
         # Normalize path to stored format (without api_prefix)
@@ -588,7 +606,13 @@ class ApiGateway:
         # Simple rate limiting (global per gateway instance)
         self._request_count += 1
         if self._request_count > self.gateway_config.rate_limit_requests:
-            return self._create_error_response(429, "Rate limit exceeded", request.request_id)
+            # Minimal rate limit headers for client guidance
+            extra_headers = {
+                "Retry-After": "1",
+                "X-Rate-Limit-Limit": str(self.gateway_config.rate_limit_requests),
+                "X-Rate-Limit-Remaining": "0",
+            }
+            return self._create_error_response(429, "Rate limit exceeded", request.request_id, extra_headers=extra_headers)
 
         # Simple API key auth if required
         if self.gateway_config.auth_required:
@@ -597,6 +621,8 @@ class ApiGateway:
                 return self._create_error_response(401, "API key required", request.request_id)
             if key not in self.api_keys:
                 return self._create_error_response(401, "Invalid API key", request.request_id)
+            if self.api_keys.get(key, {}).get("active") is False:
+                return self._create_error_response(401, "API key revoked", request.request_id)
             # Count usage
             self.api_keys[key]["request_count"] = self.api_keys[key].get("request_count", 0) + 1
 
@@ -698,6 +724,15 @@ class ApiGateway:
     async def health_check(self) -> Dict[str, Any]:
         """Lightweight health check used by CLI.status()."""
         try:
+            # When server isn't running, report unhealthy for explicit status semantics
+            if not self.server_running:
+                return {
+                    "status": "unhealthy",
+                    "server_running": False,
+                    "registered_routes": len(self.route_handlers),
+                    "active_requests": len(self.active_requests),
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
             response = await self.get_health_status()
             return {
                 "status": "healthy" if response.status_code == 200 else "unhealthy",
@@ -780,6 +815,10 @@ class ApiGateway:
     
     async def _route_request(self, request: ApiRequest) -> ApiResponse:
         """Route request to appropriate handler."""
+        # Try routing via declarative DSL first
+        dsl_response = await self._route_via_dsl(request)
+        if dsl_response is not None:
+            return dsl_response
         route_key = f"{request.method}:{request.path}"
         
         # Check for exact route match
@@ -801,6 +840,8 @@ class ApiGateway:
             return await self._handle_service_endpoints(request)
         elif request.path.startswith("/api/v1/auth"):
             return await self._handle_auth_endpoints(request)
+        elif request.path.startswith("/api/v1/keys"):
+            return await self._handle_api_key_endpoints(request)
         
         # Service discovery routing
         if self.enable_service_discovery_routing:
@@ -810,6 +851,320 @@ class ApiGateway:
         
         # No handler found
         return self._create_error_response(404, "Endpoint not found", request.request_id)
+
+    # ---- Declarative Routing DSL ----
+    def apply_routing_config(self, config: Dict[str, Any]) -> bool:
+        """Apply declarative routing configuration (hot-reload safe)."""
+        try:
+            valid, issues = self.validate_routing_config(config)
+            if not valid:
+                logger.error(f"Routing config validation failed: {issues}")
+                return False
+            self.routing_config = config
+            logger.info("Routing configuration applied")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to apply routing config: {e}")
+            return False
+
+    def validate_routing_config(self, config: Dict[str, Any]) -> (bool, List[str]):
+        """Validate routing config structure and semantics."""
+        issues: List[str] = []
+        routes = config.get("routes")
+        if not isinstance(routes, list):
+            issues.append("'routes' must be a list")
+            return False, issues
+        for idx, route in enumerate(routes):
+            match = route.get("match", {})
+            path = match.get("path")
+            if not path:
+                issues.append(f"route[{idx}]: match.path is required")
+            backends = route.get("backends", [])
+            if not backends:
+                issues.append(f"route[{idx}]: at least one backend is required")
+        return (len(issues) == 0), issues
+
+    async def _route_via_dsl(self, request: ApiRequest) -> Optional[ApiResponse]:
+        """Attempt to route request using declarative routing config. Returns ApiResponse or None."""
+        if not self.routing_config or not self.routing_config.get("routes"):
+            return None
+
+        rule = self._find_matching_rule(request)
+        if not rule:
+            return None
+
+        # Compute rewritten path if configured
+        rewritten_path = self._apply_rewrite(request.path, rule)
+        if rewritten_path != request.path:
+            request = self._clone_request_with_path(request, rewritten_path)
+
+        # Select backend by weight
+        selected_backend = self._select_weighted_backend(rule.get("backends", []))
+        if not selected_backend:
+            return self._create_error_response(503, "No backend available", request.request_id)
+
+        timeout_override = None
+        if isinstance(rule.get("timeouts"), dict):
+            rt = rule["timeouts"].get("request_timeout")
+            if isinstance(rt, (int, float)) and rt > 0:
+                timeout_override = float(rt)
+
+        # Shadow routing (fire-and-forget)
+        shadow = rule.get("shadow")
+        if isinstance(shadow, dict) and shadow.get("service"):
+            try:
+                percentage = float(shadow.get("percentage", 0))
+            except Exception:
+                percentage = 0.0
+            if random.uniform(0, 100) < percentage:
+                asyncio.create_task(self.proxy_to_service(request, shadow["service"]))
+
+        # Execute primary proxy with optional policy overrides
+        retry_cfg = rule.get("retries", {}) if isinstance(rule.get("retries"), dict) else {}
+        retries = int(retry_cfg.get("count", 0)) if isinstance(retry_cfg.get("count", 0), (int, float)) else 0
+        backoff_ms = int(retry_cfg.get("backoff_ms", 0)) if isinstance(retry_cfg.get("backoff_ms", 0), (int, float)) else 0
+
+        proxy_dict = await self.proxy_to_service(
+            request,
+            selected_backend.get("service"),
+            timeout_override=timeout_override,
+            retries=retries,
+            backoff_ms=backoff_ms,
+        )
+        return ApiResponse(
+            status_code=int(proxy_dict.get("status_code", 502)),
+            headers=proxy_dict.get("headers", {}),
+            body=proxy_dict.get("body"),
+            timestamp=datetime.utcnow(),
+            processing_time=0.0,
+            request_id=request.request_id,
+        )
+
+    def _find_matching_rule(self, request: ApiRequest) -> Optional[Dict[str, Any]]:
+        for route in self.routing_config.get("routes", []):
+            match = route.get("match", {})
+            if not self._request_matches(request, match):
+                continue
+            return route
+        return None
+
+    def _request_matches(self, request: ApiRequest, match: Dict[str, Any]) -> bool:
+        path_pattern = match.get("path")
+        if not path_pattern:
+            return False
+        use_regex = bool(match.get("regex", False))
+        if use_regex:
+            if not re.match(path_pattern, request.path):
+                return False
+        else:
+            # simple prefix or wildcard '*' match
+            if "*" in path_pattern:
+                regex = re.escape(path_pattern).replace("\\*", ".*") + "$"
+                if not re.match(regex, request.path):
+                    return False
+            else:
+                if not request.path.startswith(path_pattern):
+                    return False
+        methods = match.get("methods")
+        if methods and request.method.upper() not in [m.upper() for m in methods]:
+            return False
+        headers = match.get("headers", {})
+        for hk, hv in headers.items():
+            if request.headers.get(hk) != hv:
+                return False
+        return True
+
+    def _apply_rewrite(self, path: str, rule: Dict[str, Any]) -> str:
+        rewrite = rule.get("rewrite")
+        if not rewrite:
+            return path
+        match = rule.get("match", {})
+        src = match.get("path")
+        if src and "*" not in src and not match.get("regex", False):
+            if path.startswith(src):
+                return rewrite + path[len(src):]
+        # fallback to static rewrite
+        return rewrite
+
+    def _select_weighted_backend(self, backends: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        if not backends:
+            return None
+        total = 0
+        weighted: List[tuple] = []
+        for b in backends:
+            w = int(b.get("weight", 1))
+            if w <= 0:
+                continue
+            total += w
+            weighted.append((total, b))
+        if total == 0:
+            return None
+        r = random.randint(1, total)
+        for cutoff, b in weighted:
+            if r <= cutoff:
+                return b
+        return backends[0]
+
+    def _clone_request_with_path(self, request: ApiRequest, new_path: str) -> ApiRequest:
+        return ApiRequest(
+            method=request.method,
+            path=new_path,
+            headers=dict(request.headers),
+            query_params=dict(request.query_params),
+            body=request.body,
+            request_id=request.request_id,
+            client_ip=request.client_ip,
+            timestamp=request.timestamp,
+        )
+
+    def export_envoy_virtual_host(self, name: str = "api-gateway", domains: Optional[List[str]] = None,
+                                  cluster_name_for_service: Optional[Callable[[str], str]] = None) -> Dict[str, Any]:
+        """Export routing DSL to an Envoy virtual_host structure."""
+        from .envoy_exporter import export_envoy_virtual_host
+        return export_envoy_virtual_host(self.routing_config, name=name, domains=domains or ["*"],
+                                         cluster_name_for_service=cluster_name_for_service)
+
+    # ---- OpenAPI ingestion ----
+    def apply_openapi_spec(self, spec: Dict[str, Any], default_service_name: str) -> bool:
+        """Generate routing rules from an OpenAPI spec. Uses x-service-name overrides if present."""
+        try:
+            routes: List[Dict[str, Any]] = []
+            paths = spec.get("paths", {})
+            for path, ops in paths.items():
+                for method, op in ops.items():
+                    if isinstance(op, dict) and method.upper() in ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]:
+                        svc = op.get("x-service-name") or spec.get("x-service-name") or default_service_name
+                        routes.append({
+                            "match": {"path": path, "methods": [method.upper()]},
+                            "backends": [{"service": svc, "weight": 100}]
+                        })
+            return self.apply_routing_config({"routes": routes})
+        except Exception as e:
+            logger.error(f"Failed to apply OpenAPI spec: {e}")
+            return False
+
+    # ---- Service discovery route helpers for integration tests ----
+    def register_service_route(self, path_prefix: str, service_name: str) -> None:
+        """Register a service route prefix to a service name.
+
+        Example: register_service_route("/api/v1/users", "user-service")
+        """
+        self._service_routes[path_prefix.rstrip("/")] = service_name
+
+    def unregister_service_route(self, path_prefix: str) -> bool:
+        """Unregister a service route prefix."""
+        key = path_prefix.rstrip("/")
+        if key in self._service_routes:
+            del self._service_routes[key]
+            return True
+        return False
+
+    def _find_service_route(self, path: str) -> Optional[str]:
+        """Find mapped service name for a given request path by longest-prefix match."""
+        if not self._service_routes:
+            return None
+        normalized = path.rstrip("/")
+        # Prefer the longest matching prefix
+        candidates = [prefix for prefix in self._service_routes.keys() if normalized.startswith(prefix)]
+        if not candidates:
+            return None
+        best = max(candidates, key=len)
+        return self._service_routes[best]
+
+    async def get_service_instance(self, service_name: str) -> Optional[ServiceInstance]:
+        """Return a healthy instance for a given service name using discovery layer."""
+        try:
+            instance = await self.service_discovery.get_healthy_instance(service_name)
+            return instance
+        except Exception:
+            return None
+
+    async def proxy_to_service(self, request: ApiRequest, service_name: str, timeout_override: Optional[float] = None,
+                               retries: int = 0, backoff_ms: int = 0) -> Dict[str, Any]:
+        """Proxy an ApiRequest to a discovered service and return a simplified response dict.
+
+        This method is tailored to integration tests that mock aiohttp.ClientSession.
+        """
+        attempt = 0
+        last_error: Optional[str] = None
+        while True:
+            attempt += 1
+            instance = await self.get_service_instance(service_name)
+            if not instance:
+                # Ensure deterministic shape with headers field present
+                return {
+                    "status_code": 503,
+                    "headers": {},
+                    "body": {"error": "No service instance available"}
+                }
+
+            # Build target URL preserving the request path and query string
+            from urllib.parse import urlencode
+            base_url = f"http://{instance.host}:{instance.port}{request.path}"
+            if request.query_params:
+                query = urlencode(request.query_params, doseq=True)
+                url = f"{base_url}?{query}"
+            else:
+                url = base_url
+
+            try:
+                import aiohttp
+                total_timeout = timeout_override if timeout_override is not None else self.gateway_config.request_timeout
+                timeout = aiohttp.ClientTimeout(total=total_timeout)
+                async with aiohttp.ClientSession(timeout=timeout) as session:
+                    # Ensure request has required timestamp for compatibility
+                    if not getattr(request, "timestamp", None):
+                        try:
+                            request.timestamp = datetime.utcnow()
+                        except Exception:
+                            pass
+
+                    # Support both awaited and async-context-managed response objects (for AsyncMock patterns)
+                    pending = session.request(method=request.method, url=url, headers=request.headers, json=request.body)
+                    resp_ctx = getattr(pending, "__aenter__", None)
+                    if callable(resp_ctx):
+                        async with pending as resp:
+                            text = await resp.text()
+                            try:
+                                body = json.loads(text)
+                            except Exception:
+                                body = {"raw": text}
+                            result = {"status_code": resp.status, "headers": dict(resp.headers), "body": body}
+                            if resp.status >= 500 and attempt <= retries:
+                                last_error = f"upstream {resp.status}"
+                                if backoff_ms > 0:
+                                    await asyncio.sleep(backoff_ms / 1000.0)
+                                continue
+                            return result
+                    else:
+                        resp = await pending
+                        text = await resp.text()
+                        # Try JSON decode, fallback to text
+                        try:
+                            body = json.loads(text)
+                        except Exception:
+                            body = {"raw": text}
+                        result = {"status_code": resp.status, "headers": dict(resp.headers), "body": body}
+                        if resp.status >= 500 and attempt <= retries:
+                            last_error = f"upstream {resp.status}"
+                            if backoff_ms > 0:
+                                await asyncio.sleep(backoff_ms / 1000.0)
+                            continue
+                        return result
+            except Exception as e:
+                last_error = str(e)
+                logger.error(f"Proxy error to {service_name}: {e}")
+                if attempt <= retries:
+                    if backoff_ms > 0:
+                        await asyncio.sleep(backoff_ms / 1000.0)
+                    # try again
+                    continue
+                # Deterministic error shape with headers present for consistency
+                return {
+                    "status_code": 502,
+                    "headers": {},
+                    "body": {"error": "Bad gateway", "details": last_error or "proxy_failure"}
+                }
     
     async def _handle_auth_endpoints(self, request: ApiRequest) -> ApiResponse:
         """Handle authentication endpoints."""
@@ -843,6 +1198,23 @@ class ApiGateway:
             
             token = auth_header[7:]
             return await self.logout_user(token)
+        
+        elif request.path == "/api/v1/auth/introspect" and request.method == "POST":
+            if not request.body or not request.body.get("token"):
+                return self._create_error_response(400, "Token required", request.request_id)
+            try:
+                result = await self.jwt_service.introspect_token(request.body["token"])
+                return ApiResponse(
+                    status_code=200,
+                    headers={"Content-Type": "application/json"},
+                    body=result,
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+            except Exception:
+                logger.exception("Introspection error")
+                return self._create_error_response(500, "Introspection failed", request.request_id)
         
         else:
             return self._create_error_response(404, "Auth endpoint not found", request.request_id)
@@ -960,6 +1332,131 @@ class ApiGateway:
         except Exception as e:
             logger.error(f"Error handling service endpoint: {e}")
             return self._create_error_response(500, "Internal server error", request.request_id)
+
+    async def _handle_api_key_endpoints(self, request: ApiRequest) -> ApiResponse:
+        """Handle API key lifecycle and analytics endpoints."""
+        try:
+            from security.token_manager import TokenType
+            try:
+                from config.auth_models import Permission  # type: ignore
+            except Exception:
+                from enum import Enum
+                class Permission(Enum):
+                    READ = "read"; WRITE = "write"; ADMIN = "admin"; EXECUTE = "execute"
+
+            # Issue new API key
+            if request.path == "/api/v1/keys" and request.method == "POST":
+                if not request.body:
+                    return self._create_error_response(400, "Request body required", request.request_id)
+                user_id = request.body.get("user_id")
+                if not user_id:
+                    return self._create_error_response(400, "user_id is required", request.request_id)
+                raw_perms = request.body.get("permissions") or [Permission.READ.value]
+                permissions = [Permission(p) if not isinstance(p, Permission) else p for p in raw_perms]
+                scopes = request.body.get("scopes") or []
+
+                token, token_id = await self.jwt_service.token_manager.create_secure_token(
+                    user_id=user_id,
+                    token_type=TokenType.API_KEY,
+                    permissions=permissions,
+                    scopes=scopes,
+                    expires_in_hours=24 * 365
+                )
+                # Store in in-memory API key registry for request counting
+                self.api_keys[token] = {
+                    "user_id": user_id,
+                    "permissions": [p.value for p in permissions],
+                    "scopes": scopes,
+                    "active": True,
+                    "created_at": datetime.utcnow().isoformat(),
+                    "request_count": 0,
+                }
+                meta = self.jwt_service.token_manager.token_metadata.get(token_id)
+                expires_at = meta.expires_at.isoformat() if meta and meta.expires_at else None
+                return ApiResponse(
+                    status_code=201,
+                    headers={"Content-Type": "application/json"},
+                    body={"api_key": token, "token_id": token_id, "expires_at": expires_at},
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+
+            # Rotate API key
+            elif request.path == "/api/v1/keys/rotate" and request.method == "POST":
+                if not request.body or not request.body.get("api_key"):
+                    return self._create_error_response(400, "api_key is required", request.request_id)
+                old_key = request.body["api_key"]
+                rotation = await self.jwt_service.token_manager.rotate_token(old_key)
+                if not rotation:
+                    return self._create_error_response(400, "Rotation failed", request.request_id)
+                new_key, new_id = rotation
+                # Deactivate old key in local registry, create new entry
+                if old_key in self.api_keys:
+                    meta_local = self.api_keys.pop(old_key)
+                else:
+                    meta_local = {"user_id": None, "permissions": [], "scopes": []}
+                self.api_keys[old_key] = {**meta_local, "active": False, "revoked_at": datetime.utcnow().isoformat()}
+                self.api_keys[new_key] = {**meta_local, "active": True, "created_at": datetime.utcnow().isoformat(), "request_count": 0}
+                return ApiResponse(
+                    status_code=200,
+                    headers={"Content-Type": "application/json"},
+                    body={"api_key": new_key, "token_id": new_id},
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+
+            # Revoke API key
+            elif request.path == "/api/v1/keys/revoke" and request.method == "POST":
+                if not request.body or not request.body.get("api_key"):
+                    return self._create_error_response(400, "api_key is required", request.request_id)
+                key = request.body["api_key"]
+                # Extract token id and revoke in token manager
+                try:
+                    import jwt as _jwt
+                    payload = _jwt.decode(key, options={"verify_signature": False})
+                    token_id = payload.get("token_id")
+                except Exception:
+                    token_id = None
+                if token_id:
+                    await self.jwt_service.token_manager.revoke_token(token_id, reason="api_key_revoked")
+                # Mark in local registry
+                self.revoke_api_key(key)
+                return ApiResponse(
+                    status_code=200,
+                    headers={"Content-Type": "application/json"},
+                    body={"revoked": True},
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+
+            # Analytics
+            elif request.path == "/api/v1/keys/analytics" and request.method == "GET":
+                # Summarize local request counts and statuses
+                total = len(self.api_keys)
+                active = sum(1 for v in self.api_keys.values() if v.get("active", True))
+                total_requests = sum(int(v.get("request_count", 0)) for v in self.api_keys.values())
+                return ApiResponse(
+                    status_code=200,
+                    headers={"Content-Type": "application/json"},
+                    body={
+                        "total_keys": total,
+                        "active_keys": active,
+                        "total_requests": total_requests,
+                    },
+                    timestamp=datetime.utcnow(),
+                    processing_time=0.0,
+                    request_id=request.request_id
+                )
+
+            else:
+                return self._create_error_response(404, "Keys endpoint not found", request.request_id)
+
+        except Exception as e:
+            logger.error(f"Error handling API key endpoint: {e}")
+            return self._create_error_response(500, "Internal server error", request.request_id)
     
     async def _try_service_discovery_routing(self, request: ApiRequest) -> Optional[ApiResponse]:
         """Try to route request using service discovery."""
@@ -1055,11 +1552,14 @@ class ApiGateway:
         response.headers.update(security_headers)
         return response
     
-    def _create_error_response(self, status_code: int, message: str, request_id: str) -> ApiResponse:
+    def _create_error_response(self, status_code: int, message: str, request_id: str, extra_headers: Optional[Dict[str, str]] = None) -> ApiResponse:
         """Create standardized error response."""
+        headers = {"Content-Type": "application/json"}
+        if extra_headers:
+            headers.update(extra_headers)
         return ApiResponse(
             status_code=status_code,
-            headers={"Content-Type": "application/json"},
+            headers=headers,
             body={
                 "error": message,
                 "request_id": request_id,

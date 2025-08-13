@@ -351,16 +351,33 @@ class AuthenticationService:
             if not user or not user.active:
                 return False, "User account is not active", None
             
-            # Create new tokens
+            # Create new access token
             new_access_token, new_token_id = await self.token_manager.create_secure_token(
                 user_id=user.user_id,
                 token_type=TokenType.ACCESS,
                 permissions=user.permissions,
                 expires_in_hours=self.config.get("token_expiry_minutes", 15) / 60
             )
+            # Rotate refresh token for security (invalidate old, issue new)
+            try:
+                old_refresh_token_id = self._extract_token_id_from_token(session.refresh_token or "")
+            except Exception:
+                old_refresh_token_id = ""
+            new_refresh_token, new_refresh_token_id = await self.token_manager.create_secure_token(
+                user_id=user.user_id,
+                token_type=TokenType.REFRESH,
+                permissions=user.permissions,
+                expires_in_hours=24 * 30
+            )
+            if old_refresh_token_id:
+                try:
+                    await self.token_manager.revoke_token(old_refresh_token_id, reason="refresh_rotated")
+                except Exception:
+                    pass
             
             # Update session
             session.access_token = new_access_token
+            session.refresh_token = new_refresh_token
             session.last_activity = datetime.utcnow()
             
             # Extend session expiration

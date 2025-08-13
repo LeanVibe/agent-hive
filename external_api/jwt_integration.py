@@ -18,6 +18,11 @@ import uuid
 
 import jwt
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
+try:
+    # Optional JWKS client for remote keysets
+    from jwt import PyJWKClient  # type: ignore
+except Exception:
+    PyJWKClient = None  # type: ignore
 
 try:
     from config.auth_models import Permission, AuthResult  # type: ignore
@@ -122,6 +127,32 @@ class JwtIntegrationService:
         # Protected endpoints configuration
         self.protected_endpoints = config.get("protected_endpoints", [])
         self.public_endpoints = config.get("public_endpoints", ["/health", "/metrics"])
+
+        # JWKS configuration (optional)
+        self.jwks_url: Optional[str] = config.get("jwks_url")
+        self.jwks_client = None
+        if self.jwks_url and PyJWKClient:
+            try:
+                self.jwks_client = PyJWKClient(self.jwks_url)
+            except Exception:
+                self.jwks_client = None
+
+        # Optional Redis-backed blacklist
+        self.redis_blacklist_enabled: bool = bool(config.get("enable_redis_blacklist", False))
+        self.redis_cache_manager = None
+        if self.redis_blacklist_enabled:
+            try:
+                from .redis_cache_integration import create_redis_cache_manager  # lazy import
+                self.redis_cache_manager = create_redis_cache_manager(
+                    redis_host=config.get("redis_host", "localhost"),
+                    redis_port=int(config.get("redis_port", 6379)),
+                    redis_db=int(config.get("redis_db", 0)),
+                    redis_password=config.get("redis_password")
+                )
+                logger.info("JWT Redis blacklist enabled")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Redis blacklist, proceeding without it: {e}")
+                self.redis_cache_manager = None
         
         logger.info("JWT Integration Service initialized with enhanced security features")
     
@@ -230,6 +261,20 @@ class JwtIntegrationService:
             token_id = payload.get("token_id")
             
             if token_id:
+                # Add to Redis blacklist if available (use token exp for TTL)
+                try:
+                    if self.redis_cache_manager is not None:
+                        exp_val = payload.get("exp")
+                        from datetime import datetime, timezone
+                        if isinstance(exp_val, (int, float)):
+                            expires_at = datetime.fromtimestamp(exp_val, tz=timezone.utc).replace(tzinfo=None)
+                        else:
+                            # best-effort: blacklist for 24h if exp not present or unparsable
+                            expires_at = datetime.utcnow() + timedelta(hours=24)
+                        self.redis_cache_manager.blacklist_jwt_token(token, expires_at)
+                except Exception:
+                    # Do not fail revocation on blacklist error
+                    pass
                 return await self.token_manager.revoke_token(token_id, reason)
             
             return False
@@ -295,7 +340,37 @@ class JwtIntegrationService:
                                  required_permissions: Optional[List[Permission]] = None) -> JwtValidationMetadata:
         """Validate JWT token with comprehensive checks."""
         try:
-            # Use token manager for validation
+            # Check Redis blacklist first
+            if self.redis_cache_manager is not None:
+                try:
+                    if self.redis_cache_manager.is_jwt_token_blacklisted(token):
+                        return JwtValidationMetadata(
+                            validation_result=JwtValidationResult.REVOKED,
+                            security_flags=["blacklisted_token"],
+                            client_ip=request.client_ip
+                        )
+                except Exception:
+                    # Non-fatal if Redis unavailable
+                    pass
+            # Prefer JWKS validation if configured
+            if self.jwks_client is not None:
+                try:
+                    signing_key = self.jwks_client.get_signing_key_from_jwt(token).key
+                    data = jwt.decode(token, signing_key, algorithms=[self.config.get("jwt_algorithm", "RS256")], audience=self.config.get("jwt_audience"))
+                    perms = [Permission(p) if isinstance(p, str) else p for p in data.get("permissions", [])]
+                    return JwtValidationMetadata(
+                        validation_result=JwtValidationResult.VALID,
+                        user_id=data.get("sub"),
+                        username=data.get("username"),
+                        roles=data.get("roles", []),
+                        permissions=perms,
+                        client_ip=request.client_ip
+                    )
+                except Exception as e:
+                    # Fallback to internal validator below
+                    logger.debug(f"JWKS validation fallback: {e}")
+
+            # Fallback: Use token manager for validation
             auth_result = await self.token_manager.validate_token_secure(
                 token=token,
                 required_permissions=required_permissions,
@@ -340,6 +415,48 @@ class JwtIntegrationService:
                 validation_result=JwtValidationResult.INVALID,
                 security_flags=[f"validation_error: {str(e)}"]
             )
+
+    async def introspect_token(self, token: str) -> Dict[str, Any]:
+        """Introspect a token and return OAuth2-compatible fields."""
+        try:
+            # Blacklist check
+            if self.redis_cache_manager is not None:
+                try:
+                    if self.redis_cache_manager.is_jwt_token_blacklisted(token):
+                        return {"active": False, "reason": "revoked_blacklisted"}
+                except Exception:
+                    pass
+
+            # Validate with token manager to get status and metadata
+            result = await self.token_manager.validate_token_secure(token)
+            active = bool(result.success)
+            response: Dict[str, Any] = {"active": active}
+            # Decode without verifying to extract standard claims for introspection response
+            try:
+                payload = jwt.decode(token, options={"verify_signature": False})
+            except Exception:
+                payload = {}
+
+            if active:
+                response.update({
+                    "sub": result.user_id or payload.get("sub") or payload.get("user_id"),
+                    "token_type": payload.get("token_type"),
+                    "scope": " ".join(payload.get("scopes", [])),
+                    "permissions": [p.value if hasattr(p, "value") else p for p in (result.permissions or [])],
+                    "exp": payload.get("exp"),
+                    "iat": payload.get("iat"),
+                    "jti": payload.get("jti") or payload.get("token_id"),
+                })
+                # include extended metadata if present
+                if result.metadata:
+                    response["metadata"] = result.metadata
+            else:
+                response["reason"] = result.error or "invalid_token"
+
+            return response
+        except Exception as e:
+            logger.error(f"Token introspection failed: {e}")
+            return {"active": False, "reason": "introspection_error"}
     
     async def _perform_security_checks(self, request: ApiRequest) -> Tuple[bool, JwtValidationMetadata, Optional[ApiResponse]]:
         """Perform comprehensive security checks."""

@@ -1,0 +1,45 @@
+name: External API Tests
+
+on:
+  push:
+    branches:
+      - main
+      - feature/phase2-epic-planning+gateway-lifecycle
+  pull_request:
+    branches:
+      - main
+      - feature/phase2-epic-planning+gateway-lifecycle
+
+jobs:
+  external-api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt || true
+        pip install pytest pytest-asyncio pytest-cov httpx fastapi uvicorn aiohttp passlib bcrypt cryptography pyjwt
+
+    - name: Run external_api tests with coverage
+      run: |
+        pytest -q tests/external_api --override-ini "addopts=" --cov=external_api --cov-report=xml --cov-report=term-missing
+
+    - name: Upload coverage to Codecov (optional)
+      if: ${{ secrets.CODECOV_TOKEN != '' }}
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-external-api
+        fail_ci_if_error: true
+        verbose: true
