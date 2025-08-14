@@ -169,6 +169,33 @@ Milestone slices
 4) API key rotation/revocation + per-key limits + tests
 5) tenant header propagation + quota checks + tests
 
+Detailed Sprint Plan (Epic 2 • Sprint 1)
+- Scope: Complete 1–3, start 4 (rotation, blacklist, introspection)
+
+Tasks
+- T2.1 Rotation/jti
+  - Add in-memory jti blacklist and enforce in `SecureTokenManager.validate_token_secure` [done]
+  - Revoke + blacklist old refresh on session refresh in `AuthenticationService.refresh_session` [done]
+  - Add unit/integration tests:
+    - Extend `tests/security/test_jwt_auth.py::TestTokenRefresh::test_successful_token_refresh` to assert old refresh is invalid
+    - Add test for `JwtIntegrationService.refresh_token` failure on invalid refresh
+- T2.2 Blacklist provider
+  - Define `BlacklistProvider` proto with `blacklist(token|id, ttl)`/`is_blacklisted(token|id)`
+  - Wire: default in-memory provider; optional Redis-backed (existing redis_cache_integration)
+  - Tests: simulate blacklisting access token id; validation must fail
+- T2.3 Introspection hardening
+  - In `JwtIntegrationService.introspect_token` add `iss`/`aud` checks when provided in config; return reason on mismatch
+  - Ensure signature verification path respects algorithm from config
+  - Tests: positive/negative cases for issuer/audience
+- T2.4 API keys (begin)
+  - Add rotate API: returns new key, disables old; persist hashed value only
+  - Per-key rate limit (in-memory counters) and usage metrics (count, last_used)
+  - Tests in `tests/security` for rotate, revoke, per-key limit
+
+Deliverables & Exit
+- Tests added and green locally for T2.1–T2.3; coverage maintained for touched code
+- Feature flags documented in config
+
 ## Epic 3 – Mesh & Observability (Envoy exporter + tracing)
 
 Objectives

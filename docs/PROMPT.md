@@ -28,22 +28,20 @@ Active constraints
 - XP full-repo workflow should collect successfully (no ImportError) while we iterate
 - Coverage gate in pytest.ini currently targets external_api; do not break it
 
-Your immediate objectives (pick up from here)
-1) Finalize XP Workflow Stabilization (Docs task H in docs/PLAN.md)
-   - Implement import fallback to .claude/state/git_milestone_manager.py if state/git_milestone_manager is missing
-   - Re-validate pytest --collect-only and run a light subset to ensure no regressions
-2) Performance lifecycle helpers (confirm done)
-   - performance/metrics_collector.py must export: start_metrics_collection, stop_metrics_collection, print_live_dashboard; verify presence and import usage in tests
-3) Envoy/xDS Exporter enhancements (Docs task J)
-   - Add method-aware route duplication when match.methods is an array (create one route per method)
-   - Add weighted clusters when multiple backends provided
-   - Add unit tests under tests/external_api/test_envoy_exporter.py (or extend existing)
-4) SDK generation from OpenAPI
-   - Extend ClientLibraryFactory.generate_*_from_openapi to parse operations minimally and expose one representative method per path/verb to increase utility; add focused tests
-5) Security & Identity (Docs task I)
-   - JWT refresh rotation hardening with jti tracking; keep in-memory provider as default; make Redis provider pluggable but optional
-   - Add introspection hardening and audience verification toggles
-   - Keep tests passing; write or extend targeted tests in tests/security
+Your immediate objectives (Epic 2 • Sprint 1)
+1) Rotation & jti blacklist (T2.1)
+   - Ensure in-memory jti blacklist enforced in SecureTokenManager.validate_token_secure [done]
+   - Revoke + blacklist old refresh on session refresh [done]
+   - Add tests: old refresh invalid after rotation; JwtIntegrationService.refresh_token fails for invalid refresh
+2) Blacklist provider (T2.2)
+   - Introduce interface and wire default in-memory + optional Redis provider
+   - Add tests to assert blacklisted access token id is rejected
+3) Introspection hardening (T2.3)
+   - Add issuer/audience checks in JwtIntegrationService.introspect_token when configured; return reason on mismatch
+   - Tests for positive/negative iss/aud cases
+4) API key lifecycle (start T2.4)
+   - Add rotate API (disable old, return new); store hashed value; per-key rate limits and usage metrics
+   - Add tests for rotate/revoke/per-key-limits
 
 Non-goals for this pass
 - Terraform infrastructure (out of scope)
@@ -55,11 +53,11 @@ Quality and methodology guardrails
 - Keep import hygiene intact (no reintroducing sys.path churn); prefer adapters/shims
 
 Execution plan (pragmatic sequence)
-A) XP import adapter: implement .claude/state/git_milestone_manager.py fallback import in .claude/orchestrator.py if necessary; verify collection
-B) Envoy exporter: implement method split + weighted clusters; add unit tests; keep the function export_envoy_virtual_host backwards compatible
-C) Client SDKs: minimal endpoint method generation (e.g., GET returns fetch wrapper, POST returns post wrapper) with simple naming convention; tests
-D) Security: implement jti rotation tracking in token manager; add introspection checks; update tests
-E) Run external_api tests and targeted security tests locally; ensure pytest -q tests/external_api passes; ensure pytest --collect-only remains clean
+A) Add tests for T2.1 rotation invalidation and invalid refresh
+B) Implement blacklist provider abstraction; wire Redis option; write tests
+C) Harden introspection (iss/aud); write tests
+D) Begin API key rotate/revoke/per-key limits; write tests
+E) Run focused security tests and keep repo collection clean
 
 How to validate
 - pytest --collect-only must remain clean
