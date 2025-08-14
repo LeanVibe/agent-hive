@@ -110,6 +110,8 @@ class SecureTokenManager:
         self.token_metadata: Dict[str, TokenMetadata] = {}
         self.token_families: Dict[str, List[str]] = {}  # Track token chains
         self.security_events: List[Dict[str, Any]] = []
+        # In-memory blacklist for token ids/jtis (fallback when Redis not used)
+        self.blacklisted_token_ids: Set[str] = set()
         
         # Security thresholds
         self.max_tokens_per_user = config.get("max_tokens_per_user", 10)
@@ -242,6 +244,9 @@ class SecureTokenManager:
             token_id = payload.get("token_id")
             if not token_id:
                 return AuthResult(success=False, error="Invalid token format")
+            # In-memory blacklist check
+            if token_id in self.blacklisted_token_ids:
+                return AuthResult(success=False, error="Token is blacklisted")
             
             # Check token metadata
             if token_id not in self.token_metadata:
@@ -355,6 +360,13 @@ class SecureTokenManager:
                 self.token_families[family_id].append(new_token_id)
             
             logger.info(f"Token rotated: {old_token_id} -> {new_token_id}")
+            # Log rotation event
+            await self._log_security_event({
+                "event_type": "token_rotated",
+                "old_token_id": old_token_id,
+                "new_token_id": new_token_id,
+                "timestamp": datetime.utcnow().isoformat()
+            })
             return new_token, new_token_id
             
         except Exception as e:
@@ -587,10 +599,14 @@ class SecureTokenManager:
     async def revoke_token(self, token_id: str, reason: str = "revoked") -> bool:
         """Revoke a token and log the action."""
         if token_id not in self.token_metadata:
+            # Even if metadata missing, blacklist id to be safe
+            self.blacklisted_token_ids.add(token_id)
             return False
         
         metadata = self.token_metadata[token_id]
         metadata.status = TokenStatus.REVOKED
+        # Add to in-memory blacklist
+        self.blacklisted_token_ids.add(token_id)
         
         # Log revocation event
         await self._log_security_event({
@@ -603,6 +619,18 @@ class SecureTokenManager:
         
         logger.info(f"Token revoked: {token_id} (reason: {reason})")
         return True
+
+    # --------------------
+    # Blacklist utilities
+    # --------------------
+    def blacklist_token_id(self, token_id: str) -> None:
+        """Add a token id/jti to in-memory blacklist (fallback)."""
+        if token_id:
+            self.blacklisted_token_ids.add(token_id)
+
+    def is_token_id_blacklisted(self, token_id: str) -> bool:
+        """Check whether a token id/jti is blacklisted in-memory."""
+        return token_id in self.blacklisted_token_ids
     
     async def revoke_user_tokens(self, user_id: str, token_type: Optional[TokenType] = None) -> int:
         """Revoke all tokens for a user, optionally filtered by type."""

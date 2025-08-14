@@ -369,10 +369,7 @@ class AuthenticationService:
                 expires_in_hours=self.config.get("token_expiry_minutes", 15) / 60
             )
             # Rotate refresh token for security (invalidate old, issue new)
-            try:
-                old_refresh_token_id = self._extract_token_id_from_token(session.refresh_token or "")
-            except Exception:
-                old_refresh_token_id = ""
+            old_refresh_token_id = self._extract_token_id_from_token(session.refresh_token or "")
             new_refresh_token, new_refresh_token_id = await self.token_manager.create_secure_token(
                 user_id=user.user_id,
                 token_type=TokenType.REFRESH,
@@ -381,7 +378,9 @@ class AuthenticationService:
             )
             if old_refresh_token_id:
                 try:
+                    # Revoke old refresh token and blacklist by id
                     await self.token_manager.revoke_token(old_refresh_token_id, reason="refresh_rotated")
+                    self.token_manager.blacklist_token_id(old_refresh_token_id)
                 except Exception:
                     pass
             
