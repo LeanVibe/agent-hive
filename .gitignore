@@ -77,3 +77,6 @@ terraform/.terraform/
 infrastructure/nginx/ssl/*.pem
 .claude/logs/
 !/.claude/logs/.gitkeep
+
+# Agent metrics output
+quality_metrics/
